@@ -9,6 +9,8 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final FocusNode _buttonFocusNode = FocusNode(debugLabel: 'Menu Button');
+  final FocusNode _AffiliationFocusNode = FocusNode(debugLabel: 'Menu Button');
+  String? test_value = "";
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +76,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Icon(Icons.brush_outlined), // Add your desired icon
                         const SizedBox(width: 8), // Add spacing
                         const Text('Appearance'),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              MenuAnchor(
+                childFocusNode: _AffiliationFocusNode,
+                menuChildren: <Widget>[
+                  RadioMenuButton<String>(
+                    value: "UdeS",
+                    groupValue: test_value,
+                    onChanged: (val) {
+                      setState(() {
+                        test_value = val;
+                        print(test_value);
+                      });
+                    },
+                    child: const Text('Université de Sherbrooke'),
+                  ),
+                  RadioMenuButton<String>(
+                    value: "mcgill",
+                    groupValue: test_value,
+                    onChanged: (val) {
+                      setState(() {
+                        test_value = val;
+                        print(test_value);
+                      });
+                    },
+                    child: const Text('McGill'),
+                  ),
+                  RadioMenuButton<String>(
+                    value: "bishops",
+                    groupValue: test_value,
+                    onChanged: (val) {
+                      setState(() {
+                        test_value = val;
+                        print(test_value);
+                      });
+                    },
+                    child: const Text('Bishops'),
+                  ),
+                ],
+                builder: (BuildContext context, MenuController controller,
+                    Widget? child) {
+                  return TextButton(
+                    focusNode: _AffiliationFocusNode,
+                    onPressed: () {
+                      if (controller.isOpen) {
+                        controller.close();
+                      } else {
+                        controller.open();
+                      }
+                    },
+                    child: Row(
+                      children: [
+                        Icon(Icons.school_outlined), // Add your desired icon
+                        const SizedBox(width: 8), // Add spacing
+                        const Text('University'),
                       ],
                     ),
                   );
