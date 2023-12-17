@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../theme_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
 }
@@ -71,11 +73,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         controller.open();
                       }
                     },
-                    child: Row(
+                    child: const Row(
                       children: [
                         Icon(Icons.brush_outlined), // Add your desired icon
-                        const SizedBox(width: 8), // Add spacing
-                        const Text('Appearance'),
+                        SizedBox(width: 8), // Add spacing
+                        Text('Appearance'),
                       ],
                     ),
                   );
@@ -129,11 +131,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         controller.open();
                       }
                     },
-                    child: Row(
+                    child: const Row(
                       children: [
                         Icon(Icons.school_outlined), // Add your desired icon
-                        const SizedBox(width: 8), // Add spacing
-                        const Text('University'),
+                        SizedBox(width: 8), // Add spacing
+                        Text('University'),
                       ],
                     ),
                   );

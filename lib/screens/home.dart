@@ -31,7 +31,7 @@ _openSettingsScreen(BuildContext context) {
     context,
     MaterialPageRoute<void>(
       builder: (BuildContext context) {
-        return SettingsScreen();
+        return const SettingsScreen();
       },
     ),
   );

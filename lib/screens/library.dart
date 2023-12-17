@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class LibraryScreen extends StatelessWidget {
-  const LibraryScreen({Key? key});
+  const LibraryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +10,7 @@ class LibraryScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           centerTitle: false,
-          title: Text('Journals'),
+          title: const Text('Journals'),
           bottom: const TabBar(
             tabs: [
               Tab(text: "Following"),
@@ -18,7 +18,7 @@ class LibraryScreen extends StatelessWidget {
             ],
           ),
         ),
-        body: TabBarView(
+        body: const TabBarView(
           children: [
             Text("Subscribe to journals to populate this view"),
             Column(
@@ -35,17 +35,19 @@ class LibraryScreen extends StatelessWidget {
 }
 
 class SearchTab extends StatelessWidget {
+  const SearchTab({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
         TextFormField(
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Filter journals',
-            prefixIcon: Icon(Icons.filter_alt),
+            prefixIcon: Icon(Icons.filter_alt_outlined),
           ),
         ),
-        Text("Journals will be listed here!"),
+        const Text("Journals will be listed here!"),
       ],
     );
   }

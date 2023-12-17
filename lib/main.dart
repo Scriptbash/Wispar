@@ -11,13 +11,15 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeProvider(),
-      child: SciFeed(),
+      child: const SciFeed(),
     ),
   );
 }
 
 class SciFeed extends StatefulWidget {
-  static final title = 'SciFeed';
+  static const title = 'SciFeed';
+
+  const SciFeed({super.key});
 
   @override
   _SciFeedState createState() => _SciFeedState();
@@ -31,10 +33,10 @@ class _SciFeedState extends State<SciFeed> {
 
   var _currentIndex = 0;
   final List<Widget> _pages = [
-    HomeScreen(),
-    FavoritesScreen(),
-    LibraryScreen(),
-    DownloadsScreen(),
+    const HomeScreen(),
+    const LibraryScreen(),
+    const FavoritesScreen(),
+    const DownloadsScreen(),
   ];
 
   @override
@@ -66,23 +68,23 @@ class _SciFeedState extends State<SciFeed> {
           onTap: (i) => setState(() => _currentIndex = i),
           items: [
             SalomonBottomBarItem(
-              icon: Icon(Icons.home),
-              title: Text("Home"),
+              icon: const Icon(Icons.home_outlined),
+              title: const Text("Home"),
               selectedColor: Colors.orange,
             ),
             SalomonBottomBarItem(
-              icon: Icon(Icons.favorite_border),
-              title: Text("Favorites"),
+              icon: const Icon(Icons.library_books_outlined),
+              title: const Text("Journals"),
               selectedColor: Colors.orange,
             ),
             SalomonBottomBarItem(
-              icon: Icon(Icons.library_books_outlined),
-              title: Text("Journals"),
+              icon: const Icon(Icons.favorite_border),
+              title: const Text("Favorites"),
               selectedColor: Colors.orange,
             ),
             SalomonBottomBarItem(
-              icon: Icon(Icons.download_outlined),
-              title: Text("Downloads"),
+              icon: const Icon(Icons.download_outlined),
+              title: const Text("Downloads"),
               selectedColor: Colors.orange,
             ),
           ],

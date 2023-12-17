@@ -8,7 +8,7 @@ class FavoritesScreen extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           centerTitle: false,
-          title: Text('Favorites'),
+          title: const Text('Favorites'),
         ),
         body: const Center(
           child: Text('This will show liked articles!'),

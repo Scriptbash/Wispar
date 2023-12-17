@@ -8,7 +8,7 @@ class DownloadsScreen extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           centerTitle: false,
-          title: Text('Downloads'),
+          title: const Text('Downloads'),
         ),
         body: const Center(
           child: Text('This will show downloaded articles!'),
