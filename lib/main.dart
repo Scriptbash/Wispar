@@ -11,24 +11,24 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeProvider(),
-      child: const SciFeed(),
+      child: const Wispar(),
     ),
   );
 }
 
-class SciFeed extends StatefulWidget {
-  static const title = 'SciFeed';
+class Wispar extends StatefulWidget {
+  static const title = 'Wispar';
 
-  const SciFeed({super.key});
+  const Wispar({super.key});
 
   @override
-  _SciFeedState createState() => _SciFeedState();
+  _WisparState createState() => _WisparState();
 
-  static _SciFeedState of(BuildContext context) =>
-      context.findAncestorStateOfType<_SciFeedState>()!;
+  static _WisparState of(BuildContext context) =>
+      context.findAncestorStateOfType<_WisparState>()!;
 }
 
-class _SciFeedState extends State<SciFeed> {
+class _WisparState extends State<Wispar> {
   //ThemeMode _themeMode = ThemeMode.system;
 
   var _currentIndex = 0;
@@ -42,7 +42,7 @@ class _SciFeedState extends State<SciFeed> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: SciFeed.title,
+      title: Wispar.title,
       theme: ThemeData(
         //primarySwatch: Colors.orange,
         colorSchemeSeed: Colors.orange,

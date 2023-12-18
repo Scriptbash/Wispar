@@ -1,5 +1,5 @@
-name: scifeed
-description: "Stay up to date with articles in your field of study!"
+name: wispar
+description: "Stay up-to-date with articles in your field of study!"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

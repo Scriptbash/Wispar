@@ -43,7 +43,7 @@ class SearchTab extends StatelessWidget {
       children: <Widget>[
         TextFormField(
           decoration: const InputDecoration(
-            labelText: 'Filter journals',
+            labelText: 'Search journals',
             prefixIcon: Icon(Icons.filter_alt_outlined),
           ),
         ),
