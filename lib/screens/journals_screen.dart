@@ -14,7 +14,7 @@ class LibraryScreen extends StatelessWidget {
           bottom: const TabBar(
             tabs: [
               Tab(text: "Following"),
-              Tab(text: "Not following "),
+              Tab(text: "Find more journals"),
             ],
           ),
         ),
@@ -44,7 +44,7 @@ class SearchTab extends StatelessWidget {
         TextFormField(
           decoration: const InputDecoration(
             labelText: 'Search journals',
-            prefixIcon: Icon(Icons.filter_alt_outlined),
+            prefixIcon: Icon(Icons.search_outlined),
           ),
         ),
         const Text("Journals will be listed here!"),

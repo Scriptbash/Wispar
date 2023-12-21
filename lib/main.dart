@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'theme_provider.dart';
-import 'screens/home.dart';
-import 'screens/favorites.dart';
-import 'screens/library.dart';
-import 'screens/downloads.dart';
+import 'screens/home_screen.dart';
+import 'screens/favorites_screen.dart';
+import 'screens/journals_screen.dart';
+import 'screens/downloads_screen.dart';
 
 void main() {
   runApp(
@@ -45,13 +45,13 @@ class _WisparState extends State<Wispar> {
       title: Wispar.title,
       theme: ThemeData(
         //primarySwatch: Colors.orange,
-        colorSchemeSeed: Colors.orange,
+        colorSchemeSeed: Colors.deepPurple,
         brightness: Brightness.light,
         useMaterial3: true,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       darkTheme: ThemeData(
-        colorSchemeSeed: Colors.orange,
+        colorSchemeSeed: Colors.deepPurple,
         primaryColorDark: Colors.black,
         brightness: Brightness.dark,
         useMaterial3: true,
@@ -70,22 +70,22 @@ class _WisparState extends State<Wispar> {
             SalomonBottomBarItem(
               icon: const Icon(Icons.home_outlined),
               title: const Text("Home"),
-              selectedColor: Colors.orange,
+              selectedColor: Colors.deepPurpleAccent,
             ),
             SalomonBottomBarItem(
               icon: const Icon(Icons.library_books_outlined),
               title: const Text("Journals"),
-              selectedColor: Colors.orange,
+              selectedColor: Colors.deepPurpleAccent,
             ),
             SalomonBottomBarItem(
               icon: const Icon(Icons.favorite_border),
               title: const Text("Favorites"),
-              selectedColor: Colors.orange,
+              selectedColor: Colors.deepPurpleAccent,
             ),
             SalomonBottomBarItem(
               icon: const Icon(Icons.download_outlined),
               title: const Text("Downloads"),
-              selectedColor: Colors.orange,
+              selectedColor: Colors.deepPurpleAccent,
             ),
           ],
         ),
