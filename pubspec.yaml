@@ -38,6 +38,8 @@ dependencies:
   salomon_bottom_bar: ^3.3.2
   shared_preferences: ^2.0.9
   provider: ^6.1.1
+  http: ^1.1.2
+  json_annotation: ^4.8.1
 
 dev_dependencies:
   flutter_test:

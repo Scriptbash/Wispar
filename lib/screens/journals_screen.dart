@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../services/crossref_api.dart';
+import '../models/crossref_works_models.dart';
 
 class LibraryScreen extends StatelessWidget {
   const LibraryScreen({super.key});
@@ -46,9 +48,27 @@ class SearchTab extends StatelessWidget {
             labelText: 'Search journals',
             prefixIcon: Icon(Icons.search_outlined),
           ),
+          onFieldSubmitted: (String query) {
+            // Call the fetchData method when the user submits the search
+            fetchData();
+          },
         ),
         const Text("Journals will be listed here!"),
       ],
     );
+  }
+}
+
+Future<void> fetchData() async {
+  try {
+    final String targetDOI = '10.31838/srp.2020.5.28';
+    final CrossrefWorks specificWork =
+        await CrossRefApi.getWorkByDOI(targetDOI);
+
+    // Do something with the retrieved data
+    print('Specific Work: $specificWork');
+  } catch (e) {
+    // Handle errors
+    print('Error coming here: $e');
   }
 }
