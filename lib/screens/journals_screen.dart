@@ -43,10 +43,15 @@ class SearchTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      //mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         TextFormField(
-          decoration: const InputDecoration(
-            labelText: 'Search journals',
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(40.0),
+            ),
+            //labelText: 'Search journals',
+            hintText: 'Search journals',
             prefixIcon: Icon(Icons.search_outlined),
           ),
           onFieldSubmitted: (String query) {
@@ -54,7 +59,6 @@ class SearchTab extends StatelessWidget {
             fetchData();
           },
         ),
-        const Text("Journals will be listed here!"),
       ],
     );
   }

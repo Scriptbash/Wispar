@@ -1,4 +1,4 @@
-package com.example.scifeed
+package com.example.wispar
 
 import io.flutter.embedding.android.FlutterActivity
 
