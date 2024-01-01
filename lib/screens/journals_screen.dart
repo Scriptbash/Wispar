@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/crossref_api.dart';
 import '../models/crossref_works_models.dart';
+import 'package:wispar/models/crossref_journals_models.dart' as Journals;
 
 class LibraryScreen extends StatelessWidget {
   const LibraryScreen({super.key});
@@ -16,7 +17,7 @@ class LibraryScreen extends StatelessWidget {
           bottom: const TabBar(
             tabs: [
               Tab(text: "Following"),
-              Tab(text: "Find more journals"),
+              Tab(text: "Search"),
             ],
           ),
         ),
@@ -61,14 +62,11 @@ class SearchTab extends StatelessWidget {
 
 Future<void> fetchData() async {
   try {
-    final String targetDOI = '10.31838/srp.2020.5.28';
-    final CrossrefWorks specificWork =
-        await CrossRefApi.getWorkByDOI(targetDOI);
-
-    // Do something with the retrieved data
-    print('Specific Work: $specificWork');
-  } catch (e) {
-    // Handle errors
-    print('Error coming here: $e');
+    List<Journals.Item> items = await CrossRefApi.queryJournals("hydrology");
+    // Extract titles from the returned items
+    List<String> journalTitles = items.map((item) => item.title).toList();
+    print(journalTitles);
+  } catch (e, stackTrace) {
+    //print('Error coming here: $e, $stackTrace');
   }
 }

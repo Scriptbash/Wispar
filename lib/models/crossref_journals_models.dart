@@ -72,13 +72,13 @@ class Item {
   Counts counts;
   Breakdowns breakdowns;
   String publisher;
-  Map<String, int> coverage;
+  Map<String, double> coverage;
   String title;
-  List<String> subjects;
+  List<Subject> subjects;
   CoverageType coverageType;
   Map<String, bool> flags;
   List<String> issn;
-  IssnType issnType;
+  List<IssnType> issnType;
 
   Item({
     required this.lastStatusCheckTime,
@@ -100,14 +100,16 @@ class Item {
         breakdowns: Breakdowns.fromJson(json["breakdowns"]),
         publisher: json["publisher"],
         coverage: Map.from(json["coverage"])
-            .map((k, v) => MapEntry<String, int>(k, v)),
+            .map((k, v) => MapEntry<String, double>(k, v?.toDouble())),
         title: json["title"],
-        subjects: List<String>.from(json["subjects"].map((x) => x)),
+        subjects: List<Subject>.from(
+            json["subjects"].map((x) => Subject.fromJson(x))),
         coverageType: CoverageType.fromJson(json["coverage-type"]),
         flags:
             Map.from(json["flags"]).map((k, v) => MapEntry<String, bool>(k, v)),
         issn: List<String>.from(json["ISSN"].map((x) => x)),
-        issnType: IssnType.fromJson(json["issn-type"]),
+        issnType: List<IssnType>.from(
+            json["issn-type"].map((x) => IssnType.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -118,11 +120,11 @@ class Item {
         "coverage":
             Map.from(coverage).map((k, v) => MapEntry<String, dynamic>(k, v)),
         "title": title,
-        "subjects": List<dynamic>.from(subjects.map((x) => x)),
+        "subjects": List<dynamic>.from(subjects.map((x) => x.toJson())),
         "coverage-type": coverageType.toJson(),
         "flags": Map.from(flags).map((k, v) => MapEntry<String, dynamic>(k, v)),
         "ISSN": List<dynamic>.from(issn.map((x) => x)),
-        "issn-type": issnType.toJson(),
+        "issn-type": List<dynamic>.from(issnType.map((x) => x.toJson())),
       };
 }
 
@@ -145,54 +147,55 @@ class Breakdowns {
 }
 
 class Counts {
-  int totalDois;
   int currentDois;
   int backfileDois;
+  int totalDois;
 
   Counts({
-    required this.totalDois,
     required this.currentDois,
     required this.backfileDois,
+    required this.totalDois,
   });
 
   factory Counts.fromJson(Map<String, dynamic> json) => Counts(
-        totalDois: json["total-dois"],
         currentDois: json["current-dois"],
         backfileDois: json["backfile-dois"],
+        totalDois: json["total-dois"],
       );
 
   Map<String, dynamic> toJson() => {
-        "total-dois": totalDois,
         "current-dois": currentDois,
         "backfile-dois": backfileDois,
+        "total-dois": totalDois,
       };
 }
 
 class CoverageType {
-  Map<String, int> all;
-  Map<String, int> current;
-  Map<String, int> backfile;
+  Map<String, double> all;
+  Map<String, double> backfile;
+  Map<String, double> current;
 
   CoverageType({
     required this.all,
-    required this.current,
     required this.backfile,
+    required this.current,
   });
 
   factory CoverageType.fromJson(Map<String, dynamic> json) => CoverageType(
-        all: Map.from(json["all"]).map((k, v) => MapEntry<String, int>(k, v)),
-        current: Map.from(json["current"])
-            .map((k, v) => MapEntry<String, int>(k, v)),
+        all: Map.from(json["all"])
+            .map((k, v) => MapEntry<String, double>(k, v?.toDouble())),
         backfile: Map.from(json["backfile"])
-            .map((k, v) => MapEntry<String, int>(k, v)),
+            .map((k, v) => MapEntry<String, double>(k, v?.toDouble())),
+        current: Map.from(json["current"])
+            .map((k, v) => MapEntry<String, double>(k, v?.toDouble())),
       );
 
   Map<String, dynamic> toJson() => {
         "all": Map.from(all).map((k, v) => MapEntry<String, dynamic>(k, v)),
-        "current":
-            Map.from(current).map((k, v) => MapEntry<String, dynamic>(k, v)),
         "backfile":
             Map.from(backfile).map((k, v) => MapEntry<String, dynamic>(k, v)),
+        "current":
+            Map.from(current).map((k, v) => MapEntry<String, dynamic>(k, v)),
       };
 }
 
@@ -213,6 +216,26 @@ class IssnType {
   Map<String, dynamic> toJson() => {
         "value": value,
         "type": type,
+      };
+}
+
+class Subject {
+  int asjc;
+  String name;
+
+  Subject({
+    required this.asjc,
+    required this.name,
+  });
+
+  factory Subject.fromJson(Map<String, dynamic> json) => Subject(
+        asjc: json["ASJC"],
+        name: json["name"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "ASJC": asjc,
+        "name": name,
       };
 }
 
