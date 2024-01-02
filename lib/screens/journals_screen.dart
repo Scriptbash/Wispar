@@ -1,76 +1,91 @@
 import 'package:flutter/material.dart';
 import '../services/crossref_api.dart';
 import '../models/crossref_works_models.dart';
+import './journals_search_results_screen.dart';
 import 'package:wispar/models/crossref_journals_models.dart' as Journals;
 
-class LibraryScreen extends StatelessWidget {
+class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: false,
-          title: const Text('Journals'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: "Following"),
-              Tab(text: "Search"),
-            ],
-          ),
-        ),
-        body: const TabBarView(
-          children: [
-            Text("Subscribe to journals to populate this view"),
-            Column(
-              children: <Widget>[
-                SearchTab(),
-                // Text("Search over here!")
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  _LibraryScreenState createState() => _LibraryScreenState();
 }
 
-class SearchTab extends StatelessWidget {
-  const SearchTab({super.key});
+class _LibraryScreenState extends State<LibraryScreen> {
+  bool isSearching = false;
+  TextEditingController searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        TextFormField(
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(40.0),
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: false,
+        title: isSearching ? null : Text('Journals'),
+        actions: [
+          if (isSearching)
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 20.0),
+                child: TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search...',
+                  ),
+                  autofocus: true,
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: (query) {
+                    // Handle search query
+                    handleSearch(query);
+                  },
+                ),
+              ),
             ),
-            //labelText: 'Search journals',
-            hintText: 'Search journals',
-            prefixIcon: Icon(Icons.search_outlined),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                isSearching = !isSearching;
+                if (!isSearching) {
+                  searchController.clear();
+                }
+              });
+            },
+            child: Icon(isSearching ? Icons.close : Icons.search),
           ),
-          onFieldSubmitted: (String query) {
-            // Call the fetchData method when the user submits the search
-            fetchData();
-          },
-        ),
-      ],
+        ],
+      ),
+      body: Center(child: Text('Main Content')),
     );
   }
-}
 
-Future<void> fetchData() async {
-  try {
-    List<Journals.Item> items = await CrossRefApi.queryJournals("hydrology");
-    // Extract titles from the returned items
-    List<String> journalTitles = items.map((item) => item.title).toList();
-    print(journalTitles);
-  } catch (e, stackTrace) {
-    //print('Error coming here: $e, $stackTrace');
+  void handleSearch(String query) async {
+    try {
+      List<Journals.Item> searchResults =
+          await CrossRefApi.queryJournals(query);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              SearchResultsScreen(searchResults: searchResults),
+        ),
+      );
+
+      setState(() {
+        isSearching = false;
+      });
+    } catch (e, stackTrace) {
+      print('Error: $e, $stackTrace');
+    }
+  }
+
+  Future<void> fetchData(String query) async {
+    try {
+      List<Journals.Item> items = await CrossRefApi.queryJournals(query);
+      // Extract titles from the returned items
+      List<String> journalTitles = items.map((item) => item.title).toList();
+      print(journalTitles);
+    } catch (e, stackTrace) {
+      print('Error fetching data: $e, $stackTrace');
+    }
   }
 }

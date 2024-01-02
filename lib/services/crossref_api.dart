@@ -8,6 +8,19 @@ class CrossRefApi {
   static const String worksEndpoint = '/works';
   static const String journalsEndpoint = '/journals';
 
+  static Future<List<Journals.Item>> queryJournals(String query) async {
+    final response = await http
+        .get(Uri.parse('$baseUrl$journalsEndpoint?query=$query&rows=50'));
+
+    if (response.statusCode == 200) {
+      final crossrefJournals = Journals.crossrefJournalsFromJson(response.body);
+      List<Journals.Item> items = crossrefJournals.message.items;
+      return items;
+    } else {
+      throw Exception('Failed to query journals');
+    }
+  }
+
   static Future<CrossrefWorks> getWorkByDOI(String doi) async {
     final response = await http.get(Uri.parse('$baseUrl$worksEndpoint/$doi'));
 
@@ -34,19 +47,6 @@ class CrossRefApi {
       final List<dynamic> items = data['message']['items'];
 
       return items.map((item) => CrossrefWorks.fromJson(item)).toList();
-    } else {
-      throw Exception('Failed to query works');
-    }
-  }
-
-  static Future<List<Journals.Item>> queryJournals(String query) async {
-    final response =
-        await http.get(Uri.parse('$baseUrl$journalsEndpoint?query=$query'));
-
-    if (response.statusCode == 200) {
-      final crossrefJournals = Journals.crossrefJournalsFromJson(response.body);
-      List<Journals.Item> items = crossrefJournals.message.items;
-      return items;
     } else {
       throw Exception('Failed to query works');
     }
