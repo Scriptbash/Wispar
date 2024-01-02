@@ -20,9 +20,9 @@ jobs:
     - run: flutter pub get
     - run: flutter build apk --debug
     - uses: actions/upload-artifact@v1
-        with:
-          name: release-apk
-          path: build/app/outputs/apk/release/app-release.apk
+      with:
+        name: release-apk
+        path: build/app/outputs/apk/release/app-release.apk
   build-ios:
     name: Build for iOS
     runs-on: macos-latest
