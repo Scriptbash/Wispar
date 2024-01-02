@@ -7,14 +7,21 @@ class CrossRefApi {
   static const String baseUrl = 'https://api.crossref.org';
   static const String worksEndpoint = '/works';
   static const String journalsEndpoint = '/journals';
+  static String? _cursor = '*';
 
   static Future<List<Journals.Item>> queryJournals(String query) async {
-    final response = await http
-        .get(Uri.parse('$baseUrl$journalsEndpoint?query=$query&rows=50'));
+    final response = await http.get(Uri.parse(
+        '$baseUrl$journalsEndpoint?query=$query&rows=50&cursor=$_cursor'));
 
     if (response.statusCode == 200) {
-      final crossrefJournals = Journals.crossrefJournalsFromJson(response.body);
+      final crossrefJournals = Journals.crossrefjournalsFromJson(response.body);
       List<Journals.Item> items = crossrefJournals.message.items;
+      // Check if there are more items
+      if (items.length < crossrefJournals.message.totalResults) {
+        _cursor = Uri.encodeComponent(crossrefJournals.message.nextCursor);
+      } else {
+        _cursor = '*'; // Reset cursor when reaching the end
+      }
       return items;
     } else {
       throw Exception('Failed to query journals');

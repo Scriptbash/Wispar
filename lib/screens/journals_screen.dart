@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/crossref_api.dart';
+import '../services/database_helper.dart';
 import '../models/crossref_works_models.dart';
 import './journals_search_results_screen.dart';
 import 'package:wispar/models/crossref_journals_models.dart' as Journals;
@@ -14,6 +15,13 @@ class LibraryScreen extends StatefulWidget {
 class _LibraryScreenState extends State<LibraryScreen> {
   bool isSearching = false;
   TextEditingController searchController = TextEditingController();
+  late DatabaseHelper dbHelper;
+
+  @override
+  void initState() {
+    super.initState();
+    dbHelper = DatabaseHelper();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +61,39 @@ class _LibraryScreenState extends State<LibraryScreen> {
           ),
         ],
       ),
-      body: Center(child: Text('Main Content')),
+      body: _buildLibraryContent(),
+    );
+  }
+
+  Widget _buildLibraryContent() {
+    return FutureBuilder<List<Journal>>(
+      future: dbHelper.getJournals(), // Fetch journals from the database
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              children: [
+                Text('You are not following any journals. Use the '),
+                Icon(Icons.search),
+                Text(' icon to find and follow journals.'),
+              ],
+            ),
+          );
+        } else {
+          List<Journal> journals = snapshot.data!;
+          return ListView.builder(
+            itemCount: journals.length,
+            itemBuilder: (context, index) {
+              return JournalCard(journal: journals[index]);
+            },
+          );
+        }
+      },
     );
   }
 
@@ -65,8 +105,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              SearchResultsScreen(searchResults: searchResults),
+          builder: (context) => SearchResultsScreen(
+              searchResults: searchResults, searchQuery: query),
         ),
       );
 
@@ -87,5 +127,29 @@ class _LibraryScreenState extends State<LibraryScreen> {
     } catch (e, stackTrace) {
       print('Error fetching data: $e, $stackTrace');
     }
+  }
+}
+
+class JournalCard extends StatelessWidget {
+  final Journal journal;
+
+  const JournalCard({required this.journal});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.all(8.0),
+      child: ListTile(
+        title: Text(journal.title),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Publisher: ${journal.publisher}'),
+            Text('ISSN: ${journal.issn}'),
+            //Text('Subjects: ${journal.subjects}')
+          ],
+        ),
+      ),
+    );
   }
 }

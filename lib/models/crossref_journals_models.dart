@@ -1,30 +1,30 @@
 // To parse this JSON data, do
 //
-//     final crossrefJournals = crossrefJournalsFromJson(jsonString);
+//     final crossrefjournals = crossrefjournalsFromJson(jsonString);
 
 import 'dart:convert';
 
-CrossrefJournals crossrefJournalsFromJson(String str) =>
-    CrossrefJournals.fromJson(json.decode(str));
+Crossrefjournals crossrefjournalsFromJson(String str) =>
+    Crossrefjournals.fromJson(json.decode(str));
 
-String crossrefJournalsToJson(CrossrefJournals data) =>
+String crossrefjournalsToJson(Crossrefjournals data) =>
     json.encode(data.toJson());
 
-class CrossrefJournals {
+class Crossrefjournals {
   String status;
   String messageType;
   String messageVersion;
   Message message;
 
-  CrossrefJournals({
+  Crossrefjournals({
     required this.status,
     required this.messageType,
     required this.messageVersion,
     required this.message,
   });
 
-  factory CrossrefJournals.fromJson(Map<String, dynamic> json) =>
-      CrossrefJournals(
+  factory Crossrefjournals.fromJson(Map<String, dynamic> json) =>
+      Crossrefjournals(
         status: json["status"],
         messageType: json["message-type"],
         messageVersion: json["message-version"],
@@ -42,12 +42,14 @@ class CrossrefJournals {
 class Message {
   int itemsPerPage;
   Query query;
+  String nextCursor;
   int totalResults;
   List<Item> items;
 
   Message({
     required this.itemsPerPage,
     required this.query,
+    required this.nextCursor,
     required this.totalResults,
     required this.items,
   });
@@ -55,6 +57,7 @@ class Message {
   factory Message.fromJson(Map<String, dynamic> json) => Message(
         itemsPerPage: json["items-per-page"],
         query: Query.fromJson(json["query"]),
+        nextCursor: json["next-cursor"],
         totalResults: json["total-results"],
         items: List<Item>.from(json["items"].map((x) => Item.fromJson(x))),
       );
@@ -62,6 +65,7 @@ class Message {
   Map<String, dynamic> toJson() => {
         "items-per-page": itemsPerPage,
         "query": query.toJson(),
+        "next-cursor": nextCursor,
         "total-results": totalResults,
         "items": List<dynamic>.from(items.map((x) => x.toJson())),
       };
@@ -201,7 +205,7 @@ class CoverageType {
 
 class IssnType {
   String value;
-  String type;
+  Type type;
 
   IssnType({
     required this.value,
@@ -210,14 +214,19 @@ class IssnType {
 
   factory IssnType.fromJson(Map<String, dynamic> json) => IssnType(
         value: json["value"],
-        type: json["type"],
+        type: typeValues.map[json["type"]]!,
       );
 
   Map<String, dynamic> toJson() => {
         "value": value,
-        "type": type,
+        "type": typeValues.reverse[type],
       };
 }
+
+enum Type { ELECTRONIC, PRINT }
+
+final typeValues =
+    EnumValues({"electronic": Type.ELECTRONIC, "print": Type.PRINT});
 
 class Subject {
   int asjc;
@@ -257,4 +266,16 @@ class Query {
         "start-index": startIndex,
         "search-terms": searchTerms,
       };
+}
+
+class EnumValues<T> {
+  Map<String, T> map;
+  late Map<T, String> reverseMap;
+
+  EnumValues(this.map);
+
+  Map<T, String> get reverse {
+    reverseMap = map.map((k, v) => MapEntry(v, k));
+    return reverseMap;
+  }
 }
