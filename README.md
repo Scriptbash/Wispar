@@ -1,5 +1,5 @@
 <p align="center">
-<img alt="QRaven" src= "https://github.com/Scriptbash/Wispar/blob/main/assets/icon/icon.png?raw=true" width="100">
+<img alt="Wispar" src= "https://github.com/Scriptbash/Wispar/blob/main/assets/icon/icon.png?raw=true" width="100">
 </p>
 <h3 align="center">Stay up-to-date with articles in your field of study!</h3>
 <p align="center">
@@ -20,24 +20,24 @@ Insert screenshots here once Wispar is ready
 
 ## Description
 <p align="justify">
-Wispar description
+Wispar is a user-friendly Android/iOS app that seamlessly searches scientific journals using the Crossref API. Stay updated on your preferred journals by following them and receive new article abstracts in your main feed. The integration of EZproxy and Unpaywall ensures convenient access to open-access articles. 
 </p>
 
 ## Features overview
 <ul>
-<li></li>
-<li></li>
-<li></li>
+<li>Download articles for offline access</li>
+<li>EZproxy and Unpaywall integration</li>
+<li>Send articles to Zotero</li>
 </ul>
 
 
 ## Contribute
 <p align ="justify">
-If you want to get involved with QRaven's development, please read the <a href="https://qraven.readthedocs.io/en/latest/contribute.html">contribution guide</a>.
+
 </p>
 
 
 ## Help
 <p align ="justify">
-If you run into any issue while using Wispar, have a question or want to share your feedback, please open an issue here : https://github.com/Scriptbash/QRaven/issues
+If you run into any issue while using Wispar, have a question or want to share your feedback, please open an issue here : https://github.com/Scriptbash/Wispar/issues
 </p>
