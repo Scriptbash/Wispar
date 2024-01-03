@@ -94,6 +94,10 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   void handleSearch(String query) async {
     try {
+      // Reset the cursor to "*" only for a new search
+      if (query != CrossRefApi.getCurrentQuery()) {
+        CrossRefApi.resetCursor();
+      }
       List<Journals.Item> searchResults =
           await CrossRefApi.queryJournals(query);
 
@@ -101,13 +105,22 @@ class _LibraryScreenState extends State<LibraryScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => SearchResultsScreen(
-              searchResults: searchResults, searchQuery: query),
+            searchResults: searchResults,
+            searchQuery: query,
+          ),
         ),
       );
 
       setState(() {
         isSearching = false;
       });
+
+      // Check if there are more items before updating the cursor
+      if (searchResults.isNotEmpty && CrossRefApi.cursor != null) {
+        // Access the cursor using the getter
+        String? nextCursor = CrossRefApi.cursor;
+        // Use nextCursor as needed
+      }
     } catch (e, stackTrace) {
       print('Error: $e, $stackTrace');
     }

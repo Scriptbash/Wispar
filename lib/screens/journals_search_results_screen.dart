@@ -19,23 +19,15 @@ class SearchResultsScreen extends StatefulWidget {
 
 class _SearchResultsScreenState extends State<SearchResultsScreen> {
   List<Journals.Item> items = [];
-  int cursor = 0;
   bool isLoading = false;
-  final ScrollController _scrollController = ScrollController();
-  late DatabaseHelper dbHelper;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
-    dbHelper = DatabaseHelper();
+    _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
-    loadMoreItems(widget.searchQuery);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
+    items = widget.searchResults;
   }
 
   @override
@@ -45,35 +37,17 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
         title: Text('Search Results'),
       ),
       body: ListView.builder(
-        itemCount: items.length + 1, // +1 for the loading indicator
+        itemCount: items.length + 1,
         itemBuilder: (context, index) {
           if (index == items.length) {
             // Display loading indicator at the end of the list
             return isLoading ? CircularProgressIndicator() : Container();
           } else {
-            // Check if issn is not empty
-            if (items[index].issn.isNotEmpty) {
-              return FutureBuilder<bool>(
-                future: dbHelper.isJournalFollowed(items[index].issn.first),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    bool isFollowed = snapshot.data ?? false;
-                    return JournalsSearchResultCard(
-                      key: UniqueKey(), // Ensure each card has a unique key
-                      item: items[index],
-                      isFollowed: isFollowed,
-                    );
-                  }
-                },
-              );
-            } else {
-              // Skip creating a card if issn is missing
-              return Container();
-            }
+            return JournalsSearchResultCard(
+              key: UniqueKey(),
+              item: items[index],
+              isFollowed: false, // Update this as needed
+            );
           }
         },
         controller: _scrollController,
@@ -84,9 +58,16 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   void _onScroll() {
     if (_scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent) {
-      // User reached the end of the list
       if (!isLoading) {
-        loadMoreItems(widget.searchQuery); // Pass the search query
+        // Check if there are more items to load
+        int totalResults = widget.searchResults.length;
+        if (items.length >= totalResults) {
+          // End of the result set, do not load more items
+          return;
+        }
+
+        // Load more items
+        loadMoreItems(widget.searchQuery);
       }
     }
   }
@@ -97,12 +78,11 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
         isLoading = true;
       });
 
-      // Use the provided query
+      // Use the current cursor for lazy loading
       List<Journals.Item> newItems = await CrossRefApi.queryJournals(query);
 
-      // Add new items to the beginning of the list
       setState(() {
-        items.insertAll(0, newItems);
+        items.addAll(newItems);
         isLoading = false;
       });
     } catch (e) {
@@ -146,7 +126,8 @@ class _JournalsSearchResultCardState extends State<JournalsSearchResultCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Publisher: ${widget.item.publisher}'),
-            Text('ISSN: ${widget.item.issn.first}'),
+            if (widget.item.issn.isNotEmpty)
+              Text('ISSN: ${widget.item.issn.first}'),
           ],
         ),
         trailing: FollowButton(

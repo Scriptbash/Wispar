@@ -8,24 +8,49 @@ class CrossRefApi {
   static const String worksEndpoint = '/works';
   static const String journalsEndpoint = '/journals';
   static String? _cursor = '*';
+  static String? _currentQuery;
 
   static Future<List<Journals.Item>> queryJournals(String query) async {
-    final response = await http.get(Uri.parse(
-        '$baseUrl$journalsEndpoint?query=$query&rows=50&cursor=$_cursor'));
+    _currentQuery = query;
+    String apiUrl = '$baseUrl$journalsEndpoint?query=$query&rows=50';
+
+    if (_cursor != null) {
+      apiUrl += '&cursor=$_cursor';
+    }
+
+    print('API URL: $apiUrl'); // Add this line for debugging
+
+    final response = await http.get(Uri.parse(apiUrl));
 
     if (response.statusCode == 200) {
       final crossrefJournals = Journals.crossrefjournalsFromJson(response.body);
       List<Journals.Item> items = crossrefJournals.message.items;
-      // Check if there are more items
-      if (items.length < crossrefJournals.message.totalResults) {
-        _cursor = Uri.encodeComponent(crossrefJournals.message.nextCursor);
-      } else {
-        _cursor = '*'; // Reset cursor when reaching the end
+
+      // Update the global cursor only if it's not null
+      if (crossrefJournals.message.nextCursor != null) {
+        _cursor = crossrefJournals.message.nextCursor;
       }
+
       return items;
     } else {
       throw Exception('Failed to query journals');
     }
+  }
+
+  // Getter method for _cursor
+  static String? get cursor => _cursor;
+
+  // Add a method to get the current cursor
+  static String? getCurrentCursor() {
+    return _cursor;
+  }
+
+  static void resetCursor() {
+    _cursor = '*';
+  }
+
+  static String? getCurrentQuery() {
+    return _currentQuery;
   }
 
   static Future<CrossrefWorks> getWorkByDOI(String doi) async {
