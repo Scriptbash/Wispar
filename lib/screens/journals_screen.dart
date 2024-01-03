@@ -37,7 +37,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 autofocus: true,
                 textInputAction: TextInputAction.search,
                 onSubmitted: (query) {
-                  // Handle search query
                   handleSearch(query);
                 },
               )
@@ -98,7 +97,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
       if (query != CrossRefApi.getCurrentQuery()) {
         CrossRefApi.resetCursor();
       }
-      List<Journals.Item> searchResults =
+
+      ListAndMore<Journals.Item> searchResults =
           await CrossRefApi.queryJournals(query);
 
       Navigator.push(
@@ -110,30 +110,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
           ),
         ),
       );
-
-      setState(() {
-        isSearching = false;
-      });
-
-      // Check if there are more items before updating the cursor
-      if (searchResults.isNotEmpty && CrossRefApi.cursor != null) {
-        // Access the cursor using the getter
-        String? nextCursor = CrossRefApi.cursor;
-        // Use nextCursor as needed
-      }
-    } catch (e, stackTrace) {
-      print('Error: $e, $stackTrace');
-    }
-  }
-
-  Future<void> fetchData(String query) async {
-    try {
-      List<Journals.Item> items = await CrossRefApi.queryJournals(query);
-      // Extract titles from the returned items
-      List<String> journalTitles = items.map((item) => item.title).toList();
-      print(journalTitles);
-    } catch (e, stackTrace) {
-      print('Error fetching data: $e, $stackTrace');
+    } catch (e) {
+      print('Error handling search: $e');
     }
   }
 }

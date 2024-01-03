@@ -10,15 +10,13 @@ class CrossRefApi {
   static String? _cursor = '*';
   static String? _currentQuery;
 
-  static Future<List<Journals.Item>> queryJournals(String query) async {
+  static Future<ListAndMore<Journals.Item>> queryJournals(String query) async {
     _currentQuery = query;
     String apiUrl = '$baseUrl$journalsEndpoint?query=$query&rows=50';
 
     if (_cursor != null) {
       apiUrl += '&cursor=$_cursor';
     }
-
-    print('API URL: $apiUrl'); // Add this line for debugging
 
     final response = await http.get(Uri.parse(apiUrl));
 
@@ -31,7 +29,10 @@ class CrossRefApi {
         _cursor = crossrefJournals.message.nextCursor;
       }
 
-      return items;
+      bool hasMoreResults =
+          items.length < crossrefJournals.message.totalResults;
+
+      return ListAndMore(items, hasMoreResults);
     } else {
       throw Exception('Failed to query journals');
     }
@@ -83,4 +84,11 @@ class CrossRefApi {
       throw Exception('Failed to query works');
     }
   }
+}
+
+class ListAndMore<T> {
+  final List<T> list;
+  final bool hasMore;
+
+  ListAndMore(this.list, this.hasMore);
 }

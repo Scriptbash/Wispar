@@ -4,7 +4,7 @@ import '../services/database_helper.dart';
 import '../models/crossref_journals_models.dart' as Journals;
 
 class SearchResultsScreen extends StatefulWidget {
-  final List<Journals.Item> searchResults;
+  final ListAndMore<Journals.Item> searchResults;
   final String searchQuery;
 
   const SearchResultsScreen({
@@ -21,13 +21,23 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   List<Journals.Item> items = [];
   bool isLoading = false;
   late ScrollController _scrollController;
+  bool hasMoreResults = true;
+  bool reachedEnd = false;
+  bool waitingForMore = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
-    items = widget.searchResults;
+
+    if (widget.searchResults.list.isNotEmpty) {
+      items = widget.searchResults.list;
+      hasMoreResults = widget.searchResults.hasMore;
+    } else {
+      // Handle empty searchResults
+      hasMoreResults = false;
+    }
   }
 
   @override
@@ -37,17 +47,25 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
         title: Text('Search Results'),
       ),
       body: ListView.builder(
-        itemCount: items.length + 1,
+        itemCount: items.length + (hasMoreResults ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == items.length) {
             // Display loading indicator at the end of the list
             return isLoading ? CircularProgressIndicator() : Container();
           } else {
-            return JournalsSearchResultCard(
-              key: UniqueKey(),
-              item: items[index],
-              isFollowed: false, // Update this as needed
-            );
+            Journals.Item currentItem = items[index];
+
+            // Check if the current item has non-empty ISSN
+            if (currentItem.issn.isNotEmpty) {
+              return JournalsSearchResultCard(
+                key: UniqueKey(),
+                item: currentItem,
+                isFollowed: false,
+              );
+            } else {
+              // Skip creating a card for items with empty ISSN
+              return Container();
+            }
           }
         },
         controller: _scrollController,
@@ -56,17 +74,10 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
-      if (!isLoading) {
-        // Check if there are more items to load
-        int totalResults = widget.searchResults.length;
-        if (items.length >= totalResults) {
-          // End of the result set, do not load more items
-          return;
-        }
-
-        // Load more items
+    if (hasMoreResults &&
+        _scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent) {
+      if (!isLoading && !waitingForMore) {
         loadMoreItems(widget.searchQuery);
       }
     }
@@ -76,13 +87,21 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
     try {
       setState(() {
         isLoading = true;
+        waitingForMore = true;
       });
 
-      // Use the current cursor for lazy loading
-      List<Journals.Item> newItems = await CrossRefApi.queryJournals(query);
+      if (reachedEnd) {
+        // Clear the flag if we are making a new API call
+        reachedEnd = false;
+      }
+
+      ListAndMore<Journals.Item> newItems =
+          await CrossRefApi.queryJournals(query);
 
       setState(() {
-        items.addAll(newItems);
+        items.addAll(newItems.list);
+        hasMoreResults = newItems.hasMore &&
+            newItems.list.length >= 50; // Adjust the condition
         isLoading = false;
       });
     } catch (e) {
@@ -90,6 +109,9 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
       setState(() {
         isLoading = false;
       });
+    } finally {
+      // Reset the waitingForMore flag regardless of success or failure
+      waitingForMore = false;
     }
   }
 }
@@ -108,12 +130,20 @@ class JournalsSearchResultCard extends StatefulWidget {
 }
 
 class _JournalsSearchResultCardState extends State<JournalsSearchResultCard> {
-  late bool _isFollowed;
+  late bool _isFollowed = false; // Initialize with false by default
 
   @override
   void initState() {
     super.initState();
-    _isFollowed = widget.isFollowed;
+    _initFollowStatus();
+  }
+
+  Future<void> _initFollowStatus() async {
+    final dbHelper = DatabaseHelper();
+    bool isFollowed = await dbHelper.isJournalFollowed(widget.item.issn.first);
+    setState(() {
+      _isFollowed = isFollowed;
+    });
   }
 
   @override
@@ -170,7 +200,10 @@ class FollowButton extends StatelessWidget {
   void toggleFollowStatus(BuildContext context) async {
     final dbHelper = DatabaseHelper();
 
-    if (isFollowed) {
+    // Check if the journal is currently followed
+    bool currentlyFollowed = await dbHelper.isJournalFollowed(item.issn.first);
+
+    if (currentlyFollowed) {
       // Unfollow
       await dbHelper.removeJournal(item.issn.first);
     } else {
@@ -184,7 +217,6 @@ class FollowButton extends StatelessWidget {
         ),
       );
     }
-
-    onFollowStatusChanged(!isFollowed);
+    onFollowStatusChanged(!currentlyFollowed);
   }
 }
