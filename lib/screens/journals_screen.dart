@@ -28,28 +28,24 @@ class _LibraryScreenState extends State<LibraryScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: isSearching ? null : Text('Journals'),
-        actions: [
-          if (isSearching)
-            Expanded(
-              child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 20.0),
-                child: TextField(
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search...',
-                  ),
-                  autofocus: true,
-                  textInputAction: TextInputAction.search,
-                  onSubmitted: (query) {
-                    // Handle search query
-                    handleSearch(query);
-                  },
+        title: isSearching
+            ? TextField(
+                controller: searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search...',
                 ),
-              ),
-            ),
-          GestureDetector(
-            onTap: () {
+                autofocus: true,
+                textInputAction: TextInputAction.search,
+                onSubmitted: (query) {
+                  // Handle search query
+                  handleSearch(query);
+                },
+              )
+            : const Text('Journals'),
+        actions: [
+          IconButton(
+            icon: Icon(isSearching ? Icons.close : Icons.search),
+            onPressed: () {
               setState(() {
                 isSearching = !isSearching;
                 if (!isSearching) {
@@ -57,7 +53,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 }
               });
             },
-            child: Icon(isSearching ? Icons.close : Icons.search),
           ),
         ],
       ),
