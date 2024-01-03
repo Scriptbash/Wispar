@@ -16,6 +16,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
   bool isSearching = false;
   TextEditingController searchController = TextEditingController();
   late DatabaseHelper dbHelper;
+  late Journal selectedJournal;
 
   @override
   void initState() {
@@ -61,7 +62,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   Widget _buildLibraryContent() {
     return FutureBuilder<List<Journal>>(
-      future: dbHelper.getJournals(), // Fetch journals from the database
+      future: dbHelper.getJournals(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator();
@@ -83,7 +84,15 @@ class _LibraryScreenState extends State<LibraryScreen> {
           return ListView.builder(
             itemCount: journals.length,
             itemBuilder: (context, index) {
-              return JournalCard(journal: journals[index]);
+              final currentJournal = journals[index];
+              return Column(
+                children: [
+                  JournalCard(
+                    journal: currentJournal,
+                    unfollowCallback: _unfollowJournal,
+                  ),
+                ],
+              );
             },
           );
         }
@@ -114,25 +123,63 @@ class _LibraryScreenState extends State<LibraryScreen> {
       print('Error handling search: $e');
     }
   }
+
+  Future<void> _unfollowJournal(BuildContext context, Journal journal) async {
+    final dbHelper = DatabaseHelper();
+    await dbHelper.removeJournal(journal.issn);
+
+    // Refresh the UI after unfollowing the journal
+    setState(() {});
+  }
 }
 
 class JournalCard extends StatelessWidget {
   final Journal journal;
+  final Function(BuildContext, Journal) unfollowCallback;
 
-  const JournalCard({required this.journal});
+  const JournalCard({required this.journal, required this.unfollowCallback});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.all(8.0),
       child: ListTile(
-        title: Text(journal.title),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              child: Text(
+                journal.title,
+                style: TextStyle(
+                  //fontSize: 14.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                unfollowCallback(context, journal);
+              },
+              child: Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  'Unfollow',
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 12.0,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Publisher: ${journal.publisher}'),
             Text('ISSN: ${journal.issn}'),
-            //Text('Subjects: ${journal.subjects}')
+            // Text('Subjects: ${journal.subjects}')
           ],
         ),
       ),

@@ -47,6 +47,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
         title: Text('Search Results'),
       ),
       body: ListView.builder(
+        physics: BouncingScrollPhysics(),
         itemCount: items.length + (hasMoreResults ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == items.length) {
@@ -151,7 +152,12 @@ class _JournalsSearchResultCardState extends State<JournalsSearchResultCard> {
     return Card(
       margin: EdgeInsets.all(8.0),
       child: ListTile(
-        title: Text(widget.item.title),
+        title: Text(
+          widget.item.title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
