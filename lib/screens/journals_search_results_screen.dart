@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/crossref_api.dart';
 import '../services/database_helper.dart';
 import '../models/crossref_journals_models.dart' as Journals;
+import './journals_details_screen.dart';
 
 class SearchResultsScreen extends StatefulWidget {
   final ListAndMore<Journals.Item> searchResults;
@@ -176,6 +177,22 @@ class _JournalsSearchResultCardState extends State<JournalsSearchResultCard> {
             });
           },
         ),
+        onTap: () {
+          List<String> subjectNames =
+              widget.item.subjects.map((subject) => subject.name).toList();
+          // Navigate to the detailed screen when the card is tapped
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => JournalDetailsScreen(
+                title: widget.item.title,
+                publisher: widget.item.publisher,
+                issn: widget.item.issn.first,
+                subjects: subjectNames,
+              ),
+            ),
+          );
+        },
       ),
     );
   }
