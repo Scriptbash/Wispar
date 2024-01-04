@@ -45,7 +45,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Search Results'),
+        title: Text('Search results'),
       ),
       body: ListView.builder(
         physics: BouncingScrollPhysics(),
@@ -231,12 +231,14 @@ class FollowButton extends StatelessWidget {
       await dbHelper.removeJournal(item.issn.first);
     } else {
       // Follow
+      List<String> subjectNames =
+          item.subjects.map((subject) => subject.name).toList();
       await dbHelper.insertJournal(
         Journal(
           issn: item.issn.first,
           title: item.title,
           publisher: item.publisher,
-          subjects: item.subjects.join(', '),
+          subjects: subjectNames.join(', '),
         ),
       );
     }

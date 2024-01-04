@@ -18,7 +18,7 @@ class JournalDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Journal Details'),
+        title: Text('Journal details'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
