@@ -3,6 +3,7 @@ import '../services/crossref_api.dart';
 import '../services/database_helper.dart';
 import '../models/crossref_works_models.dart';
 import './journals_search_results_screen.dart';
+import './journals_details_screen.dart';
 import 'package:wispar/models/crossref_journals_models.dart' as Journals;
 
 class LibraryScreen extends StatefulWidget {
@@ -144,33 +145,35 @@ class JournalCard extends StatelessWidget {
     return Card(
       margin: EdgeInsets.all(8.0),
       child: ListTile(
+        onTap: () {
+          // Navigate to the detailed screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => JournalDetailsScreen(
+                title: journal.title,
+                publisher: journal.publisher,
+                issn: journal.issn,
+              ),
+            ),
+          );
+        },
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Flexible(
+            Expanded(
               child: Text(
                 journal.title,
-                style: TextStyle(
-                  //fontSize: 14.0,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-            GestureDetector(
-              onTap: () {
+            ElevatedButton(
+              onPressed: () {
+                // Perform the unfollow action
                 unfollowCallback(context, journal);
               },
-              child: Container(
-                alignment: Alignment.center,
-                padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  'Unfollow',
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontSize: 12.0,
-                  ),
-                ),
-              ),
+              child: Text('Unfollow'),
             ),
           ],
         ),
@@ -179,7 +182,6 @@ class JournalCard extends StatelessWidget {
           children: [
             Text('Publisher: ${journal.publisher}'),
             Text('ISSN: ${journal.issn}'),
-            // Text('Subjects: ${journal.subjects}')
           ],
         ),
       ),
