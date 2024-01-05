@@ -16,7 +16,6 @@
 
 ## Screenshots
 
-Insert screenshots here once Wispar is ready
 
 ## Description
 <p align="justify">
@@ -25,10 +24,10 @@ Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly s
 
 ## Features overview
 <ul>
-<li> [ ] Search and follow journals</li>
-<li> [ ] Download articles for offline access</li>
-<li> [ ] EZproxy and Unpaywall integration</li>
-<li> [ ] Send articles to Zotero</li>
+    <li> [x] Search and follow journals</li>
+    <li> [ ] Download articles for offline access</li>
+    <li> [ ] EZproxy and Unpaywall integration</li>
+    <li> [ ] Send articles to Zotero</li>
 </ul>
 
 
@@ -42,3 +41,11 @@ Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly s
 <p align ="justify">
 If you run into any issue while using Wispar, have a question or want to share your feedback, please open an issue here : https://github.com/Scriptbash/Wispar/issues
 </p>
+
+## Credits
+<ul>
+    <li><a href="https://libproxy-db.org/" target='_blank'>Library Proxy URL Database</a></li>
+    <li><a href="https://unpaywall.org/" target='_blank'>Unpaywall</a></li>
+    <li><a href="https://www.crossref.org/" target='_blank'>Crossref</a></li>
+</ul>
+
