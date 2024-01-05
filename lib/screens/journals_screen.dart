@@ -34,8 +34,13 @@ class _LibraryScreenState extends State<LibraryScreen> {
             ? TextField(
                 controller: searchController,
                 decoration: InputDecoration(
-                  hintText: 'Search...',
-                ),
+                    hintText: 'Search...',
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.backspace_outlined),
+                      onPressed: () {
+                        searchController.clear();
+                      },
+                    )),
                 autofocus: true,
                 textInputAction: TextInputAction.search,
                 onSubmitted: (query) {
