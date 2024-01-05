@@ -108,10 +108,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   void handleSearch(String query) async {
     try {
-      // Reset the cursor to "*" only for a new search
-      if (query != CrossRefApi.getCurrentQuery()) {
-        CrossRefApi.resetCursor();
-      }
+      CrossRefApi.resetCursor();
 
       ListAndMore<Journals.Item> searchResults =
           await CrossRefApi.queryJournals(query);
