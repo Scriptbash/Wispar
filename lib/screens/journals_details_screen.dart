@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import '../services/crossref_api.dart';
+import '../models/crossref_journals_works_models.dart' as journalsWorks;
+import '../publication_card.dart';
 
-class JournalDetailsScreen extends StatelessWidget {
+class JournalDetailsScreen extends StatefulWidget {
   final String title;
   final String publisher;
   final String issn;
@@ -15,6 +18,20 @@ class JournalDetailsScreen extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _JournalDetailsScreenState createState() => _JournalDetailsScreenState();
+}
+
+class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
+  late Future<ListAndMore<journalsWorks.Item>> journalWorksFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    // Call the API when the widget is initialized
+    journalWorksFuture = CrossRefApi.getJournalWorks(widget.issn);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
@@ -26,7 +43,7 @@ class JournalDetailsScreen extends StatelessWidget {
               titlePadding: EdgeInsets.symmetric(horizontal: 50, vertical: 8.0),
               centerTitle: true,
               title: Text(
-                '$title',
+                widget.title,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18.0,
@@ -38,9 +55,9 @@ class JournalDetailsScreen extends StatelessWidget {
           ),
           SliverPersistentHeader(
             delegate: JournalInfoHeader(
-              publisher: publisher,
-              issn: issn,
-              subjects: subjects,
+              publisher: widget.publisher,
+              issn: widget.issn,
+              subjects: widget.subjects,
             ),
             pinned: false,
           ),
@@ -48,83 +65,38 @@ class JournalDetailsScreen extends StatelessWidget {
             delegate: PersistentLatestPublicationsHeader(),
             pinned: true,
           ),
-          SliverList(
-            delegate: SliverChildListDelegate(
-              [
-                ListTile(
-                  title: Text('Latest Publication 1'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 2'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 1'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 2'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 1'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 2'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 1'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 2'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 1'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 2'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 1'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 2'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 1'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 2'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 1'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 2'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 1'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 2'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 1'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 2'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 1'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 2'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 1'),
-                ),
-                ListTile(
-                  title: Text('Latest Publication 2'),
-                ),
-              ],
-            ),
+          FutureBuilder<ListAndMore<journalsWorks.Item>>(
+            future: journalWorksFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return SliverToBoxAdapter(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (snapshot.hasError) {
+                print('Error loading journal works: ${snapshot.error}');
+                return SliverToBoxAdapter(
+                  child: Text('Error loading journal works'),
+                );
+              } else if (!snapshot.hasData || snapshot.data!.list.isEmpty) {
+                return SliverToBoxAdapter(
+                  child: Text('No journal works available'),
+                );
+              } else {
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final work = snapshot.data!.list[index];
+                      final workTitle = work.title;
+                      return PublicationCard(
+                        title: workTitle,
+                        abstract: work.abstract,
+                      );
+                    },
+                    childCount: snapshot.data!.list.length,
+                  ),
+                );
+              }
+            },
           ),
         ],
       ),
