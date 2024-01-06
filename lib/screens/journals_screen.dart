@@ -18,11 +18,13 @@ class _LibraryScreenState extends State<LibraryScreen> {
   TextEditingController searchController = TextEditingController();
   late DatabaseHelper dbHelper;
   late Journal selectedJournal;
+  late FocusNode searchFocusNode;
 
   @override
   void initState() {
     super.initState();
     dbHelper = DatabaseHelper();
+    searchFocusNode = FocusNode();
   }
 
   @override
@@ -33,12 +35,14 @@ class _LibraryScreenState extends State<LibraryScreen> {
         title: isSearching
             ? TextField(
                 controller: searchController,
+                focusNode: searchFocusNode,
                 decoration: InputDecoration(
                     hintText: 'Search...',
                     suffixIcon: IconButton(
                       icon: Icon(Icons.backspace_outlined),
                       onPressed: () {
                         searchController.clear();
+                        searchFocusNode.requestFocus();
                       },
                     )),
                 autofocus: true,
@@ -108,8 +112,19 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   void handleSearch(String query) async {
     try {
-      CrossRefApi.resetCursor();
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
 
+      CrossRefApi.resetCursor();
+      await Future.delayed(Duration(milliseconds: 100));
+      Navigator.pop(context);
       ListAndMore<Journals.Item> searchResults =
           await CrossRefApi.queryJournals(query);
 
@@ -124,6 +139,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       );
     } catch (e) {
       print('Error handling search: $e');
+      Navigator.pop(context);
     }
   }
 
