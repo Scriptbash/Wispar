@@ -69,18 +69,38 @@ class Item {
   final String publisher;
   final String abstract;
   final String title;
+  final DateTime publishedDate;
+  final String journalTitle;
+  final String doi;
+  final List<PublicationAuthor> authors;
 
   Item({
     required this.publisher,
     required this.abstract,
     required this.title,
+    required this.publishedDate,
+    required this.journalTitle,
+    required this.doi,
+    required this.authors,
   });
 
   factory Item.fromJson(Map<String, dynamic> json) {
+    List<PublicationAuthor> authors = [];
+    if (json['author'] != null && json['author'] is List) {
+      authors = (json['author'] as List<dynamic>)
+          .map((authorJson) => PublicationAuthor.fromJson(authorJson))
+          .toList();
+    }
     return Item(
       publisher: json['publisher'] ?? '',
       abstract: _cleanAbstract(json['abstract'] ?? ''),
       title: _extractTitle(json['title']),
+      publishedDate: _parseDate(json['published']),
+      journalTitle: (json['container-title'] as List<dynamic>).isNotEmpty
+          ? (json['container-title'] as List<dynamic>).first ?? ''
+          : '',
+      doi: json['DOI'] ?? '',
+      authors: authors,
     );
   }
 
@@ -101,8 +121,35 @@ class Item {
         : '';
   }
 
+  static DateTime _parseDate(dynamic dateData) {
+    if (dateData != null && dateData['date-parts'] != null) {
+      var dateParts = dateData['date-parts'][0];
+      if (dateParts.length >= 3) {
+        return DateTime(dateParts[0], dateParts[1], dateParts[2]);
+      }
+    }
+    return DateTime.now(); // Default to the current date if parsing fails
+  }
+
   @override
   String toString() {
     return 'Item{publisher: $publisher, abstract: $abstract}';
+  }
+}
+
+class PublicationAuthor {
+  final String given;
+  final String family;
+
+  PublicationAuthor({
+    required this.given,
+    required this.family,
+  });
+
+  factory PublicationAuthor.fromJson(Map<String, dynamic> json) {
+    return PublicationAuthor(
+      given: json['given'] ?? '',
+      family: json['family'] ?? '',
+    );
   }
 }

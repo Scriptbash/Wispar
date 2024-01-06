@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
+import './models/crossref_journals_works_models.dart';
 
 class PublicationCard extends StatefulWidget {
   final String title;
   final String abstract;
+  final String journalTitle;
+  final DateTime? publishedDate;
+  final String doi;
+  final List<PublicationAuthor> authors;
 
   const PublicationCard({
     Key? key,
     required this.title,
     required this.abstract,
-  }) : super(key: key);
+    required this.journalTitle,
+    this.publishedDate,
+    required this.doi,
+    required List<PublicationAuthor> authors,
+  })  : authors = authors,
+        super(key: key);
 
   @override
   _PublicationCardState createState() => _PublicationCardState();
@@ -19,6 +29,11 @@ class _PublicationCardState extends State<PublicationCard> {
 
   @override
   Widget build(BuildContext context) {
+    // Skip the card creation if the publication title is empty
+    if (widget.title.isEmpty) {
+      return Container();
+    }
+
     return Card(
       elevation: 2.0,
       margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -28,8 +43,21 @@ class _PublicationCardState extends State<PublicationCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
+              _formattedDate(widget.publishedDate!),
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 13,
+              ),
+            ),
+            SizedBox(height: 8.0),
+            Text(
               widget.title,
               style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8.0),
+            Text(
+              'Authors: ${_getAuthorsNames(widget.authors)}',
+              style: TextStyle(fontSize: 13),
             ),
             SizedBox(height: 8.0),
             LayoutBuilder(
@@ -71,8 +99,15 @@ class _PublicationCardState extends State<PublicationCard> {
           ],
         ),
         subtitle: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
           children: [
+            Expanded(
+              child: Text(
+                'DOI: ${widget.doi}\nPublished in ${widget.journalTitle}',
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+            ),
             IconButton(
               icon: Icon(
                 isLiked ? Icons.favorite : Icons.favorite_border,
@@ -88,5 +123,15 @@ class _PublicationCardState extends State<PublicationCard> {
         ),
       ),
     );
+  }
+
+  String _formattedDate(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
+  String _getAuthorsNames(List<PublicationAuthor> authors) {
+    return authors
+        .map((author) => '${author.given} ${author.family}')
+        .join(', ');
   }
 }

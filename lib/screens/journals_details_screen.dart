@@ -90,6 +90,10 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
                       return PublicationCard(
                         title: workTitle,
                         abstract: work.abstract,
+                        journalTitle: work.journalTitle,
+                        publishedDate: work.publishedDate,
+                        doi: work.doi,
+                        authors: work.authors,
                       );
                     },
                     childCount: snapshot.data!.list.length,
