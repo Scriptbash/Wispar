@@ -44,7 +44,7 @@ class CrossRefApi {
       String issn) async {
     //_cursor = null; // Reset the cursor for a new query
     String apiUrl =
-        '$baseUrl$journalsEndpoint/$issn/works?rows=25&sort=published&order=desc';
+        '$baseUrl$journalsEndpoint/$issn/works?rows=25&sort=created&order=desc';
 
     if (_cursor != null) {
       apiUrl += '&cursor=$_cursor';
@@ -62,11 +62,6 @@ class CrossRefApi {
       }
       bool hasMoreResults =
           items.length < crossrefJournals.message.totalResults;
-
-      //bool hasMoreResults = items.length <
-      //    ((crossrefJournals.message?.totalResults is int)
-      //        ? (crossrefJournals.message!.totalResults as int)
-      //        : 0);
 
       return ListAndMore(items, hasMoreResults);
     } else {
@@ -90,7 +85,7 @@ class CrossRefApi {
     return _currentQuery;
   }
 
-  static Future<works.Crossrefworks> getWorkByDOI(String doi) async {
+  static Future<journalsWorks.Item> getWorkByDOI(String doi) async {
     final response = await http.get(Uri.parse('$baseUrl$worksEndpoint/$doi'));
 
     if (response.statusCode == 200) {
@@ -98,7 +93,7 @@ class CrossRefApi {
       final dynamic message = data['message'];
 
       if (message is Map<String, dynamic>) {
-        return works.Crossrefworks.fromJson(message);
+        return journalsWorks.Item.fromJson(message);
       } else {
         throw Exception('Invalid response format for work by DOI');
       }

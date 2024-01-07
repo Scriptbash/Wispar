@@ -95,7 +95,7 @@ class Item {
       publisher: json['publisher'] ?? '',
       abstract: _cleanAbstract(json['abstract'] ?? ''),
       title: _extractTitle(json['title']),
-      publishedDate: _parseDate(json['published']),
+      publishedDate: _parseDate(json['created']),
       journalTitle: (json['container-title'] as List<dynamic>).isNotEmpty
           ? (json['container-title'] as List<dynamic>).first ?? ''
           : '',
