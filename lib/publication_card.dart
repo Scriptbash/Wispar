@@ -41,7 +41,10 @@ class _PublicationCardState extends State<PublicationCard> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ArticleScreen(doi: widget.doi),
+            builder: (context) => ArticleScreen(
+              doi: widget.doi,
+              title: widget.title,
+            ),
           ),
         );
       },

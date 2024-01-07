@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../services/crossref_api.dart';
 import '../models/crossref_journals_works_models.dart';
 
 class ArticleScreen extends StatefulWidget {
   final String doi;
+  final String title;
 
   const ArticleScreen({
     Key? key,
     required this.doi,
+    required this.title,
   }) : super(key: key);
 
   @override
@@ -17,6 +20,7 @@ class ArticleScreen extends StatefulWidget {
 class _ArticleScreenState extends State<ArticleScreen> {
   late Future<Item> articleDetailsFuture;
   bool isLoading = true;
+  late Item articleDetails;
 
   @override
   void initState() {
@@ -38,7 +42,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Article details'),
+        title: Text(widget.title),
       ),
       body: FutureBuilder<Item>(
         future: articleDetailsFuture,
@@ -56,13 +60,12 @@ class _ArticleScreenState extends State<ArticleScreen> {
               child: Text('No data available'),
             );
           } else {
-            Item articleDetails = snapshot.data!;
+            articleDetails = snapshot.data!; // Assign value here
             return SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: ListView(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Published on ${_formattedDate(articleDetails.publishedDate)}',
@@ -92,7 +95,9 @@ class _ArticleScreenState extends State<ArticleScreen> {
                       textAlign: TextAlign.justify,
                     ),
                     Text(
-                      articleDetails.abstract,
+                      articleDetails.abstract.isNotEmpty
+                          ? articleDetails.abstract
+                          : 'Abstract unavailable. The publisher does not provide abstracts to Crossref. The full text should still be available.',
                       textAlign: TextAlign.justify,
                     ),
                     SizedBox(height: 20),
@@ -106,6 +111,41 @@ class _ArticleScreenState extends State<ArticleScreen> {
                 ),
               ),
             );
+          }
+        },
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.copy_outlined),
+            label: 'Copy DOI',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.article),
+            label: 'Full text',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite_border_outlined),
+            label: 'Favorite',
+          ),
+        ],
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              // Handle copy DOI button tap
+              if (articleDetails != null) {
+                Clipboard.setData(ClipboardData(text: articleDetails.doi));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('DOI copied to clipboard'),
+                ));
+              }
+              break;
+            case 1:
+              // Handle full text button tap
+              break;
+            case 2:
+              // Handle favorite button tap
+              break;
           }
         },
       ),
