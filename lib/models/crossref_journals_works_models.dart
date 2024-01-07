@@ -73,6 +73,8 @@ class Item {
   final String journalTitle;
   final String doi;
   final List<PublicationAuthor> authors;
+  final String url;
+  final String primaryUrl;
 
   Item({
     required this.publisher,
@@ -82,6 +84,8 @@ class Item {
     required this.journalTitle,
     required this.doi,
     required this.authors,
+    required this.url,
+    required this.primaryUrl,
   });
 
   factory Item.fromJson(Map<String, dynamic> json) {
@@ -101,6 +105,8 @@ class Item {
           : '',
       doi: json['DOI'] ?? '',
       authors: authors,
+      url: json['URL'] ?? '',
+      primaryUrl: json['resource']['primary']['URL'] ?? '',
     );
   }
 

@@ -41,6 +41,7 @@ dependencies:
   http: ^1.1.2
   json_annotation: ^4.8.1
   sqflite: ^2.3.0
+  webview_flutter: ^4.4.3
 
 dev_dependencies:
   flutter_test:

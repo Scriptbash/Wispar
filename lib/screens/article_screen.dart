@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:wispar/screens/article_website.dart';
 import '../services/crossref_api.dart';
 import '../models/crossref_journals_works_models.dart';
 
@@ -142,6 +143,14 @@ class _ArticleScreenState extends State<ArticleScreen> {
               break;
             case 1:
               // Handle full text button tap
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ArticleWebsite(
+                    articleUrl: articleDetails.primaryUrl,
+                  ),
+                ),
+              );
               break;
             case 2:
               // Handle favorite button tap
