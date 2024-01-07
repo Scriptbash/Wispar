@@ -12,13 +12,36 @@ class ArticleWebsite extends StatefulWidget {
 }
 
 class _ArticleWebsiteState extends State<ArticleWebsite> {
-  WebViewController? controller;
+  late Future<void> setupControllerFuture;
+  late WebViewController? controller;
   late String proxyUrl = '';
 
   @override
   void initState() {
     super.initState();
-    loadProxyUrl();
+    setupControllerFuture = setupController();
+  }
+
+  Future<void> setupController() async {
+    await loadProxyUrl();
+
+    controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onProgress: (int progress) {},
+          onPageStarted: (String url) {},
+          onPageFinished: (String url) {},
+          onWebResourceError: (WebResourceError error) {},
+          onNavigationRequest: (NavigationRequest request) {
+            return NavigationDecision.navigate;
+          },
+        ),
+      );
+
+    if (controller != null) {
+      controller!.loadRequest(Uri.parse(proxyUrl + widget.articleUrl));
+    }
   }
 
   Future<void> loadProxyUrl() async {
@@ -31,36 +54,22 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
 
   @override
   Widget build(BuildContext context) {
-    if (controller == null && proxyUrl.isNotEmpty) {
-      controller = WebViewController()
-        ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..setNavigationDelegate(
-          NavigationDelegate(
-            onProgress: (int progress) {
-              // Update loading bar.
-            },
-            onPageStarted: (String url) {},
-            onPageFinished: (String url) {},
-            onWebResourceError: (WebResourceError error) {},
-            onNavigationRequest: (NavigationRequest request) {
-              return NavigationDecision.navigate;
-            },
-          ),
-        );
-
-      // Load the article URL with the proxy when both are available.
-      if (controller != null) {
-        controller!.loadRequest(Uri.parse(proxyUrl + widget.articleUrl));
-      }
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.articleUrl),
       ),
-      body: controller != null
-          ? WebViewWidget(controller: controller!)
-          : Center(child: CircularProgressIndicator()),
+      body: FutureBuilder<void>(
+        future: setupControllerFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return controller != null
+                ? WebViewWidget(controller: controller!)
+                : Center(child: CircularProgressIndicator());
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
     );
   }
 }
