@@ -22,19 +22,28 @@ class JournalDetailsScreen extends StatefulWidget {
 }
 
 class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
-  late Future<ListAndMore<journalsWorks.Item>> journalWorksFuture;
+  late List<journalsWorks.Item> allWorks;
+  bool isLoading = false;
+  late ScrollController _scrollController;
+  bool hasMoreResults = true;
+  bool reachedEnd = false;
+  bool waitingForMore = false;
 
   @override
   void initState() {
     super.initState();
-    // Call the API when the widget is initialized
-    journalWorksFuture = CrossRefApi.getJournalWorks(widget.issn);
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+    allWorks = [];
+    CrossRefApi.resetCursor();
+    loadMoreWorks();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: [
           SliverAppBar(
             pinned: true,
@@ -65,46 +74,72 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
             delegate: PersistentLatestPublicationsHeader(),
             pinned: true,
           ),
-          FutureBuilder<ListAndMore<journalsWorks.Item>>(
-            future: journalWorksFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return SliverToBoxAdapter(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (snapshot.hasError) {
-                print('Error loading journal works: ${snapshot.error}');
-                return SliverToBoxAdapter(
-                  child: Text('Error loading journal works'),
-                );
-              } else if (!snapshot.hasData || snapshot.data!.list.isEmpty) {
-                return SliverToBoxAdapter(
-                  child: Text('No journal works available'),
-                );
-              } else {
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final work = snapshot.data!.list[index];
-                      final workTitle = work.title;
-                      return PublicationCard(
-                        title: workTitle,
-                        abstract: work.abstract,
-                        journalTitle: work.journalTitle,
-                        publishedDate: work.publishedDate,
-                        doi: work.doi,
-                        authors: work.authors,
-                      );
-                    },
-                    childCount: snapshot.data!.list.length,
-                  ),
-                );
-              }
-            },
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                if (index < allWorks.length) {
+                  final work = allWorks[index];
+                  final workTitle = work.title;
+                  return PublicationCard(
+                    title: workTitle,
+                    abstract: work.abstract,
+                    journalTitle: work.journalTitle,
+                    publishedDate: work.publishedDate,
+                    doi: work.doi,
+                    authors: work.authors,
+                  );
+                } else {
+                  return Container();
+                }
+              },
+              childCount: allWorks.length + (hasMoreResults ? 1 : 0),
+            ),
           ),
         ],
       ),
     );
+  }
+
+  void _onScroll() {
+    if (hasMoreResults &&
+        _scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent) {
+      if (!isLoading && !waitingForMore) {
+        loadMoreWorks();
+      }
+    }
+  }
+
+  Future<void> loadMoreWorks() async {
+    try {
+      setState(() {
+        isLoading = true;
+        waitingForMore = true;
+      });
+
+      if (reachedEnd) {
+        // Clear the flag if we are making a new API call
+        reachedEnd = false;
+      }
+
+      ListAndMore<journalsWorks.Item> newWorks =
+          await CrossRefApi.getJournalWorks(widget.issn);
+
+      setState(() {
+        allWorks.addAll(newWorks.list);
+        hasMoreResults = newWorks.hasMore;
+        hasMoreResults = newWorks.hasMore && newWorks.list.length >= 25;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading more items: $e');
+      setState(() {
+        isLoading = false;
+      });
+    } finally {
+      // Reset the waitingForMore flag regardless of success or failure
+      waitingForMore = false;
+    }
   }
 }
 

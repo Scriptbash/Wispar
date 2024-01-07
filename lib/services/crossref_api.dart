@@ -42,9 +42,9 @@ class CrossRefApi {
 
   static Future<ListAndMore<journalsWorks.Item>> getJournalWorks(
       String issn) async {
-    _cursor = null; // Reset the cursor for a new query
+    //_cursor = null; // Reset the cursor for a new query
     String apiUrl =
-        '$baseUrl$journalsEndpoint/$issn/works?rows=25&sort=published&order=desc&cursor=*';
+        '$baseUrl$journalsEndpoint/$issn/works?rows=25&sort=published&order=desc';
 
     if (_cursor != null) {
       apiUrl += '&cursor=$_cursor';
@@ -60,11 +60,13 @@ class CrossRefApi {
       if (crossrefJournals.message?.nextCursor != null) {
         _cursor = crossrefJournals.message!.nextCursor;
       }
+      bool hasMoreResults =
+          items.length < crossrefJournals.message.totalResults;
 
-      bool hasMoreResults = items.length <
-          ((crossrefJournals.message?.totalResults is int)
-              ? (crossrefJournals.message!.totalResults as int)
-              : 0);
+      //bool hasMoreResults = items.length <
+      //    ((crossrefJournals.message?.totalResults is int)
+      //        ? (crossrefJournals.message!.totalResults as int)
+      //        : 0);
 
       return ListAndMore(items, hasMoreResults);
     } else {
