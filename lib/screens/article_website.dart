@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/unpaywall_api.dart';
 
 class ArticleWebsite extends StatefulWidget {
   final String articleUrl;
+  final String doi;
 
-  const ArticleWebsite({Key? key, required this.articleUrl}) : super(key: key);
+  const ArticleWebsite({Key? key, required this.articleUrl, required this.doi})
+      : super(key: key);
 
   @override
   _ArticleWebsiteState createState() => _ArticleWebsiteState();
@@ -14,6 +17,7 @@ class ArticleWebsite extends StatefulWidget {
 class _ArticleWebsiteState extends State<ArticleWebsite> {
   late Future<void> setupControllerFuture;
   late WebViewController? controller;
+  late String pdfUrl = '';
   late String proxyUrl = '';
 
   @override
@@ -23,9 +27,9 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
   }
 
   Future<void> setupController() async {
-    await loadProxyUrl();
+    await checkUnpaywallAvailability();
 
-    controller = WebViewController()
+    controller = await WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -39,8 +43,26 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
         ),
       );
 
-    if (controller != null) {
+    if (pdfUrl.isNotEmpty) {
+      controller!.loadRequest(Uri.parse(pdfUrl));
+      _showSnackBar('The article was provided through Unpaywall');
+    } else {
       controller!.loadRequest(Uri.parse(proxyUrl + widget.articleUrl));
+      if (proxyUrl.isNotEmpty) {
+        _showSnackBar('Forwarded through your institution proxy');
+      }
+    }
+  }
+
+  Future<void> checkUnpaywallAvailability() async {
+    final Unpaywall result =
+        await UnpaywallService.checkAvailability(widget.doi);
+    if (result.pdfUrl.isNotEmpty) {
+      setState(() {
+        pdfUrl = result.pdfUrl;
+      });
+    } else {
+      await loadProxyUrl();
     }
   }
 
@@ -50,6 +72,15 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
       proxyUrl = prefs.getString('institution_url') ?? '';
       proxyUrl = proxyUrl.replaceAll('\$@', '');
     });
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override

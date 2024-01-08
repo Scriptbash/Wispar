@@ -150,6 +150,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                       MaterialPageRoute(
                         builder: (context) => ArticleWebsite(
                           articleUrl: articleDetails.primaryUrl,
+                          doi: articleDetails.doi,
                         ),
                       ),
                     );
