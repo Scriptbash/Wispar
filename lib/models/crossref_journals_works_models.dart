@@ -151,6 +151,12 @@ class PublicationAuthor {
     required this.given,
     required this.family,
   });
+  Map<String, dynamic> toJson() {
+    return {
+      'given': given,
+      'family': family,
+    };
+  }
 
   factory PublicationAuthor.fromJson(Map<String, dynamic> json) {
     return PublicationAuthor(

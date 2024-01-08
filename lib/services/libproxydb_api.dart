@@ -29,15 +29,3 @@ class ProxyService {
     }
   }
 }
-
-void main() async {
-  try {
-    List<ProxyData> proxies = await ProxyService.fetchProxies();
-
-    for (var proxy in proxies) {
-      print('Name: ${proxy.name}, URL: ${proxy.url}');
-    }
-  } catch (e) {
-    print('Error: $e');
-  }
-}

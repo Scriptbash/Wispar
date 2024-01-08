@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import './models/crossref_journals_works_models.dart';
 import './screens/article_screen.dart';
+import './services/database_helper.dart';
 
 class PublicationCard extends StatefulWidget {
   final String title;
@@ -9,6 +10,7 @@ class PublicationCard extends StatefulWidget {
   final DateTime? publishedDate;
   final String doi;
   final List<PublicationAuthor> authors;
+  final VoidCallback? onFavoriteChanged;
 
   const PublicationCard({
     Key? key,
@@ -18,6 +20,7 @@ class PublicationCard extends StatefulWidget {
     this.publishedDate,
     required this.doi,
     required List<PublicationAuthor> authors,
+    this.onFavoriteChanged,
   })  : authors = authors,
         super(key: key);
 
@@ -27,6 +30,14 @@ class PublicationCard extends StatefulWidget {
 
 class _PublicationCardState extends State<PublicationCard> {
   bool isLiked = false;
+  late DatabaseHelper databaseHelper;
+
+  @override
+  void initState() {
+    super.initState();
+    databaseHelper = DatabaseHelper();
+    checkIfLiked();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,6 +143,15 @@ class _PublicationCardState extends State<PublicationCard> {
                   setState(() {
                     isLiked = !isLiked;
                   });
+                  if (isLiked) {
+                    databaseHelper.insertFavorite(widget);
+                  } else {
+                    databaseHelper.removeFavorite(widget.doi);
+                  }
+
+                  if (widget.onFavoriteChanged != null) {
+                    widget.onFavoriteChanged!();
+                  }
                 },
               ),
             ],
@@ -149,5 +169,12 @@ class _PublicationCardState extends State<PublicationCard> {
     return authors
         .map((author) => '${author.given} ${author.family}')
         .join(', ');
+  }
+
+  void checkIfLiked() async {
+    bool liked = await databaseHelper.isArticleFavorite(widget.doi);
+    setState(() {
+      isLiked = liked;
+    });
   }
 }

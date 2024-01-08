@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:wispar/screens/article_website.dart';
 import '../services/crossref_api.dart';
 import '../models/crossref_journals_works_models.dart';
+import '../services/database_helper.dart';
+import '../publication_card.dart';
 
 class ArticleScreen extends StatefulWidget {
   final String doi;
@@ -22,11 +24,15 @@ class _ArticleScreenState extends State<ArticleScreen> {
   late Future<Item> articleDetailsFuture;
   bool isLoading = true;
   late Item articleDetails;
+  bool isLiked = false;
+  late DatabaseHelper databaseHelper;
 
   @override
   void initState() {
     super.initState();
     articleDetailsFuture = fetchArticleDetails();
+    databaseHelper = DatabaseHelper();
+    checkIfLiked();
   }
 
   Future<Item> fetchArticleDetails() async {
@@ -61,7 +67,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
               child: Text('No data available'),
             );
           } else {
-            articleDetails = snapshot.data!; // Assign value here
+            articleDetails = snapshot.data!;
             return SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -91,7 +97,6 @@ class _ArticleScreenState extends State<ArticleScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        //decoration: TextDecoration.underline,
                       ),
                       textAlign: TextAlign.justify,
                     ),
@@ -115,48 +120,83 @@ class _ArticleScreenState extends State<ArticleScreen> {
           }
         },
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.copy_outlined),
-            label: 'Copy DOI',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.article),
-            label: 'Full text',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_border_outlined),
-            label: 'Favorite',
-          ),
-        ],
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              // Handle copy DOI button tap
-              if (articleDetails != null) {
-                Clipboard.setData(ClipboardData(text: articleDetails.doi));
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('DOI copied to clipboard'),
-                ));
-              }
-              break;
-            case 1:
-              // Handle full text button tap
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ArticleWebsite(
-                    articleUrl: articleDetails.primaryUrl,
-                  ),
+      bottomNavigationBar: Container(
+        height: 100,
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Column(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.copy_outlined),
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: articleDetails.doi));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('DOI copied to clipboard'),
+                    ));
+                  },
                 ),
-              );
-              break;
-            case 2:
-              // Handle favorite button tap
-              break;
-          }
-        },
+                Text('Copy DOI'),
+              ],
+            ),
+            Column(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.article),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ArticleWebsite(
+                          articleUrl: articleDetails.primaryUrl,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                Text('View article'),
+              ],
+            ),
+            Column(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    isLiked ? Icons.favorite : Icons.favorite_border,
+                    color: isLiked ? Colors.red : null,
+                  ),
+                  onPressed: () async {
+                    setState(() {
+                      isLiked = !isLiked;
+                    });
+
+                    PublicationCard publicationCard = PublicationCard(
+                      title: articleDetails.title,
+                      abstract: articleDetails.abstract,
+                      journalTitle: articleDetails.journalTitle,
+                      publishedDate: articleDetails.publishedDate,
+                      doi: articleDetails.doi,
+                      authors: articleDetails.authors,
+                    );
+
+                    if (isLiked) {
+                      await databaseHelper.insertFavorite(publicationCard);
+                    } else {
+                      await databaseHelper.removeFavorite(articleDetails.doi);
+                    }
+
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(isLiked
+                          ? '${articleDetails.title} added to favorites'
+                          : '${articleDetails.title} removed from favorites'),
+                    ));
+                  },
+                ),
+                Text('Favorite'),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -169,5 +209,12 @@ class _ArticleScreenState extends State<ArticleScreen> {
 
   String _formattedDate(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
+  void checkIfLiked() async {
+    bool liked = await databaseHelper.isArticleFavorite(widget.doi);
+    setState(() {
+      isLiked = liked;
+    });
   }
 }
