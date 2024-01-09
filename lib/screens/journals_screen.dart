@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/crossref_api.dart';
 import '../services/database_helper.dart';
 import '../models/crossref_works_models.dart';
@@ -37,7 +38,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 controller: searchController,
                 focusNode: searchFocusNode,
                 decoration: InputDecoration(
-                    hintText: 'Search...',
+                    hintText: AppLocalizations.of(context)!.search,
                     suffixIcon: IconButton(
                       icon: Icon(Icons.backspace_outlined),
                       onPressed: () {
@@ -51,7 +52,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                   handleSearch(query);
                 },
               )
-            : const Text('Journals'),
+            : Text(AppLocalizations.of(context)!.journals),
         actions: [
           IconButton(
             icon: Icon(isSearching ? Icons.close : Icons.search),
@@ -83,9 +84,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
             child: Wrap(
               alignment: WrapAlignment.center,
               children: [
-                Text('You are not following any journals. Use the '),
+                Text(AppLocalizations.of(context)!.journalnotfollowing1),
                 Icon(Icons.search),
-                Text(' icon to find and follow journals.'),
+                Text(AppLocalizations.of(context)!.journalnotfollowing2),
               ],
             ),
           );
@@ -192,7 +193,7 @@ class JournalCard extends StatelessWidget {
                 // Perform the unfollow action
                 unfollowCallback(context, journal);
               },
-              child: Text('Unfollow'),
+              child: Text(AppLocalizations.of(context)!.unfollow),
             ),
           ],
         ),

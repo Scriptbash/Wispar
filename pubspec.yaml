@@ -42,6 +42,9 @@ dependencies:
   json_annotation: ^4.8.1
   sqflite: ^2.3.0
   webview_flutter: ^4.4.3
+  flutter_localizations:
+    sdk: flutter
+  intl: any
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +75,7 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  generate: true  # Used for localizations
 
   # To add assets to your application, add an assets section, like this:
   # assets:

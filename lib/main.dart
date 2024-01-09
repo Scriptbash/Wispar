@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'theme_provider.dart';
 import 'screens/home_screen.dart';
@@ -43,6 +45,16 @@ class _WisparState extends State<Wispar> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: Wispar.title,
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        Locale('en'), // English
+        Locale('fr'), // French
+      ],
       theme: ThemeData(
         //primarySwatch: Colors.orange,
         colorSchemeSeed: Colors.deepPurple,
