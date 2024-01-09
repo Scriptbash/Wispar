@@ -25,7 +25,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: Text(AppLocalizations.of(context)!.favorite),
+        title: Text(AppLocalizations.of(context)!.favorites),
       ),
       body: FutureBuilder<List<PublicationCard>>(
         future: _favoriteArticles,
