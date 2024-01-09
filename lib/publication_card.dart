@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import './models/crossref_journals_works_models.dart';
 import './screens/article_screen.dart';
 import './services/database_helper.dart';
@@ -81,7 +82,7 @@ class _PublicationCardState extends State<PublicationCard> {
               ),
               SizedBox(height: 8.0),
               Text(
-                'Authors: ${_getAuthorsNames(widget.authors)}',
+                '${AppLocalizations.of(context)!.authors}: ${_getAuthorsNames(widget.authors)}',
                 style: TextStyle(fontSize: 13, color: Colors.grey),
               ),
               SizedBox(height: 8.0),
@@ -128,7 +129,7 @@ class _PublicationCardState extends State<PublicationCard> {
             children: [
               Expanded(
                 child: Text(
-                  'DOI: ${widget.doi}\nPublished in ${widget.journalTitle}',
+                  'DOI: ${widget.doi}\n${AppLocalizations.of(context)!.publishedin} ${widget.journalTitle}',
                   style: TextStyle(
                     color: Colors.grey,
                   ),

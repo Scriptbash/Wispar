@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:wispar/screens/article_website.dart';
 import '../services/crossref_api.dart';
 import '../models/crossref_journals_works_models.dart';
@@ -75,7 +76,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Published on ${_formattedDate(articleDetails.publishedDate)}',
+                      '${AppLocalizations.of(context)!.publishedon} ${_formattedDate(articleDetails.publishedDate)}',
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 13,
@@ -93,7 +94,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                     ),
                     SizedBox(height: 20),
                     Text(
-                      'Abstract',
+                      AppLocalizations.of(context)!.abstract,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -103,12 +104,12 @@ class _ArticleScreenState extends State<ArticleScreen> {
                     Text(
                       articleDetails.abstract.isNotEmpty
                           ? articleDetails.abstract
-                          : 'Abstract unavailable. The publisher does not provide abstracts to Crossref. The full text should still be available.',
+                          : AppLocalizations.of(context)!.abstractunavailable,
                       textAlign: TextAlign.justify,
                     ),
                     SizedBox(height: 20),
                     Text(
-                      'DOI: ${articleDetails.doi}\nPublished in ${articleDetails.journalTitle}',
+                      'DOI: ${articleDetails.doi}\n${AppLocalizations.of(context)!.publishedin} ${articleDetails.journalTitle}',
                       style: TextStyle(
                         color: Colors.grey,
                       ),
@@ -133,11 +134,11 @@ class _ArticleScreenState extends State<ArticleScreen> {
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: articleDetails.doi));
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('DOI copied to clipboard'),
+                      content: Text(AppLocalizations.of(context)!.doicopied),
                     ));
                   },
                 ),
-                Text('Copy DOI'),
+                Text(AppLocalizations.of(context)!.copydoi),
               ],
             ),
             Column(
@@ -156,7 +157,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                     );
                   },
                 ),
-                Text('View article'),
+                Text(AppLocalizations.of(context)!.viewarticle),
               ],
             ),
             Column(
@@ -188,12 +189,12 @@ class _ArticleScreenState extends State<ArticleScreen> {
 
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text(isLiked
-                          ? '${articleDetails.title} added to favorites'
-                          : '${articleDetails.title} removed from favorites'),
+                          ? '${articleDetails.title} ${AppLocalizations.of(context)!.favoriteadded}'
+                          : '${articleDetails.title} ${AppLocalizations.of(context)!.favoriteremoved}'),
                     ));
                   },
                 ),
-                Text('Favorite'),
+                Text(AppLocalizations.of(context)!.favorite),
               ],
             ),
           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/crossref_api.dart';
 import '../services/database_helper.dart';
 import '../models/crossref_journals_models.dart' as Journals;
@@ -45,7 +46,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Search results'),
+        title: Text(AppLocalizations.of(context)!.searchresults),
       ),
       body: ListView.builder(
         physics: BouncingScrollPhysics(),
@@ -162,7 +163,8 @@ class _JournalsSearchResultCardState extends State<JournalsSearchResultCard> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Publisher: ${widget.item.publisher}'),
+            Text(
+                '${AppLocalizations.of(context)!.publisher}: ${widget.item.publisher}'),
             if (widget.item.issn.isNotEmpty)
               Text('ISSN: ${widget.item.issn.first}'),
           ],
@@ -216,7 +218,9 @@ class FollowButton extends StatelessWidget {
       onPressed: () {
         toggleFollowStatus(context);
       },
-      child: Text(isFollowed ? 'Unfollow' : 'Follow'),
+      child: Text(isFollowed
+          ? AppLocalizations.of(context)!.unfollow
+          : AppLocalizations.of(context)!.follow),
     );
   }
 

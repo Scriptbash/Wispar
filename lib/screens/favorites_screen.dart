@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../models/crossref_journals_works_models.dart';
 import '../publication_card.dart';
 import '../services/database_helper.dart';
@@ -24,7 +25,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: const Text('Favorites'),
+        title: Text(AppLocalizations.of(context)!.favorite),
       ),
       body: FutureBuilder<List<PublicationCard>>(
         future: _favoriteArticles,
@@ -38,10 +39,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               child: Wrap(
                 alignment: WrapAlignment.center,
                 children: [
-                  Text('You have no articles in your favorites. Use the '),
+                  Text(AppLocalizations.of(context)!.nofavorites1),
                   Icon(Icons.favorite_border),
-                  Text(
-                      ' icon to add a publication you like in your favorites!'),
+                  Text(AppLocalizations.of(context)!.nofavorites2),
                 ],
               ),
             );
@@ -78,7 +78,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${publicationCard.title} removed from favorites'),
+        content: Text(
+            '${publicationCard.title} ${AppLocalizations.of(context)!.favoriteremoved}'),
       ),
     );
   }

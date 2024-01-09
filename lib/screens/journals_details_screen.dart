@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/crossref_api.dart';
 import '../models/crossref_journals_works_models.dart' as journalsWorks;
 import '../publication_card.dart';
@@ -170,9 +171,10 @@ class JournalInfoHeader extends SliverPersistentHeaderDelegate {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 8.0),
-            Text('Publisher: $publisher'),
+            Text('${AppLocalizations.of(context)!.publisher}: $publisher'),
             Text('ISSN: $issn'),
-            Text('Subjects: ${subjects.join(', ')}'),
+            Text(
+                '${AppLocalizations.of(context)!.subjects}: ${subjects.join(', ')}'),
             SizedBox(height: 8.0),
             Container(
               height: 1,
@@ -208,7 +210,7 @@ class PersistentLatestPublicationsHeader
       color: Theme.of(context).scaffoldBackgroundColor,
       child: Center(
         child: Text(
-          'Latest publications',
+          AppLocalizations.of(context)!.latestpublications,
           style: TextStyle(
             fontWeight: FontWeight.bold,
           ),

@@ -200,7 +200,8 @@ class JournalCard extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Publisher: ${journal.publisher}'),
+            Text(
+                '${AppLocalizations.of(context)!.publisher}: ${journal.publisher}'),
             Text('ISSN: ${journal.issn}'),
           ],
         ),

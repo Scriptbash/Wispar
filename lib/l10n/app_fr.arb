@@ -5,5 +5,22 @@
     "follow": "S'abonner",
     "unfollow": "Se désabonner",
     "journals": "Revues",
-    "search": "Recherche..."
+    "search": "Recherche...",
+    "publisher": "Éditeur",
+    "publishedin": "Publié dans",
+    "subjects": "Sujets",
+    "latestpublications": "Publications récentes",
+    "authors": "Auteurs",
+    "publishedon": "Publié le",
+    "abstract": "Résumé",
+    "copydoi": "Copier le DOI",
+    "doicopied": "DOI copié dans le presse-papiers",
+    "viewarticle": "Voir l'article",
+    "favorite": "Favoris",
+    "favoriteadded": "ajouté aux favoris",
+    "favoriteremoved": "retiré des favoris",
+    "abstractunavailable": "Résumé indisponible. L'éditeur ne fournis pas de résumés à Crossref. L'article devrait tout de même être accessible.",
+    "searchresults": "Résultats de recherche",
+    "nofavorites1": "Vous n'avez aucun article dans vos favoris. Utilisez l'icône ",
+    "nofavorites2": " pour ajouter un article dans vos favoris!" 
 }
