@@ -121,7 +121,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
         },
       ),
       bottomNavigationBar: Container(
-        height: 100,
+        height: 80,
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
