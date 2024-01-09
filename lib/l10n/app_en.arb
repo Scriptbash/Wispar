@@ -1,5 +1,8 @@
 {
     "home": "Home",
+    "favorites": "Favorites",
+    "downloads": "Downloads",
+    "settings": "Settings",
     "journalnotfollowing1": "You are not following any journals. Use the ",
     "journalnotfollowing2": "icon to find and follow journals.",
     "follow": "Follow",
@@ -22,5 +25,12 @@
     "abstractunavailable": "Abstract unavailable. The publisher does not provide abstracts to Crossref. The full text should still be available.",
     "searchresults": "Search results",
     "nofavorites1": "You have no articles in your favorites. Use the ",
-    "nofavorites2": " icon to add a publication you like in your favorites!"
+    "nofavorites2": " icon to add a publication you like in your favorites!",
+    "appearance": "Appearance",
+    "light": "Light",
+    "dark": "Dark",
+    "systemtheme": "System theme",
+    "unpaywallarticle": "The article was provided through Unpaywall",
+    "forwardedproxy": "Forwarded through your institution proxy",
+    "selectinstitution": "Select your institution"
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../theme_provider.dart';
 import './institutions_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,7 +20,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: const Text('Settings'),
+        title: Text(AppLocalizations.of(context)!.settings),
       ),
       body: Center(
         child: Column(
@@ -37,7 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           .setThemeMode(value);
                     }
                   },
-                  child: const Text('Light'),
+                  child: Text(AppLocalizations.of(context)!.light),
                 ),
                 RadioMenuButton<ThemeMode>(
                   value: ThemeMode.dark,
@@ -48,7 +49,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           .setThemeMode(value);
                     }
                   },
-                  child: const Text('Dark'),
+                  child: Text(AppLocalizations.of(context)!.dark),
                 ),
                 RadioMenuButton<ThemeMode>(
                   value: ThemeMode.system,
@@ -59,7 +60,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           .setThemeMode(value);
                     }
                   },
-                  child: const Text('System theme'),
+                  child: Text(AppLocalizations.of(context)!.systemtheme),
                 ),
               ],
               builder: (BuildContext context, MenuController controller,
@@ -73,11 +74,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       controller.open();
                     }
                   },
-                  child: const Row(
+                  child: Row(
                     children: [
                       Icon(Icons.brush_outlined),
                       SizedBox(width: 8),
-                      Text('Appearance'),
+                      Text(AppLocalizations.of(context)!.appearance),
                     ],
                   ),
                 );

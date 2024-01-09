@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/unpaywall_api.dart';
 
@@ -45,11 +46,11 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
 
     if (pdfUrl.isNotEmpty) {
       controller!.loadRequest(Uri.parse(pdfUrl));
-      _showSnackBar('The article was provided through Unpaywall');
+      _showSnackBar(AppLocalizations.of(context)!.unpaywallarticle);
     } else {
       controller!.loadRequest(Uri.parse(proxyUrl + widget.articleUrl));
       if (proxyUrl.isNotEmpty) {
-        _showSnackBar('Forwarded through your institution proxy');
+        _showSnackBar(AppLocalizations.of(context)!.forwardedproxy);
       }
     }
   }

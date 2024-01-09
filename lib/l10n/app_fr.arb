@@ -1,5 +1,8 @@
 {
     "home": "Accueil",
+    "favorites": "Favoris",
+    "downloads": "Téléchargements",
+    "settings": "Paramètres",
     "journalnotfollowing1": "Vous ne suivez aucune revue. Utilisez l'icône ",
     "journalnotfollowing2": "pour trouver et suivre des revues.",
     "follow": "S'abonner",
@@ -9,7 +12,7 @@
     "publisher": "Éditeur",
     "publishedin": "Publié dans",
     "subjects": "Sujets",
-    "latestpublications": "Publications récentes",
+    "latestpublications": "Dernières publications",
     "authors": "Auteurs",
     "publishedon": "Publié le",
     "abstract": "Résumé",
@@ -22,5 +25,12 @@
     "abstractunavailable": "Résumé indisponible. L'éditeur ne fournis pas de résumés à Crossref. L'article devrait tout de même être accessible.",
     "searchresults": "Résultats de recherche",
     "nofavorites1": "Vous n'avez aucun article dans vos favoris. Utilisez l'icône ",
-    "nofavorites2": " pour ajouter un article dans vos favoris!" 
+    "nofavorites2": " pour ajouter un article dans vos favoris!",
+    "appearance": "Apparence",
+    "light": "Clair",
+    "dark": "Sombre",
+    "systemtheme": "Thème du système",
+    "unpaywallarticle": "L'article a été fourni via Unpaywall.",
+    "forwardedproxy": "Transmis par le biais du proxy de votre institution.",
+    "selectinstitution": "Selectionner votre institution"
 }

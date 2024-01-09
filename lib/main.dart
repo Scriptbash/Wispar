@@ -40,6 +40,20 @@ class _WisparState extends State<Wispar> {
     const FavoritesScreen(),
     const DownloadsScreen(),
   ];
+  String getLocalizedText(BuildContext context, String key) {
+    switch (key) {
+      case 'home':
+        return AppLocalizations.of(context)!.home;
+      case 'journals':
+        return AppLocalizations.of(context)!.journals;
+      case 'favorites':
+        return AppLocalizations.of(context)!.favorites;
+      case 'downloads':
+        return AppLocalizations.of(context)!.downloads;
+      default:
+        return key; // Return the key if the translation is not found
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +68,7 @@ class _WisparState extends State<Wispar> {
       supportedLocales: [
         Locale('en'), // English
         Locale('fr'), // French
+        Locale('es'), // Spanish
       ],
       theme: ThemeData(
         //primarySwatch: Colors.orange,
@@ -75,31 +90,33 @@ class _WisparState extends State<Wispar> {
         body: Center(
           child: _pages.elementAt(_currentIndex),
         ),
-        bottomNavigationBar: SalomonBottomBar(
-          currentIndex: _currentIndex,
-          onTap: (i) => setState(() => _currentIndex = i),
-          items: [
-            SalomonBottomBarItem(
-              icon: const Icon(Icons.home_outlined),
-              title: const Text("Home"),
-              selectedColor: Colors.deepPurpleAccent,
-            ),
-            SalomonBottomBarItem(
-              icon: const Icon(Icons.library_books_outlined),
-              title: const Text("Journals"),
-              selectedColor: Colors.deepPurpleAccent,
-            ),
-            SalomonBottomBarItem(
-              icon: const Icon(Icons.favorite_border),
-              title: const Text("Favorites"),
-              selectedColor: Colors.deepPurpleAccent,
-            ),
-            SalomonBottomBarItem(
-              icon: const Icon(Icons.download_outlined),
-              title: const Text("Downloads"),
-              selectedColor: Colors.deepPurpleAccent,
-            ),
-          ],
+        bottomNavigationBar: Builder(
+          builder: (BuildContext bottomBarContext) => SalomonBottomBar(
+            currentIndex: _currentIndex,
+            onTap: (i) => setState(() => _currentIndex = i),
+            items: [
+              SalomonBottomBarItem(
+                icon: const Icon(Icons.home_outlined),
+                title: Text(getLocalizedText(bottomBarContext, 'home')),
+                selectedColor: Colors.deepPurpleAccent,
+              ),
+              SalomonBottomBarItem(
+                icon: const Icon(Icons.library_books_outlined),
+                title: Text(getLocalizedText(bottomBarContext, 'journals')),
+                selectedColor: Colors.deepPurpleAccent,
+              ),
+              SalomonBottomBarItem(
+                icon: const Icon(Icons.favorite_border),
+                title: Text(getLocalizedText(bottomBarContext, 'favorites')),
+                selectedColor: Colors.deepPurpleAccent,
+              ),
+              SalomonBottomBarItem(
+                icon: const Icon(Icons.download_outlined),
+                title: Text(getLocalizedText(bottomBarContext, 'downloads')),
+                selectedColor: Colors.deepPurpleAccent,
+              ),
+            ],
+          ),
         ),
       ),
     ); // Closing the MaterialApp widget

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'settings_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -9,7 +10,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           centerTitle: false,
-          title: const Text('Home'),
+          title: Text(AppLocalizations.of(context)!.home),
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.settings),

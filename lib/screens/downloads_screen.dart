@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DownloadsScreen extends StatelessWidget {
   const DownloadsScreen({super.key});
@@ -8,7 +9,7 @@ class DownloadsScreen extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           centerTitle: false,
-          title: const Text('Downloads'),
+          title: Text(AppLocalizations.of(context)!.downloads),
         ),
         body: const Center(
           child: Text('This will show downloaded articles!'),

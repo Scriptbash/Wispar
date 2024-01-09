@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/libproxydb_api.dart';
 
 class InstitutionScreen extends StatefulWidget {
@@ -48,7 +49,7 @@ class _InstitutionScreenState extends State<InstitutionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select your institution'),
+        title: Text(AppLocalizations.of(context)!.selectinstitution),
       ),
       body: Column(
         children: [
@@ -60,7 +61,7 @@ class _InstitutionScreenState extends State<InstitutionScreen> {
                 filterProxies(query);
               },
               decoration: InputDecoration(
-                hintText: 'Search',
+                hintText: AppLocalizations.of(context)!.search,
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0),
