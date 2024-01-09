@@ -1,4 +1,4 @@
-package com.example.wispar
+package app.wispar.wispar
 
 import io.flutter.embedding.android.FlutterActivity
 
