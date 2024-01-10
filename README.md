@@ -64,4 +64,4 @@ If you run into any issue while using Wispar, have a question or want to share y
 <b>A</b>: This is a problem with the Crossref API that originates from Scopus. The subjects metadata from Crossref may be removed in the future though according to this <a href="https://community.crossref.org/t/retrieve-subjects-and-subject-from-journals-and-works/2403/6" target="_blank">thread</a>. 
 
 <b>Q</b>: My institution's EZproxy URL is missing or is incorrect</br>
-<b>A</b>: If you see the list of proxies correctly in the app, but your institution is missing or is incorrect, please let the folks know over the ezproxy-db by opening a new <a href="https://github.com/tom5760/ezproxy-db/issues/new/choose" target="_blank">issue</a> in their repo. Otherwise, please open a new issue in Wispar's repo.
+<b>A</b>: If you can view the list of proxies correctly in the app but notice that your institution is missing or has an incorrect URL, please report the issue to the EZproxy-db by opening a new <a href="https://github.com/tom5760/ezproxy-db/issues/new/choose" target="_blank">issue</a> in their repository. Otherwise, please open a new issue in Wispar's repository. 
