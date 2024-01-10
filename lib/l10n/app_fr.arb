@@ -30,7 +30,7 @@
     "light": "Clair",
     "dark": "Sombre",
     "systemtheme": "Thème du système",
-    "unpaywallarticle": "L'article a été fourni via Unpaywall.",
-    "forwardedproxy": "Transmis par le biais du proxy de votre institution.",
+    "unpaywallarticle": "L'article a été fourni via Unpaywall",
+    "forwardedproxy": "Transmis par le biais du proxy de votre institution",
     "selectinstitution": "Selectionner votre institution"
 }
