@@ -32,5 +32,17 @@
     "systemtheme": "System theme",
     "unpaywallarticle": "The article was provided through Unpaywall",
     "forwardedproxy": "Forwarded through your institution proxy",
-    "selectinstitution": "Select your institution"
+    "selectinstitution": "Select your institution",
+    "sortby": "Sort by",
+    "sortorder": "Sort Order",
+    "followingsince": "Following since",
+    "journaltitle": "Journal title",
+    "followingdate": "Following date",
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "articletitle": "Article title",
+    "firstauthfamname": "First author family name",
+    "datepublished": "Date published",
+    "dateaddedtofavorites": "Date added to favorites",
+    "addedtoyourfav": "Added to your favorites on"
 }

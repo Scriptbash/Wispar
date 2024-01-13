@@ -131,7 +131,7 @@ class _PublicationCardState extends State<PublicationCard> {
             children: [
               Expanded(
                 child: Text(
-                  'DOI: ${widget.doi}\n${AppLocalizations.of(context)!.publishedin} ${widget.journalTitle}${widget.dateLiked != null ? '\nAdded to your favorites on ${widget.dateLiked}' : ''}',
+                  'DOI: ${widget.doi}\n${AppLocalizations.of(context)!.publishedin} ${widget.journalTitle}${widget.dateLiked != null ? '\n${AppLocalizations.of(context)!.addedtoyourfav} ${widget.dateLiked}' : ''}',
                   style: TextStyle(
                     color: Colors.grey,
                   ),

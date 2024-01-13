@@ -33,8 +33,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             icon: Icon(Icons.more_vert),
             onSelected: (item) => handleMenuButton(context, item),
             itemBuilder: (context) => [
-              PopupMenuItem<int>(value: 0, child: Text('Sort by')),
-              PopupMenuItem<int>(value: 1, child: Text('Sort order')),
+              PopupMenuItem<int>(
+                  value: 0, child: Text(AppLocalizations.of(context)!.sortby)),
+              PopupMenuItem<int>(
+                  value: 1,
+                  child: Text(AppLocalizations.of(context)!.sortorder)),
             ],
           ),
         ],
@@ -202,7 +205,7 @@ class _SortByDialogState extends State<SortByDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Sort by'),
+      title: Text(AppLocalizations.of(context)!.sortby),
       content: SingleChildScrollView(
         child: Column(
           children: [
@@ -215,7 +218,7 @@ class _SortByDialogState extends State<SortByDialog> {
                   widget.onSortByChanged(selectedSortBy);
                 });
               },
-              title: Text('Article title'),
+              title: Text(AppLocalizations.of(context)!.articletitle),
             ),
             RadioListTile<int>(
               value: 1,
@@ -226,7 +229,7 @@ class _SortByDialogState extends State<SortByDialog> {
                   widget.onSortByChanged(selectedSortBy);
                 });
               },
-              title: Text('Journal title'),
+              title: Text(AppLocalizations.of(context)!.journaltitle),
             ),
             RadioListTile<int>(
               value: 2,
@@ -237,7 +240,7 @@ class _SortByDialogState extends State<SortByDialog> {
                   widget.onSortByChanged(selectedSortBy);
                 });
               },
-              title: Text('First author family name'),
+              title: Text(AppLocalizations.of(context)!.firstauthfamname),
             ),
             RadioListTile<int>(
               value: 3,
@@ -248,7 +251,7 @@ class _SortByDialogState extends State<SortByDialog> {
                   widget.onSortByChanged(selectedSortBy);
                 });
               },
-              title: Text('Date published'),
+              title: Text(AppLocalizations.of(context)!.datepublished),
             ),
             RadioListTile<int>(
               value: 4,
@@ -259,7 +262,7 @@ class _SortByDialogState extends State<SortByDialog> {
                   widget.onSortByChanged(selectedSortBy);
                 });
               },
-              title: Text('Date added to favorites'),
+              title: Text(AppLocalizations.of(context)!.dateaddedtofavorites),
             ),
           ],
         ),
@@ -299,7 +302,7 @@ class _SortOrderDialogState extends State<SortOrderDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Sort order'),
+      title: Text(AppLocalizations.of(context)!.sortorder),
       content: SingleChildScrollView(
         child: Column(
           children: [
@@ -312,7 +315,7 @@ class _SortOrderDialogState extends State<SortOrderDialog> {
                   widget.onSortOrderChanged(selectedSortOrder);
                 });
               },
-              title: Text('Ascending'),
+              title: Text(AppLocalizations.of(context)!.ascending),
             ),
             RadioListTile<int>(
               value: 1,
@@ -323,7 +326,7 @@ class _SortOrderDialogState extends State<SortOrderDialog> {
                   widget.onSortOrderChanged(selectedSortOrder);
                 });
               },
-              title: Text('Descending'),
+              title: Text(AppLocalizations.of(context)!.descending),
             ),
           ],
         ),
