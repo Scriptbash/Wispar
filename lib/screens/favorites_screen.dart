@@ -128,16 +128,23 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   List<PublicationCard> _sortFavorites(List<PublicationCard> favorites) {
     favorites.sort((a, b) {
+      String trimString(String input) {
+        return input.trim().replaceAll(RegExp(r'\s+'), '');
+      }
+
       switch (sortBy) {
         case 0:
           // Sort by Article title
-          return a.title.compareTo(b.title);
+          return trimString(a.title.toLowerCase())
+              .compareTo(trimString(b.title.toLowerCase()));
         case 1:
           // Sort by Journal title
-          return a.journalTitle.compareTo(b.journalTitle);
+          return trimString(a.journalTitle.toLowerCase())
+              .compareTo(trimString(b.journalTitle.toLowerCase()));
         case 2:
           // Sort by First author name
-          return a.authors[0].family.compareTo(b.authors[0].family);
+          return (a.authors[0].family.toLowerCase())
+              .compareTo((b.authors[0].family.toLowerCase()));
         case 3:
           // Sort by Date published
           return a.publishedDate!.compareTo(b.publishedDate!);
@@ -230,7 +237,7 @@ class _SortByDialogState extends State<SortByDialog> {
                   widget.onSortByChanged(selectedSortBy);
                 });
               },
-              title: Text('First author name'),
+              title: Text('First author family name'),
             ),
             RadioListTile<int>(
               value: 3,
