@@ -38,14 +38,24 @@ dependencies:
   salomon_bottom_bar: ^3.3.2
   shared_preferences: ^2.0.9
   provider: ^6.1.1
-  http: ^1.1.2
   json_annotation: ^4.8.1
   sqflite: ^2.3.0
-  webview_flutter: ^4.4.3
   flutter_localizations:
     sdk: flutter
   intl: any
-  #change_app_package_name: ^1.1.0
+  flutter_inappwebview: ^6.0.0
+  url_launcher: ^6.2.3
+  pdfx: 
+    git:
+      url: 'https://github.com/ScerIO/packages.flutter'
+      ref: '4be9de9ffed5398fd7d5f44bbb07dcd3d3f1711b'
+      path: packages/pdfx
+  http: ^1.1.2
+  internet_file:
+    git:
+      url: https://github.com/ScerIO/packages.dart.git
+      ref: master
+      path: packages/internet_file
 
 dev_dependencies:
   flutter_test:

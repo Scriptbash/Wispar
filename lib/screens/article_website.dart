@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/unpaywall_api.dart';
+import 'pdf_reader.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/foundation.dart';
 
 class ArticleWebsite extends StatefulWidget {
   final String articleUrl;
@@ -16,43 +19,42 @@ class ArticleWebsite extends StatefulWidget {
 }
 
 class _ArticleWebsiteState extends State<ArticleWebsite> {
-  late Future<void> setupControllerFuture;
-  late WebViewController? controller;
+  final GlobalKey webViewKey = GlobalKey();
+  InAppWebViewController? webViewController;
+  InAppWebViewSettings settings = InAppWebViewSettings(
+      isInspectable: kDebugMode,
+      mediaPlaybackRequiresUserGesture: false,
+      allowsInlineMediaPlayback: true,
+      //iframeAllow: "camera; microphone",
+      iframeAllowFullscreen: true);
+
+  PullToRefreshController? pullToRefreshController;
+  String url = "";
+  double progress = 0;
+  final urlController = TextEditingController();
   late String pdfUrl = '';
   late String proxyUrl = '';
 
   @override
   void initState() {
     super.initState();
-    setupControllerFuture = setupController();
-  }
-
-  Future<void> setupController() async {
-    await checkUnpaywallAvailability();
-
-    controller = await WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onProgress: (int progress) {},
-          onPageStarted: (String url) {},
-          onPageFinished: (String url) {},
-          onWebResourceError: (WebResourceError error) {},
-          onNavigationRequest: (NavigationRequest request) {
-            return NavigationDecision.navigate;
-          },
-        ),
-      );
-
-    if (pdfUrl.isNotEmpty) {
-      controller!.loadRequest(Uri.parse(pdfUrl));
-      _showSnackBar(AppLocalizations.of(context)!.unpaywallarticle);
-    } else {
-      controller!.loadRequest(Uri.parse(proxyUrl + widget.articleUrl));
-      if (proxyUrl.isNotEmpty) {
-        _showSnackBar(AppLocalizations.of(context)!.forwardedproxy);
-      }
-    }
+    checkUnpaywallAvailability();
+    pullToRefreshController = kIsWeb
+        ? null
+        : PullToRefreshController(
+            settings: PullToRefreshSettings(
+              color: Colors.deepPurple,
+            ),
+            onRefresh: () async {
+              if (defaultTargetPlatform == TargetPlatform.android) {
+                webViewController?.reload();
+              } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+                webViewController?.loadUrl(
+                    urlRequest:
+                        URLRequest(url: await webViewController?.getUrl()));
+              }
+            },
+          );
   }
 
   Future<void> checkUnpaywallAvailability() async {
@@ -65,6 +67,17 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
     } else {
       await loadProxyUrl();
     }
+    if (pdfUrl.isEmpty) {
+      if (proxyUrl.isNotEmpty) {
+        _showSnackBar(AppLocalizations.of(context)!.forwardedproxy);
+        pdfUrl = proxyUrl + widget.articleUrl;
+      } else {
+        pdfUrl = widget.articleUrl;
+      }
+    } else {
+      _showSnackBar(AppLocalizations.of(context)!.unpaywallarticle);
+    }
+    setupController();
   }
 
   Future<void> loadProxyUrl() async {
@@ -73,6 +86,12 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
       proxyUrl = prefs.getString('institution_url') ?? '';
       proxyUrl = proxyUrl.replaceAll('\$@', '');
     });
+  }
+
+  void setupController() {
+    if (pdfUrl.isNotEmpty) {
+      webViewController?.loadUrl(urlRequest: URLRequest(url: WebUri(pdfUrl)));
+    }
   }
 
   void _showSnackBar(String message) {
@@ -87,21 +106,101 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.articleUrl),
-      ),
-      body: FutureBuilder<void>(
-        future: setupControllerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return controller != null
-                ? WebViewWidget(controller: controller!)
-                : Center(child: CircularProgressIndicator());
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
-    );
+        appBar: AppBar(title: Text(widget.articleUrl)),
+        body: SafeArea(
+            child: Column(children: <Widget>[
+          Expanded(
+            child: Stack(
+              children: [
+                InAppWebView(
+                  key: webViewKey,
+                  initialUrlRequest: URLRequest(url: WebUri(pdfUrl)),
+                  initialSettings: settings,
+                  pullToRefreshController: pullToRefreshController,
+                  onWebViewCreated: (controller) {
+                    webViewController = controller;
+                  },
+                  onLoadStart: (controller, url) {
+                    setState(() {
+                      this.url = url.toString();
+                      urlController.text = this.url;
+                    });
+                  },
+                  onPermissionRequest: (controller, request) async {
+                    return PermissionResponse(
+                        resources: request.resources,
+                        action: PermissionResponseAction.GRANT);
+                  },
+                  shouldOverrideUrlLoading:
+                      (controller, navigationAction) async {
+                    var uri = navigationAction.request.url!;
+
+                    if (![
+                      "http",
+                      "https",
+                      "file",
+                      "chrome",
+                      "data",
+                      "javascript",
+                      "about"
+                    ].contains(uri.scheme)) {
+                      if (await canLaunchUrl(uri)) {
+                        // Launch the App
+                        await launchUrl(
+                          uri,
+                        );
+                        // and cancel the request
+                        return NavigationActionPolicy.CANCEL;
+                      }
+                    }
+
+                    return NavigationActionPolicy.ALLOW;
+                  },
+                  onDownloadStartRequest: (controller, url) async {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => PdfViewer(
+                        pdfUrl: url.url.toString(),
+                        isDownloadable: true,
+                      ),
+                    ));
+                  },
+                  onLoadStop: (controller, url) async {
+                    pullToRefreshController?.endRefreshing();
+                    setState(() {
+                      this.url = url.toString();
+                      urlController.text = this.url;
+                    });
+                  },
+                  onReceivedError: (controller, request, error) {
+                    pullToRefreshController?.endRefreshing();
+                  },
+                  onProgressChanged: (controller, progress) {
+                    if (progress == 100) {
+                      pullToRefreshController?.endRefreshing();
+                    }
+                    setState(() {
+                      this.progress = progress / 100;
+                      urlController.text = url;
+                    });
+                  },
+                  onUpdateVisitedHistory: (controller, url, androidIsReload) {
+                    setState(() {
+                      this.url = url.toString();
+                      urlController.text = this.url;
+                    });
+                  },
+                  onConsoleMessage: (controller, consoleMessage) {
+                    if (kDebugMode) {
+                      print(consoleMessage);
+                    }
+                  },
+                ),
+                progress < 1.0
+                    ? LinearProgressIndicator(value: progress)
+                    : Container(),
+              ],
+            ),
+          ),
+        ])));
   }
 }
