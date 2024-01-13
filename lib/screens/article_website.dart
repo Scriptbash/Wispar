@@ -6,6 +6,8 @@ import 'pdf_reader.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
+import 'package:mime/mime.dart';
+import 'package:http/http.dart' as http;
 
 class ArticleWebsite extends StatefulWidget {
   final String articleUrl;
@@ -88,6 +90,23 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
     });
   }
 
+  Future<String> checkMimeType(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = response.bodyBytes;
+        final mime = lookupMimeType('', headerBytes: data);
+        return mime ?? '';
+      } else {
+        return '';
+      }
+    } catch (e) {
+      print('Error checking MIME type: $e');
+      return '';
+    }
+  }
+
   void setupController() {
     if (pdfUrl.isNotEmpty) {
       webViewController?.loadUrl(urlRequest: URLRequest(url: WebUri(pdfUrl)));
@@ -157,12 +176,18 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                     return NavigationActionPolicy.ALLOW;
                   },
                   onDownloadStartRequest: (controller, url) async {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => PdfViewer(
-                        pdfUrl: url.url.toString(),
-                        isDownloadable: true,
-                      ),
-                    ));
+                    String? mimeType = await checkMimeType(url.url.toString());
+                    if (mimeType == 'application/pdf') {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => PdfViewer(
+                          pdfUrl: url.url.toString(),
+                          isDownloadable: true,
+                        ),
+                      ));
+                    } else {
+                      launchUrl(Uri.parse(pdfUrl),
+                          mode: LaunchMode.inAppBrowserView);
+                    }
                   },
                   onLoadStop: (controller, url) async {
                     pullToRefreshController?.endRefreshing();

@@ -19,6 +19,7 @@ class HomeScreen extends StatelessWidget {
                 _openSettingsScreen(context);
               },
             ),
+            IconButton(icon: Icon(Icons.more_vert), onPressed: () {}),
           ],
         ),
         body: const Center(

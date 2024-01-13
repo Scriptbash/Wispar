@@ -11,6 +11,7 @@ class PublicationCard extends StatefulWidget {
   final DateTime? publishedDate;
   final String doi;
   final List<PublicationAuthor> authors;
+  final String? dateLiked;
   final VoidCallback? onFavoriteChanged;
 
   const PublicationCard({
@@ -21,6 +22,7 @@ class PublicationCard extends StatefulWidget {
     this.publishedDate,
     required this.doi,
     required List<PublicationAuthor> authors,
+    this.dateLiked,
     this.onFavoriteChanged,
   })  : authors = authors,
         super(key: key);
@@ -129,7 +131,7 @@ class _PublicationCardState extends State<PublicationCard> {
             children: [
               Expanded(
                 child: Text(
-                  'DOI: ${widget.doi}\n${AppLocalizations.of(context)!.publishedin} ${widget.journalTitle}',
+                  'DOI: ${widget.doi}\n${AppLocalizations.of(context)!.publishedin} ${widget.journalTitle}\n${widget.dateLiked != null ? 'Added to your favorites on ${widget.dateLiked}' : ''}',
                   style: TextStyle(
                     color: Colors.grey,
                   ),

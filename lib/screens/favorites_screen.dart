@@ -26,6 +26,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       appBar: AppBar(
         centerTitle: false,
         title: Text(AppLocalizations.of(context)!.favorites),
+        actions: [
+          IconButton(icon: Icon(Icons.more_vert), onPressed: () {}),
+        ],
       ),
       body: FutureBuilder<List<PublicationCard>>(
         future: _favoriteArticles,
@@ -57,6 +60,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     publishedDate: publicationCard.publishedDate,
                     doi: publicationCard.doi,
                     authors: publicationCard.authors,
+                    dateLiked: publicationCard.dateLiked,
                     onFavoriteChanged: () {
                       // Refresh the UI after removing the favorite
                       _removeFavorite(context, publicationCard);

@@ -28,7 +28,8 @@ class DatabaseHelper {
           issn TEXT,
           title TEXT,
           publisher TEXT,
-          subjects TEXT
+          subjects TEXT,
+          dateFollowed TEXT
         )
       ''');
 
@@ -42,7 +43,21 @@ class DatabaseHelper {
           journalTitle TEXT,
           publishedDate TEXT,  
           authors TEXT,
-          FOREIGN KEY (doi) REFERENCES journals(issn)
+          dateLiked TEXT
+        )
+      ''');
+
+        // Create the 'downloads' table
+        await db.execute('''
+        CREATE TABLE downloads (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          doi TEXT,
+          title TEXT,
+          abstract TEXT,
+          journalTitle TEXT,
+          publishedDate TEXT,  
+          authors TEXT,
+          dateDownloaded TEXT
         )
       ''');
       },
@@ -65,6 +80,7 @@ class DatabaseHelper {
         title: maps[i]['title'],
         publisher: maps[i]['publisher'],
         subjects: maps[i]['subjects'],
+        dateFollowed: maps[i]['dateFollowed'],
       );
     });
   }
@@ -84,21 +100,6 @@ class DatabaseHelper {
     return count > 0;
   }
 
-  Future<void> createFavoritesTable(Database db) async {
-    await db.execute('''
-    CREATE TABLE favorites (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      doi TEXT,
-      title TEXT,
-      abstract TEXT,
-      journalTitle TEXT,
-      publishedDate TEXT,  -- Store as TEXT or INTEGER (timestamp) based on your needs
-      authors TEXT,  -- Store authors as a serialized string or use a separate table for authors
-      FOREIGN KEY (doi) REFERENCES journals(issn)
-    )
-  ''');
-  }
-
   Future<void> insertFavorite(PublicationCard publicationCard) async {
     final db = await database;
     await db.insert('favorites', {
@@ -110,6 +111,7 @@ class DatabaseHelper {
       'authors': jsonEncode(publicationCard.authors
           .map((author) => author.toJson())
           .toList()), // Serialize authors to JSON
+      'dateLiked': DateTime.now().toIso8601String().substring(0, 10),
     });
   }
 
@@ -119,16 +121,16 @@ class DatabaseHelper {
 
     return List.generate(maps.length, (i) {
       return PublicationCard(
-        doi: maps[i]['doi'],
-        title: maps[i]['title'],
-        abstract: maps[i]['abstract'],
-        journalTitle: maps[i]['journalTitle'],
-        publishedDate: DateTime.parse(maps[i]['publishedDate']),
-        authors: List<PublicationAuthor>.from(
-          (jsonDecode(maps[i]['authors']) as List<dynamic>)
-              .map((authorJson) => PublicationAuthor.fromJson(authorJson)),
-        ), // Deserialize authors from JSON
-      );
+          doi: maps[i]['doi'],
+          title: maps[i]['title'],
+          abstract: maps[i]['abstract'],
+          journalTitle: maps[i]['journalTitle'],
+          publishedDate: DateTime.parse(maps[i]['publishedDate']),
+          authors: List<PublicationAuthor>.from(
+            (jsonDecode(maps[i]['authors']) as List<dynamic>)
+                .map((authorJson) => PublicationAuthor.fromJson(authorJson)),
+          ), // Deserialize authors from JSON
+          dateLiked: maps[i]['dateLiked']);
     });
   }
 
@@ -153,13 +155,16 @@ class Journal {
   final String title;
   final String publisher;
   final String subjects;
+  final String? dateFollowed;
 
-  Journal(
-      {this.id,
-      required this.issn,
-      required this.title,
-      required this.publisher,
-      required this.subjects});
+  Journal({
+    this.id,
+    required this.issn,
+    required this.title,
+    required this.publisher,
+    required this.subjects,
+    this.dateFollowed,
+  });
 
   Map<String, dynamic> toMap() {
     return {
@@ -167,6 +172,7 @@ class Journal {
       'title': title,
       'publisher': publisher,
       'subjects': subjects,
+      'dateFollowed': DateTime.now().toIso8601String().substring(0, 10),
     };
   }
 }
