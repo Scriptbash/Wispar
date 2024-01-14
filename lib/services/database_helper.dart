@@ -60,6 +60,27 @@ class DatabaseHelper {
           dateDownloaded TEXT
         )
       ''');
+
+        // Create the 'publications_cache' table
+        await db.execute('''
+        CREATE TABLE publications_cache (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          doi TEXT,
+          title TEXT,
+          abstract TEXT,
+          journalTitle TEXT,
+          publishedDate TEXT,  
+          authors TEXT
+        )
+      ''');
+
+        // Create the 'api_call' table
+        await db.execute('''
+        CREATE TABLE api_call_info (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        timestamp TEXT
+        )
+      ''');
       },
     );
   }
@@ -146,6 +167,84 @@ class DatabaseHelper {
       [doi],
     ))!;
     return count > 0;
+  }
+
+  Future<void> insertCachedPublication(PublicationCard publicationCard) async {
+    final db = await database;
+    await db.insert('publications_cache', {
+      'doi': publicationCard.doi,
+      'title': publicationCard.title,
+      'abstract': publicationCard.abstract,
+      'journalTitle': publicationCard.journalTitle,
+      'publishedDate': publicationCard.publishedDate?.toIso8601String(),
+      'authors': jsonEncode(
+        publicationCard.authors.map((author) => author.toJson()).toList(),
+      ),
+    });
+  }
+
+  Future<List<PublicationCard>> getCachedPublications() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps =
+        await db.query('publications_cache');
+
+    return List.generate(maps.length, (i) {
+      return PublicationCard(
+        doi: maps[i]['doi'],
+        title: maps[i]['title'],
+        abstract: maps[i]['abstract'],
+        journalTitle: maps[i]['journalTitle'],
+        publishedDate: DateTime.parse(maps[i]['publishedDate']),
+        authors: List<PublicationAuthor>.from(
+          (jsonDecode(maps[i]['authors']) as List<dynamic>)
+              .map((authorJson) => PublicationAuthor.fromJson(authorJson)),
+        ),
+      );
+    });
+  }
+
+  Future<void> updateCachedPublication(
+      PublicationCard updatedPublication) async {
+    final db = await database;
+    await db.update(
+      'publications_cache',
+      {
+        'title': updatedPublication.title,
+        'abstract': updatedPublication.abstract,
+        'journalTitle': updatedPublication.journalTitle,
+        'publishedDate': updatedPublication.publishedDate?.toIso8601String(),
+        'authors': jsonEncode(updatedPublication.authors
+            .map((author) => author.toJson())
+            .toList()),
+      },
+      where: 'doi = ?',
+      whereArgs: [updatedPublication.doi],
+    );
+  }
+
+  Future<void> clearCachedPublications() async {
+    final db = await database;
+    await db.delete('publications_cache');
+  }
+
+  Future<DateTime> getLastApiCallTimestamp() async {
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.query('api_call_info');
+
+    if (result.isNotEmpty) {
+      final timestampString = result.first['timestamp'] as String;
+      return DateTime.parse(timestampString);
+    }
+
+    return DateTime(2000);
+  }
+
+  Future<void> updateLastApiCallTimestamp(DateTime timestamp) async {
+    final db = await database;
+    await db.update(
+      'api_call_info',
+      {'timestamp': timestamp.toIso8601String()},
+    );
   }
 }
 

@@ -135,6 +135,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                     Clipboard.setData(ClipboardData(text: articleDetails.doi));
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text(AppLocalizations.of(context)!.doicopied),
+                      duration: const Duration(seconds: 1),
                     ));
                   },
                 ),

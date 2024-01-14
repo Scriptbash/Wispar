@@ -240,7 +240,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
   Future<void> _unfollowJournal(BuildContext context, Journal journal) async {
     final dbHelper = DatabaseHelper();
     await dbHelper.removeJournal(journal.issn);
-
+    // Clear the publication cache to force update the home screen
+    await dbHelper.clearCachedPublications();
     // Refresh the UI after unfollowing the journal
     setState(() {});
   }
