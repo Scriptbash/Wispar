@@ -81,6 +81,8 @@ class DatabaseHelper {
         timestamp TEXT
         )
       ''');
+        await db.insert(
+            'api_call_info', {'timestamp': DateTime.now().toIso8601String()});
       },
     );
   }
