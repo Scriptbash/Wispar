@@ -35,14 +35,26 @@ class _HomeScreenState extends State<HomeScreen> {
               onSelected: (item) => handleMenuButton(context, item),
               itemBuilder: (context) => [
                 PopupMenuItem<int>(
-                    value: 0,
-                    child: Text(AppLocalizations.of(context)!.settings)),
+                  value: 0,
+                  child: ListTile(
+                    leading: Icon(Icons.settings_outlined),
+                    title: Text(AppLocalizations.of(context)!.settings),
+                  ),
+                ),
                 PopupMenuItem<int>(
-                    value: 1,
-                    child: Text(AppLocalizations.of(context)!.sortby)),
+                  value: 1,
+                  child: ListTile(
+                    leading: Icon(Icons.sort),
+                    title: Text(AppLocalizations.of(context)!.sortby),
+                  ),
+                ),
                 PopupMenuItem<int>(
-                    value: 2,
-                    child: Text(AppLocalizations.of(context)!.sortorder)),
+                  value: 2,
+                  child: ListTile(
+                    leading: Icon(Icons.sort_by_alpha),
+                    title: Text(AppLocalizations.of(context)!.sortorder),
+                  ),
+                ),
               ],
             ),
           ],

@@ -79,10 +79,19 @@ class _LibraryScreenState extends State<LibraryScreen> {
             onSelected: (item) => handleMenuButton(context, item),
             itemBuilder: (context) => [
               PopupMenuItem<int>(
-                  value: 0, child: Text(AppLocalizations.of(context)!.sortby)),
+                value: 0,
+                child: ListTile(
+                  leading: Icon(Icons.sort),
+                  title: Text(AppLocalizations.of(context)!.sortby),
+                ),
+              ),
               PopupMenuItem<int>(
-                  value: 1,
-                  child: Text(AppLocalizations.of(context)!.sortorder)),
+                value: 1,
+                child: ListTile(
+                  leading: Icon(Icons.sort_by_alpha),
+                  title: Text(AppLocalizations.of(context)!.sortorder),
+                ),
+              ),
             ],
           ),
         ],

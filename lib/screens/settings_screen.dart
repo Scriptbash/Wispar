@@ -76,11 +76,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return Center(
-                        child: Text(snapshot.data ?? 'No institution'),
+                        child: Text(snapshot.data ??
+                            AppLocalizations.of(context)!.noinstitution),
                       );
                     } else {
                       return Center(
-                        child: Text('No institution'),
+                        child:
+                            Text(AppLocalizations.of(context)!.noinstitution),
                       );
                     }
                   },
