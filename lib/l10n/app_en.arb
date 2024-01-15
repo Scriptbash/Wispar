@@ -45,5 +45,9 @@
     "datepublished": "Date published",
     "dateaddedtofavorites": "Date added to favorites",
     "addedtoyourfav": "Added to your favorites on",
-    "noinstitution": "No institution"
+    "noinstitution": "No institution",
+    "buildingfeed": "Building your feed, please wait...",
+    "nopublication1": "No publications available. Make sure you are following journals by going in the ",
+    "nopublication2": " menu and use the",
+    "nopublication3": " icon to find journals."
 }

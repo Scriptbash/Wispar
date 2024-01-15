@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   CircularProgressIndicator(),
                   SizedBox(height: 16),
-                  Text('Building you feed, please wait...'),
+                  Text(AppLocalizations.of(context)!.buildingfeed),
                 ],
               ),
             );
@@ -91,20 +91,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: DefaultTextStyle.of(context).style,
                       children: [
                         TextSpan(
-                          text:
-                              'No data available. Make sure you are following journals by going in the ',
+                          text: AppLocalizations.of(context)!.nopublication1,
                         ),
                         WidgetSpan(
                           child: Icon(Icons.article_outlined),
                         ),
                         TextSpan(
-                          text: ' menu and use the',
+                          text: AppLocalizations.of(context)!.nopublication2,
                         ),
                         WidgetSpan(
                           child: Icon(Icons.search),
                         ),
                         TextSpan(
-                          text: ' icon to find journals.',
+                          text: AppLocalizations.of(context)!.nopublication3,
                         ),
                       ],
                     ),
@@ -302,7 +301,7 @@ class _SortByDialogState extends State<SortByDialog> {
                   widget.onSortByChanged(selectedSortBy);
                 });
               },
-              title: Text('Published date'),
+              title: Text(AppLocalizations.of(context)!.datepublished),
             ),
             RadioListTile<int>(
               value: 1,
