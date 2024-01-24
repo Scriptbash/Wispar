@@ -64,10 +64,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SizedBox(width: 8),
                 Text('EZproxy'),
                 TextButton(
-                    onPressed: () {
-                      unsetInstitution();
-                    },
-                    child: Text('Unset'))
+                  onPressed: () {
+                    unsetInstitution();
+                  },
+                  child: Text(' Unset'),
+                  style: TextButton.styleFrom(
+                    minimumSize: Size.zero,
+                    padding: EdgeInsets.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                )
               ]),
               subtitle: Row(children: [
                 SizedBox(width: 32),

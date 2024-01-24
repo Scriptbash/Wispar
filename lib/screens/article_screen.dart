@@ -6,6 +6,7 @@ import '../services/crossref_api.dart';
 import '../models/crossref_journals_works_models.dart';
 import '../services/database_helper.dart';
 import '../publication_card.dart';
+import './journals_details_screen.dart';
 
 class ArticleScreen extends StatefulWidget {
   final String doi;
@@ -91,9 +92,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
                         fontSize: 20,
                       ),
                     ),
-                    Text(
-                      _getAuthorsNames(articleDetails.authors),
-                    ),
+                    Text(_getAuthorsNames(articleDetails.authors),
+                        style: TextStyle(color: Colors.grey)),
                     SizedBox(height: 20),
                     Text(
                       AppLocalizations.of(context)!.abstract,
@@ -111,9 +111,40 @@ class _ArticleScreenState extends State<ArticleScreen> {
                     ),
                     SizedBox(height: 20),
                     Text(
-                      'DOI: ${articleDetails.doi}\n${AppLocalizations.of(context)!.publishedin} ${articleDetails.journalTitle}',
+                      'DOI: ${articleDetails.doi}',
                       style: TextStyle(
                         color: Colors.grey,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        Map<String, dynamic>? journalInfo =
+                            await getJournalDetails(widget.issn);
+                        if (journalInfo != Null) {
+                          String journalPublisher = journalInfo?['publisher'];
+                          List<String> journalSubjects =
+                              (journalInfo?['subjects'] ?? '').split(',');
+
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => JournalDetailsScreen(
+                                  title: articleDetails.journalTitle,
+                                  publisher: journalPublisher,
+                                  issn: widget.issn,
+                                  subjects: journalSubjects,
+                                ),
+                              ));
+                        }
+                      },
+                      child: Text(
+                        '${AppLocalizations.of(context)!.publishedin} ${articleDetails.journalTitle}',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                      style: TextButton.styleFrom(
+                        minimumSize: Size.zero,
+                        padding: EdgeInsets.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                     ),
                   ],
@@ -223,5 +254,17 @@ class _ArticleScreenState extends State<ArticleScreen> {
     setState(() {
       isLiked = liked;
     });
+  }
+
+  Future<Map<String, dynamic>?> getJournalDetails(String issn) async {
+    final db = await databaseHelper.database;
+    final List<Map<String, dynamic>> rows = await db.query(
+      'journals',
+      columns: ['publisher', 'subjects'],
+      where: 'issn = ?',
+      whereArgs: [issn],
+    );
+
+    return rows.isNotEmpty ? rows.first : null;
   }
 }

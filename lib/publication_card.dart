@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import './models/crossref_journals_works_models.dart';
 import './screens/article_screen.dart';
+import './screens/journals_details_screen.dart';
 import './services/database_helper.dart';
 
 class PublicationCard extends StatefulWidget {
@@ -73,6 +74,35 @@ class _PublicationCardState extends State<PublicationCard> {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              TextButton(
+                onPressed: () async {
+                  // Need to add a check to avoid infinite routing
+                  Map<String, dynamic>? journalInfo =
+                      await getJournalDetails(widget.issn);
+                  if (journalInfo != Null) {
+                    String journalPublisher = journalInfo?['publisher'];
+                    List<String> journalSubjects =
+                        (journalInfo?['subjects'] ?? '').split(',');
+
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => JournalDetailsScreen(
+                            title: widget.journalTitle,
+                            publisher: journalPublisher,
+                            issn: widget.issn,
+                            subjects: journalSubjects,
+                          ),
+                        ));
+                  }
+                },
+                child: Text(widget.journalTitle),
+                style: TextButton.styleFrom(
+                  minimumSize: Size.zero,
+                  padding: EdgeInsets.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              ),
               Text(
                 _formattedDate(widget.publishedDate!),
                 style: TextStyle(
@@ -134,7 +164,7 @@ class _PublicationCardState extends State<PublicationCard> {
             children: [
               Expanded(
                 child: Text(
-                  'DOI: ${widget.doi}\n${AppLocalizations.of(context)!.publishedin} ${widget.journalTitle}${widget.dateLiked != null ? '\n${AppLocalizations.of(context)!.addedtoyourfav} ${widget.dateLiked}' : ''}',
+                  'DOI: ${widget.doi}${widget.dateLiked != null ? '\n${AppLocalizations.of(context)!.addedtoyourfav} ${widget.dateLiked}' : ''}',
                   style: TextStyle(
                     color: Colors.grey,
                   ),
@@ -182,5 +212,17 @@ class _PublicationCardState extends State<PublicationCard> {
     setState(() {
       isLiked = liked;
     });
+  }
+
+  Future<Map<String, dynamic>?> getJournalDetails(String issn) async {
+    final db = await databaseHelper.database;
+    final List<Map<String, dynamic>> rows = await db.query(
+      'journals',
+      columns: ['publisher', 'subjects'],
+      where: 'issn = ?',
+      whereArgs: [issn],
+    );
+
+    return rows.isNotEmpty ? rows.first : null;
   }
 }
