@@ -111,11 +111,12 @@ class Item {
   }
 
   static String _cleanAbstract(String rawAbstract) {
-    return rawAbstract
+    rawAbstract = rawAbstract
         .replaceAll(RegExp(r'<[^>]*>'), '') // Remove HTML tags
-        .replaceAll(RegExp(r'\bAbstract. \b'),
-            '') // Remove the word "Abstract" in between the HTML tags
+        .replaceAll(RegExp(r'^\s*Abstract\s*'), '') // Remove leading "Abstract"
         .trim();
+
+    return rawAbstract;
   }
 
   static String _extractTitle(dynamic title) {
