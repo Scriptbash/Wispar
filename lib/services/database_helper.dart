@@ -24,45 +24,43 @@ class DatabaseHelper {
       onCreate: (db, version) async {
         await db.execute('''
         CREATE TABLE journals (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          journal_id INTEGER PRIMARY KEY AUTOINCREMENT,
           issn TEXT,
           title TEXT,
           publisher TEXT,
           subjects TEXT,
-          dateFollowed TEXT
+          dateFollowed TEXT,
+          lastUpdated TEXT
         )
       ''');
 
         // Create the 'favorites' table
         await db.execute('''
-        CREATE TABLE favorites (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
+        CREATE TABLE articles (
+          article_id INTEGER PRIMARY KEY AUTOINCREMENT,
           doi TEXT,
           title TEXT,
           abstract TEXT,
-          journalTitle TEXT,
           publishedDate TEXT,  
           authors TEXT,
-          dateLiked TEXT
-        )
-      ''');
-
-        // Create the 'downloads' table
-        await db.execute('''
-        CREATE TABLE downloads (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          doi TEXT,
-          title TEXT,
-          abstract TEXT,
-          journalTitle TEXT,
-          publishedDate TEXT,  
-          authors TEXT,
-          dateDownloaded TEXT
+          dateLiked TEXT,
+          dateDownloaded TEXT,
+          dateCached TEXT,
+          journal_id,
+          FOREIGN KEY (journal_id) REFERENCES journals(journal_id)
         )
       ''');
 
         // Create the 'publications_cache' table
         await db.execute('''
+          CREATE TABLE publications_cache (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+              article_id INTEGER,
+              FOREIGN KEY (article_id) REFERENCES articles(article_id)
+           )
+          ''');
+
+        /*await db.execute('''
         CREATE TABLE publications_cache (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           doi TEXT,
@@ -72,9 +70,9 @@ class DatabaseHelper {
           publishedDate TEXT,  
           authors TEXT
         )
-      ''');
+      ''');*/
 
-        // Create the 'api_call' table
+        /* // Create the 'api_call' table
         await db.execute('''
         CREATE TABLE api_call_info (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -82,20 +80,51 @@ class DatabaseHelper {
         )
       ''');
         await db.insert(
-            'api_call_info', {'timestamp': DateTime.now().toIso8601String()});
+            'api_call_info', {'timestamp': DateTime.now().toIso8601String()});*/
       },
     );
   }
 
   Future<void> insertJournal(Journal journal) async {
     final db = await database;
-    await db.insert('journals', journal.toMap());
+    // Check if the journal is already in the database
+    final List<Map<String, dynamic>> journalMaps = await db.query(
+      'journals',
+      columns: ['journal_id', 'dateFollowed'],
+      where: 'issn = ?',
+      whereArgs: [journal.issn],
+    );
+
+    if (journalMaps.isNotEmpty) {
+      // Journal found, retrieve its ID
+      final int journalId = journalMaps.first['journal_id'];
+
+      // If the journal wasn't followed before, update the dateFollowed
+      if (journalMaps.first['dateFollowed'] == null) {
+        await db.update(
+          'journals',
+          {
+            'dateFollowed': DateTime.now().toIso8601String().substring(0, 10),
+            'title': journal.title,
+            'publisher': journal.publisher,
+            'subjects': journal.subjects,
+          },
+          where: 'journal_id = ?',
+          whereArgs: [journalId],
+        );
+      }
+    } else {
+      // Journal not found, insert it
+      await db.insert('journals', journal.toMap());
+    }
   }
 
   Future<List<Journal>> getJournals() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('journals');
-
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+    SELECT * FROM journals
+    WHERE dateFollowed IS NOT NULL
+  ''');
     return List.generate(maps.length, (i) {
       return Journal(
         id: maps[i]['id'],
@@ -104,68 +133,166 @@ class DatabaseHelper {
         publisher: maps[i]['publisher'],
         subjects: maps[i]['subjects'],
         dateFollowed: maps[i]['dateFollowed'],
+        lastUpdated: maps[i]['lastUpdated'],
       );
     });
   }
 
   Future<void> removeJournal(String issn) async {
     final db = await database;
-    await db.delete('journals', where: 'issn = ?', whereArgs: [issn]);
-    ;
+
+    await db.update(
+      'articles',
+      {'dateCached': null},
+      where: 'journal_id IN (SELECT journal_id FROM journals WHERE issn = ?)',
+      whereArgs: [issn],
+    );
+
+    await db.update(
+      'journals',
+      {'dateFollowed': null, 'lastUpdated': null},
+      where: 'issn = ?',
+      whereArgs: [issn],
+    );
   }
 
   Future<bool> isJournalFollowed(String issn) async {
     final db = await database;
     final count = Sqflite.firstIntValue(await db.rawQuery(
-      'SELECT COUNT(*) FROM journals WHERE issn = ?',
+      'SELECT COUNT(*) FROM journals WHERE issn = ? AND dateFollowed IS NOT NULL',
       [issn],
     ))!;
     return count > 0;
   }
 
-  Future<void> insertFavorite(PublicationCard publicationCard) async {
+  Future<void> insertArticle(
+    PublicationCard publicationCard, {
+    bool isLiked = false,
+    bool isDownloaded = false,
+    bool isCached = false,
+  }) async {
     final db = await database;
-    await db.insert('favorites', {
-      'doi': publicationCard.doi,
-      'title': publicationCard.title,
-      'abstract': publicationCard.abstract,
-      'journalTitle': publicationCard.journalTitle,
-      'publishedDate': publicationCard.publishedDate?.toIso8601String(),
-      'authors': jsonEncode(publicationCard.authors
-          .map((author) => author.toJson())
-          .toList()), // Serialize authors to JSON
-      'dateLiked': DateTime.now().toIso8601String().substring(0, 10),
-    });
+
+    // Check if the article with the given DOI already exists
+    final List<Map<String, dynamic>> existingArticle = await db.query(
+      'articles',
+      columns: ['article_id', 'dateLiked', 'dateDownloaded', 'dateCached'],
+      where: 'doi = ?',
+      whereArgs: [publicationCard.doi],
+    );
+
+    if (existingArticle.isNotEmpty) {
+      // Article already exists, update the timestamp based on parameters
+      final Map<String, dynamic> updateData = {};
+
+      if (isLiked && existingArticle[0]['dateLiked'] == null) {
+        updateData['dateLiked'] =
+            DateTime.now().toIso8601String().substring(0, 10);
+      }
+
+      if (isDownloaded && existingArticle[0]['dateDownloaded'] == null) {
+        updateData['dateDownloaded'] =
+            DateTime.now().toIso8601String().substring(0, 10);
+      }
+
+      if (isCached && existingArticle[0]['dateCached'] == null) {
+        updateData['dateCached'] = DateTime.now().toIso8601String();
+      }
+
+      if (updateData.isNotEmpty) {
+        await db.update(
+          'articles',
+          updateData,
+          where: 'article_id = ?',
+          whereArgs: [existingArticle[0]['article_id']],
+        );
+      }
+    } else {
+      // Article does not exist, proceed with inserting
+      final List<Map<String, dynamic>> journalMaps = await db.query(
+        'journals',
+        columns: ['journal_id'],
+        where: 'issn = ?',
+        whereArgs: [publicationCard.issn],
+      );
+
+      int journalId;
+
+      if (journalMaps.isNotEmpty) {
+        // Journal found, retrieve its ID
+        journalId = journalMaps.first['journal_id'];
+      } else {
+        // Journal not found, insert it
+        final Map<String, dynamic> journalData = {
+          'issn': publicationCard.issn,
+          'title': publicationCard.journalTitle, // default title
+          'publisher': '',
+          'subjects': '',
+        };
+
+        journalId = await db.insert('journals', journalData);
+      }
+
+      await db.insert('articles', {
+        'doi': publicationCard.doi,
+        'title': publicationCard.title,
+        'abstract': publicationCard.abstract,
+        'publishedDate': publicationCard.publishedDate?.toIso8601String(),
+        'authors': jsonEncode(publicationCard.authors
+            .map((author) => author.toJson())
+            .toList()), // Serialize authors to JSON
+        'dateLiked':
+            isLiked ? DateTime.now().toIso8601String().substring(0, 10) : null,
+        'dateDownloaded': isDownloaded
+            ? DateTime.now().toIso8601String().substring(0, 10)
+            : null,
+        'dateCached': isCached ? DateTime.now().toIso8601String() : null,
+        'journal_id': journalId,
+      });
+    }
   }
 
   Future<List<PublicationCard>> getFavoriteArticles() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('favorites');
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+    SELECT articles.*, journals.title AS journalTitle, journals.issn
+    FROM articles
+    JOIN journals ON articles.journal_id = journals.journal_id
+    WHERE articles.dateLiked IS NOT NULL
+  ''');
 
     return List.generate(maps.length, (i) {
       return PublicationCard(
-          doi: maps[i]['doi'],
-          title: maps[i]['title'],
-          abstract: maps[i]['abstract'],
-          journalTitle: maps[i]['journalTitle'],
-          publishedDate: DateTime.parse(maps[i]['publishedDate']),
-          authors: List<PublicationAuthor>.from(
-            (jsonDecode(maps[i]['authors']) as List<dynamic>)
-                .map((authorJson) => PublicationAuthor.fromJson(authorJson)),
-          ), // Deserialize authors from JSON
-          dateLiked: maps[i]['dateLiked']);
+        doi: maps[i]['doi'],
+        title: maps[i]['title'],
+        issn: maps[i]['issn'],
+        abstract: maps[i]['abstract'],
+        publishedDate: DateTime.parse(maps[i]['publishedDate']),
+        authors: List<PublicationAuthor>.from(
+          (jsonDecode(maps[i]['authors']) as List<dynamic>)
+              .map((authorJson) => PublicationAuthor.fromJson(authorJson)),
+        ), // Deserialize authors from JSON
+        dateLiked: maps[i]['dateLiked'],
+        journalTitle: maps[i]['journalTitle'],
+      );
     });
   }
 
   Future<void> removeFavorite(String doi) async {
     final db = await database;
-    await db.delete('favorites', where: 'doi = ?', whereArgs: [doi]);
+
+    await db.update(
+      'articles',
+      {'dateLiked': null},
+      where: 'doi = ?',
+      whereArgs: [doi],
+    );
   }
 
   Future<bool> isArticleFavorite(String doi) async {
     final db = await database;
     final count = Sqflite.firstIntValue(await db.rawQuery(
-      'SELECT COUNT(*) FROM favorites WHERE doi = ?',
+      'SELECT COUNT(*) FROM articles WHERE doi = ? AND dateLiked IS NOT NULL',
       [doi],
     ))!;
     return count > 0;
@@ -173,27 +300,72 @@ class DatabaseHelper {
 
   Future<void> insertCachedPublication(PublicationCard publicationCard) async {
     final db = await database;
-    await db.insert('publications_cache', {
-      'doi': publicationCard.doi,
-      'title': publicationCard.title,
-      'abstract': publicationCard.abstract,
-      'journalTitle': publicationCard.journalTitle,
-      'publishedDate': publicationCard.publishedDate?.toIso8601String(),
-      'authors': jsonEncode(
-        publicationCard.authors.map((author) => author.toJson()).toList(),
-      ),
-    });
+    final List<Map<String, dynamic>> publicationMaps = await db.query(
+      'articles',
+      columns: ['article_id', 'dateCached'],
+      where: 'doi = ?',
+      whereArgs: [publicationCard.doi],
+    );
+
+    if (publicationMaps.isNotEmpty) {
+      // Publication found, retrieve its ID
+      final int articleId = publicationMaps.first['article_id'];
+
+      // If the publication wasn't cached before, update the dateCached
+      if (publicationMaps.first['dateCached'] == null) {
+        await db.update(
+          'articles',
+          {
+            'dateCached': DateTime.now().toIso8601String(),
+            'title': publicationCard.title,
+            'abstract': publicationCard.abstract,
+            'journal_id': // Get the corresponding journal_id based on issn
+                (await db.query('journals',
+                    columns: ['journal_id'],
+                    where: 'issn = ?',
+                    whereArgs: [publicationCard.issn]))[0]['journal_id'],
+            'publishedDate': publicationCard.publishedDate?.toIso8601String(),
+            'authors': jsonEncode(
+              publicationCard.authors.map((author) => author.toJson()).toList(),
+            ),
+          },
+          where: 'article_id = ?',
+          whereArgs: [articleId],
+        );
+      }
+    } else {
+      // Publication not found, insert it
+      await db.insert('articles', {
+        'doi': publicationCard.doi,
+        'title': publicationCard.title,
+        'abstract': publicationCard.abstract,
+        'journal_id': // Get the corresponding journal_id based on issn
+            (await db.query('journals',
+                columns: ['journal_id'],
+                where: 'issn = ?',
+                whereArgs: [publicationCard.issn]))[0]['journal_id'],
+        'publishedDate': publicationCard.publishedDate?.toIso8601String(),
+        'authors': jsonEncode(
+          publicationCard.authors.map((author) => author.toJson()).toList(),
+        ),
+        'dateCached': DateTime.now().toIso8601String(),
+      });
+    }
   }
 
   Future<List<PublicationCard>> getCachedPublications() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps =
-        await db.query('publications_cache');
-
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+    SELECT articles.*, journals.title AS journalTitle, journals.issn
+    FROM articles
+    JOIN journals ON articles.journal_id = journals.journal_id
+    WHERE articles.dateCached IS NOT NULL
+  ''');
     return List.generate(maps.length, (i) {
       return PublicationCard(
         doi: maps[i]['doi'],
         title: maps[i]['title'],
+        issn: maps[i]['issn'],
         abstract: maps[i]['abstract'],
         journalTitle: maps[i]['journalTitle'],
         publishedDate: DateTime.parse(maps[i]['publishedDate']),
@@ -205,7 +377,7 @@ class DatabaseHelper {
     });
   }
 
-  Future<void> updateCachedPublication(
+  /*Future<void> updateCachedPublication(
       PublicationCard updatedPublication) async {
     final db = await database;
     await db.update(
@@ -222,32 +394,34 @@ class DatabaseHelper {
       where: 'doi = ?',
       whereArgs: [updatedPublication.doi],
     );
-  }
+  }*/
 
   Future<void> clearCachedPublications() async {
     final db = await database;
-    await db.delete('publications_cache');
+    await db.delete(
+      'articles',
+      where:
+          'dateCached IS NOT NULL AND (dateLiked IS NULL AND dateDownloaded IS NULL)',
+    );
   }
 
-  Future<DateTime> getLastApiCallTimestamp() async {
+  Future<void> updateJournalLastUpdated(String issn) async {
     final db = await database;
-    final List<Map<String, dynamic>> result = await db.query('api_call_info');
-
-    if (result.isNotEmpty) {
-      final timestampString = result.first['timestamp'] as String;
-      return DateTime.parse(timestampString);
-    }
-
-    return DateTime(2000);
+    await db.update(
+      'journals',
+      {'lastUpdated': DateTime.now().toIso8601String()},
+      where: 'issn = ?',
+      whereArgs: [issn],
+    );
   }
 
-  Future<void> updateLastApiCallTimestamp(DateTime timestamp) async {
+  /*Future<void> updateLastApiCallTimestamp(DateTime timestamp) async {
     final db = await database;
     await db.update(
       'api_call_info',
       {'timestamp': timestamp.toIso8601String()},
     );
-  }
+  }*/
 }
 
 class Journal {
@@ -257,6 +431,7 @@ class Journal {
   final String publisher;
   final String subjects;
   final String? dateFollowed;
+  final String? lastUpdated;
 
   Journal({
     this.id,
@@ -265,6 +440,7 @@ class Journal {
     required this.publisher,
     required this.subjects,
     this.dateFollowed,
+    this.lastUpdated,
   });
 
   Map<String, dynamic> toMap() {
@@ -274,6 +450,7 @@ class Journal {
       'publisher': publisher,
       'subjects': subjects,
       'dateFollowed': DateTime.now().toIso8601String().substring(0, 10),
+      'lastUpdated': lastUpdated,
     };
   }
 }

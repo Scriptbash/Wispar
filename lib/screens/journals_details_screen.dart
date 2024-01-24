@@ -85,6 +85,7 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
                     title: workTitle,
                     abstract: work.abstract,
                     journalTitle: work.journalTitle,
+                    issn: widget.issn,
                     publishedDate: work.publishedDate,
                     doi: work.doi,
                     authors: work.authors,

@@ -241,7 +241,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
     final dbHelper = DatabaseHelper();
     await dbHelper.removeJournal(journal.issn);
     // Clear the publication cache to force update the home screen
-    await dbHelper.clearCachedPublications();
+    //await dbHelper.clearCachedPublications();
     // Refresh the UI after unfollowing the journal
     setState(() {});
   }

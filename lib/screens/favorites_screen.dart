@@ -81,6 +81,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   title: publicationCard.title,
                   abstract: publicationCard.abstract,
                   journalTitle: publicationCard.journalTitle,
+                  issn: publicationCard.issn,
                   publishedDate: publicationCard.publishedDate,
                   doi: publicationCard.doi,
                   authors: publicationCard.authors,

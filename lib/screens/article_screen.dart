@@ -10,11 +10,13 @@ import '../publication_card.dart';
 class ArticleScreen extends StatefulWidget {
   final String doi;
   final String title;
+  final String issn;
 
   const ArticleScreen({
     Key? key,
     required this.doi,
     required this.title,
+    required this.issn,
   }) : super(key: key);
 
   @override
@@ -177,13 +179,15 @@ class _ArticleScreenState extends State<ArticleScreen> {
                       title: articleDetails.title,
                       abstract: articleDetails.abstract,
                       journalTitle: articleDetails.journalTitle,
+                      issn: widget.issn,
                       publishedDate: articleDetails.publishedDate,
                       doi: articleDetails.doi,
                       authors: articleDetails.authors,
                     );
 
                     if (isLiked) {
-                      await databaseHelper.insertFavorite(publicationCard);
+                      await databaseHelper.insertArticle(publicationCard,
+                          isLiked: true);
                     } else {
                       await databaseHelper.removeFavorite(articleDetails.doi);
                     }

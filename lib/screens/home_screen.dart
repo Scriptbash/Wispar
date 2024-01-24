@@ -133,6 +133,10 @@ class _HomeScreenState extends State<HomeScreen> {
       // Get the cache publications
       List<PublicationCard> feedItems = await dbHelper.getCachedPublications();
 
+      // Check if journals need to be updated
+      List<String> journalsToUpdate =
+          await _checkJournalsLastUpdated(followedJournals);
+
       // Sort publications
       feedItems.sort((a, b) {
         switch (sortBy) {
@@ -155,43 +159,45 @@ class _HomeScreenState extends State<HomeScreen> {
       }
 
       // Check if there are new journals since the last API call
-      bool shouldForceApiCall = await _checkForNewJournals(followedJournals);
+      //bool shouldForceApiCall = await _checkForNewJournals(followedJournals);
 
       // If the cache is empty or there are new journals, fetch recent feed from the API
-      if (feedItems.isEmpty || shouldForceApiCall) {
-        feedItems = [];
+      if (feedItems.isEmpty || journalsToUpdate.isNotEmpty) {
+        //feedItems = [];
         for (Journal journal in followedJournals) {
-          try {
-            List<journalWorks.Item> recentFeed =
-                await FeedApi.getRecentFeed(journal.issn);
+          // Only fetch from the API if the journal needs an update
+          if (journalsToUpdate.contains(journal.issn)) {
+            try {
+              await dbHelper.updateJournalLastUpdated(journal.issn);
+              List<journalWorks.Item> recentFeed =
+                  await FeedApi.getRecentFeed(journal.issn);
 
-            List<PublicationCard> cards = recentFeed.map((item) {
-              return PublicationCard(
-                title: item.title,
-                abstract: item.abstract,
-                journalTitle: item.journalTitle,
-                publishedDate: item.publishedDate,
-                doi: item.doi,
-                authors: item.authors,
-              );
-            }).toList();
+              List<PublicationCard> cards = recentFeed.map((item) {
+                return PublicationCard(
+                  title: item.title,
+                  abstract: item.abstract,
+                  journalTitle: item.journalTitle,
+                  issn: journal.issn,
+                  publishedDate: item.publishedDate,
+                  doi: item.doi,
+                  authors: item.authors,
+                );
+              }).toList();
 
-            feedItems.addAll(cards);
-          } catch (e) {
-            print('Error fetching recent feed for ${journal.title}: $e');
+              feedItems.addAll(cards);
+            } catch (e) {
+              print('Error fetching recent feed for ${journal.title}: $e');
+            }
           }
         }
 
-        // Update the timestamp of the last API call
-        await dbHelper.updateLastApiCallTimestamp(DateTime.now());
-
         // Cache the fetched publications
-        await dbHelper.clearCachedPublications();
+        // await dbHelper.clearCachedPublications();
         for (PublicationCard item in feedItems) {
-          await dbHelper.insertCachedPublication(item);
+          await dbHelper.insertArticle(item, isCached: true);
+          //await dbHelper.insertCachedPublication(item);
         }
       }
-
       return feedItems;
     } catch (e) {
       print('Error in _getRecentFeedForFollowedJournals: $e');
@@ -199,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<bool> _checkForNewJournals(List<Journal> followedJournals) async {
+  /*Future<bool> _checkForNewJournals(List<Journal> followedJournals) async {
     try {
       // Get the timestamp of the last API call
       DateTime? lastApiCallTimestamp = await dbHelper.getLastApiCallTimestamp();
@@ -209,6 +215,33 @@ class _HomeScreenState extends State<HomeScreen> {
       print('Error in _checkForNewJournals: $e');
       return false;
     }
+  }*/
+
+  Future<List<String>> _checkJournalsLastUpdated(
+      List<Journal> followedJournals) async {
+    final db = await dbHelper.database;
+    List<String> journalsToUpdate = [];
+
+    for (Journal journal in followedJournals) {
+      List<Map<String, dynamic>> result = await db.query(
+        'journals',
+        columns: ['issn', 'lastUpdated'],
+        where: 'issn = ?',
+        whereArgs: [journal.issn],
+      );
+
+      if (result.isNotEmpty) {
+        String? lastUpdated = result.first['lastUpdated'] as String?;
+
+        if (lastUpdated == null ||
+            DateTime.now().difference(DateTime.parse(lastUpdated)).inHours >=
+                6) {
+          journalsToUpdate.add(result.first['issn'] as String);
+        }
+      }
+    }
+
+    return journalsToUpdate;
   }
 
   void _handleSortByChanged(int value) {

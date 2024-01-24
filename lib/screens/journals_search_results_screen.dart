@@ -247,7 +247,7 @@ class FollowButton extends StatelessWidget {
       );
     }
 
-    await dbHelper.clearCachedPublications();
+    //await dbHelper.clearCachedPublications();
     onFollowStatusChanged(!currentlyFollowed);
   }
 }

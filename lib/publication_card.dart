@@ -8,6 +8,7 @@ class PublicationCard extends StatefulWidget {
   final String title;
   final String abstract;
   final String journalTitle;
+  final String issn;
   final DateTime? publishedDate;
   final String doi;
   final List<PublicationAuthor> authors;
@@ -19,6 +20,7 @@ class PublicationCard extends StatefulWidget {
     required this.title,
     required this.abstract,
     required this.journalTitle,
+    required this.issn,
     this.publishedDate,
     required this.doi,
     required List<PublicationAuthor> authors,
@@ -44,8 +46,8 @@ class _PublicationCardState extends State<PublicationCard> {
 
   @override
   Widget build(BuildContext context) {
-    // Skip the card creation if the publication title is empty
-    if (widget.title.isEmpty) {
+    // Skip the card creation if the publication title or authors is empty
+    if (widget.title.isEmpty || widget.authors.isEmpty) {
       return Container();
     }
 
@@ -58,6 +60,7 @@ class _PublicationCardState extends State<PublicationCard> {
             builder: (context) => ArticleScreen(
               doi: widget.doi,
               title: widget.title,
+              issn: widget.issn,
             ),
           ),
         );
@@ -147,7 +150,7 @@ class _PublicationCardState extends State<PublicationCard> {
                     isLiked = !isLiked;
                   });
                   if (isLiked) {
-                    databaseHelper.insertFavorite(widget);
+                    databaseHelper.insertArticle(widget, isLiked: true);
                   } else {
                     databaseHelper.removeFavorite(widget.doi);
                   }
