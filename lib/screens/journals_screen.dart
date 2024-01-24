@@ -384,7 +384,7 @@ class _SortByDialogState extends State<SortByDialog> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: Text('OK'),
+          child: Center(child: Text('OK')),
         ),
       ],
     );
@@ -448,7 +448,7 @@ class _SortOrderDialogState extends State<SortOrderDialog> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: Text('OK'),
+          child: Center(child: Text('OK')),
         ),
       ],
     );
