@@ -94,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           text: AppLocalizations.of(context)!.nopublication1,
                         ),
                         WidgetSpan(
-                          child: Icon(Icons.article_outlined),
+                          child: Icon(Icons.library_books_outlined),
                         ),
                         TextSpan(
                           text: AppLocalizations.of(context)!.nopublication2,

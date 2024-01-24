@@ -45,18 +45,9 @@ dependencies:
   intl: any
   flutter_inappwebview: ^6.0.0
   url_launcher: ^6.2.3
-  pdfx: 
-    git:
-      url: 'https://github.com/ScerIO/packages.flutter'
-      ref: '4be9de9ffed5398fd7d5f44bbb07dcd3d3f1711b'
-      path: packages/pdfx
   http: ^1.1.2
-  internet_file:
-    git:
-      url: https://github.com/ScerIO/packages.dart.git
-      ref: master
-      path: packages/internet_file
   mime: ^1.0.4
+  pdfrx: ^0.4.10
 
 dev_dependencies:
   flutter_test:

@@ -176,18 +176,18 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                     return NavigationActionPolicy.ALLOW;
                   },
                   onDownloadStartRequest: (controller, url) async {
-                    String? mimeType = await checkMimeType(url.url.toString());
-                    if (mimeType == 'application/pdf') {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => PdfViewer(
-                          pdfUrl: url.url.toString(),
-                          isDownloadable: true,
-                        ),
-                      ));
-                    } else {
-                      launchUrl(Uri.parse(pdfUrl),
-                          mode: LaunchMode.inAppBrowserView);
-                    }
+                    //String? mimeType = await checkMimeType(url.url.toString());
+                    //if (mimeType == 'application/pdf') {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => PdfReader(
+                        pdfUrl: url.url.toString(),
+                        isDownloadable: true,
+                      ),
+                    ));
+                    //} else {
+                    //  launchUrl(Uri.parse(pdfUrl),
+                    //      mode: LaunchMode.inAppBrowserView);
+                    //x}
                   },
                   onLoadStop: (controller, url) async {
                     pullToRefreshController?.endRefreshing();
