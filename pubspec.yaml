@@ -48,6 +48,7 @@ dependencies:
   http: ^1.1.2
   mime: ^1.0.4
   pdfrx: ^0.4.10
+  package_info_plus: ^5.0.1
 
 dev_dependencies:
   flutter_test:
@@ -81,8 +82,8 @@ flutter:
   generate: true  # Used for localizations
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/icon/icon.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
