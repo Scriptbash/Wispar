@@ -25,9 +25,12 @@ jobs:
         path: build/app/outputs/apk/debug/app-debug.apk
   build-ios:
     name: Build for iOS
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
     - uses: actions/checkout@v4
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '15.1'
     - uses: subosito/flutter-action@v2
       with:
         channel: 'stable'
