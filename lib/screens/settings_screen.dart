@@ -36,7 +36,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: <Widget>[
             Center(
               child: ListTile(
-                onTap: () {},
+                //onTap: () {},
                 title: Column(
                   children: [
                     Image.asset(
@@ -201,8 +201,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             ListTile(
               onTap: () {
-                // Will need to point it to the privacy policy once it's created
-                launchUrl(Uri.parse('https://github.com/Scriptbash/Wispar/'),
+                launchUrl(
+                    Uri.parse(
+                        'https://github.com/Scriptbash/Wispar/blob/main/PRIVACY.md'),
                     mode: LaunchMode.platformDefault);
               },
               title: Row(
@@ -213,6 +214,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
             ),
+            ListTile(
+                onTap: () {
+                  launchUrl(Uri.parse('https://ko-fi.com/scriptbash'),
+                      mode: LaunchMode.platformDefault);
+                },
+                title: Row(
+                  children: [
+                    Icon(Icons.favorite_border),
+                    SizedBox(width: 8),
+                    Text('Donate'),
+                  ],
+                ),
+                subtitle: Row(children: [
+                  SizedBox(width: 32),
+                  Text('Help support development of Wispar')
+                ])),
           ],
         ),
       ),
