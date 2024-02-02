@@ -113,7 +113,8 @@ class Item {
   static String _cleanAbstract(String rawAbstract) {
     rawAbstract = rawAbstract
         .replaceAll(RegExp(r'<[^>]*>'), '') // Remove HTML tags
-        .replaceAll(RegExp(r'^\s*Abstract\s*'), '') // Remove leading "Abstract"
+        .replaceAll(
+            RegExp(r'^\s*Abstract\.?\s*'), '') // Remove leading "Abstract"
         .trim();
 
     return rawAbstract;
