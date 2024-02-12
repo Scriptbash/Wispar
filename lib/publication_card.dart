@@ -84,35 +84,43 @@ class _PublicationCardState extends State<PublicationCard> {
             children: [
               Row(
                 children: [
-                  TextButton(
-                    onPressed: () async {
-                      // Need to add a check to avoid infinite routing
-                      Map<String, dynamic>? journalInfo =
-                          await getJournalDetails(widget.issn);
-                      if (journalInfo != Null) {
-                        String journalPublisher = journalInfo?['publisher'];
-                        List<String> journalSubjects =
-                            (journalInfo?['subjects'] ?? '').split(',');
+                  Expanded(
+                      child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton(
+                            onPressed: () async {
+                              // Need to add a check to avoid infinite routing
+                              Map<String, dynamic>? journalInfo =
+                                  await getJournalDetails(widget.issn);
+                              if (journalInfo != Null) {
+                                String journalPublisher =
+                                    journalInfo?['publisher'];
+                                List<String> journalSubjects =
+                                    (journalInfo?['subjects'] ?? '').split(',');
 
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => JournalDetailsScreen(
-                                title: widget.journalTitle,
-                                publisher: journalPublisher,
-                                issn: widget.issn,
-                                subjects: journalSubjects,
-                              ),
-                            ));
-                      }
-                    },
-                    child: Text(widget.journalTitle),
-                    style: TextButton.styleFrom(
-                      minimumSize: Size.zero,
-                      padding: EdgeInsets.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                  ),
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          JournalDetailsScreen(
+                                        title: widget.journalTitle,
+                                        publisher: journalPublisher,
+                                        issn: widget.issn,
+                                        subjects: journalSubjects,
+                                      ),
+                                    ));
+                              }
+                            },
+                            child: Text(
+                              widget.journalTitle,
+                              softWrap: true,
+                            ),
+                            style: TextButton.styleFrom(
+                              minimumSize: Size.zero,
+                              padding: EdgeInsets.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ))),
                   Expanded(
                       child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
