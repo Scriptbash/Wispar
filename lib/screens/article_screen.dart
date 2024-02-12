@@ -111,12 +111,51 @@ class _ArticleScreenState extends State<ArticleScreen> {
                       textAlign: TextAlign.justify,
                     ),
                     SizedBox(height: 20),
-                    Text(
-                      'DOI: ${articleDetails.doi}',
-                      style: TextStyle(
-                        color: Colors.grey,
+                    Row(children: [
+                      Expanded(
+                        child: Text(
+                          'DOI: ${articleDetails.doi}',
+                          style: TextStyle(
+                            color: Colors.grey,
+                          ),
+                        ),
                       ),
-                    ),
+                      IconButton(
+                        icon: Icon(
+                          isLiked ? Icons.favorite : Icons.favorite_border,
+                          color: isLiked ? Colors.red : null,
+                        ),
+                        onPressed: () async {
+                          setState(() {
+                            isLiked = !isLiked;
+                          });
+
+                          PublicationCard publicationCard = PublicationCard(
+                            title: articleDetails.title,
+                            abstract: articleDetails.abstract,
+                            journalTitle: articleDetails.journalTitle,
+                            issn: widget.issn,
+                            publishedDate: articleDetails.publishedDate,
+                            doi: articleDetails.doi,
+                            authors: articleDetails.authors,
+                          );
+
+                          if (isLiked) {
+                            await databaseHelper.insertArticle(publicationCard,
+                                isLiked: true);
+                          } else {
+                            await databaseHelper
+                                .removeFavorite(articleDetails.doi);
+                          }
+
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(isLiked
+                                ? '${articleDetails.title} ${AppLocalizations.of(context)!.favoriteadded}'
+                                : '${articleDetails.title} ${AppLocalizations.of(context)!.favoriteremoved}'),
+                          ));
+                        },
+                      ),
+                    ]),
                     TextButton(
                       onPressed: () async {
                         Map<String, dynamic>? journalInfo =
@@ -164,33 +203,6 @@ class _ArticleScreenState extends State<ArticleScreen> {
             Column(
               children: [
                 IconButton(
-                  icon: Icon(Icons.book_outlined),
-                  onPressed: () {
-                    List<Map<String, dynamic>> authorsData = [];
-                    for (PublicationAuthor author in articleDetails.authors) {
-                      authorsData.add({
-                        'creatorType': 'author',
-                        'firstName': author.given,
-                        'lastName': author.family,
-                      });
-                    }
-                    ZoteroService.sendToZotero(
-                        context,
-                        authorsData,
-                        widget.title,
-                        articleDetails.abstract,
-                        articleDetails.journalTitle,
-                        articleDetails.publishedDate,
-                        widget.doi,
-                        widget.issn);
-                  },
-                ),
-                Text('Send to Zotero'),
-              ],
-            ),
-            Column(
-              children: [
-                IconButton(
                   icon: Icon(Icons.copy_outlined),
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: articleDetails.doi));
@@ -225,40 +237,28 @@ class _ArticleScreenState extends State<ArticleScreen> {
             Column(
               children: [
                 IconButton(
-                  icon: Icon(
-                    isLiked ? Icons.favorite : Icons.favorite_border,
-                    color: isLiked ? Colors.red : null,
-                  ),
-                  onPressed: () async {
-                    setState(() {
-                      isLiked = !isLiked;
-                    });
-
-                    PublicationCard publicationCard = PublicationCard(
-                      title: articleDetails.title,
-                      abstract: articleDetails.abstract,
-                      journalTitle: articleDetails.journalTitle,
-                      issn: widget.issn,
-                      publishedDate: articleDetails.publishedDate,
-                      doi: articleDetails.doi,
-                      authors: articleDetails.authors,
-                    );
-
-                    if (isLiked) {
-                      await databaseHelper.insertArticle(publicationCard,
-                          isLiked: true);
-                    } else {
-                      await databaseHelper.removeFavorite(articleDetails.doi);
+                  icon: Icon(Icons.book_outlined),
+                  onPressed: () {
+                    List<Map<String, dynamic>> authorsData = [];
+                    for (PublicationAuthor author in articleDetails.authors) {
+                      authorsData.add({
+                        'creatorType': 'author',
+                        'firstName': author.given,
+                        'lastName': author.family,
+                      });
                     }
-
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text(isLiked
-                          ? '${articleDetails.title} ${AppLocalizations.of(context)!.favoriteadded}'
-                          : '${articleDetails.title} ${AppLocalizations.of(context)!.favoriteremoved}'),
-                    ));
+                    ZoteroService.sendToZotero(
+                        context,
+                        authorsData,
+                        widget.title,
+                        articleDetails.abstract,
+                        articleDetails.journalTitle,
+                        articleDetails.publishedDate,
+                        widget.doi,
+                        widget.issn);
                   },
                 ),
-                Text(AppLocalizations.of(context)!.favorite),
+                Text('Send to Zotero'),
               ],
             ),
           ],
