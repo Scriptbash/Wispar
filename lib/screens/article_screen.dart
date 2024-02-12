@@ -113,13 +113,57 @@ class _ArticleScreenState extends State<ArticleScreen> {
                     SizedBox(height: 20),
                     Row(children: [
                       Expanded(
-                        child: Text(
-                          'DOI: ${articleDetails.doi}',
-                          style: TextStyle(
-                            color: Colors.grey,
+                          child: Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'DOI: ${articleDetails.doi}',
+                              style: TextStyle(
+                                color: Colors.grey,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: TextButton(
+                              onPressed: () async {
+                                Map<String, dynamic>? journalInfo =
+                                    await getJournalDetails(widget.issn);
+                                if (journalInfo != Null) {
+                                  String journalPublisher =
+                                      journalInfo?['publisher'];
+                                  List<String> journalSubjects =
+                                      (journalInfo?['subjects'] ?? '')
+                                          .split(',');
+
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          JournalDetailsScreen(
+                                        title: articleDetails.journalTitle,
+                                        publisher: journalPublisher,
+                                        issn: widget.issn,
+                                        subjects: journalSubjects,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Text(
+                                '${AppLocalizations.of(context)!.publishedin} ${articleDetails.journalTitle}',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                              style: TextButton.styleFrom(
+                                minimumSize: Size.zero,
+                                padding: EdgeInsets.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )),
                       IconButton(
                         icon: Icon(
                           isLiked ? Icons.favorite : Icons.favorite_border,
@@ -156,37 +200,6 @@ class _ArticleScreenState extends State<ArticleScreen> {
                         },
                       ),
                     ]),
-                    TextButton(
-                      onPressed: () async {
-                        Map<String, dynamic>? journalInfo =
-                            await getJournalDetails(widget.issn);
-                        if (journalInfo != Null) {
-                          String journalPublisher = journalInfo?['publisher'];
-                          List<String> journalSubjects =
-                              (journalInfo?['subjects'] ?? '').split(',');
-
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => JournalDetailsScreen(
-                                  title: articleDetails.journalTitle,
-                                  publisher: journalPublisher,
-                                  issn: widget.issn,
-                                  subjects: journalSubjects,
-                                ),
-                              ));
-                        }
-                      },
-                      child: Text(
-                        '${AppLocalizations.of(context)!.publishedin} ${articleDetails.journalTitle}',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      style: TextButton.styleFrom(
-                        minimumSize: Size.zero,
-                        padding: EdgeInsets.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -203,6 +216,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
             Column(
               children: [
                 IconButton(
+                  iconSize: 30,
                   icon: Icon(Icons.copy_outlined),
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: articleDetails.doi));
@@ -212,12 +226,16 @@ class _ArticleScreenState extends State<ArticleScreen> {
                     ));
                   },
                 ),
-                Text(AppLocalizations.of(context)!.copydoi),
+                Text(
+                  AppLocalizations.of(context)!.copydoi,
+                  style: TextStyle(fontSize: 10),
+                ),
               ],
             ),
             Column(
               children: [
                 IconButton(
+                  iconSize: 30,
                   icon: Icon(Icons.article),
                   onPressed: () {
                     Navigator.push(
@@ -231,12 +249,14 @@ class _ArticleScreenState extends State<ArticleScreen> {
                     );
                   },
                 ),
-                Text(AppLocalizations.of(context)!.viewarticle),
+                Text(AppLocalizations.of(context)!.viewarticle,
+                    style: TextStyle(fontSize: 10)),
               ],
             ),
             Column(
               children: [
                 IconButton(
+                  iconSize: 30,
                   icon: Icon(Icons.book_outlined),
                   onPressed: () {
                     List<Map<String, dynamic>> authorsData = [];
@@ -258,7 +278,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                         widget.issn);
                   },
                 ),
-                Text('Send to Zotero'),
+                Text('Send to Zotero', style: TextStyle(fontSize: 10)),
               ],
             ),
           ],
