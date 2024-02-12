@@ -191,6 +191,8 @@ class _PublicationCardState extends State<PublicationCard> {
               Text(
                 '${AppLocalizations.of(context)!.authors}: ${_getAuthorsNames(widget.authors)}',
                 style: TextStyle(fontSize: 13, color: Colors.grey),
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
               ),
               SizedBox(height: 8.0),
               LayoutBuilder(

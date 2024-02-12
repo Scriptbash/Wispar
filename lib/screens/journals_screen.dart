@@ -340,6 +340,7 @@ class _SortByDialogState extends State<SortByDialog> {
                   selectedSortBy = value!;
                   widget.onSortByChanged(selectedSortBy);
                 });
+                Navigator.pop(context);
               },
               title: Text(AppLocalizations.of(context)!.journaltitle),
             ),
@@ -351,6 +352,7 @@ class _SortByDialogState extends State<SortByDialog> {
                   selectedSortBy = value!;
                   widget.onSortByChanged(selectedSortBy);
                 });
+                Navigator.pop(context);
               },
               title: Text(AppLocalizations.of(context)!.publisher),
             ),
@@ -362,6 +364,7 @@ class _SortByDialogState extends State<SortByDialog> {
                   selectedSortBy = value!;
                   widget.onSortByChanged(selectedSortBy);
                 });
+                Navigator.pop(context);
               },
               title: Text(AppLocalizations.of(context)!.followingdate),
             ),
@@ -373,20 +376,13 @@ class _SortByDialogState extends State<SortByDialog> {
                   selectedSortBy = value!;
                   widget.onSortByChanged(selectedSortBy);
                 });
+                Navigator.pop(context);
               },
               title: Text('ISSN'),
             ),
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Center(child: Text('OK')),
-        ),
-      ],
     );
   }
 }
@@ -426,6 +422,7 @@ class _SortOrderDialogState extends State<SortOrderDialog> {
                   selectedSortOrder = value!;
                   widget.onSortOrderChanged(selectedSortOrder);
                 });
+                Navigator.pop(context);
               },
               title: Text(AppLocalizations.of(context)!.ascending),
             ),
@@ -437,20 +434,13 @@ class _SortOrderDialogState extends State<SortOrderDialog> {
                   selectedSortOrder = value!;
                   widget.onSortOrderChanged(selectedSortOrder);
                 });
+                Navigator.pop(context);
               },
               title: Text(AppLocalizations.of(context)!.descending),
             ),
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Center(child: Text('OK')),
-        ),
-      ],
     );
   }
 }
