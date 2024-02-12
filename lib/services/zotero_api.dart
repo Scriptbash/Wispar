@@ -71,6 +71,12 @@ class ZoteroService {
     return prefs.getString('zoteroApiKey');
   }
 
+  // Function to load the userId from shared preferences
+  static Future<String?> loadUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('zoteroUserId');
+  }
+
   // Function to get the userID required to make API requests
   static Future<int> getUserId(String apiKey) async {
     final response = await http.get(
@@ -80,7 +86,7 @@ class ZoteroService {
       Map<String, dynamic> data = json.decode(response.body);
       return data['userID'];
     } else {
-      throw Exception('Failed to load user ID');
+      return 0;
     }
   }
 

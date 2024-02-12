@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/zotero_api.dart';
 
 class ZoteroSettings extends StatefulWidget {
   const ZoteroSettings({Key? key});
@@ -64,12 +65,31 @@ class _ZoteroSettingsState extends State<ZoteroSettings> {
                   //border: OutlineInputBorder(),
                   hintText: 'Enter an API key',
                 ),
-                onChanged: (value) async {
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  await prefs.setString('zoteroApiKey', value);
-                },
+                onChanged: (value) {},
               ),
+              ElevatedButton(
+                  onPressed: () async {
+                    String apiKey = _apiKeyController.text;
+                    if (apiKey != '') {
+                      int userId = await ZoteroService.getUserId(apiKey);
+                      if (userId != 0) {
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        await prefs.setString('zoteroApiKey', apiKey);
+                        await prefs.setString(
+                            'zoteroUserId', userId.toString());
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text('API key saved!'),
+                            duration: const Duration(seconds: 2)));
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('Invalid API key'),
+                          duration: const Duration(seconds: 3),
+                        ));
+                      }
+                    }
+                  },
+                  child: Text('Save'))
             ],
           ),
         ),

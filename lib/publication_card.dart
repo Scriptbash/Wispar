@@ -282,13 +282,12 @@ class _PublicationCardState extends State<PublicationCard> {
 
   void _sendToZotero() async {
     String? apiKey = await ZoteroService.loadApiKey();
+    String? userId = await ZoteroService.loadUserId();
     String? wisparCollectionKey;
 
-    if (apiKey != null && apiKey.isNotEmpty) {
-      int userId = await ZoteroService.getUserId(apiKey);
-      //print(userId);
+    if (apiKey != null && apiKey.isNotEmpty && userId != null) {
       List<ZoteroCollection> collections =
-          await ZoteroService.getTopCollections(apiKey, userId.toString());
+          await ZoteroService.getTopCollections(apiKey, userId);
 
       bool collectionExists = false;
       for (ZoteroCollection collection in collections) {
@@ -306,12 +305,10 @@ class _PublicationCardState extends State<PublicationCard> {
         print('Wispar collection does not exist yet');
 
         // Create the "Wispar" collection
-        await ZoteroService.createZoteroCollection(
-            apiKey, userId.toString(), 'Wispar');
+        await ZoteroService.createZoteroCollection(apiKey, userId, 'Wispar');
 
         // Retrieve the updated list of collections
-        collections =
-            await ZoteroService.getTopCollections(apiKey, userId.toString());
+        collections = await ZoteroService.getTopCollections(apiKey, userId);
 
         // Extract the key of the "Wispar" collection from the updated list
         for (ZoteroCollection collection in collections) {
@@ -372,8 +369,7 @@ class _PublicationCardState extends State<PublicationCard> {
           {'creatorType': 'reviewedAuthor'}
         ]*/
       };
-      await ZoteroService.createZoteroItem(
-          apiKey, userId.toString(), articleData);
+      await ZoteroService.createZoteroItem(apiKey, userId, articleData);
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('The article was sent to Zotero'),
