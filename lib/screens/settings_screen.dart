@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../theme_provider.dart';
 import './institutions_screen.dart';
+import './zotero_settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -187,6 +188,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     }
                   },
                 ),
+              ]),
+            ),
+            ListTile(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ZoteroSettings(),
+                  ),
+                );
+              },
+              title: Row(
+                children: [
+                  Icon(Icons.book_outlined),
+                  SizedBox(width: 8),
+                  Text('Zotero'),
+                ],
+              ),
+              subtitle: Row(children: [
+                SizedBox(width: 32),
+                Text('Manage Zotero'),
               ]),
             ),
             ListTile(

@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import './models/crossref_journals_works_models.dart';
 import './screens/article_screen.dart';
 import './screens/journals_details_screen.dart';
 import './services/database_helper.dart';
+import './services/zotero_api.dart';
+
+enum SampleItem {
+  itemOne,
+  itemTwo,
+}
 
 class PublicationCard extends StatefulWidget {
   final String title;
@@ -37,6 +44,7 @@ class PublicationCard extends StatefulWidget {
 class _PublicationCardState extends State<PublicationCard> {
   bool isLiked = false;
   late DatabaseHelper databaseHelper;
+  SampleItem? selectedMenu;
 
   @override
   void initState() {
@@ -74,34 +82,80 @@ class _PublicationCardState extends State<PublicationCard> {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextButton(
-                onPressed: () async {
-                  // Need to add a check to avoid infinite routing
-                  Map<String, dynamic>? journalInfo =
-                      await getJournalDetails(widget.issn);
-                  if (journalInfo != Null) {
-                    String journalPublisher = journalInfo?['publisher'];
-                    List<String> journalSubjects =
-                        (journalInfo?['subjects'] ?? '').split(',');
+              Row(
+                children: [
+                  TextButton(
+                    onPressed: () async {
+                      // Need to add a check to avoid infinite routing
+                      Map<String, dynamic>? journalInfo =
+                          await getJournalDetails(widget.issn);
+                      if (journalInfo != Null) {
+                        String journalPublisher = journalInfo?['publisher'];
+                        List<String> journalSubjects =
+                            (journalInfo?['subjects'] ?? '').split(',');
 
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => JournalDetailsScreen(
-                            title: widget.journalTitle,
-                            publisher: journalPublisher,
-                            issn: widget.issn,
-                            subjects: journalSubjects,
-                          ),
-                        ));
-                  }
-                },
-                child: Text(widget.journalTitle),
-                style: TextButton.styleFrom(
-                  minimumSize: Size.zero,
-                  padding: EdgeInsets.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => JournalDetailsScreen(
+                                title: widget.journalTitle,
+                                publisher: journalPublisher,
+                                issn: widget.issn,
+                                subjects: journalSubjects,
+                              ),
+                            ));
+                      }
+                    },
+                    child: Text(widget.journalTitle),
+                    style: TextButton.styleFrom(
+                      minimumSize: Size.zero,
+                      padding: EdgeInsets.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
+                  Expanded(
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                        PopupMenuButton<SampleItem>(
+                          onSelected: (SampleItem result) {
+                            setState(() {
+                              //selectedMenu = result;
+                              if (result == SampleItem.itemOne) {
+                                // Send article to Zotero
+                                _sendToZotero();
+                              } else {
+                                if (result == SampleItem.itemTwo) {
+                                  // Copy DOI
+                                  Clipboard.setData(
+                                      ClipboardData(text: widget.doi));
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(SnackBar(
+                                    content: Text(AppLocalizations.of(context)!
+                                        .doicopied),
+                                    duration: const Duration(seconds: 1),
+                                  ));
+                                }
+                              }
+                            });
+                          },
+                          itemBuilder: (BuildContext context) =>
+                              <PopupMenuEntry<SampleItem>>[
+                            const PopupMenuItem<SampleItem>(
+                                value: SampleItem.itemOne,
+                                child: ListTile(
+                                    leading: Icon(Icons.book_outlined),
+                                    title: Text('Send to Zotero'))),
+                            const PopupMenuItem<SampleItem>(
+                                value: SampleItem.itemTwo,
+                                child: ListTile(
+                                  leading: Icon(Icons.copy),
+                                  title: Text('Copy DOI'),
+                                )),
+                          ],
+                        )
+                      ]))
+                ],
               ),
               Text(
                 _formattedDate(widget.publishedDate!),
@@ -224,5 +278,114 @@ class _PublicationCardState extends State<PublicationCard> {
     );
 
     return rows.isNotEmpty ? rows.first : null;
+  }
+
+  void _sendToZotero() async {
+    String? apiKey = await ZoteroService.loadApiKey();
+    String? wisparCollectionKey;
+
+    if (apiKey != null && apiKey.isNotEmpty) {
+      int userId = await ZoteroService.getUserId(apiKey);
+      //print(userId);
+      List<ZoteroCollection> collections =
+          await ZoteroService.getTopCollections(apiKey, userId.toString());
+
+      bool collectionExists = false;
+      for (ZoteroCollection collection in collections) {
+        if (collection.name == "Wispar") {
+          collectionExists = true;
+          wisparCollectionKey = collection.key; // Extract the key
+          break;
+        }
+      }
+
+      if (collectionExists) {
+        print(
+            'Wispar collection already exists with key: $wisparCollectionKey');
+      } else {
+        print('Wispar collection does not exist yet');
+
+        // Create the "Wispar" collection
+        await ZoteroService.createZoteroCollection(
+            apiKey, userId.toString(), 'Wispar');
+
+        // Retrieve the updated list of collections
+        collections =
+            await ZoteroService.getTopCollections(apiKey, userId.toString());
+
+        // Extract the key of the "Wispar" collection from the updated list
+        for (ZoteroCollection collection in collections) {
+          if (collection.name == "Wispar") {
+            wisparCollectionKey = collection.key;
+            break;
+          }
+        }
+      }
+
+      // Prepare the author names
+      List<Map<String, dynamic>> authorsData = [];
+      for (PublicationAuthor author in widget.authors) {
+        authorsData.add({
+          'creatorType': 'author',
+          'firstName': author.given,
+          'lastName': author.family,
+        });
+      }
+      Map<String, dynamic> articleData = {
+        'data': {
+          'itemType': 'journalArticle',
+          'title': widget.title,
+          'abstractNote': widget.abstract,
+          'publicationTitle': widget.journalTitle,
+          'volume': '', //'Volume Number',
+          'issue': '', //'Issue Number',
+          'pages': '', //'Page Numbers',
+          'date': widget.publishedDate!.toIso8601String(),
+          'series': '', //'Series',
+          'seriesTitle': '', //'Series Title',
+          'seriesText': '', //'Series Text',
+          'journalAbbreviation': '', //'Journal Abbreviation',
+          'language': '', //'Language',
+          'DOI': widget.doi,
+          'ISSN': widget.issn,
+          'shortTitle': '', //'Short Title',
+          'url': '',
+          'accessDate': _formattedDate(DateTime.now()),
+          'archive': '', //'Archive',
+          'archiveLocation': '', //'Archive Location',
+          'libraryCatalog': '', //'Library Catalog',
+          'callNumber': '', //'Call Number',
+          'rights': '', //'Rights',
+          'extra': '', //'Extra Information',
+          'creators': authorsData,
+          'collections': [wisparCollectionKey],
+          'tags': [
+            {'tag': 'wispar'},
+          ],
+          'relations': {},
+        }
+        /*'creatorTypes': [
+          {'creatorType': 'author', 'primary': true},
+          {'creatorType': 'contributor'},
+          {'creatorType': 'editor'},
+          {'creatorType': 'translator'},
+          {'creatorType': 'reviewedAuthor'}
+        ]*/
+      };
+      await ZoteroService.createZoteroItem(
+          apiKey, userId.toString(), articleData);
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('The article was sent to Zotero'),
+        duration: const Duration(seconds: 1),
+      ));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          'API key is null or empty. Please configure the API key in the settings.',
+        ),
+        duration: const Duration(seconds: 5),
+      ));
+    }
   }
 }
