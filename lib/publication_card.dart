@@ -123,7 +123,25 @@ class _PublicationCardState extends State<PublicationCard> {
                               //selectedMenu = result;
                               if (result == SampleItem.itemOne) {
                                 // Send article to Zotero
-                                _sendToZotero();
+                                // Prepare the author names
+                                List<Map<String, dynamic>> authorsData = [];
+                                for (PublicationAuthor author
+                                    in widget.authors) {
+                                  authorsData.add({
+                                    'creatorType': 'author',
+                                    'firstName': author.given,
+                                    'lastName': author.family,
+                                  });
+                                }
+                                ZoteroService.sendToZotero(
+                                    context,
+                                    authorsData,
+                                    widget.title,
+                                    widget.abstract,
+                                    widget.journalTitle,
+                                    widget.publishedDate,
+                                    widget.doi,
+                                    widget.issn);
                               } else {
                                 if (result == SampleItem.itemTwo) {
                                   // Copy DOI
@@ -278,110 +296,5 @@ class _PublicationCardState extends State<PublicationCard> {
     );
 
     return rows.isNotEmpty ? rows.first : null;
-  }
-
-  void _sendToZotero() async {
-    String? apiKey = await ZoteroService.loadApiKey();
-    String? userId = await ZoteroService.loadUserId();
-    String? wisparCollectionKey;
-
-    if (apiKey != null && apiKey.isNotEmpty && userId != null) {
-      List<ZoteroCollection> collections =
-          await ZoteroService.getTopCollections(apiKey, userId);
-
-      bool collectionExists = false;
-      for (ZoteroCollection collection in collections) {
-        if (collection.name == "Wispar") {
-          collectionExists = true;
-          wisparCollectionKey = collection.key; // Extract the key
-          break;
-        }
-      }
-
-      if (collectionExists) {
-        print(
-            'Wispar collection already exists with key: $wisparCollectionKey');
-      } else {
-        print('Wispar collection does not exist yet');
-
-        // Create the "Wispar" collection
-        await ZoteroService.createZoteroCollection(apiKey, userId, 'Wispar');
-
-        // Retrieve the updated list of collections
-        collections = await ZoteroService.getTopCollections(apiKey, userId);
-
-        // Extract the key of the "Wispar" collection from the updated list
-        for (ZoteroCollection collection in collections) {
-          if (collection.name == "Wispar") {
-            wisparCollectionKey = collection.key;
-            break;
-          }
-        }
-      }
-
-      // Prepare the author names
-      List<Map<String, dynamic>> authorsData = [];
-      for (PublicationAuthor author in widget.authors) {
-        authorsData.add({
-          'creatorType': 'author',
-          'firstName': author.given,
-          'lastName': author.family,
-        });
-      }
-      Map<String, dynamic> articleData = {
-        'data': {
-          'itemType': 'journalArticle',
-          'title': widget.title,
-          'abstractNote': widget.abstract,
-          'publicationTitle': widget.journalTitle,
-          'volume': '', //'Volume Number',
-          'issue': '', //'Issue Number',
-          'pages': '', //'Page Numbers',
-          'date': widget.publishedDate!.toIso8601String(),
-          'series': '', //'Series',
-          'seriesTitle': '', //'Series Title',
-          'seriesText': '', //'Series Text',
-          'journalAbbreviation': '', //'Journal Abbreviation',
-          'language': '', //'Language',
-          'DOI': widget.doi,
-          'ISSN': widget.issn,
-          'shortTitle': '', //'Short Title',
-          'url': '',
-          'accessDate': _formattedDate(DateTime.now()),
-          'archive': '', //'Archive',
-          'archiveLocation': '', //'Archive Location',
-          'libraryCatalog': '', //'Library Catalog',
-          'callNumber': '', //'Call Number',
-          'rights': '', //'Rights',
-          'extra': '', //'Extra Information',
-          'creators': authorsData,
-          'collections': [wisparCollectionKey],
-          'tags': [
-            {'tag': 'wispar'},
-          ],
-          'relations': {},
-        }
-        /*'creatorTypes': [
-          {'creatorType': 'author', 'primary': true},
-          {'creatorType': 'contributor'},
-          {'creatorType': 'editor'},
-          {'creatorType': 'translator'},
-          {'creatorType': 'reviewedAuthor'}
-        ]*/
-      };
-      await ZoteroService.createZoteroItem(apiKey, userId, articleData);
-
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('The article was sent to Zotero'),
-        duration: const Duration(seconds: 1),
-      ));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(
-          'API key is null or empty. Please configure the API key in the settings.',
-        ),
-        duration: const Duration(seconds: 5),
-      ));
-    }
   }
 }

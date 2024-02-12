@@ -7,6 +7,7 @@ import '../models/crossref_journals_works_models.dart';
 import '../services/database_helper.dart';
 import '../publication_card.dart';
 import './journals_details_screen.dart';
+import '../services/zotero_api.dart';
 
 class ArticleScreen extends StatefulWidget {
   final String doi;
@@ -160,6 +161,33 @@ class _ArticleScreenState extends State<ArticleScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            Column(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.book_outlined),
+                  onPressed: () {
+                    List<Map<String, dynamic>> authorsData = [];
+                    for (PublicationAuthor author in articleDetails.authors) {
+                      authorsData.add({
+                        'creatorType': 'author',
+                        'firstName': author.given,
+                        'lastName': author.family,
+                      });
+                    }
+                    ZoteroService.sendToZotero(
+                        context,
+                        authorsData,
+                        widget.title,
+                        articleDetails.abstract,
+                        articleDetails.journalTitle,
+                        articleDetails.publishedDate,
+                        widget.doi,
+                        widget.issn);
+                  },
+                ),
+                Text('Send to Zotero'),
+              ],
+            ),
             Column(
               children: [
                 IconButton(
