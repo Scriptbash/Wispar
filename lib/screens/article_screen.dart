@@ -94,21 +94,14 @@ class _ArticleScreenState extends State<ArticleScreen> {
                       ),
                     ),
                     Text(_getAuthorsNames(articleDetails.authors),
-                        style: TextStyle(color: Colors.grey)),
-                    SizedBox(height: 20),
-                    Text(
-                      AppLocalizations.of(context)!.abstract,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.justify,
-                    ),
+                        style: TextStyle(color: Colors.grey, fontSize: 13)),
+                    SizedBox(height: 15),
                     Text(
                       articleDetails.abstract.isNotEmpty
                           ? articleDetails.abstract
                           : AppLocalizations.of(context)!.abstractunavailable,
                       textAlign: TextAlign.justify,
+                      style: TextStyle(fontSize: 15),
                     ),
                     SizedBox(height: 20),
                     Row(children: [
