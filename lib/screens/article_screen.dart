@@ -13,12 +13,22 @@ class ArticleScreen extends StatefulWidget {
   final String doi;
   final String title;
   final String issn;
+  final String abstract;
+  final String journalTitle;
+  final DateTime? publishedDate;
+  final List<PublicationAuthor> authors;
+  final String url;
 
   const ArticleScreen({
     Key? key,
     required this.doi,
     required this.title,
     required this.issn,
+    required this.abstract,
+    required this.journalTitle,
+    this.publishedDate,
+    required this.authors,
+    required this.url,
   }) : super(key: key);
 
   @override
@@ -26,28 +36,14 @@ class ArticleScreen extends StatefulWidget {
 }
 
 class _ArticleScreenState extends State<ArticleScreen> {
-  late Future<Item> articleDetailsFuture;
-  bool isLoading = true;
-  late Item articleDetails;
   bool isLiked = false;
   late DatabaseHelper databaseHelper;
 
   @override
   void initState() {
     super.initState();
-    articleDetailsFuture = fetchArticleDetails();
     databaseHelper = DatabaseHelper();
     checkIfLiked();
-  }
-
-  Future<Item> fetchArticleDetails() async {
-    try {
-      return await CrossRefApi.getWorkByDOI(widget.doi);
-    } catch (e) {
-      print('Error fetching article details: $e');
-      throw Exception(
-          'Failed to fetch article details. Please try again later.');
-    }
   }
 
   @override
@@ -56,149 +52,130 @@ class _ArticleScreenState extends State<ArticleScreen> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: FutureBuilder<Item>(
-        future: articleDetailsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          } else if (!snapshot.hasData) {
-            return Center(
-              child: Text('No data available'),
-            );
-          } else {
-            articleDetails = snapshot.data!;
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${AppLocalizations.of(context)!.publishedon} ${_formattedDate(articleDetails.publishedDate)}',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 13,
-                      ),
-                    ),
-                    Text(
-                      articleDetails.title,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                    Text(_getAuthorsNames(articleDetails.authors),
-                        style: TextStyle(color: Colors.grey, fontSize: 13)),
-                    SizedBox(height: 15),
-                    Text(
-                      articleDetails.abstract.isNotEmpty
-                          ? articleDetails.abstract
-                          : AppLocalizations.of(context)!.abstractunavailable,
-                      textAlign: TextAlign.justify,
-                      style: TextStyle(fontSize: 15),
-                    ),
-                    SizedBox(height: 20),
-                    Row(children: [
-                      Expanded(
-                          child: Column(
-                        children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'DOI: ${articleDetails.doi}',
-                              style: TextStyle(
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: TextButton(
-                              onPressed: () async {
-                                Map<String, dynamic>? journalInfo =
-                                    await getJournalDetails(widget.issn);
-                                if (journalInfo != Null) {
-                                  String journalPublisher =
-                                      journalInfo?['publisher'];
-                                  List<String> journalSubjects =
-                                      (journalInfo?['subjects'] ?? '')
-                                          .split(',');
-
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          JournalDetailsScreen(
-                                        title: articleDetails.journalTitle,
-                                        publisher: journalPublisher,
-                                        issn: widget.issn,
-                                        subjects: journalSubjects,
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                              child: Text(
-                                '${AppLocalizations.of(context)!.publishedin} ${articleDetails.journalTitle}',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                              style: TextButton.styleFrom(
-                                minimumSize: Size.zero,
-                                padding: EdgeInsets.zero,
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                            ),
-                          ),
-                        ],
-                      )),
-                      IconButton(
-                        icon: Icon(
-                          isLiked ? Icons.favorite : Icons.favorite_border,
-                          color: isLiked ? Colors.red : null,
-                        ),
-                        onPressed: () async {
-                          setState(() {
-                            isLiked = !isLiked;
-                          });
-
-                          PublicationCard publicationCard = PublicationCard(
-                            title: articleDetails.title,
-                            abstract: articleDetails.abstract,
-                            journalTitle: articleDetails.journalTitle,
-                            issn: widget.issn,
-                            publishedDate: articleDetails.publishedDate,
-                            doi: articleDetails.doi,
-                            authors: articleDetails.authors,
-                          );
-
-                          if (isLiked) {
-                            await databaseHelper.insertArticle(publicationCard,
-                                isLiked: true);
-                          } else {
-                            await databaseHelper
-                                .removeFavorite(articleDetails.doi);
-                          }
-
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text(isLiked
-                                ? '${articleDetails.title} ${AppLocalizations.of(context)!.favoriteadded}'
-                                : '${articleDetails.title} ${AppLocalizations.of(context)!.favoriteremoved}'),
-                          ));
-                        },
-                      ),
-                    ]),
-                  ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${AppLocalizations.of(context)!.publishedon} ${_formattedDate(widget.publishedDate)}',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 13,
                 ),
               ),
-            );
-          }
-        },
+              Text(
+                widget.title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              Text(_getAuthorsNames(widget.authors),
+                  style: TextStyle(color: Colors.grey, fontSize: 13)),
+              SizedBox(height: 15),
+              Text(
+                widget.abstract.isNotEmpty
+                    ? widget.abstract
+                    : AppLocalizations.of(context)!.abstractunavailable,
+                textAlign: TextAlign.justify,
+                style: TextStyle(fontSize: 15),
+              ),
+              SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'DOI: ${widget.doi}',
+                            style: TextStyle(
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton(
+                            onPressed: () async {
+                              Map<String, dynamic>? journalInfo =
+                                  await getJournalDetails(widget.issn);
+                              if (journalInfo != null) {
+                                String journalPublisher =
+                                    journalInfo['publisher'];
+                                List<String> journalSubjects =
+                                    (journalInfo['subjects'] ?? '').split(',');
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => JournalDetailsScreen(
+                                      title: widget.journalTitle,
+                                      publisher: journalPublisher,
+                                      issn: widget.issn,
+                                      subjects: journalSubjects,
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                            child: Text(
+                              '${AppLocalizations.of(context)!.publishedin} ${widget.journalTitle}',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                            style: TextButton.styleFrom(
+                              minimumSize: Size.zero,
+                              padding: EdgeInsets.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      isLiked ? Icons.favorite : Icons.favorite_border,
+                      color: isLiked ? Colors.red : null,
+                    ),
+                    onPressed: () async {
+                      setState(() {
+                        isLiked = !isLiked;
+                      });
+
+                      if (isLiked) {
+                        await databaseHelper.insertArticle(
+                          PublicationCard(
+                            title: widget.title,
+                            abstract: widget.abstract,
+                            journalTitle: widget.journalTitle,
+                            issn: widget.issn,
+                            publishedDate: widget.publishedDate,
+                            doi: widget.doi,
+                            authors: widget.authors,
+                            url: widget.url,
+                          ),
+                          isLiked: true,
+                        );
+                      } else {
+                        await databaseHelper.removeFavorite(widget.doi);
+                      }
+
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(isLiked
+                            ? '${widget.title} ${AppLocalizations.of(context)!.favoriteadded}'
+                            : '${widget.title} ${AppLocalizations.of(context)!.favoriteremoved}'),
+                      ));
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
       bottomNavigationBar: Container(
         height: 80,
@@ -212,7 +189,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                   iconSize: 30,
                   icon: Icon(Icons.copy_outlined),
                   onPressed: () {
-                    Clipboard.setData(ClipboardData(text: articleDetails.doi));
+                    Clipboard.setData(ClipboardData(text: widget.doi));
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text(AppLocalizations.of(context)!.doicopied),
                       duration: const Duration(seconds: 1),
@@ -235,8 +212,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => ArticleWebsite(
-                          articleUrl: articleDetails.primaryUrl,
-                          doi: articleDetails.doi,
+                          articleUrl: widget.url,
+                          doi: widget.doi,
                         ),
                       ),
                     );
@@ -253,7 +230,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                   icon: Icon(Icons.book_outlined),
                   onPressed: () {
                     List<Map<String, dynamic>> authorsData = [];
-                    for (PublicationAuthor author in articleDetails.authors) {
+                    for (PublicationAuthor author in widget.authors) {
                       authorsData.add({
                         'creatorType': 'author',
                         'firstName': author.given,
@@ -264,9 +241,9 @@ class _ArticleScreenState extends State<ArticleScreen> {
                         context,
                         authorsData,
                         widget.title,
-                        articleDetails.abstract,
-                        articleDetails.journalTitle,
-                        articleDetails.publishedDate,
+                        widget.abstract,
+                        widget.journalTitle,
+                        widget.publishedDate,
                         widget.doi,
                         widget.issn);
                   },
@@ -286,7 +263,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
         .join(', ');
   }
 
-  String _formattedDate(DateTime date) {
+  String _formattedDate(DateTime? date) {
+    if (date == null) return '';
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 

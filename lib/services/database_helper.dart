@@ -43,6 +43,7 @@ class DatabaseHelper {
           abstract TEXT,
           publishedDate TEXT,  
           authors TEXT,
+          url TEXT,
           dateLiked TEXT,
           dateDownloaded TEXT,
           dateCached TEXT,
@@ -50,37 +51,6 @@ class DatabaseHelper {
           FOREIGN KEY (journal_id) REFERENCES journals(journal_id)
         )
       ''');
-
-        // Create the 'publications_cache' table
-        await db.execute('''
-          CREATE TABLE publications_cache (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-              article_id INTEGER,
-              FOREIGN KEY (article_id) REFERENCES articles(article_id)
-           )
-          ''');
-
-        /*await db.execute('''
-        CREATE TABLE publications_cache (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          doi TEXT,
-          title TEXT,
-          abstract TEXT,
-          journalTitle TEXT,
-          publishedDate TEXT,  
-          authors TEXT
-        )
-      ''');*/
-
-        /* // Create the 'api_call' table
-        await db.execute('''
-        CREATE TABLE api_call_info (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        timestamp TEXT
-        )
-      ''');
-        await db.insert(
-            'api_call_info', {'timestamp': DateTime.now().toIso8601String()});*/
       },
     );
   }
@@ -241,6 +211,7 @@ class DatabaseHelper {
         'authors': jsonEncode(publicationCard.authors
             .map((author) => author.toJson())
             .toList()), // Serialize authors to JSON
+        'url': publicationCard.url,
         'dateLiked':
             isLiked ? DateTime.now().toIso8601String().substring(0, 10) : null,
         'dateDownloaded': isDownloaded
@@ -274,6 +245,7 @@ class DatabaseHelper {
         ), // Deserialize authors from JSON
         dateLiked: maps[i]['dateLiked'],
         journalTitle: maps[i]['journalTitle'],
+        url: maps[i]['url'],
       );
     });
   }
@@ -373,28 +345,10 @@ class DatabaseHelper {
           (jsonDecode(maps[i]['authors']) as List<dynamic>)
               .map((authorJson) => PublicationAuthor.fromJson(authorJson)),
         ),
+        url: maps[i]['url'],
       );
     });
   }
-
-  /*Future<void> updateCachedPublication(
-      PublicationCard updatedPublication) async {
-    final db = await database;
-    await db.update(
-      'publications_cache',
-      {
-        'title': updatedPublication.title,
-        'abstract': updatedPublication.abstract,
-        'journalTitle': updatedPublication.journalTitle,
-        'publishedDate': updatedPublication.publishedDate?.toIso8601String(),
-        'authors': jsonEncode(updatedPublication.authors
-            .map((author) => author.toJson())
-            .toList()),
-      },
-      where: 'doi = ?',
-      whereArgs: [updatedPublication.doi],
-    );
-  }*/
 
   Future<void> clearCachedPublications() async {
     final db = await database;
@@ -414,14 +368,6 @@ class DatabaseHelper {
       whereArgs: [issn],
     );
   }
-
-  /*Future<void> updateLastApiCallTimestamp(DateTime timestamp) async {
-    final db = await database;
-    await db.update(
-      'api_call_info',
-      {'timestamp': timestamp.toIso8601String()},
-    );
-  }*/
 }
 
 class Journal {
@@ -463,6 +409,7 @@ class FavoriteArticle {
   final String journalTitle;
   final DateTime publishedDate;
   final List<PublicationAuthor> authors;
+  final String url;
 
   FavoriteArticle({
     this.id,
@@ -472,5 +419,6 @@ class FavoriteArticle {
     required this.journalTitle,
     required this.publishedDate,
     required this.authors,
+    required this.url,
   });
 }

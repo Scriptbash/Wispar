@@ -89,6 +89,7 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
                     publishedDate: work.publishedDate,
                     doi: work.doi,
                     authors: work.authors,
+                    url: work.primaryUrl,
                   );
                 } else {
                   return Container();

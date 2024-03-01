@@ -6,10 +6,12 @@ import './screens/article_screen.dart';
 import './screens/journals_details_screen.dart';
 import './services/database_helper.dart';
 import './services/zotero_api.dart';
+import 'package:share_plus/share_plus.dart';
 
 enum SampleItem {
   itemOne,
   itemTwo,
+  itemThree,
 }
 
 class PublicationCard extends StatefulWidget {
@@ -20,6 +22,7 @@ class PublicationCard extends StatefulWidget {
   final DateTime? publishedDate;
   final String doi;
   final List<PublicationAuthor> authors;
+  final String url;
   final String? dateLiked;
   final VoidCallback? onFavoriteChanged;
 
@@ -32,6 +35,7 @@ class PublicationCard extends StatefulWidget {
     this.publishedDate,
     required this.doi,
     required List<PublicationAuthor> authors,
+    required this.url,
     this.dateLiked,
     this.onFavoriteChanged,
   })  : authors = authors,
@@ -70,6 +74,11 @@ class _PublicationCardState extends State<PublicationCard> {
               doi: widget.doi,
               title: widget.title,
               issn: widget.issn,
+              abstract: widget.abstract,
+              journalTitle: widget.journalTitle,
+              publishedDate: widget.publishedDate,
+              authors: widget.authors,
+              url: widget.url,
             ),
           ),
         );
@@ -80,9 +89,10 @@ class _PublicationCardState extends State<PublicationCard> {
         child: ListTile(
           contentPadding: EdgeInsets.all(16.0),
           title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
+                mainAxisSize: MainAxisSize.max,
                 children: [
                   Expanded(
                       child: Align(
@@ -150,18 +160,20 @@ class _PublicationCardState extends State<PublicationCard> {
                                     widget.publishedDate,
                                     widget.doi,
                                     widget.issn);
-                              } else {
-                                if (result == SampleItem.itemTwo) {
-                                  // Copy DOI
-                                  Clipboard.setData(
-                                      ClipboardData(text: widget.doi));
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(SnackBar(
-                                    content: Text(AppLocalizations.of(context)!
-                                        .doicopied),
-                                    duration: const Duration(seconds: 1),
-                                  ));
-                                }
+                              } else if (result == SampleItem.itemTwo) {
+                                // Copy DOI
+                                Clipboard.setData(
+                                    ClipboardData(text: widget.doi));
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content: Text(
+                                      AppLocalizations.of(context)!.doicopied),
+                                  duration: const Duration(seconds: 1),
+                                ));
+                              } else if (result == SampleItem.itemThree) {
+                                Share.share(
+                                    'Check out this article: ${widget.url}\n\n You can also find it by searching this DOI in Wispar: ${widget.doi}');
+                                //subject: 'Look what I made!');
                               }
                             });
                           },
@@ -177,6 +189,12 @@ class _PublicationCardState extends State<PublicationCard> {
                                 child: ListTile(
                                   leading: Icon(Icons.copy),
                                   title: Text('Copy DOI'),
+                                )),
+                            const PopupMenuItem<SampleItem>(
+                                value: SampleItem.itemThree,
+                                child: ListTile(
+                                  leading: Icon(Icons.share_outlined),
+                                  title: Text('Share article'),
                                 )),
                           ],
                         )
@@ -202,78 +220,52 @@ class _PublicationCardState extends State<PublicationCard> {
                 maxLines: 4,
                 overflow: TextOverflow.ellipsis,
               ),
-              SizedBox(height: 8.0),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final abstractTextWidget = Text(
-                    widget.abstract,
-                    maxLines: 10,
-                    overflow: TextOverflow.fade,
-                    textAlign: TextAlign.justify,
-                  );
-
-                  final textPainter = TextPainter(
-                    text: TextSpan(
-                      text: widget.abstract,
-                      style: abstractTextWidget.style,
-                    ),
-                    maxLines: 10,
-                    textDirection: TextDirection.ltr,
-                  );
-
-                  textPainter.layout(maxWidth: constraints.maxWidth);
-
-                  final abstractTextHeight = textPainter.size.height;
-                  final totalHeight = constraints.maxHeight - 16.0;
-
-                  if (abstractTextHeight < totalHeight) {
-                    // If the abstract fits in the available height, use it
-                    return abstractTextWidget;
-                  } else {
-                    // Otherwise, use a constrained version of the abstract
-                    return ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: totalHeight,
-                      ),
-                      child: abstractTextWidget,
-                    );
-                  }
-                },
-              ),
             ],
           ),
-          subtitle: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'DOI: ${widget.doi}${widget.dateLiked != null ? '\n${AppLocalizations.of(context)!.addedtoyourfav} ${widget.dateLiked}' : ''}',
-                  style: TextStyle(
-                    color: Colors.grey,
+          subtitle:
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text(
+              widget.abstract.isNotEmpty
+                  ? widget.abstract
+                  : AppLocalizations.of(context)!.abstractunavailable,
+              maxLines: 10,
+              overflow: TextOverflow.fade,
+              textAlign: TextAlign.justify,
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Expanded(
+                  child: Text(
+                    'DOI: ${widget.doi}${widget.dateLiked != null ? '\n${AppLocalizations.of(context)!.addedtoyourfav} ${widget.dateLiked}' : ''}',
+                    style: TextStyle(
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
-              ),
-              IconButton(
-                icon: Icon(
-                  isLiked ? Icons.favorite : Icons.favorite_border,
-                  color: isLiked ? Colors.red : null,
-                ),
-                onPressed: () {
-                  setState(() {
-                    isLiked = !isLiked;
-                  });
-                  if (isLiked) {
-                    databaseHelper.insertArticle(widget, isLiked: true);
-                  } else {
-                    databaseHelper.removeFavorite(widget.doi);
-                  }
+                IconButton(
+                  icon: Icon(
+                    isLiked ? Icons.favorite : Icons.favorite_border,
+                    color: isLiked ? Colors.red : null,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      isLiked = !isLiked;
+                    });
+                    if (isLiked) {
+                      databaseHelper.insertArticle(widget, isLiked: true);
+                    } else {
+                      databaseHelper.removeFavorite(widget.doi);
+                    }
 
-                  if (widget.onFavoriteChanged != null) {
-                    widget.onFavoriteChanged!();
-                  }
-                },
-              ),
-            ],
-          ),
+                    if (widget.onFavoriteChanged != null) {
+                      widget.onFavoriteChanged!();
+                    }
+                  },
+                ),
+              ],
+            )
+          ]),
         ),
       ),
     );

@@ -272,7 +272,7 @@ class ZoteroService {
           'creators': authorsData,
           'collections': [wisparCollectionKey],
           'tags': [
-            {'tag': 'wispar'},
+            {'tag': 'Wispar'},
           ],
           'relations': {},
         }

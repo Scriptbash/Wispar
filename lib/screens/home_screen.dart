@@ -181,6 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   publishedDate: item.publishedDate,
                   doi: item.doi,
                   authors: item.authors,
+                  url: item.primaryUrl,
                 );
               }).toList();
 
