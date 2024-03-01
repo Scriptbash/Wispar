@@ -8,6 +8,7 @@ import '../services/database_helper.dart';
 import '../publication_card.dart';
 import './journals_details_screen.dart';
 import '../services/zotero_api.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ArticleScreen extends StatefulWidget {
   final String doi;
@@ -51,6 +52,14 @@ class _ArticleScreenState extends State<ArticleScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: [
+          IconButton(
+              onPressed: () {
+                Share.share(
+                    'Check out this article: ${widget.url}\n\n You can also find it by searching this DOI in Wispar: ${widget.doi}');
+              },
+              icon: Icon(Icons.share_outlined))
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -206,7 +215,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
               children: [
                 IconButton(
                   iconSize: 30,
-                  icon: Icon(Icons.article),
+                  icon: Icon(Icons.article_outlined),
                   onPressed: () {
                     Navigator.push(
                       context,
