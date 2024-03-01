@@ -6,10 +6,9 @@
 <a href="https://github.com/Scriptbash/Wispar/actions/workflows/build.yml">
     <img alt="GitHub Workflow Status" src="https://github.com/Scriptbash/Wispar/actions/workflows/build.yml/badge.svg">
 </a>
-</br>
-<img alt="English translations" src="https://img.shields.io/poeditor/progress/673851/en?token=68f03d3994fc70bdc6e89511ddebdb66&style=flat">
-<img alt="French translations" src="https://img.shields.io/poeditor/progress/673851/fr?token=68f03d3994fc70bdc6e89511ddebdb66&style=flat">
-<img alt="Spanish translations" src="https://img.shields.io/poeditor/progress/673851/es?token=68f03d3994fc70bdc6e89511ddebdb66&style=flat">    
+<a href="https://hosted.weblate.org/engage/wispar/">
+<img src="https://hosted.weblate.org/widget/wispar/svg-badge.svg" alt="Translation status" />
+</a>
 </br></br>
 <a href='https://ko-fi.com/A0A6ME7SJ' target='_blank'>
   <img height='32' style='border:0px;height:32px;' src='https://storage.ko-fi.com/cdn/kofi1.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com'>
@@ -38,8 +37,19 @@ Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly s
     <li> [ ] Download articles for offline access</li>
     <li> [x] EZproxy and Unpaywall integration</li>
     <li> [x] Send articles to Zotero</li>
+    <li> [x] Share articles</li>
 </ul>
 
+## Translations
+
+<p align ="justify">
+Wispar uses Weblate to manage translations. You can find the hosted instance at <a href="https://hosted.weblate.org/engage/wispar/">https://hosted.weblate.org/engage/wispar/</a>
+</br></br>Translation status:
+</p>
+
+<a href="https://hosted.weblate.org/engage/wispar/">
+<img src="https://hosted.weblate.org/widget/wispar/multi-auto.svg" alt="Translation status" />
+</a>
 
 ## Contribute
 <p align ="justify">
