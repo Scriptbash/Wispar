@@ -56,7 +56,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
           IconButton(
               onPressed: () {
                 Share.share(
-                    'Check out this article: ${widget.url}\n\n You can also find it by searching this DOI in Wispar: ${widget.doi}');
+                    '${widget.title}\n${widget.url}\n\nShared via the Wispar app.\nDOI: ${widget.doi}');
               },
               icon: Icon(Icons.share_outlined))
         ],

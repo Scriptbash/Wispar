@@ -172,7 +172,7 @@ class _PublicationCardState extends State<PublicationCard> {
                                 ));
                               } else if (result == SampleItem.itemThree) {
                                 Share.share(
-                                    'Check out this article: ${widget.url}\n\n You can also find it by searching this DOI in Wispar: ${widget.doi}');
+                                    '${widget.title}\n${widget.url}\n\nShared via the Wispar app.\nDOI: ${widget.doi}');
                                 //subject: 'Look what I made!');
                               }
                             });
@@ -213,9 +213,9 @@ class _PublicationCardState extends State<PublicationCard> {
                 widget.title,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 8.0),
+              SizedBox(height: 5.0),
               Text(
-                '${AppLocalizations.of(context)!.authors}: ${_getAuthorsNames(widget.authors)}',
+                '${_getAuthorsNames(widget.authors)}',
                 style: TextStyle(fontSize: 13, color: Colors.grey),
                 maxLines: 4,
                 overflow: TextOverflow.ellipsis,
@@ -224,6 +224,9 @@ class _PublicationCardState extends State<PublicationCard> {
           ),
           subtitle:
               Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            SizedBox(
+              height: 8,
+            ),
             Text(
               widget.abstract.isNotEmpty
                   ? widget.abstract
