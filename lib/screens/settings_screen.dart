@@ -170,25 +170,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 )
               ]),
-              subtitle: Row(children: [
-                SizedBox(width: 32),
-                FutureBuilder<String?>(
-                  future: getInstitutionName(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return Center(
-                        child: Text(snapshot.data ??
-                            AppLocalizations.of(context)!.noinstitution),
-                      );
-                    } else {
-                      return Center(
-                        child:
-                            Text(AppLocalizations.of(context)!.noinstitution),
-                      );
-                    }
-                  },
-                ),
-              ]),
+              subtitle: Row(
+                children: [
+                  SizedBox(width: 32),
+                  Expanded(
+                    child: FutureBuilder<String?>(
+                      future: getInstitutionName(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Text(
+                            snapshot.data ??
+                                AppLocalizations.of(context)!.noinstitution,
+                          );
+                        } else {
+                          return Text(
+                            AppLocalizations.of(context)!.noinstitution,
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
             ListTile(
               onTap: () {
