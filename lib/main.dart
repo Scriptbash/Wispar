@@ -70,7 +70,6 @@ class _WisparState extends State<Wispar> {
         Locale('fr'), // French
         Locale('es'), // Spanish
         Locale('nb'), // Norwegian
-        Locale('nb', 'NO') // Norwegian
       ],
       theme: ThemeData(
         //primarySwatch: Colors.orange,
