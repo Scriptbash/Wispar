@@ -61,7 +61,7 @@ class _PdfReaderState extends State<PdfReader> {
         PdfViewer.uri(
           Uri.parse(widget.pdfUrl),
           controller: controller,
-          displayParams: PdfViewerParams(
+          /*displayParams: PdfViewerParams(
             annotationRenderingMode: PdfAnnotationRenderingMode.annotation,
             enableTextSelection: true,
             maxScale: 2.5,
@@ -155,7 +155,7 @@ class _PdfReaderState extends State<PdfReader> {
                 );
               }
             },
-          ),
+          ),*/
         )
       ]),
     );
