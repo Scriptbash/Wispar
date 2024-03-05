@@ -1,15 +1,36 @@
 {
-    "home": "Hjem",
-    "@home": {},
-    "favorites": "Favoritter",
-    "@favorites": {},
-    "search": "Søk …",
-    "@search": {},
-    "settings": "Innstillinger",
-    "@settings": {},
-    "downloads": "Nedlastninger",
-    "@downloads": {},
-    "viewarticle": "Vis artikkel",
-    "@viewarticle": {}
-  }
-  
+  "home": "Hjem",
+  "@home": {},
+  "favorites": "Favoritter",
+  "@favorites": {},
+  "search": "Søk …",
+  "@search": {},
+  "settings": "Innstillinger",
+  "@settings": {},
+  "downloads": "Nedlastninger",
+  "@downloads": {},
+  "viewarticle": "Vis artikkel",
+  "@viewarticle": {},
+  "subjects": "Emner",
+  "@subjects": {},
+  "appearance": "Utseende",
+  "@appearance": {},
+  "light": "Lys",
+  "@light": {},
+  "dark": "Mørk",
+  "@dark": {},
+  "sortby": "Sorter etter",
+  "@sortby": {},
+  "sortorder": "Sorteringsrekkefølge",
+  "@sortorder": {},
+  "follow": "Følg",
+  "@follow": {
+    "description": "The button text shown on journal cards when it is not followed."
+  },
+  "unfollow": "Slutt å følge",
+  "@unfollow": {
+    "description": "The button text shown on journal cards when it is followed."
+  },
+  "systemtheme": "System",
+  "@systemtheme": {}
+}
