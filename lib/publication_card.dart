@@ -172,29 +172,32 @@ class _PublicationCardState extends State<PublicationCard> {
                                 ));
                               } else if (result == SampleItem.itemThree) {
                                 Share.share(
-                                    '${widget.title}\n${widget.url}\n\nShared via the Wispar app.\nDOI: ${widget.doi}');
+                                    '${widget.title}\n\n${widget.url}\n\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage}');
                                 //subject: 'Look what I made!');
                               }
                             });
                           },
                           itemBuilder: (BuildContext context) =>
                               <PopupMenuEntry<SampleItem>>[
-                            const PopupMenuItem<SampleItem>(
+                            PopupMenuItem<SampleItem>(
                                 value: SampleItem.itemOne,
                                 child: ListTile(
                                     leading: Icon(Icons.book_outlined),
-                                    title: Text('Send to Zotero'))),
-                            const PopupMenuItem<SampleItem>(
+                                    title: Text(AppLocalizations.of(context)!
+                                        .sendToZotero))),
+                            PopupMenuItem<SampleItem>(
                                 value: SampleItem.itemTwo,
                                 child: ListTile(
                                   leading: Icon(Icons.copy),
-                                  title: Text('Copy DOI'),
+                                  title: Text(
+                                      AppLocalizations.of(context)!.copydoi),
                                 )),
-                            const PopupMenuItem<SampleItem>(
+                            PopupMenuItem<SampleItem>(
                                 value: SampleItem.itemThree,
                                 child: ListTile(
                                   leading: Icon(Icons.share_outlined),
-                                  title: Text('Share article'),
+                                  title: Text(AppLocalizations.of(context)!
+                                      .shareArticle),
                                 )),
                           ],
                         )

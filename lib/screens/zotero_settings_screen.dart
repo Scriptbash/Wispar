@@ -35,18 +35,16 @@ class _ZoteroSettingsState extends State<ZoteroSettings> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: Text('Zotero settings'),
+        title: Text(AppLocalizations.of(context)!.zoteroSettings),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Center(
           child: Column(
             children: [
+              Text(AppLocalizations.of(context)!.zoteroPermissions1),
               Text(
-                'Wispar needs both read and write access to your Zotero account to fully enjoy its integration.',
-              ),
-              Text(
-                '\nWhen creating a new Zotero API key, you must select both "Allow library access" and "Allow write access ".\n',
+                '\n${AppLocalizations.of(context)!.zoteroPermissions2}\n',
               ),
               ElevatedButton(
                 onPressed: () {
@@ -54,16 +52,16 @@ class _ZoteroSettingsState extends State<ZoteroSettings> {
                     Uri.parse('https://www.zotero.org/settings/keys/new'),
                   );
                 },
-                child: Text('Create a new API key'),
+                child: Text(AppLocalizations.of(context)!.zoteroCreateKey),
               ),
               Text(
-                '\nOnce the API key is created, copy the value and paste it inside the text field below.\n',
+                '\n${AppLocalizations.of(context)!.zoteroPermissions3}\n',
               ),
               TextField(
                 controller: _apiKeyController,
                 decoration: InputDecoration(
                   //border: OutlineInputBorder(),
-                  hintText: 'Enter an API key',
+                  hintText: AppLocalizations.of(context)!.zoteroEnterKey,
                 ),
                 onChanged: (value) {},
               ),
@@ -79,17 +77,19 @@ class _ZoteroSettingsState extends State<ZoteroSettings> {
                         await prefs.setString(
                             'zoteroUserId', userId.toString());
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text('API key saved!'),
+                            content: Text(
+                                AppLocalizations.of(context)!.zoteroValidKey),
                             duration: const Duration(seconds: 2)));
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('Invalid API key'),
+                          content: Text(
+                              AppLocalizations.of(context)!.zoteroInvalidKey),
                           duration: const Duration(seconds: 3),
                         ));
                       }
                     }
                   },
-                  child: Text('Save'))
+                  child: Text(AppLocalizations.of(context)!.save))
             ],
           ),
         ),

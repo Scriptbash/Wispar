@@ -1,24 +1,42 @@
 {
   "home": "Home",
-  "@home": {},
+  "@home": {
+    "description": "The home menu button and the app bar title when in the home screen."
+  },
   "favorites": "Favorites",
-  "@favorites": {},
+  "@favorites": {
+    "description": "The favorites menu button and the app bar title when in the favorites screen."
+  },
   "downloads": "Downloads",
-  "@downloads": {},
+  "@downloads": {
+    "description": "The downloads menu button and the app bar title when in the downloads screen."
+  },
   "settings": "Settings",
-  "@settings": {},
-  "journalnotfollowing1": "You are not following any journals. Use the ",
-  "@journalnotfollowing1": {},
+  "@settings": {
+    "description": "The settings option menu button and the app bar title when in the settings screen."
+  },
+  "journalnotfollowing1": "You are not following any journals. Use the",
+  "@journalnotfollowing1": {
+    "description": "The message shown when the user is not following any journals. The text had to be split since it contains an icon. The full text is: You are not following any journals. Use the <magnifying glass icon> icon to find and follow journals."
+  },
   "journalnotfollowing2": "icon to find and follow journals.",
-  "@journalnotfollowing2": {},
+  "@journalnotfollowing2": {
+    "description": "The message shown when the user is not following any journals. The text had to be split since it contains an icon. The full text is: You are not following any journals. Use the <magnifying glass icon> icon to find and follow journals."
+  },
   "follow": "Follow",
-  "@follow": {},
+  "@follow": {
+    "description": "The button text shown on journal cards when it is not followed."
+  },
   "unfollow": "Unfollow",
-  "@unfollow": {},
+  "@unfollow": {"description": "The button text shown on journal cards when it is followed."},
   "journals": "Journals",
-  "@journals": {},
+  "@journals": {
+    "description": "The journals menu button and the app bar title when in the journals screen."
+  },
   "search": "Search…",
-  "@search": {},
+  "@search": {
+    "description": "Placeholder text shown inside the search bar."
+  },
   "publisher": "Publisher",
   "@publisher": {},
   "publishedin": "Published in",
@@ -36,23 +54,35 @@
   "copydoi": "Copy DOI",
   "@copydoi": {},
   "doicopied": "DOI copied to clipboard",
-  "@doicopied": {},
+  "@doicopied": {
+    "description": "Snackbar shown when the Copy DOI button is pressed."
+  },
   "viewarticle": "View article",
   "@viewarticle": {},
   "favorite": "Favorite",
   "@favorite": {},
   "favoriteadded": "added to favorites",
-  "@favoriteadded": {},
+  "@favoriteadded": {
+    "description": "Snackbar shown when an article is added to the user's favorites."
+  },
   "favoriteremoved": "removed from favorites",
-  "@favoriteremoved": {},
+  "@favoriteremoved": {
+    "description": "Snackbar shown when an article is removed from the user's favorites."
+  },
   "abstractunavailable": "Abstract unavailable. The publisher does not provide abstracts to Crossref. The full text should still be available.",
-  "@abstractunavailable": {},
+  "@abstractunavailable": {
+    "description": "Text shown in the place of the abstract when it is unavailable."
+  },
   "searchresults": "Search results",
   "@searchresults": {},
   "nofavorites1": "You have no articles in your favorites. Use the ",
-  "@nofavorites1": {},
-  "nofavorites2": " icon to add a publication you like in your favorites!",
-  "@nofavorites2": {},
+  "@nofavorites1": {
+    "description": "The message shown when the user has no articles in their favorites. The text had to be split since it contains an icon. The full text is: You have no articles in your favorites. Use the <heart icon> icon to add a publication you like in your favorites!"
+  },
+  "nofavorites2": "icon to add a publication you like in your favorites!",
+  "@nofavorites2": {
+    "description": "The message shown when the user has no articles in their favorites. The text had to be split since it contains an icon. The full text is: You have no articles in your favorites. Use the <heart icon> icon to add a publication you like in your favorites!"
+  },
   "appearance": "Appearance",
   "@appearance": {},
   "light": "Light",
@@ -62,9 +92,13 @@
   "systemtheme": "System theme",
   "@systemtheme": {},
   "unpaywallarticle": "The article was provided through Unpaywall",
-  "@unpaywallarticle": {},
+  "@unpaywallarticle": {
+    "description": "Snackbar shown when an article was fetched from Unpaywall."
+  },
   "forwardedproxy": "Forwarded through your institution proxy",
-  "@forwardedproxy": {},
+  "@forwardedproxy": {
+    "description": "Snackbar shown when a request is intercepted and sent through the user's institution EZproxy."
+  },
   "selectinstitution": "Select your institution",
   "@selectinstitution": {},
   "sortby": "Sort by",
@@ -95,10 +129,67 @@
   "@noinstitution": {},
   "buildingfeed": "Building your feed, please wait...",
   "@buildingfeed": {},
-  "nopublication1": "No publications available. Make sure you are following journals by going in the ",
-  "@nopublication1": {},
-  "nopublication2": " menu and use the",
-  "@nopublication2": {},
-  "nopublication3": " icon to find journals.",
-  "@nopublication3": {}
+  "nopublication1": "No publications available. Make sure you are following journals by going in the",
+  "@nopublication1": {
+    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
+  },
+  "nopublication2": "menu and use the",
+  "@nopublication2": {
+    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
+
+  },
+  "nopublication3": "icon to find journals.",
+  "@nopublication3": {
+    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
+  },
+  "sharedMessage": "Shared via the Wispar app",
+  "@sharedMessage":{
+    "description": "Default sharing text."
+  },
+  "shareArticle": "Share article",
+  "@shareArticle":{},
+  "sendToZotero": "Send to Zotero",
+  "@sendToZotero":{},
+  "zoteroSettings": "Zotero settings",
+  "@zoterSettings":{},
+  "zoteroPermissions1": "Wispar needs both read and write access to your Zotero account to enjoy its integration.",
+  "@zoteroPermissions1":{},
+  "zoteroPermissions2": "When creating a new Zotero API key, you must select both \"Allow library access\" and \"Allow write access\".",
+  "@zoteroPermissions2":{},
+  "zoteroPermissions3": "Once the API key is created, copy the value and paste it inside the text field below.",
+  "@zoteroPermissions3":{},
+  "zoteroCreateKey": "Create a new API key",
+  "@zoteroCreateKey":{},
+  "zoteroEnterKey": "Enter an API key",
+  "@zoteroEnterKey":{
+    "description": "Hint text shown in the text field where users can enter their Zotero API key."
+  },
+  "zoteroValidKey": "API key saved!",
+  "@zoteroValidKey":{
+    "description": "Snackbar shown when a valid Zotero API key has been saved."
+  },
+  "zoteroInvalidKey": "The API key is invalid!",
+  "@zoteroInvalidKey":{
+    "description": "Snackbar shown when an attempt to save an invalid Zotero API key is made."
+  },
+  "save":"Save",
+  "@save":{},
+  "sourceCode": "Source code",
+  "@sourceCode":{},
+  "reportIssue": "Report an issue",
+  "@reportIssue":{},
+  "enabled": "Enabled",
+  "@enabled":{},
+  "disabled": "Disabled",
+  "@disabled":{},
+  "database": "Database",
+  "@database":{},
+  "privacyPolicy": "Privacy policy",
+  "@privacyPolicy":{},
+  "donate": "Donate",
+  "@donate":{},
+  "donateMessage": "Help support development of Wispar",
+  "@donateMessage":{
+    "description": "Text shown in the subtitle of the Donate button in the settings."
+  }
 }

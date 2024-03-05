@@ -78,7 +78,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 mode: LaunchMode.platformDefault);
                           },
                           icon: Icon(Icons.code),
-                          label: Text('Source code')),
+                          label:
+                              Text(AppLocalizations.of(context)!.sourceCode)),
                       TextButton.icon(
                           onPressed: () {
                             launchUrl(
@@ -87,7 +88,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 mode: LaunchMode.platformDefault);
                           },
                           icon: Icon(Icons.bug_report_outlined),
-                          label: Text('Report an issue')),
+                          label:
+                              Text(AppLocalizations.of(context)!.reportIssue)),
                     ],
                   )
                 ]),
@@ -209,10 +211,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Text('Zotero'),
                 ],
               ),
-              subtitle: Row(children: [
+              /*subtitle: Row(children: [
                 SizedBox(width: 32),
                 Text('Manage Zotero'),
-              ]),
+              ]),*/
             ),
             ListTile(
               onTap: () {},
@@ -220,7 +222,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   Icon(Icons.dns_outlined),
                   SizedBox(width: 8),
-                  Text('Database'),
+                  Text(AppLocalizations.of(context)!.database),
                 ],
               ),
             ),
@@ -235,7 +237,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   Icon(Icons.privacy_tip_outlined),
                   SizedBox(width: 8),
-                  Text('Privacy policy'),
+                  Text(AppLocalizations.of(context)!.privacyPolicy),
                 ],
               ),
             ),
@@ -248,12 +250,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     Icon(Icons.favorite_border),
                     SizedBox(width: 8),
-                    Text('Donate'),
+                    Text(AppLocalizations.of(context)!.donate),
                   ],
                 ),
                 subtitle: Row(children: [
                   SizedBox(width: 32),
-                  Text('Help support development of Wispar')
+                  Text(AppLocalizations.of(context)!.donateMessage)
                 ])),
           ],
         ),
@@ -306,8 +308,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   RadioListTile<String>(
-                    title: Text('Enabled'),
-                    value: 'Enabled',
+                    title: Text(AppLocalizations.of(context)!.enabled),
+                    value: AppLocalizations.of(context)!.enabled,
                     groupValue: currentStatus,
                     onChanged: (value) {
                       if (value != null) {
@@ -317,8 +319,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                   ),
                   RadioListTile<String>(
-                    title: Text('Disabled'),
-                    value: 'Disabled',
+                    title: Text(AppLocalizations.of(context)!.disabled),
+                    value: AppLocalizations.of(context)!.disabled,
                     groupValue: currentStatus,
                     onChanged: (value) {
                       if (value != null) {

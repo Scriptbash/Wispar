@@ -56,7 +56,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
           IconButton(
               onPressed: () {
                 Share.share(
-                    '${widget.title}\n${widget.url}\n\nShared via the Wispar app.\nDOI: ${widget.doi}');
+                    '${widget.title}\n${widget.url}\n\n${AppLocalizations.of(context)!.sharedMessage}\nDOI: ${widget.doi}');
               },
               icon: Icon(Icons.share_outlined))
         ],
@@ -257,7 +257,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
                         widget.issn);
                   },
                 ),
-                Text('Send to Zotero', style: TextStyle(fontSize: 10)),
+                Text(AppLocalizations.of(context)!.sendToZotero,
+                    style: TextStyle(fontSize: 10)),
               ],
             ),
           ],
