@@ -28,7 +28,9 @@
     "description": "The button text shown on journal cards when it is not followed."
   },
   "unfollow": "Unfollow",
-  "@unfollow": {"description": "The button text shown on journal cards when it is followed."},
+  "@unfollow": {
+    "description": "The button text shown on journal cards when it is followed."
+  },
   "journals": "Journals",
   "@journals": {
     "description": "The journals menu button and the app bar title when in the journals screen."
@@ -127,7 +129,7 @@
   "@addedtoyourfav": {},
   "noinstitution": "No institution",
   "@noinstitution": {},
-  "buildingfeed": "Building your feed, please wait...",
+  "buildingfeed": "Building your feed. Please wait…",
   "@buildingfeed": {},
   "nopublication1": "No publications available. Make sure you are following journals by going in the",
   "@nopublication1": {
@@ -136,60 +138,59 @@
   "nopublication2": "menu and use the",
   "@nopublication2": {
     "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
-
   },
   "nopublication3": "icon to find journals.",
   "@nopublication3": {
     "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
   },
   "sharedMessage": "Shared via the Wispar app",
-  "@sharedMessage":{
+  "@sharedMessage": {
     "description": "Default sharing text."
   },
   "shareArticle": "Share article",
-  "@shareArticle":{},
+  "@shareArticle": {},
   "sendToZotero": "Send to Zotero",
-  "@sendToZotero":{},
+  "@sendToZotero": {},
   "zoteroSettings": "Zotero settings",
-  "@zoterSettings":{},
+  "@zoteroSettings": {},
   "zoteroPermissions1": "Wispar needs both read and write access to your Zotero account to enjoy its integration.",
-  "@zoteroPermissions1":{},
+  "@zoteroPermissions1": {},
   "zoteroPermissions2": "When creating a new Zotero API key, you must select both \"Allow library access\" and \"Allow write access\".",
-  "@zoteroPermissions2":{},
+  "@zoteroPermissions2": {},
   "zoteroPermissions3": "Once the API key is created, copy the value and paste it inside the text field below.",
-  "@zoteroPermissions3":{},
+  "@zoteroPermissions3": {},
   "zoteroCreateKey": "Create a new API key",
-  "@zoteroCreateKey":{},
+  "@zoteroCreateKey": {},
   "zoteroEnterKey": "Enter an API key",
-  "@zoteroEnterKey":{
+  "@zoteroEnterKey": {
     "description": "Hint text shown in the text field where users can enter their Zotero API key."
   },
   "zoteroValidKey": "API key saved!",
-  "@zoteroValidKey":{
+  "@zoteroValidKey": {
     "description": "Snackbar shown when a valid Zotero API key has been saved."
   },
   "zoteroInvalidKey": "The API key is invalid!",
-  "@zoteroInvalidKey":{
+  "@zoteroInvalidKey": {
     "description": "Snackbar shown when an attempt to save an invalid Zotero API key is made."
   },
-  "save":"Save",
-  "@save":{},
+  "save": "Save",
+  "@save": {},
   "sourceCode": "Source code",
-  "@sourceCode":{},
+  "@sourceCode": {},
   "reportIssue": "Report an issue",
-  "@reportIssue":{},
+  "@reportIssue": {},
   "enabled": "Enabled",
-  "@enabled":{},
+  "@enabled": {},
   "disabled": "Disabled",
-  "@disabled":{},
+  "@disabled": {},
   "database": "Database",
-  "@database":{},
+  "@database": {},
   "privacyPolicy": "Privacy policy",
-  "@privacyPolicy":{},
+  "@privacyPolicy": {},
   "donate": "Donate",
-  "@donate":{},
+  "@donate": {},
   "donateMessage": "Help support development of Wispar",
-  "@donateMessage":{
+  "@donateMessage": {
     "description": "Text shown in the subtitle of the Donate button in the settings."
   }
 }
