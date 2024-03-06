@@ -32,5 +32,155 @@
     "description": "The button text shown on journal cards when it is followed."
   },
   "systemtheme": "System",
-  "@systemtheme": {}
+  "@systemtheme": {},
+  "authors": "Forfattere",
+  "@authors": {},
+  "publishedin": "Publisert i",
+  "@publishedin": {},
+  "abstract": "Sammendrag",
+  "@abstract": {},
+  "publishedon": "Publisert",
+  "@publishedon": {},
+  "searchresults": "Søkeresultater",
+  "@searchresults": {},
+  "favorite": "Favoritt",
+  "@favorite": {},
+  "followingsince": "Fulgt siden",
+  "@followingsince": {},
+  "journaltitle": "Navn på vitenskapelig publikasjon",
+  "@journaltitle": {},
+  "selectinstitution": "Velg din institusjon",
+  "@selectinstitution": {},
+  "followingdate": "Dato for følging",
+  "@followingdate": {},
+  "dateaddedtofavorites": "Dato for tilleggelse i favoritter",
+  "@dateaddedtofavorites": {},
+  "noinstitution": "Ingen institusjon",
+  "@noinstitution": {},
+  "journalnotfollowing1": "Du følger ingen vitenskapelige publikasjoner. Bruk",
+  "@journalnotfollowing1": {
+    "description": "The message shown when the user is not following any journals. The text had to be split since it contains an icon. The full text is: You are not following any journals. Use the <magnifying glass icon> icon to find and follow journals."
+  },
+  "journals": "Vitenskapelige publikasjoner",
+  "@journals": {
+    "description": "The journals menu button and the app bar title when in the journals screen."
+  },
+  "abstractunavailable": "Utilgjegnelig sammendrag. Utgiveren tilbyr ikke dette til Crossref. Teksten bør fremdeles være å finne i sin helhet.",
+  "@abstractunavailable": {
+    "description": "Text shown in the place of the abstract when it is unavailable."
+  },
+  "shareArticle": "Del artikkel",
+  "@shareArticle": {},
+  "sendToZotero": "Send til Zotero",
+  "@sendToZotero": {},
+  "zoteroSettings": "Zotero-innstillinger",
+  "@zoteroSettings": {},
+  "sharedMessage": "Delt via Wispar-programmet",
+  "@sharedMessage": {
+    "description": "Default sharing text."
+  },
+  "nopublication3": "ikonet for å finne vitenskapelige publikasjoner.",
+  "@nopublication3": {
+    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
+  },
+  "forwardedproxy": "Videresendt gjennom din instutisjonsmellomtjener",
+  "@forwardedproxy": {
+    "description": "Snackbar shown when a request is intercepted and sent through the user's institution EZproxy."
+  },
+  "zoteroCreateKey": "Opprett en ny API-nøkkel",
+  "@zoteroCreateKey": {},
+  "zoteroPermissions1": "Wispar trenger både lese- og skrivetilgang til din Zotero-konto for å nye godt av integrasjonen.",
+  "@zoteroPermissions1": {},
+  "zoteroPermissions2": "Når du oppretter en ny Zotero-API-nøkkel må du velge både «Tillat bibliotekstilgang» og «Tillat skrivetilgang».",
+  "@zoteroPermissions2": {},
+  "zoteroPermissions3": "Når API-nøkkelen er opprettet, kan du kopiere verdien og lime den inn i tekstfeltet nedenfor.",
+  "@zoteroPermissions3": {},
+  "save": "Lagre",
+  "@save": {},
+  "reportIssue": "Rapporter et problem",
+  "@reportIssue": {},
+  "copydoi": "Kopier digital objektidentifikator",
+  "@copydoi": {},
+  "favoriteadded": "lagt til i favoritter",
+  "@favoriteadded": {
+    "description": "Snackbar shown when an article is added to the user's favorites."
+  },
+  "doicopied": "Digital objektidentifikator kopiert til utklippstavle",
+  "@doicopied": {
+    "description": "Snackbar shown when the Copy DOI button is pressed."
+  },
+  "sourceCode": "Kildekode",
+  "@sourceCode": {},
+  "favoriteremoved": "fjernet fra favoritter",
+  "@favoriteremoved": {
+    "description": "Snackbar shown when an article is removed from the user's favorites."
+  },
+  "zoteroValidKey": "API-nøkkel lagret.",
+  "@zoteroValidKey": {
+    "description": "Snackbar shown when a valid Zotero API key has been saved."
+  },
+  "zoteroEnterKey": "Skriv inn en API-nøkkel",
+  "@zoteroEnterKey": {
+    "description": "Hint text shown in the text field where users can enter their Zotero API key."
+  },
+  "zoteroInvalidKey": "API-nøkkelen er ugyldig.",
+  "@zoteroInvalidKey": {
+    "description": "Snackbar shown when an attempt to save an invalid Zotero API key is made."
+  },
+  "enabled": "Påskrudd",
+  "@enabled": {},
+  "disabled": "Avskrudd",
+  "@disabled": {},
+  "database": "Database",
+  "@database": {},
+  "privacyPolicy": "Personvernspraksis",
+  "@privacyPolicy": {},
+  "donate": "Doner",
+  "@donate": {},
+  "donateMessage": "Kronerull utviklingen av Wispar",
+  "@donateMessage": {
+    "description": "Text shown in the subtitle of the Donate button in the settings."
+  },
+  "unpaywallarticle": "Artikkelen har kommet deg i hende gjennom Unpaywall",
+  "@unpaywallarticle": {
+    "description": "Snackbar shown when an article was fetched from Unpaywall."
+  },
+  "ascending": "Stigende",
+  "@ascending": {},
+  "articletitle": "Artikkelnavn",
+  "@articletitle": {},
+  "descending": "Synkende",
+  "@descending": {},
+  "firstauthfamname": "Første forfatters etternavn",
+  "@firstauthfamname": {},
+  "datepublished": "Utgivelsesdato",
+  "@datepublished": {},
+  "addedtoyourfav": "Lagt til i favoritter",
+  "@addedtoyourfav": {},
+  "buildingfeed": "Bygger din informasjonsstrøm. Vent …",
+  "@buildingfeed": {},
+  "journalnotfollowing2": "ikon for å finne og følge vitenskapelige publikasjoner.",
+  "@journalnotfollowing2": {
+    "description": "The message shown when the user is not following any journals. The text had to be split since it contains an icon. The full text is: You are not following any journals. Use the <magnifying glass icon> icon to find and follow journals."
+  },
+  "latestpublications": "Seneste publiseringer",
+  "@latestpublications": {},
+  "nopublication1": "Ingen tilgjengelige publikasjoner. Sørg for at du følger noen ved å gå til",
+  "@nopublication1": {
+    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
+  },
+  "nopublication2": "menyen og bruke",
+  "@nopublication2": {
+    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
+  },
+  "publisher": "Utgiver",
+  "@publisher": {},
+  "nofavorites1": "Du har ingen artikler favorittmerket. Bruk ",
+  "@nofavorites1": {
+    "description": "The message shown when the user has no articles in their favorites. The text had to be split since it contains an icon. The full text is: You have no articles in your favorites. Use the <heart icon> icon to add a publication you like in your favorites!"
+  },
+  "nofavorites2": "ikonet for å legge til en publikasjon du liker i favoritter.",
+  "@nofavorites2": {
+    "description": "The message shown when the user has no articles in their favorites. The text had to be split since it contains an icon. The full text is: You have no articles in your favorites. Use the <heart icon> icon to add a publication you like in your favorites!"
+  }
 }
