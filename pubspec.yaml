@@ -46,11 +46,10 @@ dependencies:
   flutter_inappwebview: ^6.0.0
   url_launcher: ^6.2.3
   http: ^1.1.2
-  mime: ^1.0.4
   pdfrx: ^1.0.11
   package_info_plus: ^5.0.1
   share_plus: ^7.2.2
-
+  
 dependency_overrides:
   intl: ^0.19.0
   package_info_plus: '>=5.0.1 <6.0.0'

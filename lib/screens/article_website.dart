@@ -6,7 +6,8 @@ import 'pdf_reader.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
-import 'package:mime/mime.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class ArticleWebsite extends StatefulWidget {
@@ -27,7 +28,12 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
       isInspectable: kDebugMode,
       mediaPlaybackRequiresUserGesture: false,
       allowsInlineMediaPlayback: true,
+      javaScriptEnabled: true,
+      javaScriptCanOpenWindowsAutomatically: true,
+      useOnDownloadStart: true,
       //iframeAllow: "camera; microphone",
+      userAgent:
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:121.0) Gecko/20100101 Firefox/121.0',
       iframeAllowFullscreen: true);
 
   PullToRefreshController? pullToRefreshController;
@@ -90,23 +96,6 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
     });
   }
 
-  Future<String> checkMimeType(String url) async {
-    try {
-      final response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        final data = response.bodyBytes;
-        final mime = lookupMimeType('', headerBytes: data);
-        return mime ?? '';
-      } else {
-        return '';
-      }
-    } catch (e) {
-      print('Error checking MIME type: $e');
-      return '';
-    }
-  }
-
   void setupController() {
     if (pdfUrl.isNotEmpty) {
       webViewController?.loadUrl(urlRequest: URLRequest(url: WebUri(pdfUrl)));
@@ -154,46 +143,61 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                       (controller, navigationAction) async {
                     var uri = navigationAction.request.url!;
 
-                    if (![
-                      "http",
-                      "https",
-                      "file",
-                      "chrome",
-                      "data",
-                      "javascript",
-                      "about"
-                    ].contains(uri.scheme)) {
-                      if (await canLaunchUrl(uri)) {
-                        // Launch the App
-                        await launchUrl(
-                          uri,
-                        );
-                        // and cancel the request
-                        return NavigationActionPolicy.CANCEL;
-                      }
-                    }
-
                     return NavigationActionPolicy.ALLOW;
                   },
+                  onReceivedServerTrustAuthRequest:
+                      (controller, challenge) async {
+                    //print("challenge $challenge");
+                    return ServerTrustAuthResponse(
+                        action: ServerTrustAuthResponseAction.PROCEED);
+                  },
                   onDownloadStartRequest: (controller, url) async {
-                    //String? mimeType = await checkMimeType(url.url.toString());
-                    //if (mimeType == 'application/pdf') {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => PdfReader(
-                        pdfUrl: url.url.toString(),
-                        isDownloadable: true,
-                      ),
-                    ));
-                    //} else {
-                    //  launchUrl(Uri.parse(pdfUrl),
-                    //      mode: LaunchMode.inAppBrowserView);
-                    //x}
+                    if (url.mimeType == 'application/pdf') {
+                      final response = await http.get(url.url);
+                      if (response.body.startsWith('%PDF')) {
+                        // Needed due to shenanigans of Elsevier and the likes
+                        final appDir = await getApplicationDocumentsDirectory();
+                        final pdfFile =
+                            File('${appDir.path}/${url.suggestedFilename}');
+                        await pdfFile.writeAsBytes(response.bodyBytes);
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => PdfReader(
+                            pdfUrl: pdfFile.path,
+                          ),
+                        ));
+                      } else {
+                        launchUrl(url.url);
+                      }
+                    } else {
+                      debugPrint('The file is not a PDF. Not downloading.');
+                    }
                   },
                   onLoadStop: (controller, url) async {
                     pullToRefreshController?.endRefreshing();
                     setState(() {
                       this.url = url.toString();
                       urlController.text = this.url;
+                    });
+                    controller
+                        .evaluateJavascript(source: "document.title;")
+                        .then((result) {
+                      final title = result.trim();
+
+                      /* Check if the title is "Host Needed"    
+                      This will need to be improved as it will probably fail to
+                       redirect if the institution has changed the error 
+                       landing page or if the page is in a different language.*/
+
+                      if (title == "Host Needed") {
+                        // Load the page without the proxy URL
+                        controller.loadUrl(
+                          urlRequest:
+                              URLRequest(url: WebUri(widget.articleUrl)),
+                        );
+                      }
+                    }).catchError((error) {
+                      debugPrint(
+                          'Error occurred while evaluating JavaScript: $error');
                     });
                   },
                   onReceivedError: (controller, request, error) {
@@ -208,7 +212,8 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                       urlController.text = url;
                     });
                   },
-                  onUpdateVisitedHistory: (controller, url, androidIsReload) {
+                  onUpdateVisitedHistory:
+                      (controller, url, androidIsReload) async {
                     setState(() {
                       this.url = url.toString();
                       urlController.text = this.url;

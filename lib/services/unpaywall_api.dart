@@ -25,7 +25,9 @@ class UnpaywallService {
 
       return Unpaywall.fromJson(jsonResponse);
     } else {
-      throw Exception('Failed to load Unpaywall data');
+      return Unpaywall.fromJson({});
+
+      //throw Exception('Failed to load Unpaywall data');
     }
   }
 }
