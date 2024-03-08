@@ -16,7 +16,7 @@ class DatabaseHelper {
 
   Future<Database> initDatabase() async {
     final path = await getDatabasesPath();
-    final databasePath = join(path, 'journals_database.db');
+    final databasePath = join(path, 'wispar.db');
 
     return openDatabase(
       databasePath,
@@ -44,8 +44,11 @@ class DatabaseHelper {
           publishedDate TEXT,  
           authors TEXT,
           url TEXT,
+          license TEXT,
+          licenseName TEXT,
           dateLiked TEXT,
           dateDownloaded TEXT,
+          pdfPath TEXT,
           dateCached TEXT,
           journal_id,
           FOREIGN KEY (journal_id) REFERENCES journals(journal_id)
@@ -212,6 +215,8 @@ class DatabaseHelper {
             .map((author) => author.toJson())
             .toList()), // Serialize authors to JSON
         'url': publicationCard.url,
+        'license': publicationCard.license,
+        'licenseName': publicationCard.licenseName,
         'dateLiked':
             isLiked ? DateTime.now().toIso8601String().substring(0, 10) : null,
         'dateDownloaded': isDownloaded
@@ -246,6 +251,8 @@ class DatabaseHelper {
         dateLiked: maps[i]['dateLiked'],
         journalTitle: maps[i]['journalTitle'],
         url: maps[i]['url'],
+        license: maps[i]['license'],
+        licenseName: maps[i]['licenseName'],
       );
     });
   }
@@ -346,6 +353,8 @@ class DatabaseHelper {
               .map((authorJson) => PublicationAuthor.fromJson(authorJson)),
         ),
         url: maps[i]['url'],
+        license: maps[i]['license'],
+        licenseName: maps[i]['licenseName'],
       );
     });
   }

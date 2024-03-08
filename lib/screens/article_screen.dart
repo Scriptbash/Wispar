@@ -19,6 +19,8 @@ class ArticleScreen extends StatefulWidget {
   final DateTime? publishedDate;
   final List<PublicationAuthor> authors;
   final String url;
+  final String license;
+  final String licenseName;
 
   const ArticleScreen({
     Key? key,
@@ -30,6 +32,8 @@ class ArticleScreen extends StatefulWidget {
     this.publishedDate,
     required this.authors,
     required this.url,
+    required this.license,
+    required this.licenseName,
   }) : super(key: key);
 
   @override
@@ -56,7 +60,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
           IconButton(
               onPressed: () {
                 Share.share(
-                    '${widget.title}\n${widget.url}\n\n${AppLocalizations.of(context)!.sharedMessage}\nDOI: ${widget.doi}');
+                    '${widget.title}\n\n${widget.url}\n\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage} 👻');
               },
               icon: Icon(Icons.share_outlined))
         ],
@@ -166,6 +170,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
                             doi: widget.doi,
                             authors: widget.authors,
                             url: widget.url,
+                            license: widget.license,
+                            licenseName: widget.licenseName,
                           ),
                           isLiked: true,
                         );

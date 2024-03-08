@@ -7,6 +7,7 @@ import './screens/journals_details_screen.dart';
 import './services/database_helper.dart';
 import './services/zotero_api.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 enum SampleItem {
   itemOne,
@@ -23,6 +24,8 @@ class PublicationCard extends StatefulWidget {
   final String doi;
   final List<PublicationAuthor> authors;
   final String url;
+  final String license;
+  final String licenseName;
   final String? dateLiked;
   final VoidCallback? onFavoriteChanged;
 
@@ -36,6 +39,8 @@ class PublicationCard extends StatefulWidget {
     required this.doi,
     required List<PublicationAuthor> authors,
     required this.url,
+    required this.license,
+    required this.licenseName,
     this.dateLiked,
     this.onFavoriteChanged,
   })  : authors = authors,
@@ -79,6 +84,8 @@ class _PublicationCardState extends State<PublicationCard> {
               publishedDate: widget.publishedDate,
               authors: widget.authors,
               url: widget.url,
+              license: widget.license,
+              licenseName: widget.licenseName,
             ),
           ),
         );
@@ -172,8 +179,7 @@ class _PublicationCardState extends State<PublicationCard> {
                                 ));
                               } else if (result == SampleItem.itemThree) {
                                 Share.share(
-                                    '${widget.title}\n\n${widget.url}\n\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage}');
-                                //subject: 'Look what I made!');
+                                    '${widget.title}\n\n${widget.url}\n\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage} 👻');
                               }
                             });
                           },
@@ -242,13 +248,40 @@ class _PublicationCardState extends State<PublicationCard> {
               mainAxisSize: MainAxisSize.max,
               children: [
                 Expanded(
-                  child: Text(
-                    'DOI: ${widget.doi}${widget.dateLiked != null ? '\n${AppLocalizations.of(context)!.addedtoyourfav} ${widget.dateLiked}' : ''}',
-                    style: TextStyle(
-                      color: Colors.grey,
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'DOI: ${widget.doi}',
+                      style: TextStyle(
+                        color: Colors.grey,
+                      ),
                     ),
-                  ),
-                ),
+                    TextButton(
+                      onPressed: () {
+                        debugPrint(widget.license);
+                        if (widget.license.isNotEmpty) {
+                          launchUrl(Uri.parse(widget.license));
+                        }
+                      },
+                      child: Text(
+                        widget.license.isNotEmpty
+                            ? (widget.licenseName.isNotEmpty
+                                ? widget.licenseName
+                                : AppLocalizations.of(context)!.otherLicense)
+                            : AppLocalizations.of(context)!.unknownLicense,
+                        style: TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
+                      style: TextButton.styleFrom(
+                        minimumSize: Size.zero,
+                        padding: EdgeInsets.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                  ],
+                )),
                 IconButton(
                   icon: Icon(
                     isLiked ? Icons.favorite : Icons.favorite_border,
@@ -270,7 +303,14 @@ class _PublicationCardState extends State<PublicationCard> {
                   },
                 ),
               ],
-            )
+            ),
+            if (widget.dateLiked != null)
+              Text(
+                '${AppLocalizations.of(context)!.addedtoyourfav} ${widget.dateLiked}',
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
           ]),
         ),
       ),

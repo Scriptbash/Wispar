@@ -86,6 +86,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   doi: publicationCard.doi,
                   authors: publicationCard.authors,
                   url: publicationCard.url,
+                  license: publicationCard.license,
+                  licenseName: publicationCard.licenseName,
                   dateLiked: publicationCard.dateLiked,
                   onFavoriteChanged: () {
                     // Refresh the UI after removing the favorite

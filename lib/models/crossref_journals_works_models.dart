@@ -75,6 +75,8 @@ class Item {
   final List<PublicationAuthor> authors;
   final String url;
   final String primaryUrl;
+  final String license;
+  final String licenseName;
 
   Item({
     required this.publisher,
@@ -86,6 +88,8 @@ class Item {
     required this.authors,
     required this.url,
     required this.primaryUrl,
+    required this.license,
+    required this.licenseName,
   });
 
   factory Item.fromJson(Map<String, dynamic> json) {
@@ -95,6 +99,21 @@ class Item {
           .map((authorJson) => PublicationAuthor.fromJson(authorJson))
           .toList();
     }
+
+    String licenseUrl = '';
+    String licenseName = '';
+    if (json.containsKey('license')) {
+      if (json['license'] != null &&
+          json['license'] is List &&
+          (json['license'] as List).isNotEmpty) {
+        licenseUrl = json['license'][0]['URL'] ?? '';
+        licenseName = licenseNames[normalizeLicenseUrl(licenseUrl)] ?? '';
+      }
+    } else {
+      licenseUrl = '';
+      licenseName = '';
+    }
+
     return Item(
       publisher: json['publisher'] ?? '',
       abstract: _cleanAbstract(json['abstract'] ?? ''),
@@ -107,9 +126,33 @@ class Item {
       authors: authors,
       url: json['URL'] ?? '',
       primaryUrl: json['resource']['primary']['URL'] ?? '',
+      license: licenseUrl,
+      licenseName: licenseName,
     );
   }
-
+  static Map<String, String> licenseNames = {
+    'https://creativecommons.org/licenses/by/4.0':
+        'Creative Commons Attribution 4.0',
+    'https://creativecommons.org/licenses/by-sa/4.0':
+        'Creative Commons Attribution-ShareAlike 4.0 International',
+    'https://creativecommons.org/licenses/by-nc/4.0':
+        'Creative Commons Attribution-NonCommercial 4.0 International',
+    'https://creativecommons.org/licenses/by-nc-sa/4.0':
+        'Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International',
+    'https://creativecommons.org/licenses/by-nd/4.0':
+        'Creative Commons Attribution-NoDerivatives 4.0 International',
+    'https://www.gnu.org/licenses/agpl-3.0.html':
+        'GNU Affero General Public License v3.0',
+    'https://www.gnu.org/licenses/gpl-3.0.html':
+        'GNU General Public License v3.0',
+    'https://www.gnu.org/licenses/lgpl-3.0.html':
+        'GNU Lesser General Public License v3.0',
+    'https://opensource.org/licenses/MIT': 'MIT License',
+    'https://opensource.org/licenses/Apache-2.0': 'Apache License 2.0',
+    'https://www.elsevier.com/tdm/userlicense/1.0':
+        'Elsevier Text and Data Mining (TDM) License',
+    'https://www.springer.com/tdm': 'Springer Nature TDM policy'
+  };
   static String _cleanAbstract(String rawAbstract) {
     rawAbstract = rawAbstract
         .replaceAll(RegExp(r'<[^>]*>'), '') // Remove HTML tags
@@ -137,6 +180,17 @@ class Item {
       }
     }
     return DateTime.now(); // Default to the current date if parsing fails
+  }
+
+  // Normalize the license Url to ensure a match
+  static String normalizeLicenseUrl(String url) {
+    if (url.startsWith('http://')) {
+      url = url.replaceFirst('http://', 'https://');
+    }
+    if (url.endsWith('/')) {
+      url = url.substring(0, url.length - 1);
+    }
+    return url;
   }
 
   @override

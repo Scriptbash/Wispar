@@ -91,6 +91,8 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
                     doi: work.doi,
                     authors: work.authors,
                     url: work.primaryUrl,
+                    license: work.license,
+                    licenseName: work.licenseName,
                   );
                 } else {
                   return Container();

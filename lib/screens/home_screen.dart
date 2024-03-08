@@ -182,6 +182,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   doi: item.doi,
                   authors: item.authors,
                   url: item.primaryUrl,
+                  license: item.license,
+                  licenseName: item.licenseName,
                 );
               }).toList();
 
