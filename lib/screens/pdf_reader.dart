@@ -46,7 +46,7 @@ class _PdfReaderState extends State<PdfReader> {
             controller: controller,
             params: PdfViewerParams(
               enableTextSelection: false, // This is not ready yet.
-              maxScale: 2.5,
+              maxScale: 8,
               layoutPages: (pages, params) {
                 final width =
                     pages.fold(0.0, (prev, page) => max(prev, page.width));

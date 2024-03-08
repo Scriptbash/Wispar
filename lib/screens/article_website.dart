@@ -166,7 +166,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                           ),
                         ));
                       } else {
-                        launchUrl(url.url);
+                        launchUrl(Uri.parse(pdfUrl));
                       }
                     } else {
                       debugPrint('The file is not a PDF. Not downloading.');
