@@ -58,6 +58,7 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
                   fontWeight: FontWeight.bold,
                   fontSize: 18.0,
                 ),
+                textAlign: TextAlign.center,
                 overflow: TextOverflow.fade,
               ),
             ),
