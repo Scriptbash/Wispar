@@ -1,1 +1,200 @@
-{}
+{
+  "settings": "Ajustes",
+  "@settings": {
+    "description": "The settings option menu button and the app bar title when in the settings screen."
+  },
+  "journalnotfollowing1": "No estás siguiendo ninguna revista. Utilizar el",
+  "@journalnotfollowing1": {
+    "description": "The message shown when the user is not following any journals. The text had to be split since it contains an icon. The full text is: You are not following any journals. Use the <magnifying glass icon> icon to find and follow journals."
+  },
+  "journalnotfollowing2": "para encontrar y seguir diarios.",
+  "@journalnotfollowing2": {
+    "description": "The message shown when the user is not following any journals. The text had to be split since it contains an icon. The full text is: You are not following any journals. Use the <magnifying glass icon> icon to find and follow journals."
+  },
+  "follow": "Seguir",
+  "@follow": {
+    "description": "The button text shown on journal cards when it is not followed."
+  },
+  "unfollow": "Dejar de seguir",
+  "@unfollow": {
+    "description": "The button text shown on journal cards when it is followed."
+  },
+  "journals": "Revistas",
+  "@journals": {
+    "description": "The journals menu button and the app bar title when in the journals screen."
+  },
+  "search": "Buscar…",
+  "@search": {
+    "description": "Placeholder text shown inside the search bar."
+  },
+  "favoriteadded": "añadido a favoritos",
+  "@favoriteadded": {
+    "description": "Snackbar shown when an article is added to the user's favorites."
+  },
+  "favoriteremoved": "eliminado de favoritos",
+  "@favoriteremoved": {
+    "description": "Snackbar shown when an article is removed from the user's favorites."
+  },
+  "nofavorites1": "No tienes artículos en tus favoritos. Utilice la función ",
+  "@nofavorites1": {
+    "description": "The message shown when the user has no articles in their favorites. The text had to be split since it contains an icon. The full text is: You have no articles in your favorites. Use the <heart icon> icon to add a publication you like in your favorites!"
+  },
+  "nofavorites2": "¡para añadir una publicación que te guste a tus favoritos!",
+  "@nofavorites2": {
+    "description": "The message shown when the user has no articles in their favorites. The text had to be split since it contains an icon. The full text is: You have no articles in your favorites. Use the <heart icon> icon to add a publication you like in your favorites!"
+  },
+  "nopublication1": "No hay publicaciones disponibles. Asegúrese de que sigue las revistas entrando en la sección",
+  "@nopublication1": {
+    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
+  },
+  "nopublication2": "menú y utilice el",
+  "@nopublication2": {
+    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
+  },
+  "unpaywallarticle": "El artículo se facilitó a través de Unpaywall",
+  "@unpaywallarticle": {
+    "description": "Snackbar shown when an article was fetched from Unpaywall."
+  },
+  "forwardedproxy": "Reenviado a través del proxy de su institución",
+  "@forwardedproxy": {
+    "description": "Snackbar shown when a request is intercepted and sent through the user's institution EZproxy."
+  },
+  "sharedMessage": "Compartido a través de la aplicación Wispar",
+  "@sharedMessage": {
+    "description": "Default sharing text."
+  },
+  "shareArticle": "Compartir el artículo",
+  "@shareArticle": {},
+  "sendToZotero": "Enviar a Zotero",
+  "@sendToZotero": {},
+  "zoteroPermissions2": "Al crear una nueva clave API de Zotero, debes seleccionar tanto \"Permitir acceso a la biblioteca\" como \"Permitir acceso de escritura\".",
+  "@zoteroPermissions2": {},
+  "zoteroCreateKey": "Crear una nueva clave API",
+  "@zoteroCreateKey": {},
+  "zoteroValidKey": "¡Clave API guardada!",
+  "@zoteroValidKey": {
+    "description": "Snackbar shown when a valid Zotero API key has been saved."
+  },
+  "zoteroInvalidKey": "¡La clave API no es válida!",
+  "@zoteroInvalidKey": {
+    "description": "Snackbar shown when an attempt to save an invalid Zotero API key is made."
+  },
+  "save": "Guardar",
+  "@save": {},
+  "sourceCode": "Código fuente",
+  "@sourceCode": {},
+  "enabled": "Activado",
+  "@enabled": {},
+  "disabled": "Desactivado",
+  "@disabled": {},
+  "database": "Base de datos",
+  "@database": {},
+  "privacyPolicy": "Política de privacidad",
+  "@privacyPolicy": {},
+  "donate": "Donar",
+  "@donate": {},
+  "donateMessage": "Ayude a desarrollar Wispar",
+  "@donateMessage": {
+    "description": "Text shown in the subtitle of the Donate button in the settings."
+  },
+  "home": "Inicio",
+  "@home": {
+    "description": "The home menu button and the app bar title when in the home screen."
+  },
+  "favorites": "Favoritos",
+  "@favorites": {
+    "description": "The favorites menu button and the app bar title when in the favorites screen."
+  },
+  "downloads": "Descargas",
+  "@downloads": {
+    "description": "The downloads menu button and the app bar title when in the downloads screen."
+  },
+  "publisher": "Editorial",
+  "@publisher": {},
+  "publishedin": "Publicado en",
+  "@publishedin": {},
+  "subjects": "Temas",
+  "@subjects": {},
+  "latestpublications": "Últimas publicaciones",
+  "@latestpublications": {},
+  "authors": "Autores",
+  "@authors": {},
+  "publishedon": "Publicado el",
+  "@publishedon": {},
+  "abstract": "Abstracto",
+  "@abstract": {},
+  "copydoi": "Copiar DOI",
+  "@copydoi": {},
+  "doicopied": "DOI copiado al portapapeles",
+  "@doicopied": {
+    "description": "Snackbar shown when the Copy DOI button is pressed."
+  },
+  "viewarticle": "Leer el artículo",
+  "@viewarticle": {},
+  "favorite": "Favorito",
+  "@favorite": {},
+  "searchresults": "Resultados de la búsqueda",
+  "@searchresults": {},
+  "appearance": "Aspecto",
+  "@appearance": {},
+  "light": "Claro",
+  "@light": {},
+  "dark": "Oscuro",
+  "@dark": {},
+  "systemtheme": "Tema del sistema",
+  "@systemtheme": {},
+  "selectinstitution": "Elija su institución",
+  "@selectinstitution": {},
+  "sortby": "Ordenar por",
+  "@sortby": {},
+  "sortorder": "Ordenar",
+  "@sortorder": {},
+  "followingsince": "Siguiendo desde",
+  "@followingsince": {},
+  "journaltitle": "Título de la revista",
+  "@journaltitle": {},
+  "followingdate": "Fecha siguiente",
+  "@followingdate": {},
+  "ascending": "Ascendente",
+  "@ascending": {},
+  "descending": "Descendente",
+  "@descending": {},
+  "articletitle": "Título del artículo",
+  "@articletitle": {},
+  "firstauthfamname": "Apellido del primer autor",
+  "@firstauthfamname": {},
+  "datepublished": "Fecha de publicación",
+  "@datepublished": {},
+  "dateaddedtofavorites": "Fecha añadida a favoritos",
+  "@dateaddedtofavorites": {},
+  "addedtoyourfav": "Añadido a tus favoritos en",
+  "@addedtoyourfav": {},
+  "buildingfeed": "Construyendo tu feed. Por favor, espere…",
+  "@buildingfeed": {},
+  "otherLicense": "Otra licencia",
+  "@otherLicense": {},
+  "unknownLicense": "Licencia desconocida",
+  "@unknownLicense": {},
+  "abstractunavailable": "Resumen no disponible. El editor no proporciona resúmenes a Crossref. El texto completo debería estar disponible.",
+  "@abstractunavailable": {
+    "description": "Text shown in the place of the abstract when it is unavailable."
+  },
+  "noinstitution": "Sin institución",
+  "@noinstitution": {},
+  "nopublication3": "icono para buscar revistas.",
+  "@nopublication3": {
+    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
+  },
+  "zoteroSettings": "Ajustes de Zotero",
+  "@zoteroSettings": {},
+  "zoteroPermissions1": "Wispar necesita tanto acceso de lectura como de escritura a tu cuenta Zotero para disfrutar de su integración.",
+  "@zoteroPermissions1": {},
+  "zoteroPermissions3": "Una vez creada la clave API, copie el valor y péguelo en el campo de texto de abajo.",
+  "@zoteroPermissions3": {},
+  "zoteroEnterKey": "Introduzca una clave API",
+  "@zoteroEnterKey": {
+    "description": "Hint text shown in the text field where users can enter their Zotero API key."
+  },
+  "reportIssue": "Notificar un problema",
+  "@reportIssue": {}
+}
