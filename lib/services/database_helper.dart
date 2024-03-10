@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/crossref_journals_works_models.dart';
 import '../publication_card.dart';
+import '../downloaded_card.dart';
 import 'dart:convert';
 
 class DatabaseHelper {
@@ -22,6 +23,7 @@ class DatabaseHelper {
       databasePath,
       version: 1,
       onCreate: (db, version) async {
+        // Create the journals table
         await db.execute('''
         CREATE TABLE journals (
           journal_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,7 +36,7 @@ class DatabaseHelper {
         )
       ''');
 
-        // Create the 'favorites' table
+        // Create the 'articles' table
         await db.execute('''
         CREATE TABLE articles (
           article_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -58,6 +60,7 @@ class DatabaseHelper {
     );
   }
 
+  // Functions for journals
   Future<void> insertJournal(Journal journal) async {
     final db = await database;
     // Check if the journal is already in the database
@@ -138,11 +141,23 @@ class DatabaseHelper {
     return count > 0;
   }
 
+  Future<void> updateJournalLastUpdated(String issn) async {
+    final db = await database;
+    await db.update(
+      'journals',
+      {'lastUpdated': DateTime.now().toIso8601String()},
+      where: 'issn = ?',
+      whereArgs: [issn],
+    );
+  }
+
+  // Functions for articles
   Future<void> insertArticle(
     PublicationCard publicationCard, {
     bool isLiked = false,
     bool isDownloaded = false,
     bool isCached = false,
+    String pdfPath = '',
   }) async {
     final db = await database;
 
@@ -166,6 +181,7 @@ class DatabaseHelper {
       if (isDownloaded && existingArticle[0]['dateDownloaded'] == null) {
         updateData['dateDownloaded'] =
             DateTime.now().toIso8601String().substring(0, 10);
+        updateData['pdfPath'] = pdfPath;
       }
 
       if (isCached && existingArticle[0]['dateCached'] == null) {
@@ -205,7 +221,6 @@ class DatabaseHelper {
 
         journalId = await db.insert('journals', journalData);
       }
-
       await db.insert('articles', {
         'doi': publicationCard.doi,
         'title': publicationCard.title,
@@ -222,6 +237,7 @@ class DatabaseHelper {
         'dateDownloaded': isDownloaded
             ? DateTime.now().toIso8601String().substring(0, 10)
             : null,
+        'pdfPath': pdfPath.isNotEmpty ? pdfPath : '',
         'dateCached': isCached ? DateTime.now().toIso8601String() : null,
         'journal_id': journalId,
       });
@@ -368,13 +384,52 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> updateJournalLastUpdated(String issn) async {
+// Functions for downloaded articles
+
+  Future<bool> isArticleDownloaded(String doi) async {
     final db = await database;
+    final count = Sqflite.firstIntValue(await db.rawQuery(
+      'SELECT COUNT(*) FROM articles WHERE doi = ? AND dateDownloaded IS NOT NULL AND pdfPath IS NOT NULL',
+      [doi],
+    ))!;
+    return count > 0;
+  }
+
+  Future<List<DownloadedCard>> getDownloadedArticles() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+    SELECT articles.*, journals.title AS journalTitle, journals.issn
+    FROM articles
+    JOIN journals ON articles.journal_id = journals.journal_id
+    WHERE articles.dateDownloaded IS NOT NULL
+  ''');
+    return List.generate(maps.length, (i) {
+      return DownloadedCard(
+        pdfPath: maps[i]['pdfPath'],
+        publicationCard: PublicationCard(
+          doi: maps[i]['doi'],
+          title: maps[i]['title'],
+          issn: maps[i]['issn'],
+          abstract: maps[i]['abstract'],
+          journalTitle: maps[i]['journalTitle'],
+          publishedDate: DateTime.parse(maps[i]['publishedDate']),
+          authors: [],
+          url: '',
+          license: '',
+          licenseName: '',
+        ),
+      );
+    });
+  }
+
+  Future<void> removeDownloaded(String doi) async {
+    final db = await database;
+
     await db.update(
-      'journals',
-      {'lastUpdated': DateTime.now().toIso8601String()},
-      where: 'issn = ?',
-      whereArgs: [issn],
+      'articles',
+      {'dateDownloaded': null, 'pdfPath': null},
+      where: 'doi = ?',
+      whereArgs: [doi],
     );
   }
 }

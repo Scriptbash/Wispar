@@ -17,17 +17,19 @@ class Unpaywall {
 
 class UnpaywallService {
   static Future<Unpaywall> checkAvailability(String doi) async {
-    final response = await http.get(Uri.parse(
-        'https://api.unpaywall.org/v2/$doi?email=wispar-app@protonmail.com'));
+    try {
+      final response = await http.get(Uri.parse(
+          'https://api.unpaywall.org/v2/$doi?email=wispar-app@protonmail.com'));
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
 
-      return Unpaywall.fromJson(jsonResponse);
-    } else {
+        return Unpaywall.fromJson(jsonResponse);
+      } else {
+        return Unpaywall.fromJson({});
+      }
+    } catch (e) {
       return Unpaywall.fromJson({});
-
-      //throw Exception('Failed to load Unpaywall data');
     }
   }
 }

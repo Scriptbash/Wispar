@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:pdfrx/pdfrx.dart';
 import 'dart:math';
-import 'package:url_launcher/url_launcher.dart';
+import '../publication_card.dart';
+import '../services/database_helper.dart';
 
 class PdfReader extends StatefulWidget {
   final String pdfUrl;
+  final PublicationCard publicationCard;
 
-  PdfReader({Key? key, required this.pdfUrl}) : super(key: key);
+  PdfReader({Key? key, required this.pdfUrl, required this.publicationCard})
+      : super(key: key);
 
   @override
   _PdfReaderState createState() => _PdfReaderState();
@@ -15,11 +18,19 @@ class PdfReader extends StatefulWidget {
 
 class _PdfReaderState extends State<PdfReader> {
   final controller = PdfViewerController();
-  final isDownloadable = true;
+  late DatabaseHelper databaseHelper;
+  bool isDownloaded = false;
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    databaseHelper = DatabaseHelper();
+    checkIfDownloaded();
   }
 
   @override
@@ -29,16 +40,37 @@ class _PdfReaderState extends State<PdfReader> {
           centerTitle: false,
           title: Text("Article viewer"),
           actions: <Widget>[
-            isDownloadable == true
+            isDownloaded == false
                 ? IconButton(
                     icon: const Icon(Icons.download_outlined),
                     tooltip: 'Download',
-                    onPressed: () {},
-                  )
+                    onPressed: () async {
+                      // Otherwise, insert a new article
+                      await databaseHelper.insertArticle(
+                        widget.publicationCard,
+                        isDownloaded: true,
+                        pdfPath: widget.pdfUrl,
+                      );
+                      setState(() {
+                        isDownloaded = true;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content:
+                              Text('The article was downloaded sucessfully!')));
+                    })
                 : IconButton(
                     icon: const Icon(Icons.delete_outlined),
                     tooltip: 'Delete',
-                    onPressed: () {},
+                    onPressed: () async {
+                      await databaseHelper.removeDownloaded(
+                        widget.publicationCard.doi,
+                      );
+                      setState(() {
+                        isDownloaded = false;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('The article was deleted!')));
+                    },
                   ),
           ]),
       body: Stack(children: [
@@ -85,5 +117,13 @@ class _PdfReaderState extends State<PdfReader> {
             ))
       ]),
     );
+  }
+
+  void checkIfDownloaded() async {
+    bool downloaded =
+        await databaseHelper.isArticleDownloaded(widget.publicationCard.doi);
+    setState(() {
+      isDownloaded = downloaded;
+    });
   }
 }

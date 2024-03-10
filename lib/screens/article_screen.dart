@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:wispar/screens/article_website.dart';
-import '../services/crossref_api.dart';
 import '../models/crossref_journals_works_models.dart';
 import '../services/database_helper.dart';
 import '../publication_card.dart';
@@ -227,8 +226,18 @@ class _ArticleScreenState extends State<ArticleScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => ArticleWebsite(
-                          articleUrl: widget.url,
-                          doi: widget.doi,
+                          publicationCard: PublicationCard(
+                            doi: widget.doi,
+                            title: widget.title,
+                            authors: widget.authors,
+                            publishedDate: widget.publishedDate,
+                            journalTitle: widget.journalTitle,
+                            issn: widget.issn,
+                            url: widget.url,
+                            license: widget.license,
+                            licenseName: widget.licenseName,
+                            abstract: widget.abstract,
+                          ),
                         ),
                       ),
                     );

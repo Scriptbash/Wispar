@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/unpaywall_api.dart';
 import 'pdf_reader.dart';
+import '../publication_card.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
@@ -11,10 +12,9 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class ArticleWebsite extends StatefulWidget {
-  final String articleUrl;
-  final String doi;
+  final PublicationCard publicationCard;
 
-  const ArticleWebsite({Key? key, required this.articleUrl, required this.doi})
+  const ArticleWebsite({Key? key, required this.publicationCard})
       : super(key: key);
 
   @override
@@ -67,7 +67,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
 
   Future<void> checkUnpaywallAvailability() async {
     final Unpaywall result =
-        await UnpaywallService.checkAvailability(widget.doi);
+        await UnpaywallService.checkAvailability(widget.publicationCard.doi);
     if (result.pdfUrl.isNotEmpty) {
       setState(() {
         pdfUrl = result.pdfUrl;
@@ -78,9 +78,9 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
     if (pdfUrl.isEmpty) {
       if (proxyUrl.isNotEmpty) {
         _showSnackBar(AppLocalizations.of(context)!.forwardedproxy);
-        pdfUrl = proxyUrl + widget.articleUrl;
+        pdfUrl = proxyUrl + widget.publicationCard.url;
       } else {
-        pdfUrl = widget.articleUrl;
+        pdfUrl = widget.publicationCard.url;
       }
     } else {
       _showSnackBar(AppLocalizations.of(context)!.unpaywallarticle);
@@ -114,7 +114,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(widget.articleUrl)),
+        appBar: AppBar(title: Text(widget.publicationCard.url)),
         body: SafeArea(
             child: Column(children: <Widget>[
           Expanded(
@@ -163,6 +163,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                         Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => PdfReader(
                             pdfUrl: pdfFile.path,
+                            publicationCard: widget.publicationCard,
                           ),
                         ));
                       } else {
@@ -191,8 +192,8 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                       if (title == "Host Needed") {
                         // Load the page without the proxy URL
                         controller.loadUrl(
-                          urlRequest:
-                              URLRequest(url: WebUri(widget.articleUrl)),
+                          urlRequest: URLRequest(
+                              url: WebUri(widget.publicationCard.url)),
                         );
                       }
                     }).catchError((error) {
