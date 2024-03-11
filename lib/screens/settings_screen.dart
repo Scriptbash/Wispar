@@ -31,233 +31,235 @@ class _SettingsScreenState extends State<SettingsScreen> {
         centerTitle: false,
         title: Text(AppLocalizations.of(context)!.settings),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Center(
-              child: ListTile(
-                //onTap: () {},
-                title: Column(
-                  children: [
-                    Image.asset(
-                      'assets/icon/icon.png',
-                      width: 50,
-                    ),
-                    Text('Wispar'),
-                  ],
-                ),
-                subtitle: Column(children: [
-                  FutureBuilder<List<String>>(
-                    future: appInfo,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        List<String>? appInfo = snapshot.data;
-
-                        if (appInfo != null && appInfo.length == 2) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('Version ${appInfo[0]}'),
-                              Text(' build ${appInfo[1]}'),
-                            ],
-                          );
-                        }
-                      }
-                      return CircularProgressIndicator();
-                    },
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Center(
+                child: ListTile(
+                  //onTap: () {},
+                  title: Column(
                     children: [
-                      TextButton.icon(
-                          onPressed: () {
-                            launchUrl(
-                                Uri.parse(
-                                    'https://github.com/Scriptbash/Wispar'),
-                                mode: LaunchMode.platformDefault);
-                          },
-                          icon: Icon(Icons.code),
-                          label:
-                              Text(AppLocalizations.of(context)!.sourceCode)),
-                      TextButton.icon(
-                          onPressed: () {
-                            launchUrl(
-                                Uri.parse(
-                                    'https://github.com/Scriptbash/Wispar/issues'),
-                                mode: LaunchMode.platformDefault);
-                          },
-                          icon: Icon(Icons.bug_report_outlined),
-                          label:
-                              Text(AppLocalizations.of(context)!.reportIssue)),
+                      Image.asset(
+                        'assets/icon/icon.png',
+                        width: 50,
+                      ),
+                      Text('Wispar'),
                     ],
-                  )
-                ]),
+                  ),
+                  subtitle: Column(children: [
+                    FutureBuilder<List<String>>(
+                      future: appInfo,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          List<String>? appInfo = snapshot.data;
+
+                          if (appInfo != null && appInfo.length == 2) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('Version ${appInfo[0]}'),
+                                Text(' build ${appInfo[1]}'),
+                              ],
+                            );
+                          }
+                        }
+                        return CircularProgressIndicator();
+                      },
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton.icon(
+                            onPressed: () {
+                              launchUrl(
+                                  Uri.parse(
+                                      'https://github.com/Scriptbash/Wispar'),
+                                  mode: LaunchMode.platformDefault);
+                            },
+                            icon: Icon(Icons.code),
+                            label:
+                                Text(AppLocalizations.of(context)!.sourceCode)),
+                        TextButton.icon(
+                            onPressed: () {
+                              launchUrl(
+                                  Uri.parse(
+                                      'https://github.com/Scriptbash/Wispar/issues'),
+                                  mode: LaunchMode.platformDefault);
+                            },
+                            icon: Icon(Icons.bug_report_outlined),
+                            label: Text(
+                                AppLocalizations.of(context)!.reportIssue)),
+                      ],
+                    )
+                  ]),
+                ),
               ),
-            ),
-            ListTile(
-                onTap: () {
-                  _showThemeDialog(context);
-                },
-                title: Row(
-                  children: [
-                    Icon(Icons.palette_outlined),
-                    SizedBox(width: 8),
-                    Text(AppLocalizations.of(context)!.appearance),
-                  ],
-                ),
-                subtitle: Row(children: [
-                  SizedBox(width: 32),
-                  Text(_getThemeSubtitle(
-                      context, Provider.of<ThemeProvider>(context).themeMode)),
-                ])),
-            ListTile(
-                onTap: () {
-                  _showUnpaywallDialog(context);
-                },
-                title: Row(
-                  children: [
-                    Icon(Icons.lock_open_outlined),
-                    SizedBox(width: 8),
-                    Text('Unpaywall'),
-                  ],
-                ),
-                subtitle: Row(children: [
-                  SizedBox(width: 32),
-                  FutureBuilder<String?>(
-                    future: getUnpaywallStatus(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return Center(
-                          child: Text(snapshot.data ?? 'Enabled'),
-                        );
-                      } else {
-                        return Center(
-                          child: Text('Enabled'),
-                        );
-                      }
-                    },
-                  ),
-                ])),
-            ListTile(
-              onTap: () async {
-                Map<String, dynamic>? result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => InstitutionScreen(),
-                  ),
-                );
-                if (result != null &&
-                    result.containsKey('name') &&
-                    result.containsKey('url')) {
-                  saveInstitutionPreference(
-                    result['name'] as String,
-                    result['url'] as String,
-                  );
-                }
-              },
-              title: Row(children: [
-                Icon(Icons.school_outlined),
-                SizedBox(width: 8),
-                Text('EZproxy'),
-                TextButton(
-                  onPressed: () {
-                    unsetInstitution();
+              ListTile(
+                  onTap: () {
+                    _showThemeDialog(context);
                   },
-                  child: Text(' Unset'),
-                  style: TextButton.styleFrom(
-                    minimumSize: Size.zero,
-                    padding: EdgeInsets.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  title: Row(
+                    children: [
+                      Icon(Icons.palette_outlined),
+                      SizedBox(width: 8),
+                      Text(AppLocalizations.of(context)!.appearance),
+                    ],
                   ),
-                )
-              ]),
-              subtitle: Row(
-                children: [
-                  SizedBox(width: 32),
-                  Expanded(
-                    child: FutureBuilder<String?>(
-                      future: getInstitutionName(),
+                  subtitle: Row(children: [
+                    SizedBox(width: 32),
+                    Text(_getThemeSubtitle(context,
+                        Provider.of<ThemeProvider>(context).themeMode)),
+                  ])),
+              ListTile(
+                  onTap: () {
+                    _showUnpaywallDialog(context);
+                  },
+                  title: Row(
+                    children: [
+                      Icon(Icons.lock_open_outlined),
+                      SizedBox(width: 8),
+                      Text('Unpaywall'),
+                    ],
+                  ),
+                  subtitle: Row(children: [
+                    SizedBox(width: 32),
+                    FutureBuilder<String?>(
+                      future: getUnpaywallStatus(),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
-                          return Text(
-                            snapshot.data ??
-                                AppLocalizations.of(context)!.noinstitution,
+                          return Center(
+                            child: Text(snapshot.data ?? 'Enabled'),
                           );
                         } else {
-                          return Text(
-                            AppLocalizations.of(context)!.noinstitution,
+                          return Center(
+                            child: Text('Enabled'),
                           );
                         }
                       },
                     ),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ZoteroSettings(),
-                  ),
-                );
-              },
-              title: Row(
-                children: [
-                  Icon(Icons.book_outlined),
+                  ])),
+              ListTile(
+                onTap: () async {
+                  Map<String, dynamic>? result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => InstitutionScreen(),
+                    ),
+                  );
+                  if (result != null &&
+                      result.containsKey('name') &&
+                      result.containsKey('url')) {
+                    saveInstitutionPreference(
+                      result['name'] as String,
+                      result['url'] as String,
+                    );
+                  }
+                },
+                title: Row(children: [
+                  Icon(Icons.school_outlined),
                   SizedBox(width: 8),
-                  Text('Zotero'),
-                ],
+                  Text('EZproxy'),
+                  TextButton(
+                    onPressed: () {
+                      unsetInstitution();
+                    },
+                    child: Text(' Unset'),
+                    style: TextButton.styleFrom(
+                      minimumSize: Size.zero,
+                      padding: EdgeInsets.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  )
+                ]),
+                subtitle: Row(
+                  children: [
+                    SizedBox(width: 32),
+                    Expanded(
+                      child: FutureBuilder<String?>(
+                        future: getInstitutionName(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Text(
+                              snapshot.data ??
+                                  AppLocalizations.of(context)!.noinstitution,
+                            );
+                          } else {
+                            return Text(
+                              AppLocalizations.of(context)!.noinstitution,
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              /*subtitle: Row(children: [
+              ListTile(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ZoteroSettings(),
+                    ),
+                  );
+                },
+                title: Row(
+                  children: [
+                    Icon(Icons.book_outlined),
+                    SizedBox(width: 8),
+                    Text('Zotero'),
+                  ],
+                ),
+                /*subtitle: Row(children: [
                 SizedBox(width: 32),
                 Text('Manage Zotero'),
               ]),*/
-            ),
-            ListTile(
-              onTap: () {},
-              title: Row(
-                children: [
-                  Icon(Icons.dns_outlined),
-                  SizedBox(width: 8),
-                  Text(AppLocalizations.of(context)!.database),
-                ],
               ),
-            ),
-            ListTile(
-              onTap: () {
-                launchUrl(
-                    Uri.parse(
-                        'https://github.com/Scriptbash/Wispar/blob/main/PRIVACY.md'),
-                    mode: LaunchMode.platformDefault);
-              },
-              title: Row(
-                children: [
-                  Icon(Icons.privacy_tip_outlined),
-                  SizedBox(width: 8),
-                  Text(AppLocalizations.of(context)!.privacyPolicy),
-                ],
+              ListTile(
+                onTap: () {},
+                title: Row(
+                  children: [
+                    Icon(Icons.dns_outlined),
+                    SizedBox(width: 8),
+                    Text(AppLocalizations.of(context)!.database),
+                  ],
+                ),
               ),
-            ),
-            ListTile(
+              ListTile(
                 onTap: () {
-                  launchUrl(Uri.parse('https://ko-fi.com/scriptbash'),
+                  launchUrl(
+                      Uri.parse(
+                          'https://github.com/Scriptbash/Wispar/blob/main/PRIVACY.md'),
                       mode: LaunchMode.platformDefault);
                 },
                 title: Row(
                   children: [
-                    Icon(Icons.favorite_border),
+                    Icon(Icons.privacy_tip_outlined),
                     SizedBox(width: 8),
-                    Text(AppLocalizations.of(context)!.donate),
+                    Text(AppLocalizations.of(context)!.privacyPolicy),
                   ],
                 ),
-                subtitle: Row(children: [
-                  SizedBox(width: 32),
-                  Text(AppLocalizations.of(context)!.donateMessage)
-                ])),
-          ],
+              ),
+              ListTile(
+                  onTap: () {
+                    launchUrl(Uri.parse('https://ko-fi.com/scriptbash'),
+                        mode: LaunchMode.platformDefault);
+                  },
+                  title: Row(
+                    children: [
+                      Icon(Icons.favorite_border),
+                      SizedBox(width: 8),
+                      Text(AppLocalizations.of(context)!.donate),
+                    ],
+                  ),
+                  subtitle: Row(children: [
+                    SizedBox(width: 32),
+                    Text(AppLocalizations.of(context)!.donateMessage)
+                  ])),
+            ],
+          ),
         ),
       ),
     );

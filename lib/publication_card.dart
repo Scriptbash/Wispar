@@ -306,7 +306,7 @@ class _PublicationCardState extends State<PublicationCard> {
             ),
             if (widget.dateLiked != null)
               Text(
-                '${AppLocalizations.of(context)!.addedtoyourfav} ${widget.dateLiked}',
+                '\n${AppLocalizations.of(context)!.addedtoyourfav} ${widget.dateLiked}',
                 style: TextStyle(
                   color: Colors.grey,
                 ),
