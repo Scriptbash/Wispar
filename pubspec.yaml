@@ -47,7 +47,7 @@ dependencies:
   url_launcher: ^6.2.3
   http: ^1.1.2
   pdfrx: ^1.0.11
-  package_info_plus: ^5.0.1
+  package_info_plus: ^7.0.0
   share_plus: ^7.2.2
   
 dependency_overrides:
