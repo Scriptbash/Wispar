@@ -1,0 +1,200 @@
+{
+  "home": "வீடு",
+  "@home": {
+    "description": "The home menu button and the app bar title when in the home screen."
+  },
+  "favorites": "பிடித்தவை",
+  "@favorites": {
+    "description": "The favorites menu button and the app bar title when in the favorites screen."
+  },
+  "downloads": "பதிவிறக்கங்கள்",
+  "@downloads": {
+    "description": "The downloads menu button and the app bar title when in the downloads screen."
+  },
+  "settings": "அமைப்புகள்",
+  "@settings": {
+    "description": "The settings option menu button and the app bar title when in the settings screen."
+  },
+  "journalnotfollowing1": "நீங்கள் எந்த பத்திரிகைகளையும் பின்பற்றவில்லை. பயன்படுத்தவும்",
+  "@journalnotfollowing1": {
+    "description": "The message shown when the user is not following any journals. The text had to be split since it contains an icon. The full text is: You are not following any journals. Use the <magnifying glass icon> icon to find and follow journals."
+  },
+  "journalnotfollowing2": "பத்திரிகைகளைக் கண்டுபிடித்து பின்பற்ற படவுரு.",
+  "@journalnotfollowing2": {
+    "description": "The message shown when the user is not following any journals. The text had to be split since it contains an icon. The full text is: You are not following any journals. Use the <magnifying glass icon> icon to find and follow journals."
+  },
+  "follow": "பின்தொடர்",
+  "@follow": {
+    "description": "The button text shown on journal cards when it is not followed."
+  },
+  "unfollow": "பின்தொடரவும்",
+  "@unfollow": {
+    "description": "The button text shown on journal cards when it is followed."
+  },
+  "journals": "பத்திரிகைகள்",
+  "@journals": {
+    "description": "The journals menu button and the app bar title when in the journals screen."
+  },
+  "search": "தேடுங்கள்…",
+  "@search": {
+    "description": "Placeholder text shown inside the search bar."
+  },
+  "publishedin": "வெளியிடப்பட்டது",
+  "@publishedin": {},
+  "subjects": "பாடங்கள்",
+  "@subjects": {},
+  "latestpublications": "அண்மைக் கால வெளியீடுகள்",
+  "@latestpublications": {},
+  "authors": "ஆசிரியர்கள்",
+  "@authors": {},
+  "publishedon": "வெளியிடப்பட்டது",
+  "@publishedon": {},
+  "abstract": "சுருக்கம்",
+  "@abstract": {},
+  "copydoi": "Doi ஐ நகலெடுக்கவும்",
+  "@copydoi": {},
+  "doicopied": "DOI கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது",
+  "@doicopied": {
+    "description": "Snackbar shown when the Copy DOI button is pressed."
+  },
+  "viewarticle": "கட்டுரையைக் காண்க",
+  "@viewarticle": {},
+  "favorite": "பிடித்த",
+  "@favorite": {},
+  "favoriteadded": "பிடித்தவைகளில் சேர்க்கப்பட்டது",
+  "@favoriteadded": {
+    "description": "Snackbar shown when an article is added to the user's favorites."
+  },
+  "favoriteremoved": "பிடித்தவைகளிலிருந்து அகற்றப்பட்டது",
+  "@favoriteremoved": {
+    "description": "Snackbar shown when an article is removed from the user's favorites."
+  },
+  "abstractunavailable": "சுருக்கம் கிடைக்கவில்லை. வெளியீட்டாளர் கிராச்ரெஃப் சுருக்கங்களை வழங்கவில்லை. முழு உரை இன்னும் கிடைக்க வேண்டும்.",
+  "@abstractunavailable": {
+    "description": "Text shown in the place of the abstract when it is unavailable."
+  },
+  "searchresults": "தேடல் முடிவுகள்",
+  "@searchresults": {},
+  "nofavorites1": "உங்களுக்கு பிடித்தவைகளில் கட்டுரைகள் எதுவும் இல்லை. பயன்படுத்தவும் ",
+  "@nofavorites1": {
+    "description": "The message shown when the user has no articles in their favorites. The text had to be split since it contains an icon. The full text is: You have no articles in your favorites. Use the <heart icon> icon to add a publication you like in your favorites!"
+  },
+  "nofavorites2": "உங்களுக்கு பிடித்தவைகளில் நீங்கள் விரும்பும் வெளியீட்டைச் சேர்க்க ஐகான்!",
+  "@nofavorites2": {
+    "description": "The message shown when the user has no articles in their favorites. The text had to be split since it contains an icon. The full text is: You have no articles in your favorites. Use the <heart icon> icon to add a publication you like in your favorites!"
+  },
+  "appearance": "தோற்றம்",
+  "@appearance": {},
+  "light": "ஒளி",
+  "@light": {},
+  "dark": "இருண்ட",
+  "@dark": {},
+  "systemtheme": "கணினி கருப்பொருள்",
+  "@systemtheme": {},
+  "unpaywallarticle": "கட்டுரை unpaywall மூலம் வழங்கப்பட்டது",
+  "@unpaywallarticle": {
+    "description": "Snackbar shown when an article was fetched from Unpaywall."
+  },
+  "forwardedproxy": "உங்கள் நிறுவன பதிலாள் மூலம் அனுப்பப்பட்டது",
+  "@forwardedproxy": {
+    "description": "Snackbar shown when a request is intercepted and sent through the user's institution EZproxy."
+  },
+  "selectinstitution": "உங்கள் நிறுவனத்தைத் தேர்ந்தெடுக்கவும்",
+  "@selectinstitution": {},
+  "sortby": "வரிசைப்படுத்தவும்",
+  "@sortby": {},
+  "sortorder": "வரிசைப்படுத்தும் முறை",
+  "@sortorder": {},
+  "followingsince": "பின்வருமாறு",
+  "@followingsince": {},
+  "journaltitle": "செய்தித் தாள் தலைப்பு",
+  "@journaltitle": {},
+  "followingdate": "அடுத்த தேதி",
+  "@followingdate": {},
+  "ascending": "ஏறுதல்",
+  "@ascending": {},
+  "descending": "இறங்கு",
+  "@descending": {},
+  "articletitle": "கட்டுரை தலைப்பு",
+  "@articletitle": {},
+  "firstauthfamname": "முதல் ஆசிரியர் குடும்ப பெயர்",
+  "@firstauthfamname": {},
+  "datepublished": "தேதி வெளியிடப்பட்டது",
+  "@datepublished": {},
+  "dateaddedtofavorites": "பிடித்தவைகளில் தேதி சேர்க்கப்பட்டது",
+  "@dateaddedtofavorites": {},
+  "addedtoyourfav": "உங்களுக்கு பிடித்தவைகளில் சேர்க்கப்பட்டது",
+  "@addedtoyourfav": {},
+  "noinstitution": "நிறுவனம் இல்லை",
+  "@noinstitution": {},
+  "buildingfeed": "உங்கள் ஊட்டத்தை உருவாக்குதல். தயவுசெய்து காத்திருங்கள்…",
+  "@buildingfeed": {},
+  "nopublication1": "வெளியீடுகள் எதுவும் கிடைக்கவில்லை. நீங்கள் செல்வதன் மூலம் பத்திரிகைகளைப் பின்பற்றுகிறீர்கள் என்பதை உறுதிப்படுத்திக் கொள்ளுங்கள்",
+  "@nopublication1": {
+    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
+  },
+  "nopublication2": "பட்டியல் மற்றும் பயன்படுத்தவும்",
+  "@nopublication2": {
+    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
+  },
+  "nopublication3": "பத்திரிகைகளைக் கண்டுபிடிக்க படவுரு.",
+  "@nopublication3": {
+    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
+  },
+  "sharedMessage": "VISPAR பயன்பாடு வழியாக பகிரப்பட்டது",
+  "@sharedMessage": {
+    "description": "Default sharing text."
+  },
+  "shareArticle": "கட்டுரை பகிர்ந்து கொள்ளுங்கள்",
+  "@shareArticle": {},
+  "sendToZotero": "சோட்டெரோவுக்கு அனுப்புங்கள்",
+  "@sendToZotero": {},
+  "zoteroSettings": "சோட்டெரோ அமைப்புகள்",
+  "@zoteroSettings": {},
+  "zoteroPermissions1": "உங்கள் சோட்டெரோ கணக்கை அதன் ஒருங்கிணைப்பை அனுபவிக்க VISPAR க்கு அணுகல் மற்றும் எழுத வேண்டும்.",
+  "@zoteroPermissions1": {},
+  "zoteroPermissions2": "புதிய சோட்டெரோ பநிஇ விசையை உருவாக்கும்போது, நீங்கள் \"நூலக அணுகலை அனுமதிக்கவும்\" மற்றும் \"எழுத அணுகலை அனுமதிக்கவும்\" இரண்டையும் தேர்ந்தெடுக்க வேண்டும்.",
+  "@zoteroPermissions2": {},
+  "zoteroPermissions3": "பநிஇ விசை உருவாக்கப்பட்டதும், மதிப்பை நகலெடுத்து கீழே உள்ள உரை புலத்திற்குள் ஒட்டவும்.",
+  "@zoteroPermissions3": {},
+  "zoteroCreateKey": "புதிய பநிஇ விசையை உருவாக்கவும்",
+  "@zoteroCreateKey": {},
+  "zoteroEnterKey": "பநிஇ விசையை உள்ளிடவும்",
+  "@zoteroEnterKey": {
+    "description": "Hint text shown in the text field where users can enter their Zotero API key."
+  },
+  "zoteroValidKey": "பநிஇ விசை சேமிக்கப்பட்டது!",
+  "@zoteroValidKey": {
+    "description": "Snackbar shown when a valid Zotero API key has been saved."
+  },
+  "zoteroInvalidKey": "பநிஇ விசை தவறானது!",
+  "@zoteroInvalidKey": {
+    "description": "Snackbar shown when an attempt to save an invalid Zotero API key is made."
+  },
+  "save": "சேமி",
+  "@save": {},
+  "sourceCode": "மூலக் குறியீடு",
+  "@sourceCode": {},
+  "reportIssue": "ஒரு சிக்கலைப் புகாரளிக்கவும்",
+  "@reportIssue": {},
+  "enabled": "இயக்கப்பட்டது",
+  "@enabled": {},
+  "disabled": "முடக்கப்பட்டது",
+  "@disabled": {},
+  "database": "தரவுத்தளம்",
+  "@database": {},
+  "privacyPolicy": "தனியுரிமைக் கொள்கை",
+  "@privacyPolicy": {},
+  "donate": "நன்கொடை",
+  "@donate": {},
+  "donateMessage": "விச்பரின் வளர்ச்சியை ஆதரிக்க உதவுகிறது",
+  "@donateMessage": {
+    "description": "Text shown in the subtitle of the Donate button in the settings."
+  },
+  "otherLicense": "பிற உரிமம்",
+  "@otherLicense": {},
+  "unknownLicense": "தெரியாத உரிமம்",
+  "@unknownLicense": {},
+  "publisher": "வெளியீட்டாளர்",
+  "@publisher": {}
+}
