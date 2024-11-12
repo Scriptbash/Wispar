@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import './models/crossref_journals_works_models.dart';
-import './screens/article_screen.dart';
-import './screens/journals_details_screen.dart';
-import './services/database_helper.dart';
-import './services/zotero_api.dart';
+import '../models/crossref_journals_works_models.dart';
+import '../screens/article_screen.dart';
+import '../screens/journals_details_screen.dart';
+import '../services/database_helper.dart';
+import '../services/zotero_api.dart';
+import '../services/string_format_helper.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -215,7 +216,7 @@ class _PublicationCardState extends State<PublicationCard> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                '${AppLocalizations.of(context)!.publishedon} ${_formattedDate(widget.publishedDate!)}',
+                '${AppLocalizations.of(context)!.publishedon} ${formatDate(widget.publishedDate!)}',
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 13,
@@ -223,7 +224,7 @@ class _PublicationCardState extends State<PublicationCard> {
               ),
               SizedBox(height: 5.0),
               Text(
-                '${_getAuthorsNames(widget.authors)}',
+                '${getAuthorsNames(widget.authors)}',
                 style: TextStyle(fontSize: 14, color: Colors.grey),
                 maxLines: 4,
                 overflow: TextOverflow.ellipsis,
@@ -317,21 +318,15 @@ class _PublicationCardState extends State<PublicationCard> {
     );
   }
 
-  String _formattedDate(DateTime date) {
-    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-  }
-
-  String _getAuthorsNames(List<PublicationAuthor> authors) {
-    return authors
-        .map((author) => '${author.given} ${author.family}')
-        .join(', ');
-  }
-
   void checkIfLiked() async {
     bool liked = await databaseHelper.isArticleFavorite(widget.doi);
-    setState(() {
-      isLiked = liked;
-    });
+
+    // Check if the widget is still mounted before calling setState
+    if (mounted) {
+      setState(() {
+        isLiked = liked;
+      });
+    }
   }
 
   Future<Map<String, dynamic>?> getJournalDetails(String issn) async {

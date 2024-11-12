@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/crossref_api.dart';
-import '../services/database_helper.dart';
 import '../models/crossref_journals_models.dart' as Journals;
-import './journals_details_screen.dart';
+import '../widgets/journal_search_results_card.dart';
 
 class SearchResultsScreen extends StatefulWidget {
   final ListAndMore<Journals.Item> searchResults;
@@ -76,9 +75,8 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   }
 
   void _onScroll() {
-    if (hasMoreResults &&
-        _scrollController.position.pixels ==
-            _scrollController.position.maxScrollExtent) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent * 0.8) {
       if (!isLoading && !waitingForMore) {
         loadMoreItems(widget.searchQuery);
       }
@@ -102,8 +100,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
 
       setState(() {
         items.addAll(newItems.list);
-        hasMoreResults = newItems.hasMore &&
-            newItems.list.length >= 50; // Adjust the condition
+        hasMoreResults = newItems.hasMore && newItems.list.length >= 30;
         isLoading = false;
       });
     } catch (e) {
@@ -115,138 +112,5 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
       // Reset the waitingForMore flag regardless of success or failure
       waitingForMore = false;
     }
-  }
-}
-
-class JournalsSearchResultCard extends StatefulWidget {
-  final Journals.Item item;
-  final bool isFollowed;
-
-  const JournalsSearchResultCard(
-      {Key? key, required this.item, required this.isFollowed})
-      : super(key: key);
-
-  @override
-  _JournalsSearchResultCardState createState() =>
-      _JournalsSearchResultCardState();
-}
-
-class _JournalsSearchResultCardState extends State<JournalsSearchResultCard> {
-  late bool _isFollowed = false; // Initialize with false by default
-
-  @override
-  void initState() {
-    super.initState();
-    _initFollowStatus();
-  }
-
-  Future<void> _initFollowStatus() async {
-    final dbHelper = DatabaseHelper();
-    bool isFollowed = await dbHelper.isJournalFollowed(widget.item.issn.first);
-    setState(() {
-      _isFollowed = isFollowed;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.all(8.0),
-      child: ListTile(
-        title: Text(
-          widget.item.title,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-                '${AppLocalizations.of(context)!.publisher}: ${widget.item.publisher}'),
-            if (widget.item.issn.isNotEmpty)
-              Text('ISSN: ${widget.item.issn.first}'),
-          ],
-        ),
-        trailing: FollowButton(
-          item: widget.item,
-          isFollowed: _isFollowed,
-          onFollowStatusChanged: (isFollowed) {
-            // Handle follow status changes
-            setState(() {
-              _isFollowed = isFollowed;
-            });
-          },
-        ),
-        onTap: () {
-          List<String> subjectNames =
-              widget.item.subjects.map((subject) => subject.name).toList();
-          // Navigate to the detailed screen when the card is tapped
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => JournalDetailsScreen(
-                title: widget.item.title,
-                publisher: widget.item.publisher,
-                issn: widget.item.issn.first,
-                subjects: subjectNames,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class FollowButton extends StatelessWidget {
-  final Journals.Item item;
-  final bool isFollowed;
-  final Function(bool) onFollowStatusChanged;
-
-  const FollowButton({
-    Key? key,
-    required this.item,
-    required this.isFollowed,
-    required this.onFollowStatusChanged,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: () {
-        toggleFollowStatus(context);
-      },
-      child: Text(isFollowed
-          ? AppLocalizations.of(context)!.unfollow
-          : AppLocalizations.of(context)!.follow),
-    );
-  }
-
-  void toggleFollowStatus(BuildContext context) async {
-    final dbHelper = DatabaseHelper();
-
-    // Check if the journal is currently followed
-    bool currentlyFollowed = await dbHelper.isJournalFollowed(item.issn.first);
-
-    if (currentlyFollowed) {
-      // Unfollow
-      await dbHelper.removeJournal(item.issn.first);
-    } else {
-      // Follow
-      List<String> subjectNames =
-          item.subjects.map((subject) => subject.name).toList();
-      await dbHelper.insertJournal(
-        Journal(
-          issn: item.issn.first,
-          title: item.title,
-          publisher: item.publisher,
-          subjects: subjectNames.join(', '),
-        ),
-      );
-    }
-
-    //await dbHelper.clearCachedPublications();
-    onFollowStatusChanged(!currentlyFollowed);
   }
 }

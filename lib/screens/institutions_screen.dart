@@ -22,6 +22,11 @@ class _InstitutionScreenState extends State<InstitutionScreen> {
     try {
       List<ProxyData> proxies = await ProxyService.fetchProxies();
       setState(() {
+        // Appends "No institution" at the top of the proxy list
+        proxies = [
+          ProxyData(name: AppLocalizations.of(context)!.noinstitution, url: ''),
+          ...proxies,
+        ];
         allProxies = proxies;
         filteredProxies = proxies;
       });
@@ -75,12 +80,20 @@ class _InstitutionScreenState extends State<InstitutionScreen> {
               itemBuilder: (context, index) {
                 return ListTile(
                   title: Text(filteredProxies[index].name),
-                  subtitle: Text(filteredProxies[index].url),
+                  subtitle: Text(filteredProxies[index].url.isNotEmpty
+                      ? filteredProxies[index].url
+                      : ''),
                   onTap: () {
-                    onInstitutionSelected(
-                      filteredProxies[index].name,
-                      filteredProxies[index].url,
-                    );
+                    if (filteredProxies[index].url.isEmpty) {
+                      // Handle "No institution"
+                      onInstitutionSelected('None', 'None');
+                    } else {
+                      // Handle selected proxy
+                      onInstitutionSelected(
+                        filteredProxies[index].name,
+                        filteredProxies[index].url,
+                      );
+                    }
                   },
                 );
               },

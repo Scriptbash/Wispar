@@ -151,27 +151,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   if (result != null &&
                       result.containsKey('name') &&
                       result.containsKey('url')) {
-                    saveInstitutionPreference(
-                      result['name'] as String,
-                      result['url'] as String,
-                    );
+                    String institutionName = result['name'] as String;
+                    String institutionUrl = result['url'] as String;
+
+                    if (institutionName == 'None') {
+                      // Remove the institution if no institution is selected
+                      await unsetInstitution();
+                    } else {
+                      // Otherwise, save the selected institution
+                      await saveInstitutionPreference(
+                          institutionName, institutionUrl);
+                    }
                   }
                 },
                 title: Row(children: [
                   Icon(Icons.school_outlined),
                   SizedBox(width: 8),
                   Text('EZproxy'),
-                  TextButton(
-                    onPressed: () {
-                      unsetInstitution();
-                    },
-                    child: Text(' Unset'),
-                    style: TextButton.styleFrom(
-                      minimumSize: Size.zero,
-                      padding: EdgeInsets.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                  )
                 ]),
                 subtitle: Row(
                   children: [
@@ -295,46 +291,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return prefs.getString('unpaywall') ?? 'Enabled';
   }
 
-  void _showUnpaywallDialog(BuildContext context) {
+  void _showUnpaywallDialog(BuildContext context) async {
+    // Fetch the current status of Unpaywall before opening the dialog
+    String? currentStatus = await getUnpaywallStatus();
+    currentStatus ??= 'Enabled';
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return FutureBuilder<String?>(
-          future: getUnpaywallStatus(),
-          builder: (context, snapshot) {
-            String? currentStatus = snapshot.data;
-            currentStatus ??= 'Enabled';
-            return AlertDialog(
-              title: Text('Unpaywall'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  RadioListTile<String>(
-                    title: Text(AppLocalizations.of(context)!.enabled),
-                    value: AppLocalizations.of(context)!.enabled,
-                    groupValue: currentStatus,
-                    onChanged: (value) {
-                      if (value != null) {
-                        saveUnpaywallPreference(value);
-                      }
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  RadioListTile<String>(
-                    title: Text(AppLocalizations.of(context)!.disabled),
-                    value: AppLocalizations.of(context)!.disabled,
-                    groupValue: currentStatus,
-                    onChanged: (value) {
-                      if (value != null) {
-                        saveUnpaywallPreference(value);
-                      }
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
+        return AlertDialog(
+          title: Text('Unpaywall'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              RadioListTile<String>(
+                title: Text(AppLocalizations.of(context)!.enabled),
+                value: AppLocalizations.of(context)!.enabled,
+                groupValue: currentStatus,
+                onChanged: (value) {
+                  if (value != null) {
+                    saveUnpaywallPreference(value);
+                    Navigator.of(context).pop();
+                  }
+                },
               ),
-            );
-          },
+              RadioListTile<String>(
+                title: Text(AppLocalizations.of(context)!.disabled),
+                value: AppLocalizations.of(context)!.disabled,
+                groupValue: currentStatus,
+                onChanged: (value) {
+                  if (value != null) {
+                    saveUnpaywallPreference(value);
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+            ],
+          ),
         );
       },
     );

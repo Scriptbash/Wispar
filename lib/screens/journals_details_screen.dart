@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+//import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/crossref_api.dart';
 import '../models/crossref_journals_works_models.dart' as journalsWorks;
-import '../publication_card.dart';
+import '../widgets/publication_card.dart';
+import '../widgets/journal_header.dart';
+import '../widgets/latest_works_header.dart';
 
 class JournalDetailsScreen extends StatefulWidget {
   final String title;
@@ -27,7 +29,6 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
   bool isLoading = false;
   late ScrollController _scrollController;
   bool hasMoreResults = true;
-  bool reachedEnd = false;
   bool waitingForMore = false;
 
   @override
@@ -36,8 +37,8 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
     allWorks = [];
-    CrossRefApi.resetCursor();
-    loadMoreWorks();
+    CrossRefApi.resetJournalWorksCursor();
+    _loadMoreWorks();
   }
 
   @override
@@ -95,7 +96,7 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
                     licenseName: work.licenseName,
                   );
                 } else {
-                  return Container();
+                  return Container(); // Empty container for the loading indicator
                 }
               },
               childCount: allWorks.length + (hasMoreResults ? 1 : 0),
@@ -106,35 +107,31 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
     );
   }
 
+  // Scroll Listener to detect when we're nearing the end of the list
   void _onScroll() {
-    if (hasMoreResults &&
-        _scrollController.position.pixels ==
-            _scrollController.position.maxScrollExtent) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent * 0.8) {
       if (!isLoading && !waitingForMore) {
-        loadMoreWorks();
+        _loadMoreWorks();
       }
     }
   }
 
-  Future<void> loadMoreWorks() async {
+  // Load more works from the API
+  Future<void> _loadMoreWorks() async {
     try {
       setState(() {
         isLoading = true;
         waitingForMore = true;
       });
 
-      if (reachedEnd) {
-        // Clear the flag if we are making a new API call
-        reachedEnd = false;
-      }
-
+      // Fetch more works from the CrossRef API
       ListAndMore<journalsWorks.Item> newWorks =
           await CrossRefApi.getJournalWorks(widget.issn);
 
       setState(() {
         allWorks.addAll(newWorks.list);
         hasMoreResults = newWorks.hasMore;
-        hasMoreResults = newWorks.hasMore && newWorks.list.length >= 25;
         isLoading = false;
       });
     } catch (e) {
@@ -146,86 +143,5 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
       // Reset the waitingForMore flag regardless of success or failure
       waitingForMore = false;
     }
-  }
-}
-
-class JournalInfoHeader extends SliverPersistentHeaderDelegate {
-  final String publisher;
-  final String issn;
-  final List<String> subjects;
-
-  JournalInfoHeader({
-    required this.publisher,
-    required this.issn,
-    required this.subjects,
-  });
-
-  @override
-  double get maxExtent => 120.0;
-
-  @override
-  double get minExtent => 60.0;
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return SingleChildScrollView(
-      child: Container(
-        padding: EdgeInsets.only(left: 15.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 8.0),
-            Text('${AppLocalizations.of(context)!.publisher}: $publisher'),
-            Text('ISSN: $issn'),
-            Text(
-                '${AppLocalizations.of(context)!.subjects}: ${subjects.join(', ')}'),
-            SizedBox(height: 8.0),
-            Container(
-              height: 1,
-              margin: EdgeInsets.symmetric(
-                horizontal: 60,
-              ),
-              color: Colors.grey,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
-    return false;
-  }
-}
-
-class PersistentLatestPublicationsHeader
-    extends SliverPersistentHeaderDelegate {
-  @override
-  double get maxExtent => 40.0;
-
-  @override
-  double get minExtent => 40.0;
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: Center(
-        child: Text(
-          AppLocalizations.of(context)!.latestpublications,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
-    return false;
   }
 }

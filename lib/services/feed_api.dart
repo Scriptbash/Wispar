@@ -5,10 +5,11 @@ import '../models/crossref_journals_works_models.dart' as journalWorks;
 class FeedApi {
   static const String baseUrl = 'https://api.crossref.org';
   static const String journalsEndpoint = '/journals';
+  static const String email = 'mailto=wispar-app@protonmail.com';
 
   static Future<List<journalWorks.Item>> getRecentFeed(String issn) async {
     final response = await http.get(Uri.parse(
-        '$baseUrl$journalsEndpoint/$issn/works?rows=100&sort=created&order=desc'));
+        '$baseUrl$journalsEndpoint/$issn/works?rows=100&sort=created&order=desc&$email'));
 
     if (response.statusCode == 200) {
       final responseData =

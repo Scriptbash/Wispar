@@ -31,8 +31,6 @@ class Wispar extends StatefulWidget {
 }
 
 class _WisparState extends State<Wispar> {
-  //ThemeMode _themeMode = ThemeMode.system;
-
   var _currentIndex = 0;
   final List<Widget> _pages = [
     const HomeScreen(),
@@ -73,7 +71,6 @@ class _WisparState extends State<Wispar> {
         Locale('ta'), // Tamil
       ],
       theme: ThemeData(
-        //primarySwatch: Colors.orange,
         colorSchemeSeed: Colors.deepPurple,
         brightness: Brightness.light,
         useMaterial3: true,
@@ -86,7 +83,6 @@ class _WisparState extends State<Wispar> {
         useMaterial3: true,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      //themeMode: ThemeMode.system,
       themeMode: Provider.of<ThemeProvider>(context).themeMode,
       home: Scaffold(
         body: Center(

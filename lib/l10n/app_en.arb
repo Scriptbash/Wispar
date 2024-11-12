@@ -196,5 +196,5 @@
   "otherLicense": "Other license",
   "@otherLicense":{},
   "unknownLicense": "Unkown license",
-  "@unkownLicense":{}
+  "@unknownLicense":{}
 }

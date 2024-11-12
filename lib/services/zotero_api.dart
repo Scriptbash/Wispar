@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import './string_format_helper.dart';
 
 class Zotero {
   final String doiUrl;
@@ -241,7 +242,7 @@ class ZoteroService {
         }
       }
 
-      // Prepare the author names
+      // Prepare the article information
 
       Map<String, dynamic> articleData = {
         'data': {
@@ -262,7 +263,7 @@ class ZoteroService {
           'ISSN': issn,
           'shortTitle': '', //'Short Title',
           'url': '',
-          'accessDate': _formattedDate(DateTime.now()),
+          'accessDate': formatDate(DateTime.now()),
           'archive': '', //'Archive',
           'archiveLocation': '', //'Archive Location',
           'libraryCatalog': '', //'Library Catalog',
@@ -299,8 +300,4 @@ class ZoteroService {
       ));
     }
   }
-}
-
-String _formattedDate(DateTime date) {
-  return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 }

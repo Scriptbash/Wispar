@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/crossref_api.dart';
 import '../services/database_helper.dart';
-import '../models/crossref_works_models.dart';
+import '../widgets/sortbydialog.dart';
+import '../widgets/sortorderdialog.dart';
+import '../models/journal_entity.dart';
+import '../widgets/journal_card.dart';
 import './journals_search_results_screen.dart';
-import './journals_details_screen.dart';
 import 'package:wispar/models/crossref_journals_models.dart' as Journals;
 
 class LibraryScreen extends StatefulWidget {
@@ -18,7 +20,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
   bool isSearching = false;
   TextEditingController searchController = TextEditingController();
   late DatabaseHelper dbHelper;
-  late Journal selectedJournal;
+  late Journals.Item selectedJournal;
   late FocusNode searchFocusNode;
   int sortBy = 0; // Set the sort by option to Journal title by default
   int sortOrder = 0; // Set the sort order to Ascending by default
@@ -76,7 +78,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
           ),
           PopupMenuButton<int>(
             icon: Icon(Icons.more_vert),
-            onSelected: (item) => handleMenuButton(context, item),
+            onSelected: (item) => handleMenuButton(item),
             itemBuilder: (context) => [
               PopupMenuItem<int>(
                 value: 0,
@@ -100,29 +102,24 @@ class _LibraryScreenState extends State<LibraryScreen> {
     );
   }
 
-  void _handleSortByChanged(int value) {
-    setState(() {
-      sortBy = value;
-    });
-  }
-
-  void _handleSortOrderChanged(int value) {
-    setState(() {
-      sortOrder = value;
-    });
-  }
-
-  void handleMenuButton(BuildContext context, int item) {
+  // Handles the sort by and sort order options
+  void handleMenuButton(int item) {
     switch (item) {
       case 0:
-        showDialog(
+        showSortByDialog(
           context: context,
-          builder: (BuildContext context) {
-            return SortByDialog(
-              initialSortBy: sortBy,
-              onSortByChanged: _handleSortByChanged,
-            );
+          initialSortBy: sortBy,
+          onSortByChanged: (int value) {
+            setState(() {
+              sortBy = value;
+            });
           },
+          sortOptions: [
+            AppLocalizations.of(context)!.journaltitle,
+            AppLocalizations.of(context)!.publisher,
+            AppLocalizations.of(context)!.followingdate,
+            'ISSN',
+          ],
         );
         break;
       case 1:
@@ -131,11 +128,18 @@ class _LibraryScreenState extends State<LibraryScreen> {
           builder: (BuildContext context) {
             return SortOrderDialog(
               initialSortOrder: sortOrder,
-              onSortOrderChanged: _handleSortOrderChanged,
+              sortOrderOptions: [
+                AppLocalizations.of(context)!.ascending,
+                AppLocalizations.of(context)!.descending,
+              ],
+              onSortOrderChanged: (int value) {
+                setState(() {
+                  sortOrder = value;
+                });
+              },
             );
           },
         );
-
         break;
     }
   }
@@ -216,7 +220,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
         },
       );
 
-      CrossRefApi.resetCursor();
+      CrossRefApi.resetJournalCursor();
       await Future.delayed(Duration(milliseconds: 100));
       Navigator.pop(context);
       ListAndMore<Journals.Item> searchResults =
@@ -244,203 +248,5 @@ class _LibraryScreenState extends State<LibraryScreen> {
     //await dbHelper.clearCachedPublications();
     // Refresh the UI after unfollowing the journal
     setState(() {});
-  }
-}
-
-class JournalCard extends StatelessWidget {
-  final Journal journal;
-  final Function(BuildContext, Journal) unfollowCallback;
-
-  const JournalCard({required this.journal, required this.unfollowCallback});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.all(8.0),
-      child: ListTile(
-        onTap: () {
-          List<String> subjects = journal.subjects.split(', ');
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => JournalDetailsScreen(
-                title: journal.title,
-                publisher: journal.publisher,
-                issn: journal.issn,
-                subjects: subjects,
-              ),
-            ),
-          );
-        },
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                journal.title,
-                style: TextStyle(fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                // Perform the unfollow action
-                unfollowCallback(context, journal);
-              },
-              child: Text(AppLocalizations.of(context)!.unfollow),
-            ),
-          ],
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-                '${AppLocalizations.of(context)!.publisher}: ${journal.publisher}'),
-            Text('ISSN: ${journal.issn}'),
-            Text(
-                '${AppLocalizations.of(context)!.followingsince} ${journal.dateFollowed}'),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class SortByDialog extends StatefulWidget {
-  final int initialSortBy;
-  final ValueChanged<int> onSortByChanged;
-
-  SortByDialog({required this.initialSortBy, required this.onSortByChanged});
-
-  @override
-  _SortByDialogState createState() => _SortByDialogState();
-}
-
-class _SortByDialogState extends State<SortByDialog> {
-  late int selectedSortBy;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedSortBy = widget.initialSortBy;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(AppLocalizations.of(context)!.sortby),
-      content: SingleChildScrollView(
-        child: Column(
-          children: [
-            RadioListTile<int>(
-              value: 0,
-              groupValue: selectedSortBy,
-              onChanged: (int? value) {
-                setState(() {
-                  selectedSortBy = value!;
-                  widget.onSortByChanged(selectedSortBy);
-                });
-                Navigator.pop(context);
-              },
-              title: Text(AppLocalizations.of(context)!.journaltitle),
-            ),
-            RadioListTile<int>(
-              value: 1,
-              groupValue: selectedSortBy,
-              onChanged: (int? value) {
-                setState(() {
-                  selectedSortBy = value!;
-                  widget.onSortByChanged(selectedSortBy);
-                });
-                Navigator.pop(context);
-              },
-              title: Text(AppLocalizations.of(context)!.publisher),
-            ),
-            RadioListTile<int>(
-              value: 2,
-              groupValue: selectedSortBy,
-              onChanged: (int? value) {
-                setState(() {
-                  selectedSortBy = value!;
-                  widget.onSortByChanged(selectedSortBy);
-                });
-                Navigator.pop(context);
-              },
-              title: Text(AppLocalizations.of(context)!.followingdate),
-            ),
-            RadioListTile<int>(
-              value: 3,
-              groupValue: selectedSortBy,
-              onChanged: (int? value) {
-                setState(() {
-                  selectedSortBy = value!;
-                  widget.onSortByChanged(selectedSortBy);
-                });
-                Navigator.pop(context);
-              },
-              title: Text('ISSN'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class SortOrderDialog extends StatefulWidget {
-  final int initialSortOrder;
-  final ValueChanged<int> onSortOrderChanged;
-
-  SortOrderDialog(
-      {required this.initialSortOrder, required this.onSortOrderChanged});
-
-  @override
-  _SortOrderDialogState createState() => _SortOrderDialogState();
-}
-
-class _SortOrderDialogState extends State<SortOrderDialog> {
-  late int selectedSortOrder;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedSortOrder = widget.initialSortOrder;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(AppLocalizations.of(context)!.sortorder),
-      content: SingleChildScrollView(
-        child: Column(
-          children: [
-            RadioListTile<int>(
-              value: 0,
-              groupValue: selectedSortOrder,
-              onChanged: (int? value) {
-                setState(() {
-                  selectedSortOrder = value!;
-                  widget.onSortOrderChanged(selectedSortOrder);
-                });
-                Navigator.pop(context);
-              },
-              title: Text(AppLocalizations.of(context)!.ascending),
-            ),
-            RadioListTile<int>(
-              value: 1,
-              groupValue: selectedSortOrder,
-              onChanged: (int? value) {
-                setState(() {
-                  selectedSortOrder = value!;
-                  widget.onSortOrderChanged(selectedSortOrder);
-                });
-                Navigator.pop(context);
-              },
-              title: Text(AppLocalizations.of(context)!.descending),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../downloaded_card.dart';
+import '../widgets/downloaded_card.dart';
 import '../services/database_helper.dart';
+import '../widgets/sortbydialog.dart';
+import '../widgets/sortorderdialog.dart';
 
 class DownloadsScreen extends StatefulWidget {
   const DownloadsScreen({Key? key}) : super(key: key);
@@ -30,7 +32,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           actions: [
             PopupMenuButton<int>(
               icon: Icon(Icons.more_vert),
-              onSelected: (item) => handleMenuButton(context, item),
+              onSelected: (item) => handleMenuButton(item),
               itemBuilder: (context) => [
                 PopupMenuItem<int>(
                   value: 0,
@@ -87,29 +89,23 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     return await databaseHelper.getDownloadedArticles();
   }
 
-  void _handleSortByChanged(int value) {
-    setState(() {
-      sortBy = value;
-    });
-  }
-
-  void _handleSortOrderChanged(int value) {
-    setState(() {
-      sortOrder = value;
-    });
-  }
-
-  void handleMenuButton(BuildContext context, int item) {
+  // Handles the sort by and sort order options
+  void handleMenuButton(int item) {
     switch (item) {
       case 0:
-        showDialog(
+        showSortByDialog(
           context: context,
-          builder: (BuildContext context) {
-            return SortByDialog(
-              initialSortBy: sortBy,
-              onSortByChanged: _handleSortByChanged,
-            );
+          initialSortBy: sortBy,
+          onSortByChanged: (int value) {
+            setState(() {
+              sortBy = value;
+            });
           },
+          sortOptions: [
+            AppLocalizations.of(context)!.articletitle,
+            AppLocalizations.of(context)!.journaltitle,
+            AppLocalizations.of(context)!.datepublished,
+          ],
         );
         break;
       case 1:
@@ -118,11 +114,18 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           builder: (BuildContext context) {
             return SortOrderDialog(
               initialSortOrder: sortOrder,
-              onSortOrderChanged: _handleSortOrderChanged,
+              sortOrderOptions: [
+                AppLocalizations.of(context)!.ascending,
+                AppLocalizations.of(context)!.descending,
+              ],
+              onSortOrderChanged: (int value) {
+                setState(() {
+                  sortOrder = value;
+                });
+              },
             );
           },
         );
-
         break;
     }
   }
@@ -147,10 +150,6 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           // Sort by Date published
           return a.publicationCard.publishedDate!
               .compareTo(b.publicationCard.publishedDate!);
-        /*case 3:
-          // Sort by Date published
-          return a.publicationCard.dateDownloaded!.compareTo(b.publicationCard.dateDownloaded!);*/
-
         default:
           return 0;
       }
@@ -162,156 +161,5 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     }
 
     return downloads;
-  }
-}
-
-class SortByDialog extends StatefulWidget {
-  final int initialSortBy;
-  final ValueChanged<int> onSortByChanged;
-
-  SortByDialog({required this.initialSortBy, required this.onSortByChanged});
-
-  @override
-  _SortByDialogState createState() => _SortByDialogState();
-}
-
-class _SortByDialogState extends State<SortByDialog> {
-  late int selectedSortBy;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedSortBy = widget.initialSortBy;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(AppLocalizations.of(context)!.sortby),
-      content: SingleChildScrollView(
-        child: Column(
-          children: [
-            RadioListTile<int>(
-              value: 0,
-              groupValue: selectedSortBy,
-              onChanged: (int? value) {
-                setState(() {
-                  selectedSortBy = value!;
-                  widget.onSortByChanged(selectedSortBy);
-                });
-                Navigator.pop(context);
-              },
-              title: Text(AppLocalizations.of(context)!.articletitle),
-            ),
-            RadioListTile<int>(
-              value: 1,
-              groupValue: selectedSortBy,
-              onChanged: (int? value) {
-                setState(() {
-                  selectedSortBy = value!;
-                  widget.onSortByChanged(selectedSortBy);
-                });
-                Navigator.pop(context);
-              },
-              title: Text(AppLocalizations.of(context)!.journaltitle),
-            ),
-            RadioListTile<int>(
-              value: 2,
-              groupValue: selectedSortBy,
-              onChanged: (int? value) {
-                setState(() {
-                  selectedSortBy = value!;
-                  widget.onSortByChanged(selectedSortBy);
-                });
-                Navigator.pop(context);
-              },
-              title: Text(AppLocalizations.of(context)!.datepublished),
-            ),
-            /* RadioListTile<int>(
-              value: 3,
-              groupValue: selectedSortBy,
-              onChanged: (int? value) {
-                setState(() {
-                  selectedSortBy = value!;
-                  widget.onSortByChanged(selectedSortBy);
-                });
-                Navigator.pop(context);
-              },
-              title: Text(AppLocalizations.of(context)!.datepublished),
-            ),
-            RadioListTile<int>(
-              value: 4,
-              groupValue: selectedSortBy,
-              onChanged: (int? value) {
-                setState(() {
-                  selectedSortBy = value!;
-                  widget.onSortByChanged(selectedSortBy);
-                });
-                Navigator.pop(context);
-              },
-              title: Text(AppLocalizations.of(context)!.dateaddedtofavorites),
-            ),*/
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class SortOrderDialog extends StatefulWidget {
-  final int initialSortOrder;
-  final ValueChanged<int> onSortOrderChanged;
-
-  SortOrderDialog(
-      {required this.initialSortOrder, required this.onSortOrderChanged});
-
-  @override
-  _SortOrderDialogState createState() => _SortOrderDialogState();
-}
-
-class _SortOrderDialogState extends State<SortOrderDialog> {
-  late int selectedSortOrder;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedSortOrder = widget.initialSortOrder;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(AppLocalizations.of(context)!.sortorder),
-      content: SingleChildScrollView(
-        child: Column(
-          children: [
-            RadioListTile<int>(
-              value: 0,
-              groupValue: selectedSortOrder,
-              onChanged: (int? value) {
-                setState(() {
-                  selectedSortOrder = value!;
-                  widget.onSortOrderChanged(selectedSortOrder);
-                });
-                Navigator.pop(context);
-              },
-              title: Text(AppLocalizations.of(context)!.ascending),
-            ),
-            RadioListTile<int>(
-              value: 1,
-              groupValue: selectedSortOrder,
-              onChanged: (int? value) {
-                setState(() {
-                  selectedSortOrder = value!;
-                  widget.onSortOrderChanged(selectedSortOrder);
-                });
-                Navigator.pop(context);
-              },
-              title: Text(AppLocalizations.of(context)!.descending),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import './screens/pdf_reader.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import './screens/journals_details_screen.dart';
-import './publication_card.dart';
-import './services/database_helper.dart';
+import '../screens/pdf_reader.dart';
+//import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../screens/journals_details_screen.dart';
+import 'publication_card.dart';
+import '../services/database_helper.dart';
+import '../services/string_format_helper.dart';
 
 class DownloadedCard extends StatefulWidget {
   final pdfPath;
@@ -109,7 +110,7 @@ class _DownloadedCardState extends State<DownloadedCard> {
                 ],
               ),
               Text(
-                _formattedDate(widget.publicationCard.publishedDate!),
+                formatDate(widget.publicationCard.publishedDate!),
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 13,
@@ -142,10 +143,6 @@ class _DownloadedCardState extends State<DownloadedCard> {
         ),
       ),
     );
-  }
-
-  String _formattedDate(DateTime date) {
-    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
   Future<Map<String, dynamic>?> getJournalDetails(String issn) async {

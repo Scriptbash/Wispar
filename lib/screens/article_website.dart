@@ -3,7 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/unpaywall_api.dart';
 import 'pdf_reader.dart';
-import '../publication_card.dart';
+import '../widgets/publication_card.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
@@ -141,7 +141,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                   },
                   shouldOverrideUrlLoading:
                       (controller, navigationAction) async {
-                    var uri = navigationAction.request.url!;
+                    //var uri = navigationAction.request.url!;
 
                     return NavigationActionPolicy.ALLOW;
                   },

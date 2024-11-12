@@ -4,9 +4,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:wispar/screens/article_website.dart';
 import '../models/crossref_journals_works_models.dart';
 import '../services/database_helper.dart';
-import '../publication_card.dart';
+import '../widgets/publication_card.dart';
 import './journals_details_screen.dart';
 import '../services/zotero_api.dart';
+import '../services/string_format_helper.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ArticleScreen extends StatefulWidget {
@@ -78,14 +79,14 @@ class _ArticleScreenState extends State<ArticleScreen> {
                 ),
               ),
               Text(
-                '${AppLocalizations.of(context)!.publishedon} ${_formattedDate(widget.publishedDate)}',
+                '${AppLocalizations.of(context)!.publishedon} ${formatDate(widget.publishedDate)}',
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 13,
                 ),
               ),
               SizedBox(height: 5),
-              SelectableText(_getAuthorsNames(widget.authors),
+              SelectableText(getAuthorsNames(widget.authors),
                   style: TextStyle(color: Colors.grey, fontSize: 15)),
               SizedBox(height: 15),
               SelectableText(
@@ -281,17 +282,6 @@ class _ArticleScreenState extends State<ArticleScreen> {
         ),
       ),
     );
-  }
-
-  String _getAuthorsNames(List<PublicationAuthor> authors) {
-    return authors
-        .map((author) => '${author.given} ${author.family}')
-        .join(', ');
-  }
-
-  String _formattedDate(DateTime? date) {
-    if (date == null) return '';
-    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
   void checkIfLiked() async {
