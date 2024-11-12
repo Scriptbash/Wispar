@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:pdfrx/pdfrx.dart';
-import 'dart:math';
 import '../publication_card.dart';
 import '../services/database_helper.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PdfReader extends StatefulWidget {
   final String pdfUrl;
@@ -79,41 +79,28 @@ class _PdfReaderState extends State<PdfReader> {
             params: PdfViewerParams(
               enableTextSelection: false, // This is not ready yet.
               maxScale: 8,
-              layoutPages: (pages, params) {
-                final width =
-                    pages.fold(0.0, (prev, page) => max(prev, page.width));
-                final pageLayouts = <Rect>[];
-                double y = params.margin;
-                for (final page in pages) {
-                  final height = page.height * (width / page.width);
-                  pageLayouts.add(
-                    Rect.fromLTWH(
-                      params.margin,
-                      y,
-                      width,
-                      height,
-                    ),
-                  );
-                  y += height + params.margin;
-                }
-                return PdfPageLayout(
-                  pageLayouts: pageLayouts,
-                  documentSize: Size(width + params.margin * 2, y),
+              loadingBannerBuilder: (context, bytesDownloaded, totalBytes) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    // totalBytes may not be available on certain case
+                    value: totalBytes != null
+                        ? bytesDownloaded / totalBytes
+                        : null,
+                    backgroundColor: Colors.grey,
+                  ),
                 );
               },
-              /*linkWidgetBuilder: (context, link, size) => Material(
-                color: Colors.blue.withOpacity(0.0),
-                child: InkWell(
-                  onTap: () async {
-                    if (link.url != null) {
-                      launchUrl(link.url!);
-                    } else if (link.dest != null) {
-                      controller.goToDest(link.dest);
-                    }
-                  },
-                  hoverColor: Colors.blue.withOpacity(0.0),
-                ),
-              ),*/
+              linkHandlerParams: PdfLinkHandlerParams(
+                linkColor: const Color.fromARGB(20, 255, 235, 59),
+                onLinkTap: (link) {
+                  // handle URL or Dest
+                  if (link.url != null) {
+                    launchUrl(link.url!);
+                  } else if (link.dest != null) {
+                    controller.goToDest(link.dest);
+                  }
+                },
+              ),
             ))
       ]),
     );
