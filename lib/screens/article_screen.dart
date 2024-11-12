@@ -70,6 +70,13 @@ class _ArticleScreenState extends State<ArticleScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SelectableText(
+                widget.title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
               Text(
                 '${AppLocalizations.of(context)!.publishedon} ${_formattedDate(widget.publishedDate)}',
                 style: TextStyle(
@@ -77,22 +84,16 @@ class _ArticleScreenState extends State<ArticleScreen> {
                   fontSize: 13,
                 ),
               ),
-              Text(
-                widget.title,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
-              Text(_getAuthorsNames(widget.authors),
-                  style: TextStyle(color: Colors.grey, fontSize: 13)),
+              SizedBox(height: 5),
+              SelectableText(_getAuthorsNames(widget.authors),
+                  style: TextStyle(color: Colors.grey, fontSize: 15)),
               SizedBox(height: 15),
-              Text(
+              SelectableText(
                 widget.abstract.isNotEmpty
                     ? widget.abstract
                     : AppLocalizations.of(context)!.abstractunavailable,
                 textAlign: TextAlign.justify,
-                style: TextStyle(fontSize: 15),
+                style: TextStyle(fontSize: 16),
               ),
               SizedBox(height: 20),
               Row(

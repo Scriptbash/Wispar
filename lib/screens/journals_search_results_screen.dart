@@ -49,7 +49,6 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
         title: Text(AppLocalizations.of(context)!.searchresults),
       ),
       body: ListView.builder(
-        physics: BouncingScrollPhysics(),
         itemCount: items.length + (hasMoreResults ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == items.length) {

@@ -211,21 +211,20 @@ class _PublicationCardState extends State<PublicationCard> {
                 ],
               ),
               Text(
-                _formattedDate(widget.publishedDate!),
+                widget.title,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                '${AppLocalizations.of(context)!.publishedon} ${_formattedDate(widget.publishedDate!)}',
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 13,
                 ),
               ),
-              SizedBox(height: 8.0),
-              Text(
-                widget.title,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
               SizedBox(height: 5.0),
               Text(
                 '${_getAuthorsNames(widget.authors)}',
-                style: TextStyle(fontSize: 13, color: Colors.grey),
+                style: TextStyle(fontSize: 14, color: Colors.grey),
                 maxLines: 4,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -243,6 +242,7 @@ class _PublicationCardState extends State<PublicationCard> {
               maxLines: 10,
               overflow: TextOverflow.fade,
               textAlign: TextAlign.justify,
+              style: TextStyle(fontSize: 16),
             ),
             Row(
               mainAxisSize: MainAxisSize.max,
