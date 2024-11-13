@@ -16,12 +16,15 @@ class LibraryScreen extends StatefulWidget {
   _LibraryScreenState createState() => _LibraryScreenState();
 }
 
-class _LibraryScreenState extends State<LibraryScreen> {
+class _LibraryScreenState extends State<LibraryScreen>
+    with TickerProviderStateMixin {
   bool isSearching = false;
   TextEditingController searchController = TextEditingController();
   late DatabaseHelper dbHelper;
   late Journals.Item selectedJournal;
   late FocusNode searchFocusNode;
+  late final TabController _tabController;
+
   int sortBy = 0; // Set the sort by option to Journal title by default
   int sortOrder = 0; // Set the sort order to Ascending by default
 
@@ -30,6 +33,13 @@ class _LibraryScreenState extends State<LibraryScreen> {
     super.initState();
     dbHelper = DatabaseHelper();
     searchFocusNode = FocusNode();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -61,7 +71,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                       },
                     ),
                   )
-                : Text(AppLocalizations.of(context)!.journals),
+                : Text(AppLocalizations.of(context)!.library),
           ],
         ),
         actions: [
@@ -97,8 +107,36 @@ class _LibraryScreenState extends State<LibraryScreen> {
             ],
           ),
         ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: <Widget>[
+            Tab(
+              icon: Icon(Icons.menu_book_rounded),
+              text: AppLocalizations.of(context)!.journals,
+            ),
+            Tab(
+              icon: Icon(Icons.person_2_outlined),
+              text: AppLocalizations.of(context)!.authors,
+            ),
+            Tab(
+              icon: Icon(Icons.format_quote_rounded),
+              text: "Custom queries",
+            ),
+          ],
+        ),
       ),
-      body: _buildLibraryContent(),
+      body: TabBarView(
+        controller: _tabController,
+        children: <Widget>[
+          Center(child: _buildLibraryContent()),
+          Center(
+            child: Text("Followed authors will show here"),
+          ),
+          Center(
+            child: Text("Followed search queries will show here"),
+          ),
+        ],
+      ),
     );
   }
 

@@ -31,6 +31,11 @@
   "@unfollow": {
     "description": "The button text shown on journal cards when it is followed."
   },
+  "library": "Library",
+  "@library": {
+    "description": "The library menu button and the app bar title when in the library screen."
+  },
+
   "journals": "Journals",
   "@journals": {
     "description": "The journals menu button and the app bar title when in the journals screen."
