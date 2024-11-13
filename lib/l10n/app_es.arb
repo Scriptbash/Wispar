@@ -196,5 +196,7 @@
     "description": "Hint text shown in the text field where users can enter their Zotero API key."
   },
   "reportIssue": "Notificar un problema",
-  "@reportIssue": {}
+  "@reportIssue": {},
+  "about": "Acerca de",
+  "@about": {}
 }
