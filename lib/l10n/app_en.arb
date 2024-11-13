@@ -187,6 +187,8 @@
   "@database": {},
   "privacyPolicy": "Privacy policy",
   "@privacyPolicy": {},
+  "about": "About",
+  "@about": {},
   "donate": "Donate",
   "@donate": {},
   "donateMessage": "Help support development of Wispar",

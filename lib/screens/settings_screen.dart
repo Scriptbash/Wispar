@@ -21,7 +21,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    appInfo = getAppVersion();
   }
 
   @override
@@ -36,66 +35,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              Center(
-                child: ListTile(
-                  //onTap: () {},
-                  title: Column(
-                    children: [
-                      Image.asset(
-                        'assets/icon/icon.png',
-                        width: 50,
-                      ),
-                      Text('Wispar'),
-                    ],
-                  ),
-                  subtitle: Column(children: [
-                    FutureBuilder<List<String>>(
-                      future: appInfo,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          List<String>? appInfo = snapshot.data;
-
-                          if (appInfo != null && appInfo.length == 2) {
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text('Version ${appInfo[0]}'),
-                                Text(' build ${appInfo[1]}'),
-                              ],
-                            );
-                          }
-                        }
-                        return CircularProgressIndicator();
-                      },
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextButton.icon(
-                            onPressed: () {
-                              launchUrl(
-                                  Uri.parse(
-                                      'https://github.com/Scriptbash/Wispar'),
-                                  mode: LaunchMode.platformDefault);
-                            },
-                            icon: Icon(Icons.code),
-                            label:
-                                Text(AppLocalizations.of(context)!.sourceCode)),
-                        TextButton.icon(
-                            onPressed: () {
-                              launchUrl(
-                                  Uri.parse(
-                                      'https://github.com/Scriptbash/Wispar/issues'),
-                                  mode: LaunchMode.platformDefault);
-                            },
-                            icon: Icon(Icons.bug_report_outlined),
-                            label: Text(
-                                AppLocalizations.of(context)!.reportIssue)),
-                      ],
-                    )
-                  ]),
-                ),
-              ),
               ListTile(
                   onTap: () {
                     _showThemeDialog(context);
@@ -239,6 +178,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               ListTile(
+                onTap: () async {
+                  List<String> appInfo = await getAppVersion();
+                  final version = appInfo[0];
+                  final build = appInfo[1];
+                  showAboutDialog(
+                      context: context,
+                      applicationName: "Wispar",
+                      applicationIcon: Image.asset(
+                        'assets/icon/icon.png',
+                        width: 50,
+                      ),
+                      applicationVersion: "Version $version (Build $build)",
+                      children: [
+                        TextButton.icon(
+                            onPressed: () {
+                              launchUrl(
+                                  Uri.parse(
+                                      'https://github.com/Scriptbash/Wispar'),
+                                  mode: LaunchMode.platformDefault);
+                            },
+                            icon: Icon(Icons.code),
+                            label:
+                                Text(AppLocalizations.of(context)!.sourceCode)),
+                        TextButton.icon(
+                            onPressed: () {
+                              launchUrl(
+                                  Uri.parse(
+                                      'https://github.com/Scriptbash/Wispar/issues'),
+                                  mode: LaunchMode.platformDefault);
+                            },
+                            icon: Icon(Icons.bug_report_outlined),
+                            label: Text(
+                                AppLocalizations.of(context)!.reportIssue)),
+                      ]);
+                  //applicationLegalese: "");
+                },
+                title: Row(
+                  children: [
+                    Icon(Icons.info_outline),
+                    SizedBox(width: 8),
+                    Text(AppLocalizations.of(context)!.about),
+                  ],
+                ),
+              ),
+              ListTile(
                   onTap: () {
                     launchUrl(Uri.parse('https://ko-fi.com/scriptbash'),
                         mode: LaunchMode.platformDefault);
@@ -305,7 +289,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: <Widget>[
               RadioListTile<String>(
                 title: Text(AppLocalizations.of(context)!.enabled),
-                value: AppLocalizations.of(context)!.enabled,
+                value: "Enabled",
                 groupValue: currentStatus,
                 onChanged: (value) {
                   if (value != null) {
@@ -316,7 +300,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               RadioListTile<String>(
                 title: Text(AppLocalizations.of(context)!.disabled),
-                value: AppLocalizations.of(context)!.disabled,
+                value: "Disabled",
                 groupValue: currentStatus,
                 onChanged: (value) {
                   if (value != null) {
