@@ -7,7 +7,7 @@ import 'theme_provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/search_screen.dart';
 import 'screens/favorites_screen.dart';
-import 'screens/journals_screen.dart';
+import 'screens/library_screen.dart';
 import 'screens/downloads_screen.dart';
 
 void main() {

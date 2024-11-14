@@ -6,6 +6,9 @@ import '../widgets/sortbydialog.dart';
 import '../widgets/sortorderdialog.dart';
 import '../models/journal_entity.dart';
 import '../widgets/journal_card.dart';
+import '../widgets/journals_tab_content.dart';
+import '../widgets/authors_tab_content.dart';
+import '../widgets/queries_tab_content.dart';
 import './journals_search_results_screen.dart';
 import 'package:wispar/models/crossref_journals_models.dart' as Journals;
 
@@ -25,8 +28,12 @@ class _LibraryScreenState extends State<LibraryScreen>
   late FocusNode searchFocusNode;
   late final TabController _tabController;
 
-  int sortBy = 0; // Set the sort by option to Journal title by default
-  int sortOrder = 0; // Set the sort order to Ascending by default
+  int journalsSortBy = 0; // Set the sort by option to Journal title by default
+  int journalsSortOrder = 0; // Set the sort order to Ascending by default
+  int authorsSortBy = 0; // Set the sort by option to Journal title by default
+  int authorsSortOrder = 0; // Set the sort order to Ascending by default
+  int queriesSortBy = 0; // Set the sort by option to Journal title by default
+  int queriesSortOrder = 0; // Set the sort order to Ascending by default
 
   @override
   void initState() {
@@ -86,7 +93,7 @@ class _LibraryScreenState extends State<LibraryScreen>
               });
             },
           ),
-          PopupMenuButton<int>(
+          /* PopupMenuButton<int>(
             icon: Icon(Icons.more_vert),
             onSelected: (item) => handleMenuButton(item),
             itemBuilder: (context) => [
@@ -105,7 +112,7 @@ class _LibraryScreenState extends State<LibraryScreen>
                 ),
               ),
             ],
-          ),
+          ),*/
         ],
         bottom: TabBar(
           controller: _tabController,
@@ -120,7 +127,7 @@ class _LibraryScreenState extends State<LibraryScreen>
             ),
             Tab(
               icon: Icon(Icons.format_quote_rounded),
-              text: "Custom queries",
+              text: "Queries",
             ),
           ],
         ),
@@ -128,19 +135,54 @@ class _LibraryScreenState extends State<LibraryScreen>
       body: TabBarView(
         controller: _tabController,
         children: <Widget>[
-          Center(child: _buildLibraryContent()),
-          Center(
-            child: Text("Followed authors will show here"),
+          JournalsTabContent(
+            initialSortBy: journalsSortBy,
+            initialSortOrder: journalsSortOrder,
+            onSortByChanged: (int value) {
+              setState(() {
+                journalsSortBy = value;
+              });
+            },
+            onSortOrderChanged: (int value) {
+              setState(() {
+                journalsSortOrder = value;
+              });
+            },
           ),
-          Center(
-            child: Text("Followed search queries will show here"),
+          AuthorsTabContent(
+            initialSortBy: authorsSortBy,
+            initialSortOrder: authorsSortOrder,
+            onSortByChanged: (int value) {
+              setState(() {
+                authorsSortBy = value;
+              });
+            },
+            onSortOrderChanged: (int value) {
+              setState(() {
+                authorsSortOrder = value;
+              });
+            },
+          ),
+          QueriesTabContent(
+            initialSortBy: queriesSortBy,
+            initialSortOrder: queriesSortOrder,
+            onSortByChanged: (int value) {
+              setState(() {
+                queriesSortBy = value;
+              });
+            },
+            onSortOrderChanged: (int value) {
+              setState(() {
+                queriesSortOrder = value;
+              });
+            },
           ),
         ],
       ),
     );
   }
 
-  // Handles the sort by and sort order options
+  /*// Handles the sort by and sort order options
   void handleMenuButton(int item) {
     switch (item) {
       case 0:
@@ -183,69 +225,88 @@ class _LibraryScreenState extends State<LibraryScreen>
   }
 
   Widget _buildLibraryContent() {
-    return FutureBuilder<List<Journal>>(
-      future: dbHelper.getJournals(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              children: [
-                Text(AppLocalizations.of(context)!.journalnotfollowing1),
-                Icon(Icons.search),
-                Text(AppLocalizations.of(context)!.journalnotfollowing2),
-              ],
-            ),
-          );
-        } else {
-          List<Journal> journals = snapshot.data!;
-          journals.sort((a, b) {
-            switch (sortBy) {
-              case 0:
-                // Sort by Journal title
-                return a.title.compareTo(b.title);
-              case 1:
-                // Sort by Publisher
-                return a.publisher.compareTo(b.publisher);
-              case 2:
-                // Sort by Following date
-                return a.dateFollowed!.compareTo(b.dateFollowed!);
-              case 3:
-                // Sort by ISSN
-                return a.issn.compareTo(b.issn);
-              default:
-                return 0;
-            }
-          });
-
-          // Reverse the order if sortOrder is Descending
-          if (sortOrder == 1) {
-            journals = journals.reversed.toList();
-          }
-
-          return ListView.builder(
-            itemCount: journals.length,
-            itemBuilder: (context, index) {
-              final currentJournal = journals[index];
-              return Column(
-                children: [
-                  JournalCard(
-                    journal: currentJournal,
-                    unfollowCallback: _unfollowJournal,
+    return Column(
+      children: [
+        // Row with Sort By and Sort Order buttons
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ElevatedButton(
+                onPressed: () => handleMenuButton(0), // Sort By
+                child: Text(AppLocalizations.of(context)!.sortby),
+              ),
+              ElevatedButton(
+                onPressed: () => handleMenuButton(1), // Sort Order
+                child: Text(AppLocalizations.of(context)!.sortorder),
+              ),
+            ],
+          ),
+        ),
+        // Space between the buttons and the journal list
+        Expanded(
+          child: FutureBuilder<List<Journal>>(
+            future: dbHelper.getJournals(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    children: [
+                      Text(AppLocalizations.of(context)!.journalnotfollowing1),
+                      Icon(Icons.search),
+                      Text(AppLocalizations.of(context)!.journalnotfollowing2),
+                    ],
                   ),
-                ],
-              );
+                );
+              } else {
+                List<Journal> journals = snapshot.data!;
+                journals.sort((a, b) {
+                  switch (sortBy) {
+                    case 0:
+                      return a.title.compareTo(b.title);
+                    case 1:
+                      return a.publisher.compareTo(b.publisher);
+                    case 2:
+                      return a.dateFollowed!.compareTo(b.dateFollowed!);
+                    case 3:
+                      return a.issn.compareTo(b.issn);
+                    default:
+                      return 0;
+                  }
+                });
+
+                if (sortOrder == 1) {
+                  journals = journals.reversed.toList();
+                }
+
+                return ListView.builder(
+                  itemCount: journals.length,
+                  itemBuilder: (context, index) {
+                    final currentJournal = journals[index];
+                    return Column(
+                      children: [
+                        JournalCard(
+                          journal: currentJournal,
+                          unfollowCallback: _unfollowJournal,
+                        ),
+                      ],
+                    );
+                  },
+                );
+              }
             },
-          );
-        }
-      },
+          ),
+        ),
+      ],
     );
   }
-
+*/
   void handleSearch(String query) async {
     try {
       showDialog(
@@ -278,7 +339,7 @@ class _LibraryScreenState extends State<LibraryScreen>
       Navigator.pop(context);
     }
   }
-
+/*
   Future<void> _unfollowJournal(BuildContext context, Journal journal) async {
     final dbHelper = DatabaseHelper();
     await dbHelper.removeJournal(journal.issn);
@@ -286,5 +347,5 @@ class _LibraryScreenState extends State<LibraryScreen>
     //await dbHelper.clearCachedPublications();
     // Refresh the UI after unfollowing the journal
     setState(() {});
-  }
+  }*/
 }
