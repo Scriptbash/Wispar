@@ -108,7 +108,7 @@ class _WisparState extends State<Wispar> {
                 selectedColor: Colors.deepPurpleAccent,
               ),
               SalomonBottomBarItem(
-                icon: const Icon(Icons.library_books_outlined),
+                icon: const Icon(Icons.my_library_books_outlined),
                 title: Text(getLocalizedText(bottomBarContext, 'library')),
                 selectedColor: Colors.deepPurpleAccent,
               ),
