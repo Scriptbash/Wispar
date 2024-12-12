@@ -31,7 +31,7 @@ class _LibraryScreenState extends State<LibraryScreen>
     super.initState();
     dbHelper = DatabaseHelper();
     searchFocusNode = FocusNode();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -53,10 +53,10 @@ class _LibraryScreenState extends State<LibraryScreen>
               icon: Icon(Icons.menu_book_rounded),
               text: AppLocalizations.of(context)!.journals,
             ),
-            Tab(
+            /*ab(
               icon: Icon(Icons.person_2_outlined),
               text: AppLocalizations.of(context)!.authors,
-            ),
+            ),*/
             Tab(
               icon: Icon(Icons.format_quote_rounded),
               text: "Queries",
@@ -81,7 +81,7 @@ class _LibraryScreenState extends State<LibraryScreen>
               });
             },
           ),
-          AuthorsTabContent(
+          /*AuthorsTabContent(
             initialSortBy: authorsSortBy,
             initialSortOrder: authorsSortOrder,
             onSortByChanged: (int value) {
@@ -94,7 +94,7 @@ class _LibraryScreenState extends State<LibraryScreen>
                 authorsSortOrder = value;
               });
             },
-          ),
+          ),*/
           QueriesTabContent(
             initialSortBy: queriesSortBy,
             initialSortOrder: queriesSortOrder,

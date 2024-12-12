@@ -24,21 +24,21 @@ class _JournalSearchFormState extends State<JournalSearchForm> {
         String text = _searchController.text;
 
         // Limit input to 9 characters
-        if (text.length > 9) {
+        /* if (text.length > 9) {
           _searchController.value = TextEditingValue(
             text: text.substring(0, 9),
             selection: TextSelection.collapsed(offset: 9),
           );
           return;
-        }
+        }*/
 
         // Automatically add a dash after the first 4 digits
-        if (text.length == 4 && !text.contains('-')) {
+        /*if (text.length == 4 && !text.contains('-')) {
           _searchController.value = TextEditingValue(
             text: '${text}-',
             selection: TextSelection.collapsed(offset: text.length + 1),
           );
-        }
+        }*/
       }
     });
   }
@@ -51,76 +51,68 @@ class _JournalSearchFormState extends State<JournalSearchForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Search by',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        Row(
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Radio<String>(
-              value: 'name',
-              groupValue: selectedSearchlType,
-              onChanged: (String? value) {
-                setState(() {
-                  selectedSearchlType = value;
-                  _searchController.clear();
-                });
-              },
+            Text(
+              'Search by',
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            Text('Journal name'),
-            Radio<String>(
-              value: 'issn',
-              groupValue: selectedSearchlType,
-              onChanged: (String? value) {
-                setState(() {
-                  selectedSearchlType = value;
-                  _searchController.clear();
-                });
-              },
+            Row(
+              children: [
+                Radio<String>(
+                  value: 'name',
+                  groupValue: selectedSearchlType,
+                  onChanged: (String? value) {
+                    setState(() {
+                      selectedSearchlType = value;
+                      _searchController.clear();
+                    });
+                  },
+                ),
+                Text('Journal name'),
+                Radio<String>(
+                  value: 'issn',
+                  groupValue: selectedSearchlType,
+                  onChanged: (String? value) {
+                    setState(() {
+                      selectedSearchlType = value;
+                      _searchController.clear();
+                    });
+                  },
+                ),
+                Text('ISSN'),
+              ],
             ),
-            Text('ISSN'),
+            TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText:
+                    selectedSearchlType == 'name' ? 'Journal name' : 'ISSN',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
           ],
         ),
-        TextField(
-          controller: _searchController,
-          decoration: InputDecoration(
-            labelText: selectedSearchlType == 'name' ? 'Journal name' : 'ISSN',
-            border: UnderlineInputBorder(),
-          ),
-        ),
-        SizedBox(height: 16),
-        Text(
-          'Save this query',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        Switch(
-          value: saveQuery,
-          onChanged: (bool value) {
-            setState(() {
-              saveQuery = value;
-            });
-          },
-        ),
-        SizedBox(height: 16),
-        Center(
-          child: ElevatedButton(
-            onPressed: () {
-              String query = _searchController.text.trim();
-              if (query.isNotEmpty) {
-                _handleSearch(query);
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Please enter a search query')),
-                );
-              }
-            },
-            child: Text('Search'),
-          ),
-        ),
-      ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          String query = _searchController.text.trim();
+          if (query.isNotEmpty) {
+            _handleSearch(query);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Please enter a search query')),
+            );
+          }
+        },
+        child: Icon(Icons.search),
+        shape: CircleBorder(),
+      ),
     );
   }
 

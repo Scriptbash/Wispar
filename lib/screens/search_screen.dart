@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../widgets/article_search_form.dart';
+import '../widgets/article_main_search_form.dart';
 import '../widgets/author_search_form.dart';
 import '../widgets/journal_search_form.dart';
 
@@ -23,13 +23,13 @@ class _SearchScreenState extends State<SearchScreen> {
         style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
       ),
     ),
-    DropdownMenuItem(
+    /*DropdownMenuItem(
       value: 2,
       child: Text(
         'Authors',
         style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
       ),
-    ),
+    ),*/
     DropdownMenuItem(
       value: 3,
       child: Text(
@@ -52,11 +52,10 @@ class _SearchScreenState extends State<SearchScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(
-              "Category",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            DropdownButton<int>(
+            DropdownButtonFormField<int>(
+              decoration: InputDecoration(
+                labelText: 'Category',
+              ),
               value: selectedSearchType,
               isExpanded: true,
               onChanged: (int? newValue) {
