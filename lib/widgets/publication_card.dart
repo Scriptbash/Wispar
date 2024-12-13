@@ -131,6 +131,7 @@ class _PublicationCardState extends State<PublicationCard> {
                             },
                             child: Text(
                               widget.journalTitle,
+                              style: TextStyle(fontSize: 16),
                               softWrap: true,
                             ),
                             style: TextButton.styleFrom(

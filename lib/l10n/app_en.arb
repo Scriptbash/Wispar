@@ -31,13 +31,18 @@
   "@unfollow": {
     "description": "The button text shown on journal cards when it is followed."
   },
+  "library": "Library",
+  "@library": {
+    "description": "The library menu button and the app bar title when in the library screen."
+  },
+
   "journals": "Journals",
   "@journals": {
     "description": "The journals menu button and the app bar title when in the journals screen."
   },
-  "search": "Search…",
+  "search": "Search",
   "@search": {
-    "description": "Placeholder text shown inside the search bar."
+    "description": "Text shown inside the search screen app bar and for the seach button."
   },
   "publisher": "Publisher",
   "@publisher": {},

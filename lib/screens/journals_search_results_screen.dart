@@ -96,7 +96,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
       }
 
       ListAndMore<Journals.Item> newItems =
-          await CrossRefApi.queryJournals(query);
+          await CrossRefApi.queryJournalsByName(query);
 
       setState(() {
         items.addAll(newItems.list);

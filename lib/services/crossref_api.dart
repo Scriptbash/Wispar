@@ -12,14 +12,38 @@ class CrossRefApi {
   static String? _journalWorksCursor = '*';
   static String? _currentQuery;
 
-  // Query journals
-  static Future<ListAndMore<Journals.Item>> queryJournals(String query) async {
+  // Query journals by name
+  static Future<ListAndMore<Journals.Item>> queryJournalsByName(
+      String query) async {
     _currentQuery = query;
     String apiUrl = '$baseUrl$journalsEndpoint?query=$query&rows=30&$email';
 
     if (_journalCursor != null) {
       apiUrl += '&cursor=$_journalCursor';
     }
+
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final crossrefJournals = Journals.crossrefjournalsFromJson(response.body);
+      List<Journals.Item> items = crossrefJournals.message.items;
+
+      // Update the journal cursor
+      _journalCursor = crossrefJournals.message.nextCursor;
+
+      // Use nextCursor to determine if there are more results
+      bool hasMoreResults = _journalCursor != null && _journalCursor != "";
+
+      return ListAndMore(items, hasMoreResults);
+    } else {
+      throw Exception('Failed to query journals');
+    }
+  }
+
+  // Query journals by ISSN
+  static Future<ListAndMore<Journals.Item>> queryJournalsByISSN(
+      String query) async {
+    String apiUrl = '$baseUrl$journalsEndpoint/$query&$email';
 
     final response = await http.get(Uri.parse(apiUrl));
 

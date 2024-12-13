@@ -31,13 +31,13 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: false,
         title: Text(AppLocalizations.of(context)!.home),
         actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.search),
+          /*IconButton(
+            icon: const Icon(Icons.filter_alt_outlined),
             //tooltip: 'Settings',
             onPressed: () {
               //_openSettingsScreen(context);
             },
-          ),
+          ),*/
           PopupMenuButton<int>(
             icon: Icon(Icons.more_vert),
             onSelected: (item) => handleMenuButton(item),
