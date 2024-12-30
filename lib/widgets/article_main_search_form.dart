@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'article_doi_search_form.dart';
 import 'article_query_search_form.dart';
+import '../services/crossref_api.dart';
+import '../screens/article_screen.dart';
 
 class ArticleSearchForm extends StatefulWidget {
   @override
@@ -9,13 +11,85 @@ class ArticleSearchForm extends StatefulWidget {
 }
 
 class _ArticleSearchFormState extends State<ArticleSearchForm> {
-  bool saveQuery = false;
-  String? selectedSearchType = 'query';
+  int selectedSearchIndex = 0; // 0 for Query, 1 for DOI
+  final TextEditingController doiController = TextEditingController();
+  bool isLoading = false;
+
+  @override
+  void dispose() {
+    doiController.dispose();
+    super.dispose();
+  }
+
+  void _handleSearch() async {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
+      if (selectedSearchIndex == 0) {
+        // Query search
+        print('this will be implemented soon');
+        Navigator.pop(context);
+      } else {
+        // DOI-based search
+        String doi = doiController.text.trim();
+
+        if (doi.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Please enter a DOI')),
+          );
+          return;
+        }
+        try {
+          final article = await CrossRefApi.getWorkByDOI(doi);
+
+          // Dismiss the loading dialog
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ArticleScreen(
+                doi: article.doi,
+                title: article.title,
+                issn: article.issn,
+                abstract: article.abstract,
+                journalTitle: article.journalTitle,
+                publishedDate: article.publishedDate,
+                authors: article.authors,
+                url: article.url,
+                license: article.license,
+                licenseName: article.licenseName,
+              ),
+            ),
+          );
+        } catch (e) {
+          Navigator.pop(context); // Close loading dialog
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e')),
+          );
+          print('Error: $e');
+        }
+      }
+    } catch (e) {
+      Navigator.pop(context); // Close loading dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+      print('Error: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    Widget searchForm =
-        selectedSearchType == 'query' ? QuerySearchForm() : DOISearchForm();
+    Widget searchForm = selectedSearchIndex == 0
+        ? QuerySearchForm()
+        : DOISearchForm(doiController: doiController);
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -23,55 +97,40 @@ class _ArticleSearchFormState extends State<ArticleSearchForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Search by"),
-            Row(
-              children: [
-                Radio<String>(
-                  value: 'query',
-                  groupValue: selectedSearchType,
-                  onChanged: (String? value) {
-                    setState(() {
-                      selectedSearchType = value;
-                    });
-                  },
-                ),
-                Text('Query'),
-                Radio<String>(
-                  value: 'doi',
-                  groupValue: selectedSearchType,
-                  onChanged: (String? value) {
-                    setState(() {
-                      selectedSearchType = value;
-                    });
-                  },
-                ),
-                Text('DOI'),
-              ],
+            SizedBox(height: 8),
+            Center(
+              child: ToggleButtons(
+                isSelected: [
+                  selectedSearchIndex == 0,
+                  selectedSearchIndex == 1
+                ],
+                onPressed: (int index) {
+                  setState(() {
+                    selectedSearchIndex = index;
+                  });
+                },
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text('Search by query'),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text('Search by DOI'),
+                  ),
+                ],
+                borderRadius: BorderRadius.circular(8.0),
+              ),
             ),
             SizedBox(height: 16),
             // Display the selected search form here
             searchForm,
             SizedBox(height: 16),
-            Text(
-              'Save this query',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Switch(
-              value: saveQuery,
-              onChanged: (bool value) {
-                setState(() {
-                  saveQuery = value;
-                });
-              },
-            ),
-            SizedBox(height: 16),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          print("Search for Articles");
-        },
+        onPressed: _handleSearch,
         child: Icon(Icons.search),
         shape: CircleBorder(),
       ),

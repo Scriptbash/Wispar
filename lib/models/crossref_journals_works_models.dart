@@ -77,6 +77,7 @@ class Item {
   final String primaryUrl;
   final String license;
   final String licenseName;
+  final String issn;
 
   Item({
     required this.publisher,
@@ -90,6 +91,7 @@ class Item {
     required this.primaryUrl,
     required this.license,
     required this.licenseName,
+    required this.issn,
   });
 
   factory Item.fromJson(Map<String, dynamic> json) {
@@ -128,6 +130,7 @@ class Item {
       primaryUrl: json['resource']['primary']['URL'] ?? '',
       license: licenseUrl,
       licenseName: licenseName,
+      issn: json['issn'] ?? '',
     );
   }
   static Map<String, String> licenseNames = {

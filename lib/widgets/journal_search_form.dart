@@ -11,7 +11,7 @@ class JournalSearchForm extends StatefulWidget {
 
 class _JournalSearchFormState extends State<JournalSearchForm> {
   bool saveQuery = false;
-  String? selectedSearchlType = 'name';
+  int selectedSearchIndex = 0; // 0 for 'name', 1 for 'issn'
   late Journals.Item selectedJournal;
   TextEditingController _searchController = TextEditingController();
 
@@ -20,20 +20,20 @@ class _JournalSearchFormState extends State<JournalSearchForm> {
     super.initState();
 
     _searchController.addListener(() {
-      if (selectedSearchlType == 'issn') {
-        String text = _searchController.text;
+      if (selectedSearchIndex == 1) {
+        /*String text = _searchController.text;
 
         // Limit input to 9 characters
-        /* if (text.length > 9) {
+        if (text.length > 9) {
           _searchController.value = TextEditingValue(
             text: text.substring(0, 9),
             selection: TextSelection.collapsed(offset: 9),
           );
           return;
-        }*/
+        }
 
         // Automatically add a dash after the first 4 digits
-        /*if (text.length == 4 && !text.contains('-')) {
+        if (text.length == 4 && !text.contains('-')) {
           _searchController.value = TextEditingValue(
             text: '${text}-',
             selection: TextSelection.collapsed(offset: text.length + 1),
@@ -57,41 +57,41 @@ class _JournalSearchFormState extends State<JournalSearchForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Search by',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(height: 16),
+            Center(
+              child: ToggleButtons(
+                isSelected: [
+                  selectedSearchIndex == 0,
+                  selectedSearchIndex == 1
+                ],
+                onPressed: (int index) {
+                  setState(() {
+                    selectedSearchIndex = index;
+                    _searchController.clear();
+                  });
+                },
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text('Search by journal name'),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text('Search by ISSN'),
+                  ),
+                ],
+                borderRadius: BorderRadius.circular(8.0),
+                //selectedBorderColor: Theme.of(context).colorScheme.primary,
+                //selectedColor: Colors.white,
+                //fillColor: Theme.of(context).colorScheme.primary,
+                //color: Colors.grey,
+              ),
             ),
-            Row(
-              children: [
-                Radio<String>(
-                  value: 'name',
-                  groupValue: selectedSearchlType,
-                  onChanged: (String? value) {
-                    setState(() {
-                      selectedSearchlType = value;
-                      _searchController.clear();
-                    });
-                  },
-                ),
-                Text('Journal name'),
-                Radio<String>(
-                  value: 'issn',
-                  groupValue: selectedSearchlType,
-                  onChanged: (String? value) {
-                    setState(() {
-                      selectedSearchlType = value;
-                      _searchController.clear();
-                    });
-                  },
-                ),
-                Text('ISSN'),
-              ],
-            ),
+            SizedBox(height: 32),
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                labelText:
-                    selectedSearchlType == 'name' ? 'Journal name' : 'ISSN',
+                labelText: selectedSearchIndex == 0 ? 'Journal name' : 'ISSN',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -131,11 +131,10 @@ class _JournalSearchFormState extends State<JournalSearchForm> {
       CrossRefApi.resetJournalCursor();
 
       ListAndMore<Journals.Item> searchResults;
-      if (selectedSearchlType == 'name') {
+      if (selectedSearchIndex == 0) {
         searchResults = await CrossRefApi.queryJournalsByName(query);
-      } else if (selectedSearchlType == 'issn') {
+      } else if (selectedSearchIndex == 1) {
         searchResults = await CrossRefApi.queryJournalsByISSN(query);
-        print('Search Results: ${searchResults}');
       } else {
         throw Exception('Invalid search type selected');
       }

@@ -7,6 +7,7 @@ class QuerySearchForm extends StatefulWidget {
 
 class _QuerySearchFormState extends State<QuerySearchForm> {
   bool isAdvancedSearchVisible = false;
+  bool saveQuery = false;
   int selectedSortBy = 0;
   int selectedSortOrder = 0;
 
@@ -209,7 +210,7 @@ class _QuerySearchFormState extends State<QuerySearchForm> {
                 ),
               ],
             ),
-
+            SizedBox(height: 16),
             // Collapsible section that shows more search options
             ExpansionTile(
               title: Text('More options'),
@@ -337,6 +338,19 @@ class _QuerySearchFormState extends State<QuerySearchForm> {
                 ),
                 SizedBox(height: 16),
               ],
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Save this query',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Switch(
+              value: saveQuery,
+              onChanged: (bool value) {
+                setState(() {
+                  saveQuery = value;
+                });
+              },
             ),
           ],
         ),
