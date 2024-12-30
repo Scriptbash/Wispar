@@ -26,6 +26,22 @@ class QuerySearchFormState extends State<QuerySearchForm> {
   final TextEditingController bibliographicController = TextEditingController();
   final TextEditingController degreeController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController editorFirstNameController =
+      TextEditingController();
+  final TextEditingController editorLastNameController =
+      TextEditingController();
+  final TextEditingController eventAcronymController = TextEditingController();
+  final TextEditingController eventLocationController = TextEditingController();
+  final TextEditingController eventNameController = TextEditingController();
+  final TextEditingController eventSponsorController = TextEditingController();
+  final TextEditingController eventThemeController = TextEditingController();
+  final TextEditingController funderNameController = TextEditingController();
+  final TextEditingController publisherLocationController =
+      TextEditingController();
+  final TextEditingController standardsBodyAcronymController =
+      TextEditingController();
+  final TextEditingController standardsBodyNameController =
+      TextEditingController();
 
   // List of sort by options
   final List<DropdownMenuItem<int>> sortbyItems = [
@@ -157,6 +173,17 @@ class QuerySearchFormState extends State<QuerySearchForm> {
     bibliographicController.dispose();
     degreeController.dispose();
     descriptionController.dispose();
+    editorFirstNameController.dispose();
+    editorLastNameController.dispose();
+    eventAcronymController.dispose();
+    eventLocationController.dispose();
+    eventNameController.dispose();
+    eventSponsorController.dispose();
+    eventThemeController.dispose();
+    funderNameController.dispose();
+    publisherLocationController.dispose();
+    standardsBodyAcronymController.dispose();
+    standardsBodyNameController.dispose();
     super.dispose();
   }
 
@@ -190,10 +217,72 @@ class QuerySearchFormState extends State<QuerySearchForm> {
     final description = descriptionController.text.trim();
     if (description.isNotEmpty) queryParams['query.description'] = description;
 
+    final editorFirstName = editorFirstNameController.text.trim();
+    final editorLastName = editorLastNameController.text.trim();
+    if (editorFirstName.isNotEmpty || editorLastName.isNotEmpty) {
+      final editor = '$editorFirstName $editorLastName'.trim();
+      queryParams['query.editor'] = editor;
+    }
+
+    final eventAcronym = eventAcronymController.text.trim();
+    if (eventAcronym.isNotEmpty)
+      queryParams['query.event-acronym'] = eventAcronym;
+
+    final eventLocation = eventLocationController.text.trim();
+    if (eventLocation.isNotEmpty)
+      queryParams['query.event-location'] = eventLocation;
+
+    final eventName = eventNameController.text.trim();
+    if (eventName.isNotEmpty) queryParams['query.event-name'] = eventName;
+
+    final eventSponsor = eventSponsorController.text.trim();
+    if (eventSponsor.isNotEmpty)
+      queryParams['query.event-sponsor'] = eventSponsor;
+
+    final eventTheme = eventThemeController.text.trim();
+    if (eventTheme.isNotEmpty) queryParams['query.event-theme'] = eventTheme;
+
+    final funderName = funderNameController.text.trim();
+    if (funderName.isNotEmpty) queryParams['query.funder-name'] = funderName;
+
+    final publisherLocation = publisherLocationController.text.trim();
+    if (publisherLocation.isNotEmpty)
+      queryParams['query.publisher-location'] = publisherLocation;
+
+    final standardsBodyAcronym = standardsBodyAcronymController.text.trim();
+    if (standardsBodyAcronym.isNotEmpty)
+      queryParams['query.standards-body-acronym'] = standardsBodyAcronym;
+
+    final standardsBodyName = standardsBodyNameController.text.trim();
+    if (standardsBodyName.isNotEmpty)
+      queryParams['query.standards-body-name'] = standardsBodyName;
+
     // Handle sorting options
-    if (selectedSortBy != 0) queryParams['query.sortBy'] = selectedSortBy;
-    if (selectedSortOrder != 0)
-      queryParams['query.sortOrder'] = selectedSortOrder;
+    if (selectedSortBy != 0) {
+      // Map the sortbyItems to the API request format
+      final sortOptions = [
+        '-',
+        'created',
+        'deposited',
+        'indexed',
+        'is-referenced-by-count',
+        'issued',
+        'published',
+        'published-online',
+        'published-print',
+        'references-count',
+        'relevance',
+        'score',
+        'updated'
+      ];
+      queryParams['sort'] = sortOptions[selectedSortBy];
+    }
+
+    if (selectedSortOrder != 0) {
+      // Map the sortorderItems to the API request format
+      final orderOptions = ['-', 'asc', 'desc'];
+      queryParams['order'] = orderOptions[selectedSortOrder];
+    }
 
     // Show loading indicator
     showDialog(
