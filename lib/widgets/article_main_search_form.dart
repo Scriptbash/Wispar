@@ -35,7 +35,6 @@ class _ArticleSearchFormState extends State<ArticleSearchForm> {
       );
       if (selectedSearchIndex == 0) {
         // Query search
-        print("Search button pressed!");
         if (_queryFormKey.currentState != null) {
           _queryFormKey.currentState!
               .submitForm(); // Call the search function in QuerySearchForm

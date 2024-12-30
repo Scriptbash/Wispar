@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/crossref_api.dart';
 import '../screens/article_search_results_screen.dart';
+import '../services/save_search_query.dart';
 
 class QuerySearchForm extends StatefulWidget {
   // The key allows to access the state of the form from outside
@@ -42,6 +43,8 @@ class QuerySearchFormState extends State<QuerySearchForm> {
       TextEditingController();
   final TextEditingController standardsBodyNameController =
       TextEditingController();
+
+  final TextEditingController queryNameController = TextEditingController();
 
   // List of sort by options
   final List<DropdownMenuItem<int>> sortbyItems = [
@@ -184,6 +187,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
     publisherLocationController.dispose();
     standardsBodyAcronymController.dispose();
     standardsBodyNameController.dispose();
+    queryNameController.dispose();
     super.dispose();
   }
 
@@ -294,9 +298,26 @@ class QuerySearchFormState extends State<QuerySearchForm> {
     );
 
     try {
-      // Makes the API call
-      final response = await CrossRefApi.getWorksByQuery(queryParams);
-      print(response);
+      late final response;
+      if (saveQuery) {
+        final queryName = queryNameController.text.trim();
+        if (queryName != '') {
+          // Call the save query function
+          await SaveSearchQuery.save(queryParams);
+          // Makes the API call
+          response = await CrossRefApi.getWorksByQuery(queryParams);
+        } else {
+          // Close the loading indicator
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content:
+                    Text('You must enter a query name in order to save it.')),
+          );
+        }
+      } else {
+        response = await CrossRefApi.getWorksByQuery(queryParams);
+      }
 
       // Close the loading indicator
       Navigator.pop(context);
@@ -554,6 +575,15 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                   });
                 },
               ),
+              SizedBox(height: 8),
+              if (saveQuery)
+                TextFormField(
+                  controller: queryNameController,
+                  decoration: InputDecoration(
+                    labelText: 'Query name',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
               SizedBox(height: 16),
             ],
           ),

@@ -142,7 +142,7 @@ class CrossRefApi {
 
     final response =
         await http.get(Uri.parse('$url?$queryString&rows=50&$email'));
-    print('$url?$queryString');
+    //print('$url?$queryString');
 
     if (response.statusCode == 200) {
       final responseData =
@@ -150,7 +150,7 @@ class CrossRefApi {
       List<journalsWorks.Item> feedItems = responseData.message.items;
       return feedItems;
     } else {
-      throw Exception('Failed to fetch recent feed');
+      throw Exception('Failed to fetch results');
     }
   }
 }
