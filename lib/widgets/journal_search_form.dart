@@ -73,7 +73,7 @@ class _JournalSearchFormState extends State<JournalSearchForm> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text('Search by journal name'),
+                    child: Text('Search by name'),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -81,10 +81,6 @@ class _JournalSearchFormState extends State<JournalSearchForm> {
                   ),
                 ],
                 borderRadius: BorderRadius.circular(8.0),
-                //selectedBorderColor: Theme.of(context).colorScheme.primary,
-                //selectedColor: Colors.white,
-                //fillColor: Theme.of(context).colorScheme.primary,
-                //color: Colors.grey,
               ),
             ),
             SizedBox(height: 32),

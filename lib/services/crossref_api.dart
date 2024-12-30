@@ -130,6 +130,29 @@ class CrossRefApi {
       throw Exception('Failed to load work by DOI');
     }
   }
+
+  static Future<List<journalsWorks.Item>> getWorksByQuery(
+      Map<String, dynamic> queryParams) async {
+    String url = '$baseUrl$worksEndpoint';
+    // Construct the query parameters string by iterating over the queryParams map
+    String queryString = queryParams.entries
+        .map((entry) =>
+            '${Uri.encodeQueryComponent(entry.key)}=${Uri.encodeQueryComponent(entry.value.toString())}')
+        .join('&');
+
+    final response =
+        await http.get(Uri.parse('$url?$queryString&rows=50&$email'));
+    print('$url?$queryString');
+
+    if (response.statusCode == 200) {
+      final responseData =
+          journalsWorks.JournalWork.fromJson(json.decode(response.body));
+      List<journalsWorks.Item> feedItems = responseData.message.items;
+      return feedItems;
+    } else {
+      throw Exception('Failed to fetch recent feed');
+    }
+  }
 }
 
 class ListAndMore<T> {

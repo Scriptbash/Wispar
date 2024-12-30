@@ -13,7 +13,8 @@ class ArticleSearchForm extends StatefulWidget {
 class _ArticleSearchFormState extends State<ArticleSearchForm> {
   int selectedSearchIndex = 0; // 0 for Query, 1 for DOI
   final TextEditingController doiController = TextEditingController();
-  bool isLoading = false;
+  final GlobalKey<QuerySearchFormState> _queryFormKey =
+      GlobalKey<QuerySearchFormState>(); // GlobalKey for QuerySearchForm
 
   @override
   void dispose() {
@@ -34,7 +35,11 @@ class _ArticleSearchFormState extends State<ArticleSearchForm> {
       );
       if (selectedSearchIndex == 0) {
         // Query search
-        print('this will be implemented soon');
+        print("Search button pressed!");
+        if (_queryFormKey.currentState != null) {
+          _queryFormKey.currentState!
+              .submitForm(); // Call the search function in QuerySearchForm
+        } else {}
         Navigator.pop(context);
       } else {
         // DOI-based search
@@ -88,7 +93,7 @@ class _ArticleSearchFormState extends State<ArticleSearchForm> {
   @override
   Widget build(BuildContext context) {
     Widget searchForm = selectedSearchIndex == 0
-        ? QuerySearchForm()
+        ? QuerySearchForm(key: _queryFormKey)
         : DOISearchForm(doiController: doiController);
 
     return Scaffold(
