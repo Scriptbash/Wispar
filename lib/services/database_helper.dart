@@ -31,7 +31,6 @@ class DatabaseHelper {
           issn TEXT,
           title TEXT,
           publisher TEXT,
-          subjects TEXT,
           dateFollowed TEXT,
           lastUpdated TEXT
         )
@@ -94,7 +93,6 @@ class DatabaseHelper {
             'dateFollowed': DateTime.now().toIso8601String().substring(0, 10),
             'title': journal.title,
             'publisher': journal.publisher,
-            'subjects': journal.subjects,
           },
           where: 'journal_id = ?',
           whereArgs: [journalId],
@@ -118,7 +116,6 @@ class DatabaseHelper {
         issn: maps[i]['issn'],
         title: maps[i]['title'],
         publisher: maps[i]['publisher'],
-        subjects: maps[i]['subjects'],
         dateFollowed: maps[i]['dateFollowed'],
         lastUpdated: maps[i]['lastUpdated'],
       );
@@ -227,7 +224,6 @@ class DatabaseHelper {
           'issn': publicationCard.issn,
           'title': publicationCard.journalTitle, // default title
           'publisher': '',
-          'subjects': '',
         };
 
         journalId = await db.insert('journals', journalData);

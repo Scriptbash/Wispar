@@ -69,8 +69,6 @@ class _JournalsSearchResultCardState extends State<JournalsSearchResultCard> {
           },
         ),
         onTap: () {
-          List<String> subjectNames =
-              widget.item.subjects.map((subject) => subject.name).toList();
           // Navigate to the detailed screen when the card is tapped
           Navigator.push(
             context,
@@ -79,7 +77,6 @@ class _JournalsSearchResultCardState extends State<JournalsSearchResultCard> {
                 title: widget.item.title,
                 publisher: widget.item.publisher,
                 issn: widget.item.issn.first,
-                subjects: subjectNames,
               ),
             ),
           );

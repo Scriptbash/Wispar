@@ -16,7 +16,6 @@ class JournalCard extends StatelessWidget {
       margin: EdgeInsets.all(8.0),
       child: ListTile(
         onTap: () {
-          List<String> subjects = journal.subjects.split(', ');
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -24,7 +23,6 @@ class JournalCard extends StatelessWidget {
                 title: journal.title,
                 publisher: journal.publisher,
                 issn: journal.issn,
-                subjects: subjects,
               ),
             ),
           );

@@ -392,11 +392,11 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                 ],
               ),
               SizedBox(height: 16),
-              // Publisher field
+              // Affiliation field
               TextFormField(
-                controller: publisherController,
+                controller: affiliationController,
                 decoration: InputDecoration(
-                  labelText: 'Publisher',
+                  labelText: 'Affiliation',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -453,6 +453,16 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                   });
                 },
                 children: [
+                  SizedBox(height: 8),
+                  // Publisher field
+                  TextFormField(
+                    controller: publisherController,
+                    decoration: InputDecoration(
+                      labelText: 'Publisher',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
                   TextFormField(
                     controller: affiliationController,
                     decoration: InputDecoration(

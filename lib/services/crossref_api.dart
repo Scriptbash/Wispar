@@ -26,6 +26,7 @@ class CrossRefApi {
 
     if (response.statusCode == 200) {
       final crossrefJournals = Journals.crossrefjournalsFromJson(response.body);
+
       List<Journals.Item> items = crossrefJournals.message.items;
 
       // Update the journal cursor

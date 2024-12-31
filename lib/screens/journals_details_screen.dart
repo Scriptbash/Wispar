@@ -10,14 +10,12 @@ class JournalDetailsScreen extends StatefulWidget {
   final String title;
   final String publisher;
   final String issn;
-  final List<String> subjects;
 
   const JournalDetailsScreen({
     Key? key,
     required this.title,
     required this.publisher,
     required this.issn,
-    required this.subjects,
   }) : super(key: key);
 
   @override
@@ -69,7 +67,6 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
             delegate: JournalInfoHeader(
               publisher: widget.publisher,
               issn: widget.issn,
-              subjects: widget.subjects,
             ),
             pinned: false,
           ),

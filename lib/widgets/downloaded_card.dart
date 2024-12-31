@@ -64,8 +64,6 @@ class _DownloadedCardState extends State<DownloadedCard> {
                               if (journalInfo != Null) {
                                 String journalPublisher =
                                     journalInfo?['publisher'];
-                                List<String> journalSubjects =
-                                    (journalInfo?['subjects'] ?? '').split(',');
 
                                 Navigator.push(
                                     context,
@@ -76,7 +74,6 @@ class _DownloadedCardState extends State<DownloadedCard> {
                                             widget.publicationCard.journalTitle,
                                         publisher: journalPublisher,
                                         issn: widget.publicationCard.issn,
-                                        subjects: journalSubjects,
                                       ),
                                     ));
                               }
