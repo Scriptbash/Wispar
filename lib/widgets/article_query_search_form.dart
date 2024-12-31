@@ -453,28 +453,32 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                   });
                 },
                 children: [
-                  TextField(
+                  TextFormField(
+                    controller: affiliationController,
                     decoration: InputDecoration(
                       labelText: 'Affiliation',
                       border: OutlineInputBorder(),
                     ),
                   ),
                   SizedBox(height: 16),
-                  TextField(
+                  TextFormField(
+                    controller: bibliographicController,
                     decoration: InputDecoration(
                       labelText: "Bibliographic",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   SizedBox(height: 16),
-                  TextField(
+                  TextFormField(
+                    controller: degreeController,
                     decoration: InputDecoration(
                       labelText: "Degree",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   SizedBox(height: 16),
-                  TextField(
+                  TextFormField(
+                    controller: descriptionController,
                     decoration: InputDecoration(
                       labelText: "Description",
                       border: OutlineInputBorder(),
@@ -484,7 +488,8 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                   Row(
                     children: [
                       Expanded(
-                        child: TextField(
+                        child: TextFormField(
+                          controller: editorFirstNameController,
                           decoration: InputDecoration(
                             labelText: "Editor first name",
                             border: OutlineInputBorder(),
@@ -493,7 +498,8 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                       ),
                       SizedBox(width: 5),
                       Expanded(
-                        child: TextField(
+                        child: TextFormField(
+                          controller: editorLastNameController,
                           decoration: InputDecoration(
                             labelText: "Editor last name",
                             border: OutlineInputBorder(),
@@ -503,63 +509,72 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                     ],
                   ),
                   SizedBox(height: 16),
-                  TextField(
+                  TextFormField(
+                    controller: eventAcronymController,
                     decoration: InputDecoration(
                       labelText: "Event acronym",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   SizedBox(height: 16),
-                  TextField(
+                  TextFormField(
+                    controller: eventLocationController,
                     decoration: InputDecoration(
                       labelText: "Event location",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   SizedBox(height: 16),
-                  TextField(
+                  TextFormField(
+                    controller: eventNameController,
                     decoration: InputDecoration(
                       labelText: "Event name",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   SizedBox(height: 16),
-                  TextField(
+                  TextFormField(
+                    controller: eventSponsorController,
                     decoration: InputDecoration(
                       labelText: "Event sponsor",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   SizedBox(height: 16),
-                  TextField(
+                  TextFormField(
+                    controller: eventThemeController,
                     decoration: InputDecoration(
                       labelText: "Event theme",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   SizedBox(height: 16),
-                  TextField(
+                  TextFormField(
+                    controller: funderNameController,
                     decoration: InputDecoration(
                       labelText: "Funder name",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   SizedBox(height: 16),
-                  TextField(
+                  TextFormField(
+                    controller: publisherController,
                     decoration: InputDecoration(
                       labelText: "Publisher location",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   SizedBox(height: 16),
-                  TextField(
+                  TextFormField(
+                    controller: standardsBodyAcronymController,
                     decoration: InputDecoration(
                       labelText: "Standards body acronym",
                       border: OutlineInputBorder(),
                     ),
                   ),
                   SizedBox(height: 16),
-                  TextField(
+                  TextFormField(
+                    controller: standardsBodyNameController,
                     decoration: InputDecoration(
                       labelText: "Standards body name",
                       border: OutlineInputBorder(),
