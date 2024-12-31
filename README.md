@@ -19,27 +19,15 @@
 
 ## Screenshots
 
-<div style="display: flex; flex-wrap: wrap; justify-content: center;">
- <div style="flex: 0 0 30%; margin: 10px;">
-    <img src="screenshots/light_ios_feed.png" alt="Feed" style="width: 100%; border-radius: 8px;">
-  </div>
-  <div style="flex: 0 0 30%; margin: 10px;">
-    <img src="screenshots/light_ios_search_screen.png" alt="Search" style="width: 100%; border-radius: 8px;">
-  </div>
-  <div style="flex: 0 0 30%; margin: 10px;">
-    <img src="screenshots/dark_ios_library_journals.png" alt="Journals" style="width: 100%; border-radius: 8px;">
-  </div>
-  <div style="flex: 0 0 30%; margin: 10px;">
-    <img src="screenshots/dark_ios_library_queries.png" alt="Example2" style="width: 100%; border-radius: 8px;">
-  </div>
-  <div style="flex: 0 0 30%; margin: 10px;">
-    <img src="screenshots/dark_ios_journal_details.png" alt="JournalDetails" style="width: 100%; border-radius: 8px;">
-  </div>
-  <div style="flex: 0 0 30%; margin: 10px;">
-    <img src="screenshots/dark_android_abstract.png" alt="Abstract" style="width: 100%; border-radius: 8px;">
-  </div>
-  
-</div>
+
+| Feed (light)                                       | Search screen (light)                                | Journals (dark)                                          |
+|---------------------------------------------------|------------------------------------------------------|---------------------------------------------------------|
+| ![Feed](screenshots/light_ios_feed.png)            | ![Search](screenshots/light_ios_search_screen.png)   | ![Journals](screenshots/dark_ios_library_journals.png)  |
+
+| Example Query (dark)                              | Journal details (dark)                               | Abstract (dark)                                          |
+|---------------------------------------------------|------------------------------------------------------|---------------------------------------------------------|
+| ![Query](screenshots/dark_ios_library_queries.png) | ![JournalDetails](screenshots/dark_ios_journal_details.png) | ![Abstract](screenshots/dark_android_abstract.png)      |
+
 
 ## Description
 <p align="justify">
