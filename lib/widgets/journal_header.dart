@@ -30,8 +30,8 @@ class JournalInfoHeader extends SliverPersistentHeaderDelegate {
             SizedBox(height: 8.0),
             Text('${AppLocalizations.of(context)!.publisher}: $publisher'),
             Text('ISSN: $issn'),
-            Text(
-                '${AppLocalizations.of(context)!.subjects}: ${subjects.join(', ')}'),
+            //Text(
+            //    '${AppLocalizations.of(context)!.subjects}: ${subjects.join(', ')}'),
             SizedBox(height: 8.0),
             Container(
               height: 1,
