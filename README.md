@@ -19,9 +19,9 @@
 
 ## Screenshots
 
-| Followed journals (dark)                           | Search results (light)                                  | Journal details (light)                                      | Abstract (dark)                                    |
+| Followed journals (dark)                           | Search screen (light)                                  | Journal details (dark)                                      | Abstract (dark)                                    |
 |----------------------------------------------------|---------------------------------------------------------|--------------------------------------------------------------|----------------------------------------------------|
-| ![Journals](screenshots/dark_android_journals.png) | ![Search](screenshots/light_android_search_results.png) | ![JournalDetails](screenshots/light_ios_journal_details.png) | ![abstract](screenshots/dark_android_abstract.png) |
+| ![Journals](screenshots/dark_ios_library_journals.png) | ![Search](screenshots/light_ios_search_screen.png) | ![JournalDetails](screenshots/dark_ios_journal_details.png) | ![abstract](screenshots/dark_android_abstract.png) |
 
 
 ## Description
@@ -34,6 +34,7 @@ Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly s
 ## Features overview
 <ul>
     <li> [x] Search and follow journals</li>
+    <li> [x] Search for articles and save the queries for easy access later</li>
     <li> [x] Download articles for offline access *</li>
     <li> [x] EZproxy and Unpaywall integration</li>
     <li> [x] Send articles to Zotero</li>
@@ -45,9 +46,11 @@ Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly s
 
 <p align ="justify">
 Wispar uses Weblate to manage translations. You can find the hosted instance at <a href="https://hosted.weblate.org/engage/wispar/">https://hosted.weblate.org/engage/wispar/</a>
-</br></br>Translation status:
-</p>
 
+A huge thank you to Weblate for hosting the translations for free :heart:
+
+Translation status:
+</p>
 <a href="https://hosted.weblate.org/engage/wispar/">
 <img src="https://hosted.weblate.org/widget/wispar/multi-auto.svg" alt="Translation status" />
 </a>
