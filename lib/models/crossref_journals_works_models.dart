@@ -105,13 +105,14 @@ class Item {
     String licenseUrl = '';
     String licenseName = '';
 
+    // Check if 'license' is available in the JSON and is a non-empty list
     if (json.containsKey('license') &&
         json['license'] is List &&
         (json['license'] as List).isNotEmpty) {
       final licenseData = json['license'][0];
       if (licenseData is Map<String, dynamic> &&
           licenseData.containsKey('URL')) {
-        licenseUrl = licenseUrl;
+        licenseUrl = licenseData['URL'];
         licenseName = licenseNames[normalizeLicenseUrl(licenseUrl)] ?? '';
       }
     }
@@ -158,7 +159,17 @@ class Item {
     'https://opensource.org/licenses/Apache-2.0': 'Apache License 2.0',
     'https://www.elsevier.com/tdm/userlicense/1.0':
         'Elsevier Text and Data Mining (TDM) License',
-    'https://www.springer.com/tdm': 'Springer Nature TDM policy'
+    'https://www.springer.com/tdm': 'Springer Nature TDM policy',
+    'https://www.springernature.com/gp/researchers/text-and-data-mining':
+        'Springer Nature TDM policy',
+    'https://onlinelibrary.wiley.com/termsAndConditions#vor':
+        'Wiley Online Library Terms of Use',
+    'https://doi.wiley.com/10.1002/tdm_license_1.1': 'Wiley TDM policy',
+    'https://iopscience.iop.org/page/copyright': 'IOP copyright protection',
+    'https://ieeexplore.ieee.org/Xplorehelp/downloads/license-information/IEEE.html':
+        'IEE copyright policy',
+    'https://creativecommons.org/licenses/by-nc-nd/4.0':
+        'Creative Commons Attribution-NonCommercial-Nonderivatives 4.0 International'
   };
   static String _cleanAbstract(String rawAbstract) {
     rawAbstract = rawAbstract
