@@ -4,7 +4,7 @@ import '../models/journal_entity.dart';
 import '../widgets/sortbydialog.dart';
 import '../widgets/sortorderdialog.dart';
 import '../services/database_helper.dart';
-import '../widgets/journal_card.dart';
+import '../widgets/search_query_card.dart';
 
 class QueriesTabContent extends StatefulWidget {
   final int initialSortBy;
@@ -25,12 +25,13 @@ class QueriesTabContent extends StatefulWidget {
 }
 
 class _QueriesTabContentState extends State<QueriesTabContent> {
-  late DatabaseHelper dbHelper;
+  final dbHelper = DatabaseHelper();
+  late Future<List<Map<String, dynamic>>> savedQueriesFuture;
 
   @override
   void initState() {
     super.initState();
-    dbHelper = DatabaseHelper();
+    savedQueriesFuture = dbHelper.getSavedQueries();
   }
 
   @override
@@ -64,58 +65,59 @@ class _QueriesTabContentState extends State<QueriesTabContent> {
             ],
           ),
         ),
-        // Journal list
+        // Saved queries list
         Expanded(
-          child: FutureBuilder<List<Journal>>(
-            future: dbHelper.getJournals(),
+          child: FutureBuilder<List<Map<String, dynamic>>>(
+            future: savedQueriesFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
+                return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
+                return Center(child: Text('Error: ${snapshot.error}'));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return Center(
                   child: Wrap(
                     alignment: WrapAlignment.center,
                     children: [
-                      Text(AppLocalizations.of(context)!.journalnotfollowing1),
+                      Text('No saved queries.'),
                       Icon(Icons.search),
-                      Text(AppLocalizations.of(context)!.journalnotfollowing2),
                     ],
                   ),
                 );
               } else {
-                List<Journal> journals = snapshot.data!;
-                journals.sort((a, b) {
+                // Sorting logic
+                List<Map<String, dynamic>> savedQueries =
+                    List.from(snapshot.data!);
+                savedQueries.sort((a, b) {
                   switch (widget.initialSortBy) {
-                    case 0:
-                      return a.title.compareTo(b.title);
-                    case 1:
-                      return a.publisher.compareTo(b.publisher);
-                    case 2:
-                      return a.dateFollowed!.compareTo(b.dateFollowed!);
-                    case 3:
-                      return a.issn.compareTo(b.issn);
+                    case 0: // Sort by query name
+                      return a['queryName'].compareTo(b['queryName']);
+                    case 1: // Sort by date saved
+                      return a['dateSaved'].compareTo(b['dateSaved']);
                     default:
                       return 0;
                   }
                 });
 
                 if (widget.initialSortOrder == 1) {
-                  journals = journals.reversed.toList();
+                  savedQueries = savedQueries.reversed.toList();
                 }
 
+                // Display saved queries
                 return ListView.builder(
-                  itemCount: journals.length,
+                  itemCount: savedQueries.length,
                   itemBuilder: (context, index) {
-                    final currentJournal = journals[index];
-                    return Column(
-                      children: [
-                        JournalCard(
-                          journal: currentJournal,
-                          unfollowCallback: _unfollowJournal,
-                        ),
-                      ],
+                    final query = savedQueries[index];
+                    return SearchQueryCard(
+                      queryName: query['queryName'],
+                      queryParams: query['queryParams'],
+                      dateSaved: query['dateSaved'],
+                      onDelete: () async {
+                        await dbHelper.deleteQuery(query['query_id']);
+                        setState(() {
+                          savedQueriesFuture = dbHelper.getSavedQueries();
+                        });
+                      },
                     );
                   },
                 );
@@ -133,10 +135,8 @@ class _QueriesTabContentState extends State<QueriesTabContent> {
       initialSortBy: widget.initialSortBy,
       onSortByChanged: widget.onSortByChanged,
       sortOptions: [
-        AppLocalizations.of(context)!.journaltitle,
-        AppLocalizations.of(context)!.publisher,
-        AppLocalizations.of(context)!.followingdate,
-        'ISSN',
+        "Query name",
+        "Date saved",
       ],
     );
   }

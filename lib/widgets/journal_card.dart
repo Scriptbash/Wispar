@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../screens/journals_details_screen.dart';
 import '../models/journal_entity.dart';
@@ -26,6 +27,12 @@ class JournalCard extends StatelessWidget {
                 subjects: subjects,
               ),
             ),
+          );
+        },
+        onLongPress: () {
+          Clipboard.setData(ClipboardData(text: journal.issn));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('ISSN copied to clipboard')),
           );
         },
         title: Row(

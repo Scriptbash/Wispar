@@ -57,6 +57,16 @@ class DatabaseHelper {
           FOREIGN KEY (journal_id) REFERENCES journals(journal_id)
         )
       ''');
+
+        // Create the table for saved queries
+        await db.execute('''
+        CREATE TABLE savedQueries (
+          query_id INTEGER PRIMARY KEY AUTOINCREMENT,
+          queryName TEXT,
+          queryParams TEXT,
+          dateSaved TEXT
+        )
+      ''');
       },
     );
   }
@@ -431,6 +441,36 @@ class DatabaseHelper {
       {'dateDownloaded': null, 'pdfPath': null},
       where: 'doi = ?',
       whereArgs: [doi],
+    );
+  }
+
+  // Insert function for the saved search queries
+  Future<void> saveSearchQuery(String queryName, String queryParams) async {
+    final db = await database;
+    final String dateSaved = DateTime.now().toIso8601String();
+    await db.insert(
+      'savedQueries',
+      {
+        'queryName': queryName,
+        'queryParams': queryParams,
+        'dateSaved': dateSaved,
+      },
+    );
+  }
+
+  // Get the saved search queries
+  Future<List<Map<String, dynamic>>> getSavedQueries() async {
+    final db = await database;
+    return await db.query('savedQueries', orderBy: 'dateSaved DESC');
+  }
+
+  // Remove a saved search query
+  Future<void> deleteQuery(int id) async {
+    final db = await database;
+    await db.delete(
+      'savedQueries',
+      where: 'query_id = ?',
+      whereArgs: [id],
     );
   }
 }

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/database_helper.dart';
 import '../widgets/journals_tab_content.dart';
-import '../widgets/authors_tab_content.dart';
+//import '../widgets/authors_tab_content.dart';
 import '../widgets/queries_tab_content.dart';
+import '../widgets/search_query_card.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
@@ -23,7 +24,7 @@ class _LibraryScreenState extends State<LibraryScreen>
   int journalsSortOrder = 0; // Set the sort order to Ascending by default
   int authorsSortBy = 0; // Set the sort by option to Journal title by default
   int authorsSortOrder = 0; // Set the sort order to Ascending by default
-  int queriesSortBy = 0; // Set the sort by option to Journal title by default
+  int queriesSortBy = 0; // Set the sort by option to Queriy name by default
   int queriesSortOrder = 0; // Set the sort order to Ascending by default
 
   @override

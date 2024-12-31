@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/crossref_api.dart';
 import '../screens/article_search_results_screen.dart';
-import '../services/save_search_query.dart';
+import '../services/database_helper.dart';
 
 class QuerySearchForm extends StatefulWidget {
   // The key allows to access the state of the form from outside
@@ -298,12 +298,18 @@ class QuerySearchFormState extends State<QuerySearchForm> {
     );
 
     try {
+      final dbHelper = DatabaseHelper();
       late final response;
       if (saveQuery) {
         final queryName = queryNameController.text.trim();
         if (queryName != '') {
+          String queryString = queryParams.entries
+              .map((entry) =>
+                  '${Uri.encodeQueryComponent(entry.key)}=${Uri.encodeQueryComponent(entry.value.toString())}')
+              .join('&');
+
           // Call the save query function
-          await SaveSearchQuery.save(queryParams);
+          await dbHelper.saveSearchQuery(queryName, queryString);
           // Makes the API call
           response = await CrossRefApi.getWorksByQuery(queryParams);
         } else {
