@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/crossref_journals_works_models.dart';
@@ -5,6 +6,8 @@ import '../widgets/publication_card.dart';
 import '../widgets/downloaded_card.dart';
 import '../models/journal_entity.dart';
 import 'dart:convert';
+import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DatabaseHelper {
   static Database? _database;
@@ -382,14 +385,14 @@ class DatabaseHelper {
     });
   }
 
-  Future<void> clearCachedPublications() async {
+  /*Future<void> clearCachedPublications() async {
     final db = await database;
     await db.delete(
       'articles',
       where:
           'dateCached IS NOT NULL AND (dateLiked IS NULL AND dateDownloaded IS NULL)',
     );
-  }
+  }*/
 
 // Functions for downloaded articles
 
@@ -468,5 +471,64 @@ class DatabaseHelper {
       where: 'query_id = ?',
       whereArgs: [id],
     );
+  }
+
+  // Cleanup the database, removing old articles
+  Future<void> cleanupOldArticles(BuildContext context) async {
+    final db = await database;
+
+    // Retrieve CleanupInterval from SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    final int cleanupInterval =
+        prefs.getInt('CleanupInterval') ?? 7; // Default to 7 days if not set
+
+    final DateTime thresholdDate =
+        DateTime.now().subtract(Duration(days: cleanupInterval));
+    final String thresholdDateString =
+        thresholdDate.toIso8601String().substring(0, 10);
+
+    try {
+      final List<Map<String, dynamic>> oldArticles = await db.rawQuery('''
+      SELECT * FROM articles
+      WHERE dateCached < ? AND dateLiked IS NULL AND dateDownloaded IS NULL
+    ''', [thresholdDateString]);
+
+      // Delete the old articles
+      if (oldArticles.isNotEmpty) {
+        for (var article in oldArticles) {
+          // If pdfPath is not null, try to delete the file
+          String? pdfPath = article['pdfPath'];
+          if (pdfPath != null && pdfPath.isNotEmpty) {
+            try {
+              final file = File(pdfPath);
+              if (await file.exists()) {
+                await file.delete();
+              }
+            } catch (e) {
+              debugPrint('Error deleting PDF file at $pdfPath: $e');
+            }
+          }
+
+          // Delete the article entry from the database
+          await db.delete(
+            'articles',
+            where: 'article_id = ?',
+            whereArgs: [article['article_id']],
+          );
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("The database cleanup was successful.")),
+        );
+      } /*else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("No old articles to clean up.")),
+        );
+      }*/
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error during database cleanup: $e")),
+      );
+    }
   }
 }

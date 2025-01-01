@@ -126,6 +126,6 @@ class _WisparState extends State<Wispar> {
           ),
         ),
       ),
-    ); // Closing the MaterialApp widget
+    );
   }
 }

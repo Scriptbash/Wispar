@@ -181,6 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
       // Check if there are new journals since the last API call
       //bool shouldForceApiCall = await _checkForNewJournals(followedJournals);
 
+      bool isCleanupDone = false;
       // If the cache is empty or there are new journals, fetch recent feed from the API
       if (feedItems.isEmpty || journalsToUpdate.isNotEmpty) {
         //feedItems = [];
@@ -215,6 +216,12 @@ class _HomeScreenState extends State<HomeScreen> {
             } catch (e) {
               print('Error fetching recent feed for ${journal.title}: $e');
             }
+            // Call the database cleanup function
+            if (!isCleanupDone) {
+              isCleanupDone = true;
+              await dbHelper.cleanupOldArticles(context);
+              isCleanupDone = true; // Prevent spamming the function if it fails
+            }
           }
         }
 
@@ -225,6 +232,7 @@ class _HomeScreenState extends State<HomeScreen> {
           //await dbHelper.insertCachedPublication(item);
         }
       }
+      isCleanupDone = false; // Reset the cleanup flag just in case
       return feedItems;
     } catch (e) {
       print('Error in _getRecentFeedForFollowedJournals: $e');
