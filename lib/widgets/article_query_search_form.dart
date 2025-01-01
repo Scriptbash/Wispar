@@ -468,14 +468,6 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                   ),
                   SizedBox(height: 16),
                   TextFormField(
-                    controller: affiliationController,
-                    decoration: InputDecoration(
-                      labelText: 'Affiliation',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
                     controller: bibliographicController,
                     decoration: InputDecoration(
                       labelText: "Bibliographic",
