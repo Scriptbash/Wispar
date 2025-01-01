@@ -34,6 +34,7 @@ class SearchQueryCard extends StatelessWidget {
         );
         // Convert the params string to the needed mapstring
         Map<String, dynamic> queryMap = Uri.splitQueryString(queryParams);
+        CrossRefApi.resetWorksQueryCursor(); // Reset the cursor on new search
         var response = await CrossRefApi.getWorksByQuery(queryMap);
 
         Navigator.pop(context);

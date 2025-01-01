@@ -34,7 +34,7 @@ class _ArticleSearchResultsScreenState
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
-              _scrollController.position.maxScrollExtent - 100 &&
+              _scrollController.position.maxScrollExtent - 70 &&
           !_isLoadingMore &&
           _hasMoreResults) {
         _loadMoreResults();
@@ -43,9 +43,9 @@ class _ArticleSearchResultsScreenState
   }
 
   Future<void> _loadMoreResults() async {
-    setState(() {
-      _isLoadingMore = true;
-    });
+    if (_isLoadingMore) return; // Prevent multiple API calls
+
+    _isLoadingMore = true;
 
     try {
       final ListAndMore<journalsWorks.Item> newResults =
@@ -60,9 +60,7 @@ class _ArticleSearchResultsScreenState
         SnackBar(content: Text('Failed to load more results')),
       );
     } finally {
-      setState(() {
-        _isLoadingMore = false;
-      });
+      _isLoadingMore = false;
     }
   }
 

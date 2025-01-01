@@ -156,9 +156,4 @@ class _QueriesTabContentState extends State<QueriesTabContent> {
       },
     );
   }
-
-  Future<void> _unfollowJournal(BuildContext context, Journal journal) async {
-    await dbHelper.removeJournal(journal.issn);
-    setState(() {});
-  }
 }
