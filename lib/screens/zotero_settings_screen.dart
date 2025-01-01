@@ -46,13 +46,16 @@ class _ZoteroSettingsState extends State<ZoteroSettings> {
               Text(
                 '\n${AppLocalizations.of(context)!.zoteroPermissions2}\n',
               ),
-              ElevatedButton(
-                onPressed: () {
-                  launchUrl(
-                    Uri.parse('https://www.zotero.org/settings/keys/new'),
-                  );
-                },
-                child: Text(AppLocalizations.of(context)!.zoteroCreateKey),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    launchUrl(
+                      Uri.parse('https://www.zotero.org/settings/keys/new'),
+                    );
+                  },
+                  child: Text(AppLocalizations.of(context)!.zoteroCreateKey),
+                ),
               ),
               Text(
                 '\n${AppLocalizations.of(context)!.zoteroPermissions3}\n',
@@ -60,12 +63,16 @@ class _ZoteroSettingsState extends State<ZoteroSettings> {
               TextField(
                 controller: _apiKeyController,
                 decoration: InputDecoration(
-                  //border: OutlineInputBorder(),
                   hintText: AppLocalizations.of(context)!.zoteroEnterKey,
                 ),
                 onChanged: (value) {},
               ),
-              ElevatedButton(
+              SizedBox(
+                height: 16,
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
                   onPressed: () async {
                     String apiKey = _apiKeyController.text;
                     if (apiKey != '') {
@@ -89,7 +96,9 @@ class _ZoteroSettingsState extends State<ZoteroSettings> {
                       }
                     }
                   },
-                  child: Text(AppLocalizations.of(context)!.save))
+                  child: Text(AppLocalizations.of(context)!.save),
+                ),
+              ),
             ],
           ),
         ),

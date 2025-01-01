@@ -7,6 +7,7 @@ import './zotero_settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import './database_settings_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -153,7 +154,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ]),*/
               ),
               ListTile(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DatabaseSettingsScreen(),
+                    ),
+                  );
+                },
                 title: Row(
                   children: [
                     Icon(Icons.dns_outlined),

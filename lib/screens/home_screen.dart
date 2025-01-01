@@ -8,6 +8,7 @@ import '../services/database_helper.dart';
 import '../widgets/publication_card.dart';
 import '../widgets/sortbydialog.dart';
 import '../widgets/sortorderdialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +24,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int sortBy = 0; // Set the default sort by to published date
   int sortOrder = 1; // Set the default sort order to descending
+
+  int fetchIntervalInHours = 6; // Default to 6 hours for API fetch
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFetchInterval();
+  }
+
+  // Load the fetch interval from SharedPreferences
+  Future<void> _loadFetchInterval() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      fetchIntervalInHours = prefs.getInt('fetchInterval') ?? 6;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -245,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (lastUpdated == null ||
             DateTime.now().difference(DateTime.parse(lastUpdated)).inHours >=
-                6) {
+                fetchIntervalInHours) {
           journalsToUpdate.add(result.first['issn'] as String);
         }
       }
