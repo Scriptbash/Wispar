@@ -171,11 +171,12 @@ class Item {
     'https://creativecommons.org/licenses/by-nc-nd/4.0':
         'Creative Commons Attribution-NonCommercial-Nonderivatives 4.0 International'
   };
+
   static String _cleanAbstract(String rawAbstract) {
     rawAbstract = rawAbstract
         .replaceAll(RegExp(r'<[^>]*>'), '') // Remove HTML tags
-        .replaceAll(
-            RegExp(r'^\s*Abstract\.?\s*'), '') // Remove leading "Abstract"
+        .replaceAll(RegExp(r'^\s*abstract[:.\s]*', caseSensitive: false),
+            '') // Remove leading "Abstract"
         .trim();
 
     return rawAbstract;
