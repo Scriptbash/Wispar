@@ -124,13 +124,13 @@ class _PublicationCardState extends State<PublicationCard> {
                                         title: widget.journalTitle,
                                         publisher: journalPublisher,
                                         issn: widget.issn,
-                                        subjects: journalSubjects,
                                       ),
                                     ));
                               }
                             },
                             child: Text(
                               widget.journalTitle,
+                              style: TextStyle(fontSize: 16),
                               softWrap: true,
                             ),
                             style: TextButton.styleFrom(

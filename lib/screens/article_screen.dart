@@ -120,8 +120,6 @@ class _ArticleScreenState extends State<ArticleScreen> {
                               if (journalInfo != null) {
                                 String journalPublisher =
                                     journalInfo['publisher'];
-                                List<String> journalSubjects =
-                                    (journalInfo['subjects'] ?? '').split(',');
 
                                 Navigator.push(
                                   context,
@@ -130,7 +128,6 @@ class _ArticleScreenState extends State<ArticleScreen> {
                                       title: widget.journalTitle,
                                       publisher: journalPublisher,
                                       issn: widget.issn,
-                                      subjects: journalSubjects,
                                     ),
                                   ),
                                 );
@@ -295,7 +292,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
     final db = await databaseHelper.database;
     final List<Map<String, dynamic>> rows = await db.query(
       'journals',
-      columns: ['publisher', 'subjects'],
+      columns: ['publisher'],
       where: 'issn = ?',
       whereArgs: [issn],
     );

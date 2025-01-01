@@ -10,16 +10,42 @@ class CrossRefApi {
   static const String email = 'mailto=wispar-app@protonmail.com';
   static String? _journalCursor = '*';
   static String? _journalWorksCursor = '*';
+  static String? _worksQueryCursor = '*';
   static String? _currentQuery;
 
-  // Query journals
-  static Future<ListAndMore<Journals.Item>> queryJournals(String query) async {
+  // Query journals by name
+  static Future<ListAndMore<Journals.Item>> queryJournalsByName(
+      String query) async {
     _currentQuery = query;
     String apiUrl = '$baseUrl$journalsEndpoint?query=$query&rows=30&$email';
 
     if (_journalCursor != null) {
       apiUrl += '&cursor=$_journalCursor';
     }
+
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final crossrefJournals = Journals.crossrefjournalsFromJson(response.body);
+
+      List<Journals.Item> items = crossrefJournals.message.items;
+
+      // Update the journal cursor
+      _journalCursor = crossrefJournals.message.nextCursor;
+
+      // Use nextCursor to determine if there are more results
+      bool hasMoreResults = _journalCursor != null && _journalCursor != "";
+
+      return ListAndMore(items, hasMoreResults);
+    } else {
+      throw Exception('Failed to query journals');
+    }
+  }
+
+  // Query journals by ISSN
+  static Future<ListAndMore<Journals.Item>> queryJournalsByISSN(
+      String query) async {
+    String apiUrl = '$baseUrl$journalsEndpoint/$query&$email';
 
     final response = await http.get(Uri.parse(apiUrl));
 
@@ -86,6 +112,10 @@ class CrossRefApi {
     _journalWorksCursor = '*';
   }
 
+  static void resetWorksQueryCursor() {
+    _worksQueryCursor = '*';
+  }
+
   static String? getCurrentQuery() {
     return _currentQuery;
   }
@@ -104,6 +134,34 @@ class CrossRefApi {
       }
     } else {
       throw Exception('Failed to load work by DOI');
+    }
+  }
+
+  static Future<ListAndMore<journalsWorks.Item>> getWorksByQuery(
+      Map<String, dynamic> queryParams) async {
+    String url = '$baseUrl$worksEndpoint';
+    // Construct the query parameters string by iterating over the queryParams map
+    String queryString = queryParams.entries
+        .map((entry) =>
+            '${Uri.encodeQueryComponent(entry.key)}=${Uri.encodeQueryComponent(entry.value.toString())}')
+        .join('&');
+    String apiUrl = '$url?$queryString&rows=50&$email';
+    if (_worksQueryCursor != null) {
+      apiUrl += '&cursor=$_worksQueryCursor';
+    }
+    final response = await http.get(Uri.parse(apiUrl));
+    //print('$url?$queryString');
+
+    if (response.statusCode == 200) {
+      final responseData =
+          journalsWorks.JournalWork.fromJson(json.decode(response.body));
+      List<journalsWorks.Item> feedItems = responseData.message.items;
+      _worksQueryCursor = responseData.message.nextCursor;
+      bool hasMoreResults =
+          _worksQueryCursor != null && _worksQueryCursor != "";
+      return ListAndMore(feedItems, hasMoreResults);
+    } else {
+      throw Exception('Failed to fetch results');
     }
   }
 }

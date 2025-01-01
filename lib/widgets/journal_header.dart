@@ -4,12 +4,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class JournalInfoHeader extends SliverPersistentHeaderDelegate {
   final String publisher;
   final String issn;
-  final List<String> subjects;
 
   JournalInfoHeader({
     required this.publisher,
     required this.issn,
-    required this.subjects,
   });
 
   @override
@@ -30,8 +28,6 @@ class JournalInfoHeader extends SliverPersistentHeaderDelegate {
             SizedBox(height: 8.0),
             Text('${AppLocalizations.of(context)!.publisher}: $publisher'),
             Text('ISSN: $issn'),
-            Text(
-                '${AppLocalizations.of(context)!.subjects}: ${subjects.join(', ')}'),
             SizedBox(height: 8.0),
             Container(
               height: 1,

@@ -31,7 +31,6 @@ class DatabaseHelper {
           issn TEXT,
           title TEXT,
           publisher TEXT,
-          subjects TEXT,
           dateFollowed TEXT,
           lastUpdated TEXT
         )
@@ -55,6 +54,16 @@ class DatabaseHelper {
           dateCached TEXT,
           journal_id,
           FOREIGN KEY (journal_id) REFERENCES journals(journal_id)
+        )
+      ''');
+
+        // Create the table for saved queries
+        await db.execute('''
+        CREATE TABLE savedQueries (
+          query_id INTEGER PRIMARY KEY AUTOINCREMENT,
+          queryName TEXT,
+          queryParams TEXT,
+          dateSaved TEXT
         )
       ''');
       },
@@ -84,7 +93,6 @@ class DatabaseHelper {
             'dateFollowed': DateTime.now().toIso8601String().substring(0, 10),
             'title': journal.title,
             'publisher': journal.publisher,
-            'subjects': journal.subjects,
           },
           where: 'journal_id = ?',
           whereArgs: [journalId],
@@ -108,7 +116,6 @@ class DatabaseHelper {
         issn: maps[i]['issn'],
         title: maps[i]['title'],
         publisher: maps[i]['publisher'],
-        subjects: maps[i]['subjects'],
         dateFollowed: maps[i]['dateFollowed'],
         lastUpdated: maps[i]['lastUpdated'],
       );
@@ -217,7 +224,6 @@ class DatabaseHelper {
           'issn': publicationCard.issn,
           'title': publicationCard.journalTitle, // default title
           'publisher': '',
-          'subjects': '',
         };
 
         journalId = await db.insert('journals', journalData);
@@ -431,6 +437,36 @@ class DatabaseHelper {
       {'dateDownloaded': null, 'pdfPath': null},
       where: 'doi = ?',
       whereArgs: [doi],
+    );
+  }
+
+  // Insert function for the saved search queries
+  Future<void> saveSearchQuery(String queryName, String queryParams) async {
+    final db = await database;
+    final String dateSaved = DateTime.now().toIso8601String();
+    await db.insert(
+      'savedQueries',
+      {
+        'queryName': queryName,
+        'queryParams': queryParams,
+        'dateSaved': dateSaved,
+      },
+    );
+  }
+
+  // Get the saved search queries
+  Future<List<Map<String, dynamic>>> getSavedQueries() async {
+    final db = await database;
+    return await db.query('savedQueries', orderBy: 'dateSaved DESC');
+  }
+
+  // Remove a saved search query
+  Future<void> deleteQuery(int id) async {
+    final db = await database;
+    await db.delete(
+      'savedQueries',
+      where: 'query_id = ?',
+      whereArgs: [id],
     );
   }
 }

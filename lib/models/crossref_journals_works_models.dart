@@ -77,6 +77,7 @@ class Item {
   final String primaryUrl;
   final String license;
   final String licenseName;
+  final String issn;
 
   Item({
     required this.publisher,
@@ -90,6 +91,7 @@ class Item {
     required this.primaryUrl,
     required this.license,
     required this.licenseName,
+    required this.issn,
   });
 
   factory Item.fromJson(Map<String, dynamic> json) {
@@ -102,16 +104,23 @@ class Item {
 
     String licenseUrl = '';
     String licenseName = '';
-    if (json.containsKey('license')) {
-      if (json['license'] != null &&
-          json['license'] is List &&
-          (json['license'] as List).isNotEmpty) {
-        licenseUrl = json['license'][0]['URL'] ?? '';
+
+    // Check if 'license' is available in the JSON and is a non-empty list
+    if (json.containsKey('license') &&
+        json['license'] is List &&
+        (json['license'] as List).isNotEmpty) {
+      final licenseData = json['license'][0];
+      if (licenseData is Map<String, dynamic> &&
+          licenseData.containsKey('URL')) {
+        licenseUrl = licenseData['URL'];
         licenseName = licenseNames[normalizeLicenseUrl(licenseUrl)] ?? '';
       }
-    } else {
-      licenseUrl = '';
-      licenseName = '';
+    }
+
+    String journalTitle = '';
+    if (json['container-title'] is List &&
+        (json['container-title'] as List).isNotEmpty) {
+      journalTitle = (json['container-title'] as List<dynamic>).first ?? '';
     }
 
     return Item(
@@ -119,15 +128,14 @@ class Item {
       abstract: _cleanAbstract(json['abstract'] ?? ''),
       title: _extractTitle(json['title']),
       publishedDate: _parseDate(json['created']),
-      journalTitle: (json['container-title'] as List<dynamic>).isNotEmpty
-          ? (json['container-title'] as List<dynamic>).first ?? ''
-          : '',
+      journalTitle: journalTitle,
       doi: json['DOI'] ?? '',
       authors: authors,
       url: json['URL'] ?? '',
       primaryUrl: json['resource']['primary']['URL'] ?? '',
       license: licenseUrl,
       licenseName: licenseName,
+      issn: json['issn'] ?? '',
     );
   }
   static Map<String, String> licenseNames = {
@@ -151,7 +159,17 @@ class Item {
     'https://opensource.org/licenses/Apache-2.0': 'Apache License 2.0',
     'https://www.elsevier.com/tdm/userlicense/1.0':
         'Elsevier Text and Data Mining (TDM) License',
-    'https://www.springer.com/tdm': 'Springer Nature TDM policy'
+    'https://www.springer.com/tdm': 'Springer Nature TDM policy',
+    'https://www.springernature.com/gp/researchers/text-and-data-mining':
+        'Springer Nature TDM policy',
+    'https://onlinelibrary.wiley.com/termsAndConditions#vor':
+        'Wiley Online Library Terms of Use',
+    'https://doi.wiley.com/10.1002/tdm_license_1.1': 'Wiley TDM policy',
+    'https://iopscience.iop.org/page/copyright': 'IOP copyright protection',
+    'https://ieeexplore.ieee.org/Xplorehelp/downloads/license-information/IEEE.html':
+        'IEE copyright policy',
+    'https://creativecommons.org/licenses/by-nc-nd/4.0':
+        'Creative Commons Attribution-NonCommercial-Nonderivatives 4.0 International'
   };
   static String _cleanAbstract(String rawAbstract) {
     rawAbstract = rawAbstract
@@ -165,10 +183,8 @@ class Item {
 
   static String _extractTitle(dynamic title) {
     // Extract the title if it's not null and is a non-empty list
-    return (title != null &&
-            title is List<dynamic> &&
-            (title as List<dynamic>).isNotEmpty)
-        ? (title as List<dynamic>).first ?? ''
+    return title != null && title is List<dynamic> && (title.isNotEmpty)
+        ? title.first ?? ''
         : '';
   }
 

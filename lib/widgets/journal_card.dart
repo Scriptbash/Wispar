@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../screens/journals_details_screen.dart';
 import '../models/journal_entity.dart';
@@ -15,7 +16,6 @@ class JournalCard extends StatelessWidget {
       margin: EdgeInsets.all(8.0),
       child: ListTile(
         onTap: () {
-          List<String> subjects = journal.subjects.split(', ');
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -23,9 +23,14 @@ class JournalCard extends StatelessWidget {
                 title: journal.title,
                 publisher: journal.publisher,
                 issn: journal.issn,
-                subjects: subjects,
               ),
             ),
+          );
+        },
+        onLongPress: () {
+          Clipboard.setData(ClipboardData(text: journal.issn));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('ISSN copied to clipboard')),
           );
         },
         title: Row(
