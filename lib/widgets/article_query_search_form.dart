@@ -321,6 +321,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                 content:
                     Text('You must enter a query name in order to save it.')),
           );
+          return;
         }
       } else {
         response = await CrossRefApi.getWorksByQuery(queryParams);
