@@ -23,8 +23,6 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   bool isLoading = false;
   late ScrollController _scrollController;
   bool hasMoreResults = true;
-  bool reachedEnd = false;
-  bool waitingForMore = false;
 
   @override
   void initState() {
@@ -36,7 +34,6 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
       items = widget.searchResults.list;
       hasMoreResults = widget.searchResults.hasMore;
     } else {
-      // Handle empty searchResults
       hasMoreResults = false;
     }
   }
@@ -47,70 +44,67 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.searchresults),
       ),
-      body: ListView.builder(
-        itemCount: items.length + (hasMoreResults ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index == items.length) {
-            // Display loading indicator at the end of the list
-            return isLoading ? CircularProgressIndicator() : Container();
-          } else {
-            Journals.Item currentItem = items[index];
+      body: items.isEmpty
+          ? Center(
+              child: Text('No results found.'),
+            )
+          : ListView.builder(
+              itemCount: items.length + (hasMoreResults ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (index == items.length) {
+                  // Display a loading indicator at the end of the list
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                } else {
+                  Journals.Item currentItem = items[index];
 
-            // Check if the current item has non-empty ISSN
-            if (currentItem.issn.isNotEmpty) {
-              return JournalsSearchResultCard(
-                key: UniqueKey(),
-                item: currentItem,
-                isFollowed: false,
-              );
-            } else {
-              // Skip creating a card for items with empty ISSN
-              return Container();
-            }
-          }
-        },
-        controller: _scrollController,
-      ),
+                  // Skip invalid items
+                  if (currentItem.issn.isEmpty) return SizedBox.shrink();
+
+                  return JournalsSearchResultCard(
+                    key: UniqueKey(),
+                    item: currentItem,
+                    isFollowed: false,
+                  );
+                }
+              },
+              controller: _scrollController,
+            ),
     );
   }
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent * 0.8) {
-      if (!isLoading && !waitingForMore) {
-        loadMoreItems(widget.searchQuery);
-      }
+            _scrollController.position.maxScrollExtent * 0.8 &&
+        !isLoading &&
+        hasMoreResults) {
+      loadMoreItems(widget.searchQuery);
     }
   }
 
   Future<void> loadMoreItems(String query) async {
+    setState(() => isLoading = true);
+
     try {
-      setState(() {
-        isLoading = true;
-        waitingForMore = true;
-      });
-
-      if (reachedEnd) {
-        // Clear the flag if we are making a new API call
-        reachedEnd = false;
-      }
-
-      ListAndMore<Journals.Item> newItems =
+      ListAndMore<Journals.Item> newResults =
           await CrossRefApi.queryJournalsByName(query);
 
       setState(() {
-        items.addAll(newItems.list);
-        hasMoreResults = newItems.hasMore && newItems.list.length >= 30;
-        isLoading = false;
+        items.addAll(newResults.list);
+        hasMoreResults = newResults.hasMore && newResults.list.isNotEmpty;
       });
     } catch (e) {
       print('Error loading more items: $e');
-      setState(() {
-        isLoading = false;
-      });
     } finally {
-      // Reset the waitingForMore flag regardless of success or failure
-      waitingForMore = false;
+      setState(() => isLoading = false);
     }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }

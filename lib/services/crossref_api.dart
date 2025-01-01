@@ -36,7 +36,11 @@ class CrossRefApi {
       // Use nextCursor to determine if there are more results
       bool hasMoreResults = _journalCursor != null && _journalCursor != "";
 
-      return ListAndMore(items, hasMoreResults);
+      return ListAndMore(
+        list: items,
+        hasMore: hasMoreResults,
+        totalResults: crossrefJournals.message.totalResults,
+      );
     } else {
       throw Exception('Failed to query journals');
     }
@@ -59,7 +63,11 @@ class CrossRefApi {
       // Use nextCursor to determine if there are more results
       bool hasMoreResults = _journalCursor != null && _journalCursor != "";
 
-      return ListAndMore(items, hasMoreResults);
+      return ListAndMore(
+        list: items,
+        hasMore: hasMoreResults,
+        totalResults: crossrefJournals.message.totalResults,
+      );
     } else {
       throw Exception('Failed to query journals');
     }
@@ -89,7 +97,11 @@ class CrossRefApi {
       bool hasMoreResults =
           _journalWorksCursor != null && _journalWorksCursor != "";
 
-      return ListAndMore(items, hasMoreResults);
+      return ListAndMore(
+        list: items,
+        hasMore: hasMoreResults,
+        totalResults: crossrefWorks.message.totalResults,
+      );
     } else {
       throw Exception('Failed to query journal works');
     }
@@ -159,7 +171,11 @@ class CrossRefApi {
       _worksQueryCursor = responseData.message.nextCursor;
       bool hasMoreResults =
           _worksQueryCursor != null && _worksQueryCursor != "";
-      return ListAndMore(feedItems, hasMoreResults);
+      return ListAndMore(
+        list: feedItems,
+        hasMore: hasMoreResults,
+        totalResults: responseData.message.totalResults,
+      );
     } else {
       throw Exception('Failed to fetch results');
     }
@@ -169,6 +185,11 @@ class CrossRefApi {
 class ListAndMore<T> {
   final List<T> list;
   final bool hasMore;
+  final int totalResults;
 
-  ListAndMore(this.list, this.hasMore);
+  ListAndMore({
+    required this.list,
+    required this.hasMore,
+    required this.totalResults,
+  });
 }

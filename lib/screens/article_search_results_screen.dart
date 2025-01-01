@@ -31,6 +31,7 @@ class _ArticleSearchResultsScreenState
   void initState() {
     super.initState();
     _searchResults = widget.initialSearchResults;
+    _hasMoreResults = widget.initialHasMore;
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
@@ -43,9 +44,11 @@ class _ArticleSearchResultsScreenState
   }
 
   Future<void> _loadMoreResults() async {
-    if (_isLoadingMore) return; // Prevent multiple API calls
+    if (_isLoadingMore || !_hasMoreResults) return;
 
-    _isLoadingMore = true;
+    setState(() {
+      _isLoadingMore = true;
+    });
 
     try {
       final ListAndMore<journalsWorks.Item> newResults =
@@ -53,14 +56,17 @@ class _ArticleSearchResultsScreenState
 
       setState(() {
         _searchResults.addAll(newResults.list);
-        _hasMoreResults = newResults.hasMore;
+        _hasMoreResults = newResults.hasMore &&
+            _searchResults.length < newResults.totalResults;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to load more results')),
       );
     } finally {
-      _isLoadingMore = false;
+      setState(() {
+        _isLoadingMore = false;
+      });
     }
   }
 

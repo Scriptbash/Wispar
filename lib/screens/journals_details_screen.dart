@@ -27,7 +27,6 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
   bool isLoading = false;
   late ScrollController _scrollController;
   bool hasMoreResults = true;
-  bool waitingForMore = false;
 
   @override
   void initState() {
@@ -49,11 +48,14 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
             pinned: true,
             expandedHeight: 200.0,
             flexibleSpace: FlexibleSpaceBar(
-              titlePadding: EdgeInsets.symmetric(horizontal: 50, vertical: 8.0),
+              titlePadding: const EdgeInsets.symmetric(
+                horizontal: 50,
+                vertical: 8.0,
+              ),
               centerTitle: true,
               title: Text(
                 widget.title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18.0,
                 ),
@@ -74,71 +76,81 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
             delegate: PersistentLatestPublicationsHeader(),
             pinned: true,
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                if (index < allWorks.length) {
-                  final work = allWorks[index];
-                  final workTitle = work.title;
-                  return PublicationCard(
-                    title: workTitle,
-                    abstract: work.abstract,
-                    journalTitle: work.journalTitle,
-                    issn: widget.issn,
-                    publishedDate: work.publishedDate,
-                    doi: work.doi,
-                    authors: work.authors,
-                    url: work.primaryUrl,
-                    license: work.license,
-                    licenseName: work.licenseName,
-                  );
-                } else {
-                  return Container(); // Empty container for the loading indicator
-                }
-              },
-              childCount: allWorks.length + (hasMoreResults ? 1 : 0),
-            ),
-          ),
+          allWorks.isEmpty && !isLoading
+              ? SliverFillRemaining(
+                  child: Center(
+                    child: Text(
+                      'No publications found.',
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                  ),
+                )
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      if (index < allWorks.length) {
+                        final work = allWorks[index];
+                        return PublicationCard(
+                          title: work.title,
+                          abstract: work.abstract,
+                          journalTitle: work.journalTitle,
+                          issn: widget.issn,
+                          publishedDate: work.publishedDate,
+                          doi: work.doi,
+                          authors: work.authors,
+                          url: work.primaryUrl,
+                          license: work.license,
+                          licenseName: work.licenseName,
+                        );
+                      } else if (hasMoreResults) {
+                        return const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    },
+                    childCount: allWorks.length + (hasMoreResults ? 1 : 0),
+                  ),
+                ),
         ],
       ),
     );
   }
 
-  // Scroll Listener to detect when we're nearing the end of the list
   void _onScroll() {
     if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent * 0.8) {
-      if (!isLoading && !waitingForMore) {
-        _loadMoreWorks();
-      }
+            _scrollController.position.maxScrollExtent * 0.8 &&
+        !isLoading &&
+        hasMoreResults) {
+      _loadMoreWorks();
     }
   }
 
-  // Load more works from the API
   Future<void> _loadMoreWorks() async {
-    try {
-      setState(() {
-        isLoading = true;
-        waitingForMore = true;
-      });
+    setState(() => isLoading = true);
 
-      // Fetch more works from the CrossRef API
+    try {
       ListAndMore<journalsWorks.Item> newWorks =
           await CrossRefApi.getJournalWorks(widget.issn);
 
       setState(() {
         allWorks.addAll(newWorks.list);
-        hasMoreResults = newWorks.hasMore;
-        isLoading = false;
+        hasMoreResults = newWorks.hasMore && newWorks.list.isNotEmpty;
       });
     } catch (e) {
-      print('Error loading more items: $e');
-      setState(() {
-        isLoading = false;
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load more publications: $e')),
+      );
     } finally {
-      // Reset the waitingForMore flag regardless of success or failure
-      waitingForMore = false;
+      setState(() => isLoading = false);
     }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }
