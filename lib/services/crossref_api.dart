@@ -10,6 +10,7 @@ class CrossRefApi {
   static const String email = 'mailto=wispar-app@protonmail.com';
   static String? _journalCursor = '*';
   static String? _journalWorksCursor = '*';
+  static String? _worksQueryCursor = '*';
   static String? _currentQuery;
 
   // Query journals by name
@@ -111,6 +112,10 @@ class CrossRefApi {
     _journalWorksCursor = '*';
   }
 
+  static void resetWorksQueryCursor() {
+    _worksQueryCursor = '*';
+  }
+
   static String? getCurrentQuery() {
     return _currentQuery;
   }
@@ -132,7 +137,7 @@ class CrossRefApi {
     }
   }
 
-  static Future<List<journalsWorks.Item>> getWorksByQuery(
+  static Future<ListAndMore<journalsWorks.Item>> getWorksByQuery(
       Map<String, dynamic> queryParams) async {
     String url = '$baseUrl$worksEndpoint';
     // Construct the query parameters string by iterating over the queryParams map
@@ -140,16 +145,21 @@ class CrossRefApi {
         .map((entry) =>
             '${Uri.encodeQueryComponent(entry.key)}=${Uri.encodeQueryComponent(entry.value.toString())}')
         .join('&');
-
-    final response =
-        await http.get(Uri.parse('$url?$queryString&rows=50&$email'));
+    String apiUrl = '$url?$queryString&rows=50&$email';
+    if (_worksQueryCursor != null) {
+      apiUrl += '&cursor=$_worksQueryCursor';
+    }
+    final response = await http.get(Uri.parse(apiUrl));
     //print('$url?$queryString');
 
     if (response.statusCode == 200) {
       final responseData =
           journalsWorks.JournalWork.fromJson(json.decode(response.body));
       List<journalsWorks.Item> feedItems = responseData.message.items;
-      return feedItems;
+      _worksQueryCursor = responseData.message.nextCursor;
+      bool hasMoreResults =
+          _worksQueryCursor != null && _worksQueryCursor != "";
+      return ListAndMore(feedItems, hasMoreResults);
     } else {
       throw Exception('Failed to fetch results');
     }

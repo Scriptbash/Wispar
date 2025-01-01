@@ -300,6 +300,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
     try {
       final dbHelper = DatabaseHelper();
       late final response;
+      CrossRefApi.resetWorksQueryCursor(); // Reset the cursor on new search
       if (saveQuery) {
         final queryName = queryNameController.text.trim();
         if (queryName != '') {
@@ -333,7 +334,9 @@ class QuerySearchFormState extends State<QuerySearchForm> {
         context,
         MaterialPageRoute(
           builder: (context) => ArticleSearchResultsScreen(
-            searchResults: response,
+            initialSearchResults: response.list,
+            initialHasMore: response.hasMore,
+            queryParams: queryParams,
           ),
         ),
       );

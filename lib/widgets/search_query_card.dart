@@ -42,7 +42,9 @@ class SearchQueryCard extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => ArticleSearchResultsScreen(
-              searchResults: response,
+              initialSearchResults: response.list,
+              initialHasMore: response.hasMore,
+              queryParams: queryMap,
             ),
           ),
         );

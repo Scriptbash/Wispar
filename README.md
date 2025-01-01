@@ -20,18 +20,18 @@
 ## Screenshots
 
 
-| Feed (light)                                       | Search screen (light)                                | Journals (dark)                                          |
+| Home screen (light)                                       | Search screen (light)                                | Journals screen(dark)                                          |
 |---------------------------------------------------|------------------------------------------------------|---------------------------------------------------------|
 | ![Feed](screenshots/light_ios_feed.png)            | ![Search](screenshots/light_ios_search_screen.png)   | ![Journals](screenshots/dark_ios_library_journals.png)  |
 
-| Example Query (dark)                              | Journal details (dark)                               | Abstract (dark)                                          |
+| Queries screen (dark)                              | Journal latest works (dark)                               | Abstract (dark)                                          |
 |---------------------------------------------------|------------------------------------------------------|---------------------------------------------------------|
 | ![Query](screenshots/dark_ios_library_queries.png) | ![JournalDetails](screenshots/dark_ios_journal_details.png) | ![Abstract](screenshots/dark_android_abstract.png)      |
 
 
 ## Description
 <p align="justify">
-Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly searches scientific journals using the Crossref API. Stay updated on your preferred journals by following them and receive new article abstracts in your main feed. No account required. The integration of Unpaywall ensures convenient access to open-access articles, while EZproxy helps overcome subscription barriers.
+Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly searches scientific journals and articles using the Crossref API. Stay updated on your preferred journals by following them and receive new article abstracts in your main feed. No account required. The integration of Unpaywall ensures convenient access to open-access articles, while EZproxy helps overcome subscription barriers.
     
 <b>Wispar is still under development and is not ready yet. APK files can be obtained from the workflow artifacts (must be signed in).</b>    
 </p>
