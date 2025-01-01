@@ -150,7 +150,9 @@ class _ArticleScreenState extends State<ArticleScreen> {
                   IconButton(
                     icon: Icon(
                       isLiked ? Icons.favorite : Icons.favorite_border,
-                      color: isLiked ? Colors.red : null,
+                      color: isLiked
+                          ? Theme.of(context).colorScheme.primary
+                          : null,
                     ),
                     onPressed: () async {
                       setState(() {

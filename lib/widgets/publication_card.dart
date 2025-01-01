@@ -286,7 +286,8 @@ class _PublicationCardState extends State<PublicationCard> {
                 IconButton(
                   icon: Icon(
                     isLiked ? Icons.favorite : Icons.favorite_border,
-                    color: isLiked ? Colors.red : null,
+                    color:
+                        isLiked ? Theme.of(context).colorScheme.primary : null,
                   ),
                   onPressed: () {
                     setState(() {
