@@ -9,11 +9,13 @@ import '../services/string_format_helper.dart';
 class DownloadedCard extends StatefulWidget {
   final pdfPath;
   final PublicationCard publicationCard;
+  final VoidCallback onDelete;
 
   const DownloadedCard({
     Key? key,
     required this.pdfPath,
     required this.publicationCard,
+    required this.onDelete,
   }) : super(key: key);
 
   @override
@@ -93,16 +95,17 @@ class _DownloadedCardState extends State<DownloadedCard> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                         IconButton(
-                            onPressed: () async {
-                              await databaseHelper.removeDownloaded(
-                                widget.publicationCard.doi,
-                              );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content:
-                                          Text('The article was deleted!')));
-                            },
-                            icon: Icon(Icons.delete_outline))
+                          onPressed: () async {
+                            await databaseHelper
+                                .removeDownloaded(widget.publicationCard.doi);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text('The article was deleted!')),
+                            );
+                            widget.onDelete();
+                          },
+                          icon: Icon(Icons.delete_outline),
+                        ),
                       ]))
                 ],
               ),

@@ -13,83 +13,80 @@ class DownloadsScreen extends StatefulWidget {
 }
 
 class _DownloadsScreenState extends State<DownloadsScreen> {
-  late Future<List<DownloadedCard>> _downloadedArticlesFuture;
+  List<DownloadedCard> _downloadedArticles = [];
+  bool _isLoading = true;
+
   int sortBy = 0; // Set the sort by option to Article title by default
   int sortOrder = 0; // Set the sort order to Ascending by default
 
   @override
   void initState() {
     super.initState();
-    _downloadedArticlesFuture = getDownloadedArticles();
+    _fetchDownloadedArticles();
+  }
+
+  Future<void> _fetchDownloadedArticles() async {
+    final databaseHelper = DatabaseHelper();
+    final articles = await databaseHelper.getDownloadedArticles();
+    setState(() {
+      _downloadedArticles = articles;
+      _isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          centerTitle: false,
-          title: Text(AppLocalizations.of(context)!.downloads),
-          actions: [
-            PopupMenuButton<int>(
-              icon: Icon(Icons.more_vert),
-              onSelected: (item) => handleMenuButton(item),
-              itemBuilder: (context) => [
-                PopupMenuItem<int>(
-                  value: 0,
-                  child: ListTile(
-                    leading: Icon(Icons.sort),
-                    title: Text(AppLocalizations.of(context)!.sortby),
-                  ),
+        centerTitle: false,
+        title: Text(AppLocalizations.of(context)!.downloads),
+        actions: [
+          PopupMenuButton<int>(
+            icon: Icon(Icons.more_vert),
+            onSelected: (item) => handleMenuButton(item),
+            itemBuilder: (context) => [
+              PopupMenuItem<int>(
+                value: 0,
+                child: ListTile(
+                  leading: Icon(Icons.sort),
+                  title: Text(AppLocalizations.of(context)!.sortby),
                 ),
-                PopupMenuItem<int>(
-                  value: 1,
-                  child: ListTile(
-                    leading: Icon(Icons.sort_by_alpha),
-                    title: Text(AppLocalizations.of(context)!.sortorder),
-                  ),
+              ),
+              PopupMenuItem<int>(
+                value: 1,
+                child: ListTile(
+                  leading: Icon(Icons.sort_by_alpha),
+                  title: Text(AppLocalizations.of(context)!.sortorder),
                 ),
-              ],
-            )
-          ]),
-      body: Center(
-        child: FutureBuilder<List<DownloadedCard>>(
-          future: _downloadedArticlesFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else if (snapshot.hasData) {
-              final downloadedArticles = snapshot.data!;
-              if (downloadedArticles.isEmpty) {
-                return Text('You do not have any downloads.');
-              } else {
-                List<DownloadedCard> downloads = snapshot.data!;
-                List<DownloadedCard> sortedDownloads =
-                    _sortDownloads(downloads);
-                return ListView.builder(
-                  itemCount: sortedDownloads.length,
-                  itemBuilder: (context, index) {
-                    return sortedDownloads[index];
-                  },
-                );
-              }
-            } else {
-              return Text('No downloaded articles found.');
-            }
-          },
-        ),
+              ),
+            ],
+          )
+        ],
       ),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : _downloadedArticles.isEmpty
+              ? Center(child: Text('You do not have any downloads.'))
+              : ListView.builder(
+                  itemCount: _downloadedArticles.length,
+                  itemBuilder: (context, index) {
+                    final article = _downloadedArticles[index];
+                    return DownloadedCard(
+                      publicationCard: article.publicationCard,
+                      pdfPath: article.pdfPath,
+                      onDelete: () => _handleDelete(index),
+                    );
+                  },
+                ),
     );
   }
 
-  Future<List<DownloadedCard>> getDownloadedArticles() async {
-    final databaseHelper = DatabaseHelper();
-
-    return await databaseHelper.getDownloadedArticles();
+  void _handleDelete(int index) {
+    setState(() {
+      _downloadedArticles.removeAt(index); // Remove the article from the list
+    });
   }
 
-  // Handles the sort by and sort order options
   void handleMenuButton(int item) {
     switch (item) {
       case 0:
@@ -99,6 +96,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           onSortByChanged: (int value) {
             setState(() {
               sortBy = value;
+              _downloadedArticles = _sortDownloads(_downloadedArticles);
             });
           },
           sortOptions: [
@@ -121,6 +119,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
               onSortOrderChanged: (int value) {
                 setState(() {
                   sortOrder = value;
+                  _downloadedArticles = _sortDownloads(_downloadedArticles);
                 });
               },
             );
@@ -155,7 +154,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
       }
     });
 
-    // Reverse the order if sortOrder is Descending
+// Reverse the order if sortOrder is Descending
     if (sortOrder == 1) {
       downloads = downloads.reversed.toList();
     }

@@ -428,6 +428,7 @@ class DatabaseHelper {
           license: '',
           licenseName: '',
         ),
+        onDelete: () {},
       );
     });
   }
