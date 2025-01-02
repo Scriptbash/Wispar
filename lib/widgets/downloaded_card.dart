@@ -146,7 +146,7 @@ class _DownloadedCardState extends State<DownloadedCard> {
     final db = await databaseHelper.database;
     final List<Map<String, dynamic>> rows = await db.query(
       'journals',
-      columns: ['publisher', 'subjects'],
+      columns: ['publisher'],
       where: 'issn = ?',
       whereArgs: [issn],
     );

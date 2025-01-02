@@ -60,6 +60,8 @@ class _WisparState extends State<Wispar> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner:
+          false, // remove debug watermark for screenshots
       title: Wispar.title,
       localizationsDelegates: [
         AppLocalizations.delegate,

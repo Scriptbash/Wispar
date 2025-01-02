@@ -110,12 +110,9 @@ class _PublicationCardState extends State<PublicationCard> {
                               // Need to add a check to avoid infinite routing
                               Map<String, dynamic>? journalInfo =
                                   await getJournalDetails(widget.issn);
-                              if (journalInfo != Null) {
+                              if (journalInfo != Null && journalInfo != '') {
                                 String journalPublisher =
                                     journalInfo?['publisher'];
-                                List<String> journalSubjects =
-                                    (journalInfo?['subjects'] ?? '').split(',');
-
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -334,7 +331,7 @@ class _PublicationCardState extends State<PublicationCard> {
     final db = await databaseHelper.database;
     final List<Map<String, dynamic>> rows = await db.query(
       'journals',
-      columns: ['publisher', 'subjects'],
+      columns: ['publisher'],
       where: 'issn = ?',
       whereArgs: [issn],
     );
