@@ -23,7 +23,7 @@
   "@journals": {
     "description": "The journals menu button and the app bar title when in the journals screen."
   },
-  "search": "Buscar…",
+  "search": "Buscar",
   "@search": {
     "description": "Placeholder text shown inside the search bar."
   },
