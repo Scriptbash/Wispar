@@ -8,7 +8,9 @@
     "description": "The favorites menu button and the app bar title when in the favorites screen."
   },
   "download": "Download",
-  "@download": {"description": "The verb to download, without the 'to'."},
+  "@download": {
+    "description": "The verb to download, without the 'to'."
+  },
   "delete": "Delete",
   "@delete": {},
   "downloads": "Downloads",
@@ -28,7 +30,7 @@
   "journalLibraryEmpty": "You are not following any journals. Use the search menu to find and follow journals.",
   "@journalLibraryEmpty": {
     "description": "Message shown when the user is not following any journals."
-    },
+  },
   "follow": "Follow",
   "@follow": {
     "description": "The button text shown on journal cards when it is not followed."
@@ -41,19 +43,22 @@
   "@library": {
     "description": "The library menu button and the app bar title when in the library screen."
   },
-
   "journals": "Journals",
   "@journals": {
     "description": "The journals menu button and the app bar title when in the journals screen."
   },
   "queries": "Queries",
-  "@queries": {"description": "Title of the saved search queries tab."},
+  "@queries": {
+    "description": "Title of the saved search queries tab."
+  },
   "search": "Search",
   "@search": {
     "description": "Text shown inside the search screen app bar and for the seach button."
   },
-  "searchPlaceholder": "Search...",
-  "@searchPlaceholder":{"description": "Place holder text in the search input widget."},
+  "searchPlaceholder": "Search…",
+  "@searchPlaceholder": {
+    "description": "Place holder text in the search input widget."
+  },
   "emptyDOIError": "Please enter a DOI",
   "@emptyDOIError": {},
   "searchByQuery": "Search by query",
@@ -79,7 +84,9 @@
   "dateSaved": "Date saved",
   "@dateSaved": {},
   "articles": "Articles",
-  "@articles":{"description": "As in scientific articles."},
+  "@articles": {
+    "description": "As in scientific articles."
+  },
   "category": "Category",
   "@category": {},
   "publisher": "Publisher",
@@ -261,9 +268,9 @@
     "description": "Text shown in the subtitle of the Donate button in the settings."
   },
   "otherLicense": "Other license",
-  "@otherLicense":{},
+  "@otherLicense": {},
   "unknownLicense": "Unkown license",
-  "@unknownLicense":{},
+  "@unknownLicense": {},
   "hours": "hours",
   "@hours": {}
 }
