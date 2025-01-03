@@ -78,9 +78,7 @@ class _AuthorsTabContentState extends State<AuthorsTabContent> {
                   child: Wrap(
                     alignment: WrapAlignment.center,
                     children: [
-                      Text(AppLocalizations.of(context)!.journalnotfollowing1),
-                      Icon(Icons.search),
-                      Text(AppLocalizations.of(context)!.journalnotfollowing2),
+                      Text(AppLocalizations.of(context)!.journalLibraryEmpty),
                     ],
                   ),
                 );

@@ -4,7 +4,6 @@ import '../services/database_helper.dart';
 import '../widgets/journals_tab_content.dart';
 //import '../widgets/authors_tab_content.dart';
 import '../widgets/queries_tab_content.dart';
-import '../widgets/search_query_card.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
@@ -60,7 +59,7 @@ class _LibraryScreenState extends State<LibraryScreen>
             ),*/
             Tab(
               icon: Icon(Icons.format_quote_rounded),
-              text: "Queries",
+              text: AppLocalizations.of(context)!.queries,
             ),
           ],
         ),

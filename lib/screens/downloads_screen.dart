@@ -66,7 +66,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _downloadedArticles.isEmpty
-              ? Center(child: Text('You do not have any downloads.'))
+              ? Center(child: Text(AppLocalizations.of(context)!.noDownloads))
               : ListView.builder(
                   itemCount: _downloadedArticles.length,
                   itemBuilder: (context, index) {

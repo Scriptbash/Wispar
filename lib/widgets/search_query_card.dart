@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import '../services/crossref_api.dart';
 import '../services/string_format_helper.dart';
@@ -55,7 +56,7 @@ class SearchQueryCard extends StatelessWidget {
         String request = 'https://api.crossref.org/works?$queryParams&rows=50';
         Clipboard.setData(ClipboardData(text: request));
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('API request copied to clipboard')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.apiQueryCopied)),
         );
       },
       child: Card(
@@ -89,7 +90,7 @@ class SearchQueryCard extends StatelessWidget {
               ),
               const SizedBox(height: 8.0),
               Text(
-                "Saved on: $formattedDate",
+                "${AppLocalizations.of(context)!.savedOn} $formattedDate",
                 style: const TextStyle(fontSize: 12.0, color: Colors.grey),
               ),
             ],

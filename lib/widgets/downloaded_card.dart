@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/pdf_reader.dart';
-//import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../screens/journals_details_screen.dart';
 import 'publication_card.dart';
 import '../services/database_helper.dart';
@@ -100,7 +100,8 @@ class _DownloadedCardState extends State<DownloadedCard> {
                                 .removeDownloaded(widget.publicationCard.doi);
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                  content: Text('The article was deleted!')),
+                                  content: Text(AppLocalizations.of(context)!
+                                      .downloadDeleted)),
                             );
                             widget.onDelete();
                           },

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:pdfrx/pdfrx.dart';
 import '../widgets/publication_card.dart';
 import '../services/database_helper.dart';
@@ -38,12 +38,12 @@ class _PdfReaderState extends State<PdfReader> {
     return Scaffold(
       appBar: AppBar(
           centerTitle: false,
-          title: Text("Article viewer"),
+          title: Text(AppLocalizations.of(context)!.articleViewer),
           actions: <Widget>[
             isDownloaded == false
                 ? IconButton(
                     icon: const Icon(Icons.download_outlined),
-                    tooltip: 'Download',
+                    tooltip: AppLocalizations.of(context)!.download,
                     onPressed: () async {
                       // Otherwise, insert a new article
                       await databaseHelper.insertArticle(
@@ -55,12 +55,12 @@ class _PdfReaderState extends State<PdfReader> {
                         isDownloaded = true;
                       });
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content:
-                              Text('The article was downloaded sucessfully!')));
+                          content: Text(AppLocalizations.of(context)!
+                              .downloadSuccessful)));
                     })
                 : IconButton(
                     icon: const Icon(Icons.delete_outlined),
-                    tooltip: 'Delete',
+                    tooltip: AppLocalizations.of(context)!.delete,
                     onPressed: () async {
                       await databaseHelper.removeDownloaded(
                         widget.publicationCard.doi,
@@ -68,8 +68,9 @@ class _PdfReaderState extends State<PdfReader> {
                       setState(() {
                         isDownloaded = false;
                       });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('The article was deleted!')));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              AppLocalizations.of(context)!.downloadDeleted)));
                     },
                   ),
           ]),

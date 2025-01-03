@@ -46,7 +46,8 @@ class _ArticleSearchFormState extends State<ArticleSearchForm> {
 
         if (doi.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Please enter a DOI')),
+            SnackBar(
+                content: Text(AppLocalizations.of(context)!.emptyDOIError)),
           );
           return;
         }
@@ -77,7 +78,7 @@ class _ArticleSearchFormState extends State<ArticleSearchForm> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error: $e')),
           );
-          print('Error: $e');
+          debugPrint('Error: $e');
         }
       }
     } catch (e) {
@@ -85,7 +86,7 @@ class _ArticleSearchFormState extends State<ArticleSearchForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
-      print('Error: $e');
+      debugPrint('Error: $e');
     }
   }
 
@@ -116,11 +117,11 @@ class _ArticleSearchFormState extends State<ArticleSearchForm> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text('Search by query'),
+                    child: Text(AppLocalizations.of(context)!.searchByQuery),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text('Search by DOI'),
+                    child: Text(AppLocalizations.of(context)!.searchByDOI),
                   ),
                 ],
                 borderRadius: BorderRadius.circular(8.0),

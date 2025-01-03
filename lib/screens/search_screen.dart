@@ -14,33 +14,32 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   int selectedSearchType = 1; // Default to article type
 
-  // List of search category items
-  final List<DropdownMenuItem<int>> dropdownItems = [
-    DropdownMenuItem(
-      value: 1,
-      child: Text(
-        'Articles',
-        style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
-      ),
-    ),
-    /*DropdownMenuItem(
-      value: 2,
-      child: Text(
-        'Authors',
-        style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
-      ),
-    ),*/
-    DropdownMenuItem(
-      value: 3,
-      child: Text(
-        'Journals',
-        style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
-      ),
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final List<DropdownMenuItem<int>> dropdownItems = [
+      DropdownMenuItem(
+        value: 1,
+        child: Text(
+          AppLocalizations.of(context)!.articles,
+          style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
+        ),
+      ),
+      /*DropdownMenuItem(
+        value: 2,
+        child: Text(
+          AppLocalizations.of(context)!.authors,
+          style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
+        ),
+      ),*/
+      DropdownMenuItem(
+        value: 3,
+        child: Text(
+          AppLocalizations.of(context)!.journals,
+          style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
+        ),
+      ),
+    ];
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -54,7 +53,7 @@ class _SearchScreenState extends State<SearchScreen> {
           children: [
             DropdownButtonFormField<int>(
               decoration: InputDecoration(
-                labelText: 'Category',
+                labelText: AppLocalizations.of(context)!.category,
               ),
               value: selectedSearchType,
               isExpanded: true,
@@ -66,7 +65,6 @@ class _SearchScreenState extends State<SearchScreen> {
               items: dropdownItems,
             ),
             SizedBox(height: 20),
-
             // Show form based on selected category
             Expanded(
               child: _getSearchForm(),

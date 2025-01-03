@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/crossref_api.dart';
 import '../models/crossref_journals_works_models.dart' as journalsWorks;
 import '../widgets/publication_card.dart';
@@ -80,7 +80,7 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
               ? SliverFillRemaining(
                   child: Center(
                     child: Text(
-                      'No publications found.',
+                      AppLocalizations.of(context)!.noPublicationFound,
                       style: const TextStyle(fontSize: 16.0),
                     ),
                   ),
@@ -140,9 +140,10 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
         hasMoreResults = newWorks.hasMore && newWorks.list.isNotEmpty;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load more publications: $e')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(AppLocalizations.of(context)!
+                  .failLoadMorePublication)) //$e')),
+          );
     } finally {
       setState(() => isLoading = false);
     }

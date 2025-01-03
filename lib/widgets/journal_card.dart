@@ -30,7 +30,7 @@ class JournalCard extends StatelessWidget {
         onLongPress: () {
           Clipboard.setData(ClipboardData(text: journal.issn));
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('ISSN copied to clipboard')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.issnCopied)),
           );
         },
         title: Row(

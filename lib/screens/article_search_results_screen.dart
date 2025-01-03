@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../widgets/publication_card.dart';
 import '../models/crossref_journals_works_models.dart' as journalsWorks;
 import '../services/crossref_api.dart';
@@ -80,7 +81,7 @@ class _ArticleSearchResultsScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Search results'),
+        title: Text(AppLocalizations.of(context)!.searchresults),
       ),
       body: _searchResults.isNotEmpty
           ? ListView.builder(
@@ -112,7 +113,7 @@ class _ArticleSearchResultsScreenState
               },
             )
           : Center(
-              child: Text('No results found'),
+              child: Text(AppLocalizations.of(context)!.noresultsfound),
             ),
     );
   }

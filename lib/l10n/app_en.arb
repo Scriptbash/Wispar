@@ -7,22 +7,28 @@
   "@favorites": {
     "description": "The favorites menu button and the app bar title when in the favorites screen."
   },
+  "download": "Download",
+  "@download": {"description": "The verb to download, without the 'to'."},
+  "delete": "Delete",
+  "@delete": {},
   "downloads": "Downloads",
   "@downloads": {
     "description": "The downloads menu button and the app bar title when in the downloads screen."
   },
+  "downloadSuccessful": "The article was downloaded sucessfully!",
+  "@downloadSuccessful": {},
+  "downloadDeleted": "The article was deleted!",
+  "@downloadDeleted": {},
+  "noDownloads": "You do not have any downloads.",
+  "@noDownloads": {},
   "settings": "Settings",
   "@settings": {
     "description": "The settings option menu button and the app bar title when in the settings screen."
   },
-  "journalnotfollowing1": "You are not following any journals. Use the",
-  "@journalnotfollowing1": {
-    "description": "The message shown when the user is not following any journals. The text had to be split since it contains an icon. The full text is: You are not following any journals. Use the <magnifying glass icon> icon to find and follow journals."
-  },
-  "journalnotfollowing2": "icon to find and follow journals.",
-  "@journalnotfollowing2": {
-    "description": "The message shown when the user is not following any journals. The text had to be split since it contains an icon. The full text is: You are not following any journals. Use the <magnifying glass icon> icon to find and follow journals."
-  },
+  "journalLibraryEmpty": "You are not following any journals. Use the search menu to find and follow journals.",
+  "@journalLibraryEmpty": {
+    "description": "Message shown when the user is not following any journals."
+    },
   "follow": "Follow",
   "@follow": {
     "description": "The button text shown on journal cards when it is not followed."
@@ -40,10 +46,42 @@
   "@journals": {
     "description": "The journals menu button and the app bar title when in the journals screen."
   },
+  "queries": "Queries",
+  "@queries": {"description": "Title of the saved search queries tab."},
   "search": "Search",
   "@search": {
     "description": "Text shown inside the search screen app bar and for the seach button."
   },
+  "searchPlaceholder": "Search...",
+  "@searchPlaceholder":{"description": "Place holder text in the search input widget."},
+  "emptyDOIError": "Please enter a DOI",
+  "@emptyDOIError": {},
+  "searchByQuery": "Search by query",
+  "@searchByQuery": {},
+  "searchByDOI": "Search by DOI",
+  "@searchByDOI": {},
+  "searchByTitle": "Search by title",
+  "@searchByTitle": {},
+  "searchByISSN": "Search by ISSN",
+  "@searchByISSN": {},
+  "queryHasNoNameError": "You must enter a query name in order to save it.",
+  "@queryHasNoNameError": {},
+  "emptySearchQuery": "Please enter a search query",
+  "@emptySearchQuery": {},
+  "journalSearchError": "An error occured while trying to search for journals.",
+  "@journalSearchError": {},
+  "moreOptions": "More options",
+  "@moreOptions": {},
+  "saveQuery": "Save this query",
+  "@saveQuery": {},
+  "queryName": "Query name",
+  "@queryName": {},
+  "dateSaved": "Date saved",
+  "@dateSaved": {},
+  "articles": "Articles",
+  "@articles":{"description": "As in scientific articles."},
+  "category": "Category",
+  "@category": {},
   "publisher": "Publisher",
   "@publisher": {},
   "publishedin": "Published in",
@@ -64,8 +102,14 @@
   "@doicopied": {
     "description": "Snackbar shown when the Copy DOI button is pressed."
   },
+  "issnCopied": "ISSN copied to clipboard",
+  "@issnCopied": {},
+  "apiQueryCopied": "API request copied to clipboard",
+  "@apiQueryCopied": {},
   "viewarticle": "View article",
   "@viewarticle": {},
+  "articleViewer": "Article viewer",
+  "@articleViewer": {},
   "favorite": "Favorite",
   "@favorite": {},
   "favoriteadded": "added to favorites",
@@ -82,13 +126,13 @@
   },
   "searchresults": "Search results",
   "@searchresults": {},
-  "nofavorites1": "You have no articles in your favorites. Use the ",
-  "@nofavorites1": {
-    "description": "The message shown when the user has no articles in their favorites. The text had to be split since it contains an icon. The full text is: You have no articles in your favorites. Use the <heart icon> icon to add a publication you like in your favorites!"
-  },
-  "nofavorites2": "icon to add a publication you like in your favorites!",
-  "@nofavorites2": {
-    "description": "The message shown when the user has no articles in their favorites. The text had to be split since it contains an icon. The full text is: You have no articles in your favorites. Use the <heart icon> icon to add a publication you like in your favorites!"
+  "noresultsfound": "No results found.",
+  "@noresultsfound": {},
+  "noSavedQueries": "No saved queries.",
+  "@noSavedQueries": {},
+  "noFavorites": "You have no articles in your favorites. Use the heart icon on publication cards you like to add them to your favorites!",
+  "@noFavorites": {
+    "description": "The message shown when the user has no articles in their favorites."
   },
   "appearance": "Appearance",
   "@appearance": {},
@@ -136,17 +180,13 @@
   "@noinstitution": {},
   "buildingfeed": "Building your feed. Please wait…",
   "@buildingfeed": {},
-  "nopublication1": "No publications available. Make sure you are following journals by going in the",
-  "@nopublication1": {
-    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
-  },
-  "nopublication2": "menu and use the",
-  "@nopublication2": {
-    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
-  },
-  "nopublication3": "icon to find journals.",
-  "@nopublication3": {
-    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
+  "noPublicationFound": "No publications found.",
+  "@noPublicationFound": {},
+  "failLoadMorePublication": "Failed to load more publications.",
+  "@failLoadMorePublication": {},
+  "homeFeedEmpty": "No publications available. Publication cards will be added once you are following at least one journal.",
+  "@homeFeedEmpty": {
+    "description": "The message shown when the feed in the home screen is empty."
   },
   "sharedMessage": "Shared via the Wispar app",
   "@sharedMessage": {
@@ -180,6 +220,8 @@
   },
   "save": "Save",
   "@save": {},
+  "savedOn": "Saved on:",
+  "@savedOn": {},
   "sourceCode": "Source code",
   "@sourceCode": {},
   "reportIssue": "Report an issue",
@@ -190,6 +232,24 @@
   "@disabled": {},
   "database": "Database",
   "@database": {},
+  "databaseSettings": "Database settings",
+  "@databaseSettings": {},
+  "cleanupInterval": "Cleanup interval (days)",
+  "@cleanupInterval": {},
+  "cleanupIntervalHint": "Enter number of days (1 to 365)",
+  "@cleanupIntervalHint": {},
+  "apiFetchInterval": "API fetch interval",
+  "@apiFetchInterval": {},
+  "apiFetchIntervalHint": "Select how often to fetch articles",
+  "@apiFetchIntervalHint": {},
+  "cleanupIntervalInvalidNumber": "Please enter a valid number of days.",
+  "@cleanupIntervalInvalidNumber": {},
+  "cleanupIntervalNumberNotBetween": "Please enter a value between 1 and 365.",
+  "@cleanupIntervalNumberNotBetween": {},
+  "saveSettings": "Save settings",
+  "@saveSettings": {},
+  "settingsSaved": "Settings saved successfully!",
+  "@settingsSaved": {},
   "privacyPolicy": "Privacy policy",
   "@privacyPolicy": {},
   "about": "About",
@@ -203,5 +263,7 @@
   "otherLicense": "Other license",
   "@otherLicense":{},
   "unknownLicense": "Unkown license",
-  "@unknownLicense":{}
+  "@unknownLicense":{},
+  "hours": "hours",
+  "@hours": {}
 }

@@ -75,12 +75,21 @@ class _JournalsTabContentState extends State<JournalsTabContent> {
                 return Text('Error: ${snapshot.error}');
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return Center(
-                  child: Wrap(
-                    alignment: WrapAlignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(AppLocalizations.of(context)!.journalnotfollowing1),
-                      Icon(Icons.search),
-                      Text(AppLocalizations.of(context)!.journalnotfollowing2),
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          style: DefaultTextStyle.of(context).style,
+                          children: [
+                            TextSpan(
+                              text: AppLocalizations.of(context)!
+                                  .journalLibraryEmpty,
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 );

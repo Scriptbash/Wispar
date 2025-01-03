@@ -102,7 +102,6 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
       proxyUrl = prefs.getString('institution_url') ?? '';
       proxyUrl = proxyUrl.replaceAll('\$@', '');
     });
-    print('loaded proxy url is $proxyUrl');
   }
 
   void _showSnackBar(String message) {

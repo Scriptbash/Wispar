@@ -46,7 +46,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
       ),
       body: items.isEmpty
           ? Center(
-              child: Text('No results found.'),
+              child: Text(AppLocalizations.of(context)!.noPublicationFound),
             )
           : ListView.builder(
               itemCount: items.length + (hasMoreResults ? 1 : 0),
@@ -96,7 +96,10 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
         hasMoreResults = newResults.hasMore && newResults.list.isNotEmpty;
       });
     } catch (e) {
-      print('Error loading more items: $e');
+      debugPrint('Error loading more items: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content:
+              Text(AppLocalizations.of(context)!.failLoadMorePublication)));
     } finally {
       setState(() => isLoading = false);
     }

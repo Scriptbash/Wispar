@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/crossref_api.dart';
 import '../screens/article_search_results_screen.dart';
 import '../services/database_helper.dart';
@@ -319,7 +320,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 content:
-                    Text('You must enter a query name in order to save it.')),
+                    Text(AppLocalizations.of(context)!.queryHasNoNameError)),
           );
           return;
         }
@@ -347,8 +348,11 @@ class QuerySearchFormState extends State<QuerySearchForm> {
 
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $error')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.noresultsfound)),
       );
+      /*ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $error')),
+      );*/
     }
   }
 
@@ -591,7 +595,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
               ),
               SizedBox(height: 16),
               Text(
-                'Save this query',
+                AppLocalizations.of(context)!.saveQuery,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Switch(
@@ -607,7 +611,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                 TextFormField(
                   controller: queryNameController,
                   decoration: InputDecoration(
-                    labelText: 'Query name',
+                    labelText: AppLocalizations.of(context)!.queryName,
                     border: OutlineInputBorder(),
                   ),
                 ),

@@ -61,12 +61,20 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
-              child: Wrap(
-                alignment: WrapAlignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(AppLocalizations.of(context)!.nofavorites1),
-                  Icon(Icons.favorite_border),
-                  Text(AppLocalizations.of(context)!.nofavorites2),
+                  RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style: DefaultTextStyle.of(context).style,
+                      children: [
+                        TextSpan(
+                          text: AppLocalizations.of(context)!.noFavorites,
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             );

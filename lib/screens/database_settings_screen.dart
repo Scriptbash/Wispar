@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DatabaseSettingsScreen extends StatefulWidget {
@@ -41,7 +42,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       await prefs.setInt('fetchInterval', _fetchInterval); // Save as integer
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Settings saved successfully!')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.settingsSaved)),
       );
     }
   }
@@ -50,7 +51,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Database settings'),
+        title: Text(AppLocalizations.of(context)!.databaseSettings),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -62,9 +63,9 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
               TextFormField(
                 controller: _cleanupIntervalController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Cleanup Interval (days)',
-                  hintText: 'Enter number of days (1 to 365)',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.cleanupInterval,
+                  hintText: AppLocalizations.of(context)!.cleanupIntervalHint,
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -73,11 +74,13 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                 },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a valid number of days.';
+                    return AppLocalizations.of(context)!
+                        .cleanupIntervalInvalidNumber;
                   }
                   final intValue = int.tryParse(value);
                   if (intValue == null || intValue < 1 || intValue > 365) {
-                    return 'Please enter a value between 1 and 365.';
+                    return AppLocalizations.of(context)!
+                        .cleanupIntervalNumberNotBetween;
                   }
                   return null;
                 },
@@ -90,37 +93,37 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                     _fetchInterval = newValue!;
                   });
                 },
-                decoration: const InputDecoration(
-                  labelText: 'API Fetch Interval',
-                  hintText: 'Select how often to fetch articles',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.apiFetchInterval,
+                  hintText: AppLocalizations.of(context)!.apiFetchIntervalHint,
                 ),
-                items: const [
+                items: [
                   DropdownMenuItem(
                     value: 6,
-                    child: Text('6 hours'),
+                    child: Text('6 ${AppLocalizations.of(context)!.hours}'),
                   ),
                   DropdownMenuItem(
                     value: 12,
-                    child: Text('12 hours'),
+                    child: Text('12 ${AppLocalizations.of(context)!.hours}'),
                   ),
                   DropdownMenuItem(
                     value: 24,
-                    child: Text('24 hours'),
+                    child: Text('24 ${AppLocalizations.of(context)!.hours}'),
                   ),
                   DropdownMenuItem(
                     value: 48,
-                    child: Text('48 hours'),
+                    child: Text('48 ${AppLocalizations.of(context)!.hours}'),
                   ),
                   DropdownMenuItem(
                     value: 72,
-                    child: Text('72 hours'),
+                    child: Text('72 ${AppLocalizations.of(context)!.hours}'),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _saveSettings,
-                child: const Text('Save settings'),
+                child: Text(AppLocalizations.of(context)!.saveSettings),
               ),
             ],
           ),

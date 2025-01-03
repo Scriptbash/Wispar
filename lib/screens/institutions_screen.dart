@@ -31,7 +31,7 @@ class _InstitutionScreenState extends State<InstitutionScreen> {
         filteredProxies = proxies;
       });
     } catch (e) {
-      print('Error: $e');
+      debugPrint('Error: $e');
     }
   }
 
@@ -66,7 +66,7 @@ class _InstitutionScreenState extends State<InstitutionScreen> {
                 filterProxies(query);
               },
               decoration: InputDecoration(
-                hintText: AppLocalizations.of(context)!.search,
+                hintText: AppLocalizations.of(context)!.searchPlaceholder,
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0),

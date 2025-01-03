@@ -76,11 +76,21 @@ class _QueriesTabContentState extends State<QueriesTabContent> {
                 return Center(child: Text('Error: ${snapshot.error}'));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return Center(
-                  child: Wrap(
-                    alignment: WrapAlignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('No saved queries.'),
-                      Icon(Icons.search),
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          style: DefaultTextStyle.of(context).style,
+                          children: [
+                            TextSpan(
+                              text:
+                                  AppLocalizations.of(context)!.noSavedQueries,
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 );
@@ -135,8 +145,8 @@ class _QueriesTabContentState extends State<QueriesTabContent> {
       initialSortBy: widget.initialSortBy,
       onSortByChanged: widget.onSortByChanged,
       sortOptions: [
-        "Query name",
-        "Date saved",
+        AppLocalizations.of(context)!.queryName,
+        AppLocalizations.of(context)!.dateSaved,
       ],
     );
   }

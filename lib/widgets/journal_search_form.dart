@@ -73,11 +73,11 @@ class _JournalSearchFormState extends State<JournalSearchForm> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text('Search by name'),
+                    child: Text(AppLocalizations.of(context)!.searchByTitle),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text('Search by ISSN'),
+                    child: Text(AppLocalizations.of(context)!.searchByISSN),
                   ),
                 ],
                 borderRadius: BorderRadius.circular(8.0),
@@ -87,7 +87,9 @@ class _JournalSearchFormState extends State<JournalSearchForm> {
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                labelText: selectedSearchIndex == 0 ? 'Journal name' : 'ISSN',
+                labelText: selectedSearchIndex == 0
+                    ? AppLocalizations.of(context)!.journaltitle
+                    : 'ISSN',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -102,7 +104,9 @@ class _JournalSearchFormState extends State<JournalSearchForm> {
             _handleSearch(query);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Please enter a search query')),
+              SnackBar(
+                  content:
+                      Text(AppLocalizations.of(context)!.emptySearchQuery)),
             );
           }
         },
@@ -147,7 +151,11 @@ class _JournalSearchFormState extends State<JournalSearchForm> {
         ),
       );
     } catch (e) {
-      print('Error handling search: $e');
+      debugPrint('Error handling search: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(AppLocalizations.of(context)!.journalSearchError)),
+      );
       Navigator.pop(context);
     }
   }

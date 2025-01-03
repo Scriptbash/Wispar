@@ -111,19 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: DefaultTextStyle.of(context).style,
                       children: [
                         TextSpan(
-                          text: AppLocalizations.of(context)!.nopublication1,
-                        ),
-                        WidgetSpan(
-                          child: Icon(Icons.library_books_outlined),
-                        ),
-                        TextSpan(
-                          text: AppLocalizations.of(context)!.nopublication2,
-                        ),
-                        WidgetSpan(
-                          child: Icon(Icons.search),
-                        ),
-                        TextSpan(
-                          text: AppLocalizations.of(context)!.nopublication3,
+                          text: AppLocalizations.of(context)!.homeFeedEmpty,
                         ),
                       ],
                     ),
@@ -214,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       item.title.isNotEmpty && item.authors.isNotEmpty)
                   .toList();
             } catch (e) {
-              print('Error fetching recent feed for ${journal.title}: $e');
+              debugPrint('Error fetching recent feed for ${journal.title}: $e');
             }
             // Call the database cleanup function
             if (!isCleanupDone) {
@@ -235,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
       isCleanupDone = false; // Reset the cleanup flag just in case
       return feedItems;
     } catch (e) {
-      print('Error in _getRecentFeedForFollowedJournals: $e');
+      debugPrint('Error in _getRecentFeedForFollowedJournals: $e');
       return [];
     }
   }
