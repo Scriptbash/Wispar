@@ -3,7 +3,7 @@
   "@home": {},
   "favorites": "Favoritter",
   "@favorites": {},
-  "search": "Søk …",
+  "search": "Søk",
   "@search": {},
   "settings": "Innstillinger",
   "@settings": {},
@@ -115,7 +115,7 @@
   "@favoriteremoved": {
     "description": "Snackbar shown when an article is removed from the user's favorites."
   },
-  "zoteroValidKey": "API-nøkkel lagret.",
+  "zoteroValidKey": "API-nøkkel lagret!",
   "@zoteroValidKey": {
     "description": "Snackbar shown when a valid Zotero API key has been saved."
   },
@@ -123,7 +123,7 @@
   "@zoteroEnterKey": {
     "description": "Hint text shown in the text field where users can enter their Zotero API key."
   },
-  "zoteroInvalidKey": "API-nøkkelen er ugyldig.",
+  "zoteroInvalidKey": "API-nøkkelen er ugyldig!",
   "@zoteroInvalidKey": {
     "description": "Snackbar shown when an attempt to save an invalid Zotero API key is made."
   },

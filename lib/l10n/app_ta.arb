@@ -35,7 +35,7 @@
   "@journals": {
     "description": "The journals menu button and the app bar title when in the journals screen."
   },
-  "search": "தேடுங்கள்…",
+  "search": "தேடுங்கள்",
   "@search": {
     "description": "Placeholder text shown inside the search bar."
   },
