@@ -17,6 +17,17 @@
 
 ---
 
+> [!IMPORTANT]
+> Wispar is currently in closed testing before being published on the Play Store. Google requires a minimum of 12 testers, and **I need your help!** If you'd like to test the app and provide feedback, please send me your email at wispar-app@protonmail.com, and I'll add you to the closed testing group.
+>
+>Once Wispar is live on the Play Store, I will also look into publishing it on the App Store and F-Droid.
+
+
+## Description
+<p align="justify">
+Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly searches scientific journals and articles using the Crossref API. Stay updated on your preferred journals by following them and receive new article abstracts in your main feed. No account required. The integration of Unpaywall ensures convenient access to open-access articles, while EZproxy helps overcome subscription barriers.  
+</p>
+
 ## Screenshots
 
 
@@ -28,13 +39,6 @@
 |---------------------------------------------------|------------------------------------------------------|---------------------------------------------------------|
 | ![Query](screenshots/dark_ios_library_queries.png) | ![JournalDetails](screenshots/dark_ios_journal_details.png) | ![Abstract](screenshots/dark_android_abstract.png)      |
 
-
-## Description
-<p align="justify">
-Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly searches scientific journals and articles using the Crossref API. Stay updated on your preferred journals by following them and receive new article abstracts in your main feed. No account required. The integration of Unpaywall ensures convenient access to open-access articles, while EZproxy helps overcome subscription barriers.
-    
-<b>Wispar is still under development and is not ready yet. APK files can be obtained from the workflow artifacts (must be signed in).</b>    
-</p>
 
 ## Features overview
 <ul>
@@ -52,7 +56,7 @@ Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly s
 <p align ="justify">
 Wispar uses Weblate to manage translations. You can find the hosted instance at <a href="https://hosted.weblate.org/engage/wispar/">https://hosted.weblate.org/engage/wispar/</a>
 
-A huge thank you to Weblate for hosting the translations for free :heart:
+A huge thank you to Weblate for hosting the translations for free :heart:.
 
 Translation status:
 </p>
@@ -62,7 +66,11 @@ Translation status:
 
 ## Contribute
 <p align ="justify">
-
+    <ul>
+        <li>There are many ways you can contribute to improving Wispar—and it's not just about writing code!</li>
+        <li>You can help translate Wispar into your language by using our hosted Weblate instance.</li>
+        <li>Additionally, providing feedback and reporting bugs are invaluable ways to contribute!</li>
+    </ul>
 </p>
 
 
