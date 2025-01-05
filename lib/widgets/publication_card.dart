@@ -259,6 +259,7 @@ class _PublicationCardState extends State<PublicationCard> {
                       onPressed: () {
                         debugPrint(widget.license);
                         if (widget.license.isNotEmpty) {
+                          debugPrint(widget.license);
                           launchUrl(Uri.parse(widget.license));
                         }
                       },
