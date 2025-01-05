@@ -13,6 +13,7 @@ class ZoteroSettings extends StatefulWidget {
 
 class _ZoteroSettingsState extends State<ZoteroSettings> {
   TextEditingController _apiKeyController = TextEditingController();
+  bool passwordVisible = false;
 
   @override
   void initState() {
@@ -62,8 +63,21 @@ class _ZoteroSettingsState extends State<ZoteroSettings> {
               ),
               TextField(
                 controller: _apiKeyController,
+                obscureText: !passwordVisible,
                 decoration: InputDecoration(
                   hintText: AppLocalizations.of(context)!.zoteroEnterKey,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      passwordVisible
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        passwordVisible = !passwordVisible;
+                      });
+                    },
+                  ),
                 ),
                 onChanged: (value) {},
               ),
