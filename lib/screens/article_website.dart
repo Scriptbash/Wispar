@@ -31,6 +31,8 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
     javaScriptCanOpenWindowsAutomatically: true,
     useOnDownloadStart: true,
     iframeAllowFullscreen: true,
+    userAgent:
+        "Mozilla/5.0 (Android 15; Mobile; rv:133.0) Gecko/133.0 Firefox/133.0",
   );
 
   PullToRefreshController? pullToRefreshController;

@@ -82,6 +82,7 @@ class _DownloadedCardState extends State<DownloadedCard> {
                             },
                             child: Text(
                               widget.publicationCard.journalTitle,
+                              style: TextStyle(fontSize: 16),
                               softWrap: true,
                             ),
                             style: TextButton.styleFrom(
