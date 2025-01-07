@@ -207,7 +207,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
       queryParams['query.author'] = author;
     }
     final publisher = publisherController.text.trim();
-    if (publisher.isNotEmpty) queryParams['query.publisher'] = publisher;
+    if (publisher.isNotEmpty) queryParams['query.publisher-name'] = publisher;
 
     final affiliation = affiliationController.text.trim();
     if (affiliation.isNotEmpty) queryParams['query.affiliation'] = affiliation;
