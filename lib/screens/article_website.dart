@@ -118,7 +118,28 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(widget.publicationCard.url)),
+        appBar: AppBar(
+          title: Text(widget.publicationCard.url),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.open_in_browser),
+              onPressed: () async {
+                if (await canLaunchUrl(Uri.parse(pdfUrl))) {
+                  await launchUrl(Uri.parse(pdfUrl),
+                      mode: LaunchMode.externalApplication);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(AppLocalizations.of(context)!
+                          .errorOpenExternalBrowser),
+                    ),
+                  );
+                }
+              },
+              tooltip: AppLocalizations.of(context)!.openExternalBrowser,
+            ),
+          ],
+        ),
         body: SafeArea(
             child: Column(children: <Widget>[
           Expanded(
