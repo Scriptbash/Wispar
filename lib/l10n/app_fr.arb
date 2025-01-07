@@ -252,5 +252,9 @@
   "queryHasNoNameError": "Vous devez entrer un nom de requête afin de l'enregistrer.",
   "@queryHasNoNameError": {},
   "noresultsfound": "Aucun résultat trouvé.",
-  "@noresultsfound": {}
+  "@noresultsfound": {},
+  "errorOpenExternalBrowser": "Impossible d'ouvrir le lien dans un autre navigateur",
+  "@errorOpenExternalBrowser": {},
+  "openExternalBrowser": "Ouvrir dans un navigateur externe",
+  "@openExternalBrowser": {}
 }
