@@ -84,7 +84,6 @@ class _WisparState extends State<Wispar> {
       ),
       darkTheme: ThemeData(
         colorSchemeSeed: Colors.deepPurple,
-        primaryColorDark: Colors.black,
         brightness: Brightness.dark,
         useMaterial3: true,
         visualDensity: VisualDensity.adaptivePlatformDensity,

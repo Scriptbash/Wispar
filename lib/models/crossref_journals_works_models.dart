@@ -170,7 +170,7 @@ class Item {
         'IEE copyright policy',
     'https://creativecommons.org/licenses/by-nc-nd/4.0':
         'Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International',
-    'http://www.nrcresearchpress.com/page/about/CorporateTextAndDataMining':
+    'https://www.nrcresearchpress.com/page/about/CorporateTextAndDataMining':
         'Canadian Science Publishing TDM policy'
   };
 

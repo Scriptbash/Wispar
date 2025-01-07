@@ -370,7 +370,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
               TextFormField(
                 controller: titleController,
                 decoration: InputDecoration(
-                  labelText: 'Article Title',
+                  labelText: 'Article title',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -568,7 +568,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                   ),
                   SizedBox(height: 16),
                   TextFormField(
-                    controller: publisherController,
+                    controller: publisherLocationController,
                     decoration: InputDecoration(
                       labelText: "Publisher location",
                       border: OutlineInputBorder(),
