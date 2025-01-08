@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'theme_provider.dart';
+import 'screens/introduction_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/search_screen.dart';
 import 'screens/favorites_screen.dart';
@@ -19,20 +21,116 @@ void main() {
   );
 }
 
-class Wispar extends StatefulWidget {
+class Wispar extends StatelessWidget {
   static const title = 'Wispar';
 
-  const Wispar({super.key});
+  const Wispar({Key? key}) : super(key: key);
 
   @override
-  _WisparState createState() => _WisparState();
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: _checkIntroPreference(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const MaterialApp(
+            home: Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+          );
+        }
 
-  static _WisparState of(BuildContext context) =>
-      context.findAncestorStateOfType<_WisparState>()!;
+        final bool hasSeenIntro = snapshot.data ?? false;
+        return MaterialApp(
+          debugShowCheckedModeBanner:
+              false, // remove debug watermark for screenshots
+          title: Wispar.title,
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en'), // English
+            Locale('fr'), // French
+            Locale('es'), // Spanish
+            Locale('nb'), // Norwegian
+            Locale('ta'), // Tamil
+          ],
+          theme: ThemeData(
+            colorSchemeSeed: Colors.deepPurple,
+            brightness: Brightness.light,
+            useMaterial3: true,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+          ),
+          darkTheme: ThemeData(
+            colorSchemeSeed: Colors.deepPurple,
+            brightness: Brightness.dark,
+            useMaterial3: true,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+          ),
+          themeMode: Provider.of<ThemeProvider>(context).themeMode,
+          home: Builder(
+            builder: (context) => hasSeenIntro
+                ? const HomeScreenNavigator()
+                : IntroScreen(
+                    onDone: () async {
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      await prefs.setBool('hasSeenIntro', true);
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              const HomeScreenNavigator(skipToSearch: true),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<bool> _checkIntroPreference() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('hasSeenIntro') ?? false;
+    //return (false);
+  }
 }
 
-class _WisparState extends State<Wispar> {
+class HomeScreenNavigator extends StatefulWidget {
+  final bool skipToSearch;
+  const HomeScreenNavigator({Key? key, this.skipToSearch = false})
+      : super(key: key);
+
+  @override
+  _HomeScreenNavigatorState createState() => _HomeScreenNavigatorState();
+}
+
+class _HomeScreenNavigatorState extends State<HomeScreenNavigator> {
   var _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializePageIndex();
+  }
+
+  Future<void> _initializePageIndex() async {
+    if (widget.skipToSearch) {
+      // If skipToSearch is true, default to the Search screen
+      setState(() {
+        _currentIndex = 1;
+      });
+    } else {
+      // If intro has been seen, default to the Home screen
+      setState(() {
+        _currentIndex = 0;
+      });
+    }
+  }
+
   final List<Widget> _pages = [
     const HomeScreen(),
     const SearchScreen(),
@@ -40,6 +138,7 @@ class _WisparState extends State<Wispar> {
     const FavoritesScreen(),
     const DownloadsScreen(),
   ];
+
   String getLocalizedText(BuildContext context, String key) {
     switch (key) {
       case 'home':
@@ -59,72 +158,39 @@ class _WisparState extends State<Wispar> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner:
-          false, // remove debug watermark for screenshots
-      title: Wispar.title,
-      localizationsDelegates: [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: [
-        Locale('en'), // English
-        Locale('fr'), // French
-        Locale('es'), // Spanish
-        Locale('nb'), // Norwegian
-        Locale('ta'), // Tamil
-      ],
-      theme: ThemeData(
-        colorSchemeSeed: Colors.deepPurple,
-        brightness: Brightness.light,
-        useMaterial3: true,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      darkTheme: ThemeData(
-        colorSchemeSeed: Colors.deepPurple,
-        brightness: Brightness.dark,
-        useMaterial3: true,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      themeMode: Provider.of<ThemeProvider>(context).themeMode,
-      home: Scaffold(
-        body: Center(
-          child: _pages.elementAt(_currentIndex),
-        ),
-        bottomNavigationBar: Builder(
-          builder: (BuildContext bottomBarContext) => SalomonBottomBar(
-            currentIndex: _currentIndex,
-            onTap: (i) => setState(() => _currentIndex = i),
-            items: [
-              SalomonBottomBarItem(
-                icon: const Icon(Icons.home_outlined),
-                title: Text(getLocalizedText(bottomBarContext, 'home')),
-                selectedColor: Colors.deepPurpleAccent,
-              ),
-              SalomonBottomBarItem(
-                icon: const Icon(Icons.search_outlined),
-                title: Text(getLocalizedText(bottomBarContext, 'search')),
-                selectedColor: Colors.deepPurpleAccent,
-              ),
-              SalomonBottomBarItem(
-                icon: const Icon(Icons.my_library_books_outlined),
-                title: Text(getLocalizedText(bottomBarContext, 'library')),
-                selectedColor: Colors.deepPurpleAccent,
-              ),
-              SalomonBottomBarItem(
-                icon: const Icon(Icons.favorite_border),
-                title: Text(getLocalizedText(bottomBarContext, 'favorites')),
-                selectedColor: Colors.deepPurpleAccent,
-              ),
-              SalomonBottomBarItem(
-                icon: const Icon(Icons.download_outlined),
-                title: Text(getLocalizedText(bottomBarContext, 'downloads')),
-                selectedColor: Colors.deepPurpleAccent,
-              ),
-            ],
-          ),
+    return Scaffold(
+      body: _pages[_currentIndex],
+      bottomNavigationBar: Builder(
+        builder: (BuildContext bottomBarContext) => SalomonBottomBar(
+          currentIndex: _currentIndex,
+          onTap: (i) => setState(() => _currentIndex = i),
+          items: [
+            SalomonBottomBarItem(
+              icon: const Icon(Icons.home_outlined),
+              title: Text(getLocalizedText(bottomBarContext, 'home')),
+              selectedColor: Colors.deepPurpleAccent,
+            ),
+            SalomonBottomBarItem(
+              icon: const Icon(Icons.search_outlined),
+              title: Text(getLocalizedText(bottomBarContext, 'search')),
+              selectedColor: Colors.deepPurpleAccent,
+            ),
+            SalomonBottomBarItem(
+              icon: const Icon(Icons.my_library_books_outlined),
+              title: Text(getLocalizedText(bottomBarContext, 'library')),
+              selectedColor: Colors.deepPurpleAccent,
+            ),
+            SalomonBottomBarItem(
+              icon: const Icon(Icons.favorite_border),
+              title: Text(getLocalizedText(bottomBarContext, 'favorites')),
+              selectedColor: Colors.deepPurpleAccent,
+            ),
+            SalomonBottomBarItem(
+              icon: const Icon(Icons.download_outlined),
+              title: Text(getLocalizedText(bottomBarContext, 'downloads')),
+              selectedColor: Colors.deepPurpleAccent,
+            ),
+          ],
         ),
       ),
     );

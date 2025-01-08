@@ -49,6 +49,7 @@ dependencies:
   pdfrx: ^1.0.88
   package_info_plus: ^8.1.1
   share_plus: ^10.1.2
+  introduction_screen: ^3.1.14
   
 
 dev_dependencies:
