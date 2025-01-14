@@ -42,9 +42,9 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
             },
             title: Row(
               children: [
-                //Icon(Icons.palette_outlined),
-                SizedBox(width: 32),
-                Text(AppLocalizations.of(context)!.theme),
+                Icon(Icons.brightness_4_outlined),
+                SizedBox(width: 8),
+                Text(AppLocalizations.of(context)!.appearance),
               ],
             ),
             subtitle: Row(
@@ -65,8 +65,8 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
             },
             title: Row(
               children: [
-                //Icon(Icons.description_outlined),
-                SizedBox(width: 32),
+                Icon(Icons.description_outlined),
+                SizedBox(width: 8),
                 Text(AppLocalizations.of(context)!.publicationCard),
               ],
             ),

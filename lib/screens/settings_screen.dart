@@ -36,25 +36,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               ListTile(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DisplaySettingsScreen(),
-                      ),
-                    );
-                  },
-                  title: Row(
-                    children: [
-                      Icon(Icons.palette_outlined),
-                      SizedBox(width: 8),
-                      Text(AppLocalizations.of(context)!.display),
-                    ],
-                  ),
-                  subtitle: Row(children: [
-                    SizedBox(width: 32),
-                    Text(""),
-                  ])),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const DisplaySettingsScreen(),
+                    ),
+                  );
+                },
+                title: Row(
+                  children: [
+                    Icon(Icons.palette_outlined),
+                    SizedBox(width: 8),
+                    Text(AppLocalizations.of(context)!.display),
+                  ],
+                ),
+              ),
               ListTile(
                   onTap: () {
                     _showUnpaywallDialog(context);
