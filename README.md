@@ -18,7 +18,7 @@
 ---
 
 > [!IMPORTANT]
-> Wispar is currently in closed testing before being published on the Play Store. Google requires a minimum of 12 testers, and **I need your help!** If you'd like to test the app and provide feedback, please send me your email at wispar-app@protonmail.com, and I'll add you to the closed testing group.
+> Wispar is currently in closed testing before being published on the Play Store. ~~Google requires a minimum of 12 testers, and **I need your help!** If you'd like to test the app and provide feedback, please send me your email at wispar-app@protonmail.com, and I'll add you to the closed testing group.~~ Thank you to everyone who spent time testing Wispar and providing valuable feedback, I appreciate it! As of January 13th, there are just 6 days left until I can submit the app for review. If approved, I’ll be able to send it for review on the production channel!
 >
 >Once Wispar is live on the Play Store, I will also look into publishing it on the App Store and F-Droid.
 
