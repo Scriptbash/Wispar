@@ -269,12 +269,12 @@ class _PublicationCardState extends State<PublicationCard> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        /*Text(
                           'DOI: ${widget.doi}',
                           style: TextStyle(
                             color: Colors.grey,
                           ),
-                        ),
+                        ),*/
                         TextButton(
                           onPressed: () {
                             debugPrint(widget.license);
