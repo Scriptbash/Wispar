@@ -54,22 +54,22 @@ class CrossRefApi {
     final response = await http.get(Uri.parse(apiUrl));
 
     if (response.statusCode == 200) {
-      final crossrefJournals = Journals.crossrefjournalsFromJson(response.body);
-      List<Journals.Item> items = crossrefJournals.message.items;
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      var message = jsonResponse['message'];
 
-      // Update the journal cursor
-      _journalCursor = crossrefJournals.message.nextCursor;
+      if (message != null) {
+        Journals.Item item = Journals.Item.fromJson(message);
 
-      // Use nextCursor to determine if there are more results
-      bool hasMoreResults = _journalCursor != null && _journalCursor != "";
-
-      return ListAndMore(
-        list: items,
-        hasMore: hasMoreResults,
-        totalResults: crossrefJournals.message.totalResults,
-      );
+        return ListAndMore(
+          list: [item],
+          hasMore: false,
+          totalResults: 0,
+        );
+      } else {
+        throw Exception('Message object missing in response');
+      }
     } else {
-      throw Exception('Failed to query journals');
+      throw Exception('Failed to query journals: ${response.statusCode}');
     }
   }
 
