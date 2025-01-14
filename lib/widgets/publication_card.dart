@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/crossref_journals_works_models.dart';
 import '../screens/article_screen.dart';
 import '../screens/journals_details_screen.dart';
@@ -228,90 +229,112 @@ class _PublicationCardState extends State<PublicationCard> {
               ),
             ],
           ),
-          subtitle:
-              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            SizedBox(
-              height: 8,
-            ),
-            Text(
-              widget.abstract.isNotEmpty
-                  ? widget.abstract
-                  : AppLocalizations.of(context)!.abstractunavailable,
-              maxLines: 10,
-              overflow: TextOverflow.fade,
-              textAlign: TextAlign.justify,
-              style: TextStyle(fontSize: 16),
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Expanded(
-                    child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'DOI: ${widget.doi}',
-                      style: TextStyle(
-                        color: Colors.grey,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        debugPrint(widget.license);
-                        if (widget.license.isNotEmpty) {
-                          debugPrint(widget.license);
-                          launchUrl(Uri.parse(widget.license));
-                        }
-                      },
-                      child: Text(
-                        widget.license.isNotEmpty
-                            ? (widget.licenseName.isNotEmpty
-                                ? widget.licenseName
-                                : AppLocalizations.of(context)!.otherLicense)
-                            : AppLocalizations.of(context)!.unknownLicense,
-                        style: TextStyle(
-                          color: Colors.grey,
-                        ),
-                      ),
-                      style: TextButton.styleFrom(
-                        minimumSize: Size.zero,
-                        padding: EdgeInsets.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                    ),
-                  ],
-                )),
-                IconButton(
-                  icon: Icon(
-                    isLiked ? Icons.favorite : Icons.favorite_border,
-                    color:
-                        isLiked ? Theme.of(context).colorScheme.primary : null,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      isLiked = !isLiked;
-                    });
-                    if (isLiked) {
-                      databaseHelper.insertArticle(widget, isLiked: true);
-                    } else {
-                      databaseHelper.removeFavorite(widget.doi);
-                    }
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(height: 8),
+              FutureBuilder<int>(
+                future: getAbstractSetting(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return SizedBox();
+                  }
 
-                    if (widget.onFavoriteChanged != null) {
-                      widget.onFavoriteChanged!();
-                    }
-                  },
-                ),
-              ],
-            ),
-            if (widget.dateLiked != null)
-              Text(
-                '\n${AppLocalizations.of(context)!.addedtoyourfav} ${widget.dateLiked}',
-                style: TextStyle(
-                  color: Colors.grey,
-                ),
+                  final abstractSetting = snapshot.data!;
+                  final hasAbstract = widget.abstract.isNotEmpty;
+
+                  if (abstractSetting == 2) {
+                    // Hide all abstracts
+                    return SizedBox();
+                  } else if (abstractSetting == 1 && !hasAbstract) {
+                    // Hide missing abstracts
+                    return SizedBox();
+                  }
+                  // Show abstract if available
+                  return Text(
+                    hasAbstract
+                        ? widget.abstract
+                        : AppLocalizations.of(context)!.abstractunavailable,
+                    maxLines: 10,
+                    overflow: TextOverflow.fade,
+                    textAlign: TextAlign.justify,
+                    style: TextStyle(fontSize: 16),
+                  );
+                },
               ),
-          ]),
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'DOI: ${widget.doi}',
+                          style: TextStyle(
+                            color: Colors.grey,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            debugPrint(widget.license);
+                            if (widget.license.isNotEmpty) {
+                              launchUrl(Uri.parse(widget.license));
+                            }
+                          },
+                          child: Text(
+                            widget.license.isNotEmpty
+                                ? (widget.licenseName.isNotEmpty
+                                    ? widget.licenseName
+                                    : AppLocalizations.of(context)!
+                                        .otherLicense)
+                                : AppLocalizations.of(context)!.unknownLicense,
+                            style: TextStyle(
+                              color: Colors.grey,
+                            ),
+                          ),
+                          style: TextButton.styleFrom(
+                            minimumSize: Size.zero,
+                            padding: EdgeInsets.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      isLiked ? Icons.favorite : Icons.favorite_border,
+                      color: isLiked
+                          ? Theme.of(context).colorScheme.primary
+                          : null,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        isLiked = !isLiked;
+                      });
+                      if (isLiked) {
+                        databaseHelper.insertArticle(widget, isLiked: true);
+                      } else {
+                        databaseHelper.removeFavorite(widget.doi);
+                      }
+
+                      if (widget.onFavoriteChanged != null) {
+                        widget.onFavoriteChanged!();
+                      }
+                    },
+                  ),
+                ],
+              ),
+              if (widget.dateLiked != null)
+                Text(
+                  '\n${AppLocalizations.of(context)!.addedtoyourfav} ${widget.dateLiked}',
+                  style: TextStyle(
+                    color: Colors.grey,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -338,5 +361,11 @@ class _PublicationCardState extends State<PublicationCard> {
     );
 
     return rows.isNotEmpty ? rows.first : null;
+  }
+
+  Future<int> getAbstractSetting() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('publicationCardAbstractSetting') ??
+        0; // Default to "show all abstracts"
   }
 }

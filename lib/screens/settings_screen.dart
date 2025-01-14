@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../theme_provider.dart';
 import './institutions_screen.dart';
 import './zotero_settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import './database_settings_screen.dart';
+import './display_settings_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -38,19 +37,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: <Widget>[
               ListTile(
                   onTap: () {
-                    _showThemeDialog(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DisplaySettingsScreen(),
+                      ),
+                    );
                   },
                   title: Row(
                     children: [
                       Icon(Icons.palette_outlined),
                       SizedBox(width: 8),
-                      Text(AppLocalizations.of(context)!.appearance),
+                      Text(AppLocalizations.of(context)!.display),
                     ],
                   ),
                   subtitle: Row(children: [
                     SizedBox(width: 32),
-                    Text(_getThemeSubtitle(context,
-                        Provider.of<ThemeProvider>(context).themeMode)),
+                    Text(""),
                   ])),
               ListTile(
                   onTap: () {
@@ -322,71 +325,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       },
     );
-  }
-}
-
-void _showThemeDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text(AppLocalizations.of(context)!.appearance),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            RadioListTile<ThemeMode>(
-              title: Text(AppLocalizations.of(context)!.light),
-              value: ThemeMode.light,
-              groupValue: Provider.of<ThemeProvider>(context).themeMode,
-              onChanged: (ThemeMode? value) {
-                if (value != null) {
-                  Provider.of<ThemeProvider>(context, listen: false)
-                      .setThemeMode(value);
-                }
-                Navigator.of(context).pop();
-              },
-            ),
-            RadioListTile<ThemeMode>(
-              title: Text(AppLocalizations.of(context)!.dark),
-              value: ThemeMode.dark,
-              groupValue: Provider.of<ThemeProvider>(context).themeMode,
-              onChanged: (ThemeMode? value) {
-                if (value != null) {
-                  Provider.of<ThemeProvider>(context, listen: false)
-                      .setThemeMode(value);
-                }
-                Navigator.of(context).pop();
-              },
-            ),
-            RadioListTile<ThemeMode>(
-              title: Text(AppLocalizations.of(context)!.systemtheme),
-              value: ThemeMode.system,
-              groupValue: Provider.of<ThemeProvider>(context).themeMode,
-              onChanged: (ThemeMode? value) {
-                if (value != null) {
-                  Provider.of<ThemeProvider>(context, listen: false)
-                      .setThemeMode(value);
-                }
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
-
-String _getThemeSubtitle(BuildContext context, ThemeMode? themeMode) {
-  switch (themeMode) {
-    case ThemeMode.light:
-      return AppLocalizations.of(context)!.light;
-    case ThemeMode.dark:
-      return AppLocalizations.of(context)!.dark;
-    case ThemeMode.system:
-      return AppLocalizations.of(context)!.systemtheme;
-    default:
-      return 'Unknown';
   }
 }
 

@@ -175,14 +175,26 @@
   "@noFavorites": {
     "description": "The message shown when the user has no articles in their favorites."
   },
+  "display": "Display",
+  "@display": {},
   "appearance": "Appearance",
   "@appearance": {},
+  "theme": "Theme",
+  "@theme": {},
   "light": "Light",
   "@light": {},
   "dark": "Dark",
   "@dark": {},
   "systemtheme": "System theme",
   "@systemtheme": {},
+  "publicationCard": "Publication card",
+  "@publicationCard": {},
+  "showAllAbstracts": "Show all abstracts",
+  "@showAllAbstracts": {},
+  "hideMissingAbstracts": "Hide missing abstracts",
+  "@hideMissingAbstracts": {},
+  "hideAllAbstracts": "Hide all abstracts",
+  "@hideAllAbstracts": {},
   "unpaywallarticle": "The article was provided through Unpaywall",
   "@unpaywallarticle": {
     "description": "Snackbar shown when an article was fetched from Unpaywall."

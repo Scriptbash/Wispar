@@ -32,7 +32,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
     useOnDownloadStart: true,
     iframeAllowFullscreen: true,
     userAgent:
-        "Mozilla/5.0 (Android 15; Mobile; rv:133.0) Gecko/133.0 Firefox/133.0",
+        "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36",
   );
 
   PullToRefreshController? pullToRefreshController;
