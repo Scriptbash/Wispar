@@ -99,6 +99,10 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                 ),
                 items: [
                   DropdownMenuItem(
+                    value: 3,
+                    child: Text('3 ${AppLocalizations.of(context)!.hours}'),
+                  ),
+                  DropdownMenuItem(
                     value: 6,
                     child: Text('6 ${AppLocalizations.of(context)!.hours}'),
                   ),
