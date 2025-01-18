@@ -298,5 +298,7 @@
   "showAllAbstracts": "Afficher tous les résumés",
   "@showAllAbstracts": {},
   "hideAllAbstracts": "Cacher tous les résumés",
-  "@hideAllAbstracts": {}
+  "@hideAllAbstracts": {},
+  "displaySettings": "Paramètres d'affichage",
+  "@displaySettings": {}
 }
