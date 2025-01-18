@@ -235,6 +235,8 @@
   "@noinstitution": {},
   "buildingfeed": "Building your feed. Please wait…",
   "@buildingfeed": {},
+  "fetchingArticleFromJournal": "Fetching articles from {journalName}.",
+  "@fetchingArticleFromJournal": {},
   "noPublicationFound": "No publications found.",
   "@noPublicationFound": {},
   "failLoadMorePublication": "Failed to load more publications.",

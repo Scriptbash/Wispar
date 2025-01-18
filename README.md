@@ -51,6 +51,13 @@ Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly s
 </ul>
 * The download feature is currently limited to open access articles. Flutter tools and publishers like Elsevier and Wiley make it hard to get the PDF file behind their paywall.
 
+### Planned features
+<ul>
+    <li> [] Deep links</li>
+    <li> [] Get downloads working for more publishers</li>
+    <li> [] Export/Import the database</li>
+</ul>
+
 ## Translations
 
 <p align ="justify">

@@ -31,76 +31,75 @@ class Wispar extends StatefulWidget {
 }
 
 class _WisparState extends State<Wispar> {
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: _checkIntroPreference(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const MaterialApp(
-            home: Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            ),
-          );
-        }
+  bool _hasSeenIntro = false;
 
-        final bool hasSeenIntro = snapshot.data ?? false;
-        return MaterialApp(
-          debugShowCheckedModeBanner:
-              false, // remove debug watermark for screenshots
-          title: Wispar.title,
-          localizationsDelegates: [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en'), // English
-            Locale('fr'), // French
-            Locale('es'), // Spanish
-            Locale('nb'), // Norwegian
-            Locale('ta'), // Tamil
-          ],
-          theme: ThemeData(
-            colorSchemeSeed: Colors.deepPurple,
-            brightness: Brightness.light,
-            useMaterial3: true,
-            visualDensity: VisualDensity.adaptivePlatformDensity,
-          ),
-          darkTheme: ThemeData(
-            colorSchemeSeed: Colors.deepPurple,
-            brightness: Brightness.dark,
-            useMaterial3: true,
-            visualDensity: VisualDensity.adaptivePlatformDensity,
-          ),
-          themeMode: Provider.of<ThemeProvider>(context).themeMode,
-          home: Builder(
-            builder: (context) => hasSeenIntro
-                ? const HomeScreenNavigator()
-                : IntroScreen(
-                    onDone: () async {
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      await prefs.setBool('hasSeenIntro', true);
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              const HomeScreenNavigator(skipToSearch: true),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        );
-      },
-    );
+  @override
+  void initState() {
+    super.initState();
+    _checkIntroPreference();
   }
 
-  Future<bool> _checkIntroPreference() async {
+  // Load the intro preference
+  Future<void> _checkIntroPreference() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('hasSeenIntro') ?? false;
-    //return (false);
+    setState(() {
+      _hasSeenIntro = prefs.getBool('hasSeenIntro') ?? false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner:
+          false, // remove debug watermark for screenshots
+      title: Wispar.title,
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('fr'), // French
+        Locale('es'), // Spanish
+        Locale('nb'), // Norwegian
+        Locale('ta'), // Tamil
+        Locale('nl'), // Dutch
+      ],
+      theme: ThemeData(
+        colorSchemeSeed: Colors.deepPurple,
+        brightness: Brightness.light,
+        useMaterial3: true,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      darkTheme: ThemeData(
+        colorSchemeSeed: Colors.deepPurple,
+        brightness: Brightness.dark,
+        useMaterial3: true,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      themeMode: Provider.of<ThemeProvider>(context).themeMode,
+      home: Builder(
+        builder: (context) {
+          return _hasSeenIntro
+              ? const HomeScreenNavigator()
+              : IntroScreen(
+                  onDone: () async {
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    await prefs.setBool('hasSeenIntro', true);
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            const HomeScreenNavigator(skipToSearch: true),
+                      ),
+                    );
+                  },
+                );
+        },
+      ),
+    );
   }
 }
 
