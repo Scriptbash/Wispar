@@ -177,6 +177,8 @@
   },
   "display": "Display",
   "@display": {},
+  "displaySettings": "Display settings",
+  "@displaySettings": {},
   "appearance": "Appearance",
   "@appearance": {},
   "theme": "Theme",

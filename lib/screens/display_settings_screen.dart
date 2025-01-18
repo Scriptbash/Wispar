@@ -32,7 +32,7 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.display),
+        title: Text(AppLocalizations.of(context)!.displaySettings),
       ),
       body: ListView(
         children: <Widget>[

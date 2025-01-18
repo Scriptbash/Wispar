@@ -21,11 +21,16 @@ void main() {
   );
 }
 
-class Wispar extends StatelessWidget {
+class Wispar extends StatefulWidget {
   static const title = 'Wispar';
 
   const Wispar({Key? key}) : super(key: key);
 
+  @override
+  _WisparState createState() => _WisparState();
+}
+
+class _WisparState extends State<Wispar> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(
