@@ -300,5 +300,7 @@
   "hideAllAbstracts": "Cacher tous les résumés",
   "@hideAllAbstracts": {},
   "displaySettings": "Paramètres d'affichage",
-  "@displaySettings": {}
+  "@displaySettings": {},
+  "fetchingArticleFromJournal": "Récupération des articles de {journalName}.",
+  "@fetchingArticleFromJournal": {}
 }
