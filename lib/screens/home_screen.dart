@@ -5,6 +5,7 @@ import '../services/feed_api.dart';
 import '../models/journal_entity.dart';
 import '../models/crossref_journals_works_models.dart' as journalWorks;
 import '../services/database_helper.dart';
+import '../services/abstract_helper.dart';
 import '../widgets/publication_card.dart';
 import '../widgets/sortbydialog.dart';
 import '../widgets/sortorderdialog.dart';
@@ -141,6 +142,24 @@ class _HomeScreenState extends State<HomeScreen> {
       // Get the cache publications
       List<PublicationCard> feedItems = await dbHelper.getCachedPublications();
 
+      // Process abstracts for cached publications
+      feedItems = await Future.wait(feedItems.map((item) async {
+        String processedAbstract =
+            await AbstractHelper.buildAbstract(context, item.abstract);
+        return PublicationCard(
+          title: item.title,
+          abstract: processedAbstract,
+          journalTitle: item.journalTitle,
+          issn: item.issn,
+          publishedDate: item.publishedDate,
+          doi: item.doi,
+          authors: item.authors,
+          url: item.url,
+          license: item.license,
+          licenseName: item.licenseName,
+        );
+      }).toList());
+
       // Check if journals need to be updated
       List<String> journalsToUpdate =
           await _checkJournalsLastUpdated(followedJournals);
@@ -181,10 +200,14 @@ class _HomeScreenState extends State<HomeScreen> {
               List<journalWorks.Item> recentFeed =
                   await FeedApi.getRecentFeed(journal.issn);
 
-              List<PublicationCard> cards = recentFeed.map((item) {
+              List<PublicationCard> cards =
+                  await Future.wait(recentFeed.map((item) async {
+                String processedAbstract =
+                    await AbstractHelper.buildAbstract(context, item.abstract);
+
                 return PublicationCard(
                   title: item.title,
-                  abstract: item.abstract,
+                  abstract: processedAbstract,
                   journalTitle: item.journalTitle,
                   issn: journal.issn,
                   publishedDate: item.publishedDate,
@@ -194,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   license: item.license,
                   licenseName: item.licenseName,
                 );
-              }).toList();
+              }).toList());
 
               feedItems.addAll(cards);
               feedItems = feedItems
@@ -216,7 +239,25 @@ class _HomeScreenState extends State<HomeScreen> {
         // Cache the fetched publications
         // await dbHelper.clearCachedPublications();
         for (PublicationCard item in feedItems) {
-          await dbHelper.insertArticle(item, isCached: true);
+          await dbHelper.insertArticle(
+              PublicationCard(
+                title: item.title,
+                abstract: item.abstract.isNotEmpty &&
+                        item.abstract !=
+                            AppLocalizations.of(context)!.abstractunavailable
+                    ? item
+                        .abstract // Use the abstract if it's not empty and not the fallback string
+                    : '', // Otherwise, insert an empty string
+                journalTitle: item.journalTitle,
+                issn: item.issn,
+                publishedDate: item.publishedDate,
+                doi: item.doi,
+                authors: item.authors,
+                url: item.url,
+                license: item.license,
+                licenseName: item.licenseName,
+              ),
+              isCached: true);
           //await dbHelper.insertCachedPublication(item);
         }
       }

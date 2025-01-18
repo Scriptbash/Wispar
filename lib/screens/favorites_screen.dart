@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../widgets/publication_card.dart';
 import '../services/database_helper.dart';
+import '../services/abstract_helper.dart';
 import '../widgets/sortbydialog.dart';
 import '../widgets/sortorderdialog.dart';
 
@@ -16,6 +17,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   late Future<List<PublicationCard>> _favoriteArticles;
   int sortBy = 0; // Set the sort by option to Article title by default
   int sortOrder = 0; // Set the sort order to Ascending by default
+  Map<String, String> abstractCache = {}; // Cache for abstracts
 
   @override
   void initState() {
@@ -86,23 +88,66 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               itemCount: sortedFavorites.length,
               itemBuilder: (context, index) {
                 final publicationCard = sortedFavorites[index];
-                return PublicationCard(
-                  title: publicationCard.title,
-                  abstract: publicationCard.abstract,
-                  journalTitle: publicationCard.journalTitle,
-                  issn: publicationCard.issn,
-                  publishedDate: publicationCard.publishedDate,
-                  doi: publicationCard.doi,
-                  authors: publicationCard.authors,
-                  url: publicationCard.url,
-                  license: publicationCard.license,
-                  licenseName: publicationCard.licenseName,
-                  dateLiked: publicationCard.dateLiked,
-                  onFavoriteChanged: () {
-                    // Refresh the UI after removing the favorite
-                    _removeFavorite(context, publicationCard);
-                  },
-                );
+
+                // Check if the abstract is cached, if not fetch it
+                String? cachedAbstract = abstractCache[publicationCard.doi];
+                if (cachedAbstract != null) {
+                  return PublicationCard(
+                    title: publicationCard.title,
+                    abstract: cachedAbstract,
+                    journalTitle: publicationCard.journalTitle,
+                    issn: publicationCard.issn,
+                    publishedDate: publicationCard.publishedDate,
+                    doi: publicationCard.doi,
+                    authors: publicationCard.authors,
+                    url: publicationCard.url,
+                    license: publicationCard.license,
+                    licenseName: publicationCard.licenseName,
+                    dateLiked: publicationCard.dateLiked,
+                    onFavoriteChanged: () {
+                      _removeFavorite(context, publicationCard);
+                    },
+                  );
+                } else {
+                  // Use the AbstractHelper to get the formatted abstract
+                  return FutureBuilder<String>(
+                    future: AbstractHelper.buildAbstract(
+                        context, publicationCard.abstract),
+                    builder: (context, abstractSnapshot) {
+                      if (abstractSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (abstractSnapshot.hasError) {
+                        return Center(
+                            child: Text('Error: ${abstractSnapshot.error}'));
+                      } else if (!abstractSnapshot.hasData) {
+                        return Center(child: Text('No abstract available'));
+                      } else {
+                        String formattedAbstract = abstractSnapshot.data!;
+
+                        // Cache the abstract for future use
+                        abstractCache[publicationCard.doi] = formattedAbstract;
+
+                        return PublicationCard(
+                          title: publicationCard.title,
+                          abstract: formattedAbstract,
+                          journalTitle: publicationCard.journalTitle,
+                          issn: publicationCard.issn,
+                          publishedDate: publicationCard.publishedDate,
+                          doi: publicationCard.doi,
+                          authors: publicationCard.authors,
+                          url: publicationCard.url,
+                          license: publicationCard.license,
+                          licenseName: publicationCard.licenseName,
+                          dateLiked: publicationCard.dateLiked,
+                          onFavoriteChanged: () {
+                            _removeFavorite(context, publicationCard);
+                          },
+                        );
+                      }
+                    },
+                  );
+                }
               },
             );
           }

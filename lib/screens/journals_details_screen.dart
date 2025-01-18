@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/crossref_api.dart';
+import '../services/abstract_helper.dart';
 import '../models/crossref_journals_works_models.dart' as journalsWorks;
 import '../widgets/publication_card.dart';
 import '../widgets/journal_header.dart';
@@ -27,6 +28,7 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
   bool isLoading = false;
   late ScrollController _scrollController;
   bool hasMoreResults = true;
+  Map<String, String> abstractCache = {};
 
   @override
   void initState() {
@@ -90,18 +92,61 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
                     (context, index) {
                       if (index < allWorks.length) {
                         final work = allWorks[index];
-                        return PublicationCard(
-                          title: work.title,
-                          abstract: work.abstract,
-                          journalTitle: work.journalTitle,
-                          issn: widget.issn,
-                          publishedDate: work.publishedDate,
-                          doi: work.doi,
-                          authors: work.authors,
-                          url: work.primaryUrl,
-                          license: work.license,
-                          licenseName: work.licenseName,
-                        );
+                        String? cachedAbstract = abstractCache[work.doi];
+                        if (cachedAbstract == null) {
+                          return FutureBuilder<String>(
+                            future: AbstractHelper.buildAbstract(
+                                context, work.abstract ?? ''),
+                            builder: (context, abstractSnapshot) {
+                              if (abstractSnapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Padding(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: Center(
+                                      child: CircularProgressIndicator()),
+                                );
+                              } else if (abstractSnapshot.hasError) {
+                                return Center(
+                                    child: Text(
+                                        'Error: ${abstractSnapshot.error}'));
+                              } else if (!abstractSnapshot.hasData) {
+                                return const Center(
+                                    child: Text('No abstract available'));
+                              } else {
+                                String formattedAbstract =
+                                    abstractSnapshot.data!;
+                                // Cache the abstract
+                                abstractCache[work.doi] = formattedAbstract;
+
+                                return PublicationCard(
+                                  title: work.title,
+                                  abstract: formattedAbstract,
+                                  journalTitle: work.journalTitle,
+                                  issn: widget.issn,
+                                  publishedDate: work.publishedDate,
+                                  doi: work.doi,
+                                  authors: work.authors,
+                                  url: work.primaryUrl,
+                                  license: work.license,
+                                  licenseName: work.licenseName,
+                                );
+                              }
+                            },
+                          );
+                        } else {
+                          return PublicationCard(
+                            title: work.title,
+                            abstract: cachedAbstract,
+                            journalTitle: work.journalTitle,
+                            issn: widget.issn,
+                            publishedDate: work.publishedDate,
+                            doi: work.doi,
+                            authors: work.authors,
+                            url: work.primaryUrl,
+                            license: work.license,
+                            licenseName: work.licenseName,
+                          );
+                        }
                       } else if (hasMoreResults) {
                         return const Padding(
                           padding: EdgeInsets.all(16.0),
