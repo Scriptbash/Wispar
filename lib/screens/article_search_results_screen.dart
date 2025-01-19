@@ -87,6 +87,7 @@ class _ArticleSearchResultsScreenState
           ? ListView.builder(
               controller: _scrollController,
               itemCount: _searchResults.length + (_hasMoreResults ? 1 : 0),
+              cacheExtent: 1000.0,
               itemBuilder: (context, index) {
                 if (index == _searchResults.length) {
                   return Center(

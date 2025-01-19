@@ -206,6 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
           } else {
             return ListView.builder(
               itemCount: snapshot.data!.length,
+              cacheExtent: 1000.0,
               itemBuilder: (context, index) {
                 return snapshot.data![index];
               },
