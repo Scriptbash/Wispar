@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../models/journal_entity.dart';
 import '../widgets/sortbydialog.dart';
 import '../widgets/sortorderdialog.dart';
 import '../services/database_helper.dart';

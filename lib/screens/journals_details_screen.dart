@@ -96,7 +96,7 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
                         if (cachedAbstract == null) {
                           return FutureBuilder<String>(
                             future: AbstractHelper.buildAbstract(
-                                context, work.abstract ?? ''),
+                                context, work.abstract),
                             builder: (context, abstractSnapshot) {
                               if (abstractSnapshot.connectionState ==
                                   ConnectionState.waiting) {
