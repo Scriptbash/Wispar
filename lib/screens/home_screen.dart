@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'settings_screen.dart';
-import '../services/feed_api.dart';
-import '../models/journal_entity.dart';
-import '../models/crossref_journals_works_models.dart' as journalWorks;
 import '../services/database_helper.dart';
-import '../services/abstract_helper.dart';
+import '../services/feed_service.dart';
 import '../widgets/publication_card.dart';
 import '../widgets/sortbydialog.dart';
 import '../widgets/sortorderdialog.dart';
@@ -29,6 +26,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int fetchIntervalInHours = 6; // Default to 6 hours for API fetch
   String _currentJournalName = '';
 
+  final FeedService _feedService = FeedService();
+
   @override
   void initState() {
     super.initState();
@@ -46,151 +45,56 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _buildAndStreamFeed() async {
     try {
       final followedJournals = await dbHelper.getJournals();
-      final feedItems = await _buildFeed(followedJournals);
-      _feedStreamController.add(feedItems);
-    } catch (e) {
-      _feedStreamController.addError(e);
-    }
-  }
+      final journalsToUpdate = await _feedService.checkJournalsToUpdate(
+          followedJournals, fetchIntervalInHours);
 
-  Future<List<PublicationCard>> _buildFeed(
-      List<Journal> followedJournals) async {
-    try {
-      // Fetch cached publications
-      List<PublicationCard> feedItems = await dbHelper.getCachedPublications();
-
-      feedItems = await Future.wait(feedItems.map((item) async {
-        return PublicationCard(
-          title: item.title,
-          abstract: await AbstractHelper.buildAbstract(context, item.abstract),
-          journalTitle: item.journalTitle,
-          issn: item.issn,
-          publishedDate: item.publishedDate,
-          doi: item.doi,
-          authors: item.authors,
-          url: item.url,
-          license: item.license,
-          licenseName: item.licenseName,
-        );
-      }).toList());
-
-      // Check for journals that need updates
-      List<String> journalsToUpdate =
-          await _checkJournalsLastUpdated(followedJournals);
-
-      if (feedItems.isEmpty || journalsToUpdate.isNotEmpty) {
-        for (Journal journal in followedJournals) {
-          if (journalsToUpdate.contains(journal.issn)) {
-            setState(() {
-              _currentJournalName = journal.title;
-            });
-            try {
-              await dbHelper.updateJournalLastUpdated(journal.issn);
-
-              // Fetch recent feed for the journal
-              List<journalWorks.Item> recentFeed =
-                  await FeedApi.getRecentFeed(journal.issn);
-
-              List<PublicationCard> newCards =
-                  await Future.wait(recentFeed.map((item) async {
-                return PublicationCard(
-                  title: item.title,
-                  abstract: await AbstractHelper.buildAbstract(
-                      context, item.abstract),
-                  journalTitle: item.journalTitle,
-                  issn: journal.issn,
-                  publishedDate: item.publishedDate,
-                  doi: item.doi,
-                  authors: item.authors,
-                  url: item.primaryUrl,
-                  license: item.license,
-                  licenseName: item.licenseName,
-                );
-              }).toList());
-
-              feedItems.addAll(newCards);
-            } catch (e) {
-              debugPrint('Error fetching feed for ${journal.title}: $e');
+      if (mounted && journalsToUpdate.isNotEmpty) {
+        await _feedService.updateFeed(
+          context,
+          followedJournals,
+          (String journalName) {
+            if (mounted) {
+              setState(() {
+                _currentJournalName = journalName;
+              });
             }
+          },
+        );
+      }
+
+      if (mounted) {
+        final List<PublicationCard> cachedFeed =
+            await _feedService.getCachedFeed(context);
+
+        // Sort publications
+        List<PublicationCard> sortedFeed = List.from(cachedFeed);
+        sortedFeed.sort((a, b) {
+          switch (sortBy) {
+            case 0: // Sort by published date
+              return a.publishedDate!.compareTo(b.publishedDate!);
+            case 1: // Sort by title
+              return a.title.compareTo(b.title);
+            case 2: // Sort by journal title
+              return a.journalTitle.compareTo(b.journalTitle);
+            case 3: // Sort by first author's family name
+              return a.authors[0].family.compareTo(b.authors[0].family);
+            default:
+              return 0;
           }
+        });
+
+        // Reverse the list if sortOrder is descending
+        if (sortOrder == 1) {
+          sortedFeed = sortedFeed.reversed.toList();
         }
 
-        // Cache the fetched publications
-        for (PublicationCard item in feedItems) {
-          await dbHelper.insertArticle(
-              PublicationCard(
-                title: item.title,
-                abstract: item.abstract.isNotEmpty &&
-                        item.abstract !=
-                            AppLocalizations.of(context)!.abstractunavailable
-                    ? item
-                        .abstract // Use the abstract if it's not empty and not the fallback string
-                    : '', // Otherwise, insert an empty string
-                journalTitle: item.journalTitle,
-                issn: item.issn,
-                publishedDate: item.publishedDate,
-                doi: item.doi,
-                authors: item.authors,
-                url: item.url,
-                license: item.license,
-                licenseName: item.licenseName,
-              ),
-              isCached: true);
-        }
+        _feedStreamController.add(sortedFeed);
       }
-
-      // Sort publications
-      feedItems.sort((a, b) {
-        switch (sortBy) {
-          case 0:
-            return a.publishedDate!.compareTo(b.publishedDate!);
-          case 1:
-            return a.title.compareTo(b.title);
-          case 2:
-            return a.journalTitle.compareTo(b.journalTitle);
-          case 3:
-            return a.authors[0].family.compareTo(b.authors[0].family);
-          default:
-            return 0;
-        }
-      });
-
-      // Reverse feed items if sortOrder is descending
-      if (sortOrder == 1) {
-        feedItems = feedItems.reversed.toList();
-      }
-
-      return feedItems;
     } catch (e) {
-      debugPrint('Error in _buildFeed: $e');
-      return [];
-    }
-  }
-
-  Future<List<String>> _checkJournalsLastUpdated(
-      List<Journal> followedJournals) async {
-    final db = await dbHelper.database;
-    List<String> journalsToUpdate = [];
-
-    for (Journal journal in followedJournals) {
-      List<Map<String, dynamic>> result = await db.query(
-        'journals',
-        columns: ['issn', 'lastUpdated'],
-        where: 'issn = ?',
-        whereArgs: [journal.issn],
-      );
-
-      if (result.isNotEmpty) {
-        String? lastUpdated = result.first['lastUpdated'] as String?;
-        if (lastUpdated == null ||
-            DateTime.now().difference(DateTime.parse(lastUpdated)).inHours >=
-                fetchIntervalInHours) {
-          journalsToUpdate.add(journal.issn);
-        }
+      if (mounted) {
+        _feedStreamController.addError(e);
       }
     }
-
-    return journalsToUpdate;
   }
 
   void handleMenuButton(int item) {

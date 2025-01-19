@@ -53,9 +53,9 @@ Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly s
 
 ### Planned features
 <ul>
-    <li> [] Deep links</li>
-    <li> [] Get downloads working for more publishers</li>
-    <li> [] Export/Import the database</li>
+    <li> [ ] Deep links</li>
+    <li> [ ] Get downloads working for more publishers</li>
+    <li> [ ] Export/Import the database</li>
 </ul>
 
 ## Translations
