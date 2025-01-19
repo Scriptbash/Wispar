@@ -1,1 +1,152 @@
-{}
+{
+  "welcomeWispar": "Welkom bij Wispar!",
+  "@welcomeWispar": {},
+  "setupInstitutionalAccess": "Institutie Toegang Opzetten",
+  "@setupInstitutionalAccess": {},
+  "setupSelectInstitution": "Selecteer mijn institutie",
+  "@setupSelectInstitution": {},
+  "setupSelectedInstitution": "Je hebt geselecteerd:",
+  "@setupSelectedInstitution": {},
+  "setupLinkZotero": "Koppel Zotero",
+  "@setupLinkZotero": {},
+  "setupZoteroLong": "Zend publicaties direct naar je Zotero bibliotheek. Ze zullen toegevoegd worden aan een speciale Wispar verzameling.",
+  "@setupZoteroLong": {},
+  "setupLinkMyZotero": "Koppel mijn Zotero profiel",
+  "@setupLinkMyZotero": {},
+  "setupOtherSettings": "Andere Instellingen",
+  "@setupOtherSettings": {},
+  "setupOtherSettingsLong": "Additionele instellingen zijn beschikbaar in de app's instellingen menu. Ze is toegankelijk van de Thuis scherm door de ellips menu te tappen aan de rechterbovenhoek.",
+  "@setupOtherSettingsLong": {},
+  "setupAlmostSet": "Je bent helemaal klaar!... Bijna!",
+  "@setupAlmostSet": {},
+  "skip": "Overslaan",
+  "@skip": {},
+  "getStarted": "Aan de Slag",
+  "@getStarted": {},
+  "home": "Thuis",
+  "@home": {
+    "description": "The home menu button and the app bar title when in the home screen."
+  },
+  "favorites": "Favorieten",
+  "@favorites": {
+    "description": "The favorites menu button and the app bar title when in the favorites screen."
+  },
+  "download": "Installeer",
+  "@download": {
+    "description": "The verb to download, without the 'to'."
+  },
+  "delete": "Verwijder",
+  "@delete": {},
+  "downloadSuccessful": "Het artikel werd succesvol geinstalleerd!",
+  "@downloadSuccessful": {},
+  "downloadDeleted": "Het artikel werd verwijderd!",
+  "@downloadDeleted": {},
+  "noDownloads": "Je hebt geen enkele downloads.",
+  "@noDownloads": {},
+  "settings": "Instellingen",
+  "@settings": {
+    "description": "The settings option menu button and the app bar title when in the settings screen."
+  },
+  "journalLibraryEmpty": "Je bent geen enkele journalen aan het volgen. Gebruik de zoek menu om journalen te vinden en te volgen.",
+  "@journalLibraryEmpty": {
+    "description": "Message shown when the user is not following any journals."
+  },
+  "library": "Bibliotheek",
+  "@library": {
+    "description": "The library menu button and the app bar title when in the library screen."
+  },
+  "queries": "Zoektermen",
+  "@queries": {
+    "description": "Title of the saved search queries tab."
+  },
+  "search": "Zoek",
+  "@search": {
+    "description": "Text shown inside the search screen app bar and for the seach button."
+  },
+  "searchPlaceholder": "Zoek…",
+  "@searchPlaceholder": {
+    "description": "Place holder text in the search input widget."
+  },
+  "emptyDOIError": "Gelieve een DOI ingeven",
+  "@emptyDOIError": {},
+  "searchByQuery": "Zoek via zoektermen",
+  "@searchByQuery": {},
+  "searchByDOI": "Zoek via DOI",
+  "@searchByDOI": {},
+  "searchByTitle": "Zoek via titel",
+  "@searchByTitle": {},
+  "searchByISSN": "Zoek via ISSN",
+  "@searchByISSN": {},
+  "queryHasNoNameError": "Je moet een zoekterm naam ingeven om het op te slaan.",
+  "@queryHasNoNameError": {},
+  "emptySearchQuery": "Gelieve een zoekterm in te geven",
+  "@emptySearchQuery": {},
+  "moreOptions": "Meer opties",
+  "@moreOptions": {},
+  "saveQuery": "Bewaar deze zoekterm",
+  "@saveQuery": {},
+  "queryName": "Zoekterm naam",
+  "@queryName": {},
+  "dateSaved": "Datum bewaard",
+  "@dateSaved": {},
+  "articles": "Artikels",
+  "@articles": {
+    "description": "As in scientific articles."
+  },
+  "category": "Categorie",
+  "@category": {},
+  "publisher": "Uitgever",
+  "@publisher": {},
+  "publishedin": "Uitgegeven in",
+  "@publishedin": {},
+  "latestpublications": "Laatste uitgevingen",
+  "@latestpublications": {},
+  "authors": "Auteurs",
+  "@authors": {},
+  "publishedon": "Uitgegeven Op",
+  "@publishedon": {},
+  "abstract": "Samenvatting",
+  "@abstract": {},
+  "copydoi": "Kopieer DOI",
+  "@copydoi": {},
+  "doicopied": "DOI gekopieerd naar klembord",
+  "@doicopied": {
+    "description": "Snackbar shown when the Copy DOI button is pressed."
+  },
+  "issnCopied": "ISSN gekopieerd naar klembord",
+  "@issnCopied": {},
+  "apiQueryCopied": "API aanvraag gekopieerd naar klembord",
+  "@apiQueryCopied": {},
+  "articleViewer": "Artikel waarnemer",
+  "@articleViewer": {},
+  "openExternalBrowser": "Open in externale browser",
+  "@openExternalBrowser": {},
+  "journals": "Journalen",
+  "@journals": {
+    "description": "The journals menu button and the app bar title when in the journals screen."
+  },
+  "appDescription": "Jouw open-source app om bij te blijven met de wetenschappelijke literatuur. We zullen jouw snel op gang zetten!",
+  "@appDescription": {},
+  "setupInstitutionalAccessLong": "Selecteer de EZproxy van je institutie om toegang te krijgen aan hun journaal abonnementen. Dit zal de nood aan een VPN of op locatie toegang elimineren.",
+  "@setupInstitutionalAccessLong": {},
+  "downloads": "Installaties",
+  "@downloads": {
+    "description": "The downloads menu button and the app bar title when in the downloads screen."
+  },
+  "setupAlmostSetLong": "Vervolgens, we zullen jouw naar de zoekscherm brengen, waar je jouw favoriete journalen kan volgen. Vergeet niet om de categorie menu te veranderen van 'Artikels' naar 'Journalen'.",
+  "@setupAlmostSetLong": {},
+  "follow": "Volg",
+  "@follow": {
+    "description": "The button text shown on journal cards when it is not followed."
+  },
+  "unfollow": "Ontvolg",
+  "@unfollow": {
+    "description": "The button text shown on journal cards when it is followed."
+  },
+  "journalSearchError": "Een fout vond plaats tijdens het zoeken naar journalen.",
+  "@journalSearchError": {},
+  "subjects": "Onderwerpen",
+  "@subjects": {},
+  "viewarticle": "Zie artikel",
+  "@viewarticle": {}
+}
