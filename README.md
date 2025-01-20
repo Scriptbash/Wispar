@@ -17,12 +17,6 @@
 
 ---
 
-> [!IMPORTANT]
-> Wispar is currently in closed testing before being published on the Play Store. ~~Google requires a minimum of 12 testers, and **I need your help!** If you'd like to test the app and provide feedback, please send me your email at wispar-app@protonmail.com, and I'll add you to the closed testing group.~~ Thank you to everyone who spent time testing Wispar and providing valuable feedback, I appreciate it! As of January 13th, there are just 6 days left until I can submit the app for review. If approved, I’ll be able to send it for review on the production channel!
->
->Once Wispar is live on the Play Store, I will also look into publishing it on the App Store and F-Droid.
-
-
 ## Description
 <p align="justify">
 Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly searches scientific journals and articles using the Crossref API. Stay updated on your preferred journals by following them and receive new article abstracts in your main feed. No account required. The integration of Unpaywall ensures convenient access to open-access articles, while EZproxy helps overcome subscription barriers.  
@@ -54,8 +48,9 @@ Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly s
 ### Planned features
 <ul>
     <li> [ ] Deep links</li>
-    <li> [ ] Get downloads working for more publishers</li>
     <li> [ ] Export/Import the database</li>
+    <li> [ ] Filters</li>
+    <li> [ ] Get downloads working for more publishers</li> 
 </ul>
 
 ## Translations

@@ -6,6 +6,8 @@ import '../services/database_helper.dart';
 import '../services/abstract_helper.dart';
 import '../widgets/publication_card.dart';
 
+// TODO Add cleanup function back and fix "hide all abstract" removing abstract from article screen
+
 class FeedService {
   final DatabaseHelper _dbHelper = DatabaseHelper();
 
@@ -35,12 +37,24 @@ class FeedService {
     return journalsToUpdate;
   }
 
-  Future<void> updateFeed(BuildContext context, List<Journal> followedJournals,
-      void Function(String journalName) onJournalUpdate) async {
+  Future<void> updateFeed(
+      BuildContext context,
+      List<Journal> followedJournals,
+      void Function(String journalName) onJournalUpdate,
+      int fetchIntervalInHours) async {
     try {
-      for (Journal journal in followedJournals) {
+      // Check which journals need updating
+      final journalsToUpdate =
+          await checkJournalsToUpdate(followedJournals, fetchIntervalInHours);
+
+      for (String issn in journalsToUpdate) {
+        final journal = followedJournals.firstWhere((j) => j.issn == issn);
+
         // Notify the UI of the current journal being updated
         onJournalUpdate(journal.title);
+
+        // Update journal's last updated time
+        await _dbHelper.updateJournalLastUpdated(journal.issn);
 
         // Fetch recent feed from API
         List<journalWorks.Item> recentFeed =
@@ -64,8 +78,6 @@ class FeedService {
             isCached: true,
           );
         }
-        // Update journal's last updated time
-        await _dbHelper.updateJournalLastUpdated(journal.issn);
       }
     } catch (e) {
       debugPrint('Error updating feed: $e');
