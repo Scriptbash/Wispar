@@ -6,7 +6,7 @@ import '../services/database_helper.dart';
 import '../services/abstract_helper.dart';
 import '../widgets/publication_card.dart';
 
-// TODO Add cleanup function back and fix "hide all abstract" removing abstract from article screen
+// TODO fix "hide all abstract" removing abstract from article screen
 
 class FeedService {
   final DatabaseHelper _dbHelper = DatabaseHelper();
@@ -79,6 +79,7 @@ class FeedService {
           );
         }
       }
+      _dbHelper.cleanupOldArticles();
     } catch (e) {
       debugPrint('Error updating feed: $e');
     }

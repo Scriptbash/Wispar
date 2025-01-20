@@ -475,7 +475,7 @@ class DatabaseHelper {
   }
 
   // Cleanup the database, removing old articles
-  Future<void> cleanupOldArticles(BuildContext context) async {
+  Future<void> cleanupOldArticles() async {
     final db = await database;
 
     // Retrieve CleanupInterval from SharedPreferences
@@ -517,19 +517,11 @@ class DatabaseHelper {
             whereArgs: [article['article_id']],
           );
         }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("The database cleanup was successful.")),
-        );
-      } /*else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("No old articles to clean up.")),
-        );
-      }*/
+      } else {
+        debugPrint("No old articles to clean up.");
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error during database cleanup: $e")),
-      );
+      debugPrint('Error cleaning up the database : ${e}');
     }
   }
 }
