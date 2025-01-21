@@ -39,6 +39,19 @@ jobs:
         path: |
          build/app/outputs/flutter-apk/app-release.apk
          build/app/outputs/bundle/release/app-release.aab
+    - name: Extract version from pubspec.yaml
+      id: extract_version
+      run: |
+        version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+        echo "VERSION=$version" >> $GITHUB_ENV
+    - name: Create GitHub Release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "build/app/outputs/flutter-apk/app-release.apk,build/app/outputs/bundle/release/app-release.aab"
+        tag: v${{ env.VERSION }}
+        token: ${{ secrets.TOKEN }}
+        draft: true
+        generateReleaseNotes: true
     - name: Create google_service_account.json
       run: |
        echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT }}" | base64 --decode > android/google_service_account.json
