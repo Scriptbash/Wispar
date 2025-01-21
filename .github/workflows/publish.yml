@@ -42,11 +42,12 @@ jobs:
     - name: Create google_service_account.json
       run: |
        echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT }}" | base64 --decode > android/fastlane/google_service_account.json
-    - name: Deploy to Play Store
+    - name: Setup ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.0'
         bundler-cache: true
+    - name: Deploy to Play Store
       uses: maierj/fastlane-action@v3.1.0
       with:
         lane: deploy
