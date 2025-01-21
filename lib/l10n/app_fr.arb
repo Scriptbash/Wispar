@@ -302,5 +302,7 @@
   "displaySettings": "Paramètres d'affichage",
   "@displaySettings": {},
   "fetchingArticleFromJournal": "Récupération des articles de {journalName}.",
-  "@fetchingArticleFromJournal": {}
+  "@fetchingArticleFromJournal": {},
+  "madeBy": "Fait par {app_author}",
+  "@madeBy": {}
 }
