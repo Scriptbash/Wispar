@@ -221,7 +221,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
               children: [
                 IconButton(
                   iconSize: 30,
-                  icon: Icon(Icons.article_outlined),
+                  icon: Icon(Icons.description_outlined),
                   onPressed: () {
                     Navigator.push(
                       context,
