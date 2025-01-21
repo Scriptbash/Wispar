@@ -65,7 +65,7 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
             },
             title: Row(
               children: [
-                Icon(Icons.description_outlined),
+                Icon(Icons.article_outlined),
                 SizedBox(width: 8),
                 Text(AppLocalizations.of(context)!.publicationCard),
               ],

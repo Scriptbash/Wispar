@@ -150,6 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.home),
+        centerTitle: false,
         actions: <Widget>[
           PopupMenuButton<int>(
             icon: Icon(Icons.more_vert),

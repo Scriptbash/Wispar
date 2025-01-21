@@ -219,7 +219,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             icon: Icon(Icons.bug_report_outlined),
                             label: Text(
                                 AppLocalizations.of(context)!.reportIssue)),
-                      ]);
+                      ],
+                      applicationLegalese: AppLocalizations.of(context)!
+                          .madeBy("Francis Lapointe"));
                   //applicationLegalese: "");
                 },
                 title: Row(

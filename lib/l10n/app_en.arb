@@ -311,6 +311,8 @@
   "@privacyPolicy": {},
   "about": "About",
   "@about": {},
+  "madeBy": "Made by {app_author}",
+  "@madeBy": {},
   "donate": "Donate",
   "@donate": {},
   "donateMessage": "Help support development of Wispar",
