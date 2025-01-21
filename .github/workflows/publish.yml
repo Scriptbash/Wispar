@@ -41,7 +41,7 @@ jobs:
          build/app/outputs/bundle/release/app-release.aab
     - name: Create google_service_account.json
       run: |
-       echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT }}" | base64 --decode > android/fastlane/google_service_account.json
+       echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT }}" | base64 --decode > android/google_service_account.json
     - name: Setup ruby
       uses: ruby/setup-ruby@v1
       with:
