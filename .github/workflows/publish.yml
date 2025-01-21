@@ -45,7 +45,7 @@ jobs:
     - name: Setup ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.0'
+        ruby-version: '3.3.0'
         bundler-cache: true
     - name: Deploy to Play Store
       uses: maierj/fastlane-action@v3.1.0
