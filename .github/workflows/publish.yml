@@ -1,4 +1,4 @@
-name: Signed builds
+name: Signed builds and upload to Play Store
 
 on:
   workflow_dispatch:
@@ -39,3 +39,11 @@ jobs:
         path: |
          build/app/outputs/flutter-apk/app-release.apk
          build/app/outputs/bundle/release/app-release.aab
+    - name: Create google_service_account.json
+      run: |
+       echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT }}" | base64 --decode > android/fastlane/google_service_account.json
+    - name: Deploy to Play Store
+      uses: maierj/fastlane-action@v2.3.0
+      with:
+        lane: deploy
+        subdirectory: android
