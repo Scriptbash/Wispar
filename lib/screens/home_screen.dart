@@ -73,12 +73,32 @@ class _HomeScreenState extends State<HomeScreen> {
           switch (sortBy) {
             case 0: // Sort by published date
               return a.publishedDate!.compareTo(b.publishedDate!);
+
             case 1: // Sort by title
+              // If one of the titles is empty, push it to the end
+              if (a.title.isEmpty && b.title.isEmpty) return 0;
+              if (a.title.isEmpty) return 1;
+              if (b.title.isEmpty) return -1;
               return a.title.compareTo(b.title);
+
             case 2: // Sort by journal title
+              // If one of the journal titles is empty, push it to the end
+              if (a.journalTitle.isEmpty && b.journalTitle.isEmpty) return 0;
+              if (a.journalTitle.isEmpty) return 1;
+              if (b.journalTitle.isEmpty) return -1;
               return a.journalTitle.compareTo(b.journalTitle);
+
             case 3: // Sort by first author's family name
-              return a.authors[0].family.compareTo(b.authors[0].family);
+              // If one of the family names is empty, push it to the end
+              String aFamily =
+                  (a.authors.isNotEmpty ? a.authors[0].family : '');
+              String bFamily =
+                  (b.authors.isNotEmpty ? b.authors[0].family : '');
+              if (aFamily.isEmpty && bFamily.isEmpty) return 0;
+              if (aFamily.isEmpty) return 1;
+              if (bFamily.isEmpty) return -1;
+              return aFamily.compareTo(bFamily);
+
             default:
               return 0;
           }
