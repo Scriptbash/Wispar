@@ -104,27 +104,34 @@ class _ArticleSearchFormState extends State<ArticleSearchForm> {
           children: [
             SizedBox(height: 8),
             Center(
-              child: ToggleButtons(
-                isSelected: [
-                  selectedSearchIndex == 0,
-                  selectedSearchIndex == 1
-                ],
-                onPressed: (int index) {
-                  setState(() {
-                    selectedSearchIndex = index;
-                  });
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return ToggleButtons(
+                    children: [
+                      Container(
+                        width: constraints.maxWidth / 2 - 1.5,
+                        alignment: Alignment.center,
+                        child:
+                            Text(AppLocalizations.of(context)!.searchByQuery),
+                      ),
+                      Container(
+                        width: constraints.maxWidth / 2 - 1.5,
+                        alignment: Alignment.center,
+                        child: Text(AppLocalizations.of(context)!.searchByDOI),
+                      ),
+                    ],
+                    isSelected: [
+                      selectedSearchIndex == 0,
+                      selectedSearchIndex == 1,
+                    ],
+                    onPressed: (int index) {
+                      setState(() {
+                        selectedSearchIndex = index;
+                      });
+                    },
+                    borderRadius: BorderRadius.circular(8.0),
+                  );
                 },
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(AppLocalizations.of(context)!.searchByQuery),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(AppLocalizations.of(context)!.searchByDOI),
-                  ),
-                ],
-                borderRadius: BorderRadius.circular(8.0),
               ),
             ),
             SizedBox(height: 16),

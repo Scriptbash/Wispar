@@ -359,265 +359,260 @@ class QuerySearchFormState extends State<QuerySearchForm> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title field
-              TextFormField(
-                controller: titleController,
-                decoration: InputDecoration(
-                  labelText: 'Article title',
-                  border: OutlineInputBorder(),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title field
+            TextFormField(
+              controller: titleController,
+              decoration: InputDecoration(
+                labelText: 'Article title',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
+            // Author name fields
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: firstNameController,
+                    decoration: InputDecoration(
+                      labelText: "Author's first name",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(height: 16),
-              // Author name fields
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: firstNameController,
-                      decoration: InputDecoration(
-                        labelText: "Author's first name",
-                        border: OutlineInputBorder(),
-                      ),
+                SizedBox(width: 5),
+                Expanded(
+                  child: TextFormField(
+                    controller: lastNameController,
+                    decoration: InputDecoration(
+                      labelText: "Author's last name",
+                      border: OutlineInputBorder(),
                     ),
                   ),
-                  SizedBox(width: 5),
-                  Expanded(
-                    child: TextFormField(
-                      controller: lastNameController,
-                      decoration: InputDecoration(
-                        labelText: "Author's last name",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-              // Affiliation field
-              TextFormField(
-                controller: affiliationController,
-                decoration: InputDecoration(
-                  labelText: 'Affiliation',
-                  border: OutlineInputBorder(),
                 ),
+              ],
+            ),
+            SizedBox(height: 16),
+            // Affiliation field
+            TextFormField(
+              controller: affiliationController,
+              decoration: InputDecoration(
+                labelText: 'Affiliation',
+                border: OutlineInputBorder(),
               ),
-              SizedBox(height: 16),
-              // Sort by and sort order fields
-              Row(
-                children: [
-                  Expanded(
-                    child: DropdownButtonFormField<int>(
-                      decoration: InputDecoration(
-                        labelText: 'Sort by',
-                      ),
-                      value: selectedSortBy,
-                      isExpanded: true,
-                      onChanged: (int? newValue) {
-                        setState(() {
-                          selectedSortBy = newValue ?? 0;
-                        });
-                      },
-                      items: sortbyItems,
+            ),
+            SizedBox(height: 16),
+            // Sort by and sort order fields
+            Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<int>(
+                    decoration: InputDecoration(
+                      labelText: 'Sort by',
                     ),
+                    value: selectedSortBy,
+                    isExpanded: true,
+                    onChanged: (int? newValue) {
+                      setState(() {
+                        selectedSortBy = newValue ?? 0;
+                      });
+                    },
+                    items: sortbyItems,
                   ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: DropdownButtonFormField<int>(
-                      decoration: InputDecoration(
-                        labelText: 'Sort order',
-                      ),
-                      value: selectedSortOrder,
-                      isExpanded: true,
-                      onChanged: (int? newValue) {
-                        setState(() {
-                          selectedSortOrder = newValue ?? 0;
-                        });
-                      },
-                      items: sortorderItems,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-              // Collapsible section that shows more search options
-              ExpansionTile(
-                title: Text('More options'),
-                leading: Icon(
-                  isAdvancedSearchVisible
-                      ? Icons.expand_less
-                      : Icons.expand_more,
                 ),
-                trailing: SizedBox(),
-                onExpansionChanged: (bool expanded) {
-                  setState(() {
-                    isAdvancedSearchVisible = expanded;
-                  });
-                },
-                children: [
-                  SizedBox(height: 8),
-                  // Publisher field
-                  TextFormField(
-                    controller: publisherController,
+                SizedBox(width: 16),
+                Expanded(
+                  child: DropdownButtonFormField<int>(
                     decoration: InputDecoration(
-                      labelText: 'Publisher',
-                      border: OutlineInputBorder(),
+                      labelText: 'Sort order',
                     ),
+                    value: selectedSortOrder,
+                    isExpanded: true,
+                    onChanged: (int? newValue) {
+                      setState(() {
+                        selectedSortOrder = newValue ?? 0;
+                      });
+                    },
+                    items: sortorderItems,
                   ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: bibliographicController,
-                    decoration: InputDecoration(
-                      labelText: "Bibliographic",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: degreeController,
-                    decoration: InputDecoration(
-                      labelText: "Degree",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: descriptionController,
-                    decoration: InputDecoration(
-                      labelText: "Description",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: editorFirstNameController,
-                          decoration: InputDecoration(
-                            labelText: "Editor first name",
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 5),
-                      Expanded(
-                        child: TextFormField(
-                          controller: editorLastNameController,
-                          decoration: InputDecoration(
-                            labelText: "Editor last name",
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: eventAcronymController,
-                    decoration: InputDecoration(
-                      labelText: "Event acronym",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: eventLocationController,
-                    decoration: InputDecoration(
-                      labelText: "Event location",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: eventNameController,
-                    decoration: InputDecoration(
-                      labelText: "Event name",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: eventSponsorController,
-                    decoration: InputDecoration(
-                      labelText: "Event sponsor",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: eventThemeController,
-                    decoration: InputDecoration(
-                      labelText: "Event theme",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: funderNameController,
-                    decoration: InputDecoration(
-                      labelText: "Funder name",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: publisherLocationController,
-                    decoration: InputDecoration(
-                      labelText: "Publisher location",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: standardsBodyAcronymController,
-                    decoration: InputDecoration(
-                      labelText: "Standards body acronym",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: standardsBodyNameController,
-                    decoration: InputDecoration(
-                      labelText: "Standards body name",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                ],
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
+            // Collapsible section that shows more search options
+            ExpansionTile(
+              title: Text('More options'),
+              leading: Icon(
+                isAdvancedSearchVisible ? Icons.expand_less : Icons.expand_more,
               ),
-              SizedBox(height: 16),
-              Text(
-                AppLocalizations.of(context)!.saveQuery,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Switch(
-                value: saveQuery,
-                onChanged: (bool value) {
-                  setState(() {
-                    saveQuery = value;
-                  });
-                },
-              ),
-              SizedBox(height: 8),
-              if (saveQuery)
+              trailing: SizedBox(),
+              onExpansionChanged: (bool expanded) {
+                setState(() {
+                  isAdvancedSearchVisible = expanded;
+                });
+              },
+              children: [
+                SizedBox(height: 8),
+                // Publisher field
                 TextFormField(
-                  controller: queryNameController,
+                  controller: publisherController,
                   decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.queryName,
+                    labelText: 'Publisher',
                     border: OutlineInputBorder(),
                   ),
                 ),
-              SizedBox(height: 16),
-            ],
-          ),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: bibliographicController,
+                  decoration: InputDecoration(
+                    labelText: "Bibliographic",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: degreeController,
+                  decoration: InputDecoration(
+                    labelText: "Degree",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: descriptionController,
+                  decoration: InputDecoration(
+                    labelText: "Description",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: editorFirstNameController,
+                        decoration: InputDecoration(
+                          labelText: "Editor first name",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 5),
+                    Expanded(
+                      child: TextFormField(
+                        controller: editorLastNameController,
+                        decoration: InputDecoration(
+                          labelText: "Editor last name",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: eventAcronymController,
+                  decoration: InputDecoration(
+                    labelText: "Event acronym",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: eventLocationController,
+                  decoration: InputDecoration(
+                    labelText: "Event location",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: eventNameController,
+                  decoration: InputDecoration(
+                    labelText: "Event name",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: eventSponsorController,
+                  decoration: InputDecoration(
+                    labelText: "Event sponsor",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: eventThemeController,
+                  decoration: InputDecoration(
+                    labelText: "Event theme",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: funderNameController,
+                  decoration: InputDecoration(
+                    labelText: "Funder name",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: publisherLocationController,
+                  decoration: InputDecoration(
+                    labelText: "Publisher location",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: standardsBodyAcronymController,
+                  decoration: InputDecoration(
+                    labelText: "Standards body acronym",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: standardsBodyNameController,
+                  decoration: InputDecoration(
+                    labelText: "Standards body name",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+              ],
+            ),
+            SizedBox(height: 16),
+            Text(
+              AppLocalizations.of(context)!.saveQuery,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Switch(
+              value: saveQuery,
+              onChanged: (bool value) {
+                setState(() {
+                  saveQuery = value;
+                });
+              },
+            ),
+            SizedBox(height: 8),
+            if (saveQuery)
+              TextFormField(
+                controller: queryNameController,
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.queryName,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            SizedBox(height: 16),
+          ],
         ),
       ),
     );

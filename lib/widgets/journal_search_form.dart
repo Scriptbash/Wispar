@@ -59,28 +59,35 @@ class _JournalSearchFormState extends State<JournalSearchForm> {
           children: [
             SizedBox(height: 16),
             Center(
-              child: ToggleButtons(
-                isSelected: [
-                  selectedSearchIndex == 0,
-                  selectedSearchIndex == 1
-                ],
-                onPressed: (int index) {
-                  setState(() {
-                    selectedSearchIndex = index;
-                    _searchController.clear();
-                  });
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return ToggleButtons(
+                    isSelected: [
+                      selectedSearchIndex == 0,
+                      selectedSearchIndex == 1,
+                    ],
+                    onPressed: (int index) {
+                      setState(() {
+                        selectedSearchIndex = index;
+                        _searchController.clear();
+                      });
+                    },
+                    children: [
+                      Container(
+                        width: constraints.maxWidth / 2 - 1.5,
+                        alignment: Alignment.center,
+                        child:
+                            Text(AppLocalizations.of(context)!.searchByTitle),
+                      ),
+                      Container(
+                        width: constraints.maxWidth / 2 - 1.5,
+                        alignment: Alignment.center,
+                        child: Text(AppLocalizations.of(context)!.searchByISSN),
+                      ),
+                    ],
+                    borderRadius: BorderRadius.circular(8.0),
+                  );
                 },
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(AppLocalizations.of(context)!.searchByTitle),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(AppLocalizations.of(context)!.searchByISSN),
-                  ),
-                ],
-                borderRadius: BorderRadius.circular(8.0),
               ),
             ),
             SizedBox(height: 32),

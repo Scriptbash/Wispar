@@ -209,13 +209,27 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(AppLocalizations.of(context)!.buildingfeed),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      AppLocalizations.of(context)!.buildingfeed,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                  ),
                   SizedBox(height: 16),
                   CircularProgressIndicator(),
                   SizedBox(height: 16),
                   if (_currentJournalName.isNotEmpty)
-                    Text(AppLocalizations.of(context)!
-                        .fetchingArticleFromJournal(_currentJournalName))
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        AppLocalizations.of(context)!
+                            .fetchingArticleFromJournal(_currentJournalName),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16.0),
+                      ),
+                    ),
                 ],
               ),
             );
@@ -223,7 +237,14 @@ class _HomeScreenState extends State<HomeScreen> {
             return Center(child: Text('Error: ${snapshot.error.toString()}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
-              child: Text(AppLocalizations.of(context)!.homeFeedEmpty),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  AppLocalizations.of(context)!.homeFeedEmpty,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16.0),
+                ),
+              ),
             );
           } else {
             return ListView.builder(

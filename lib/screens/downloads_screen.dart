@@ -66,7 +66,16 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _downloadedArticles.isEmpty
-              ? Center(child: Text(AppLocalizations.of(context)!.noDownloads))
+              ? Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      AppLocalizations.of(context)!.noDownloads,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                  ),
+                )
               : ListView.builder(
                   itemCount: _downloadedArticles.length,
                   itemBuilder: (context, index) {
