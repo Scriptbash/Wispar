@@ -20,10 +20,10 @@ platform :android do
   lane :deploy do
     #version = flutter_version()
     upload_to_play_store(
-      track: 'internal', # Can be 'internal', 'alpha', 'beta', 'production'
+      track: 'production', # Can be 'internal', 'alpha', 'beta', 'production'
       json_key: 'google_service_account.json',
       skip_upload_apk: true,
-      validate_only: true,
+      validate_only: false,
       #skip_upload_metadata: true, # Skip uploading metadata
       #skip_upload_images: true, # Skip uploading screenshots
       #skip_upload_screenshots: true, # Skip uploading screenshots
