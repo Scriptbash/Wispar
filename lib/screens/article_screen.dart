@@ -21,6 +21,7 @@ class ArticleScreen extends StatefulWidget {
   final String url;
   final String license;
   final String licenseName;
+  final String? publisher;
 
   const ArticleScreen({
     Key? key,
@@ -34,6 +35,7 @@ class ArticleScreen extends StatefulWidget {
     required this.url,
     required this.license,
     required this.licenseName,
+    this.publisher,
   }) : super(key: key);
 
   @override
@@ -291,6 +293,11 @@ class _ArticleScreenState extends State<ArticleScreen> {
   }
 
   Future<Map<String, dynamic>?> getJournalDetails(String issn) async {
+    if (widget.publisher != null) {
+      return {'publisher': widget.publisher};
+    }
+
+    // If publisher is not passed, fetch from the database
     final db = await databaseHelper.database;
     final List<Map<String, dynamic>> rows = await db.query(
       'journals',

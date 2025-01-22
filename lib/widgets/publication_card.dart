@@ -29,6 +29,7 @@ class PublicationCard extends StatefulWidget {
   final String licenseName;
   final String? dateLiked;
   final VoidCallback? onFavoriteChanged;
+  final String? publisher;
 
   const PublicationCard({
     Key? key,
@@ -44,6 +45,7 @@ class PublicationCard extends StatefulWidget {
     required this.licenseName,
     this.dateLiked,
     this.onFavoriteChanged,
+    this.publisher,
   })  : authors = authors,
         super(key: key);
 
@@ -87,6 +89,7 @@ class _PublicationCardState extends State<PublicationCard> {
               url: widget.url,
               license: widget.license,
               licenseName: widget.licenseName,
+              publisher: widget.publisher,
             ),
           ),
         );
@@ -325,6 +328,10 @@ class _PublicationCardState extends State<PublicationCard> {
   }
 
   Future<Map<String, dynamic>?> getJournalDetails(String issn) async {
+    if (widget.publisher != null) {
+      return {'publisher': widget.publisher};
+    }
+    // If publisher is not passed, fetch from the database
     final db = await databaseHelper.database;
     final List<Map<String, dynamic>> rows = await db.query(
       'journals',

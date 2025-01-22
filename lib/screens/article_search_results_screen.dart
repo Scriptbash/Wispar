@@ -110,6 +110,7 @@ class _ArticleSearchResultsScreenState
                   url: item.url,
                   license: item.license,
                   licenseName: item.licenseName,
+                  publisher: item.publisher,
                 );
               },
             )
