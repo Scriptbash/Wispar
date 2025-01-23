@@ -105,48 +105,48 @@ class _PublicationCardState extends State<PublicationCard> {
               Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
+                  Flexible(
+                    flex: 4,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton(
+                        onPressed: () async {
+                          Map<String, dynamic>? journalInfo =
+                              await getJournalDetails(widget.issn);
+                          if (journalInfo != null && journalInfo.isNotEmpty) {
+                            String journalPublisher = journalInfo['publisher'];
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => JournalDetailsScreen(
+                                  title: widget.journalTitle,
+                                  publisher: journalPublisher,
+                                  issn: widget.issn,
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        child: Text(
+                          widget.journalTitle,
+                          style: TextStyle(fontSize: 16),
+                          softWrap: true,
+                        ),
+                        style: TextButton.styleFrom(
+                          minimumSize: Size.zero,
+                          padding: EdgeInsets.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ),
+                    ),
+                  ),
                   Expanded(
-                      child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: TextButton(
-                            onPressed: () async {
-                              // Need to add a check to avoid infinite routing
-                              Map<String, dynamic>? journalInfo =
-                                  await getJournalDetails(widget.issn);
-                              if (journalInfo != Null && journalInfo != '') {
-                                String journalPublisher =
-                                    journalInfo?['publisher'];
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          JournalDetailsScreen(
-                                        title: widget.journalTitle,
-                                        publisher: journalPublisher,
-                                        issn: widget.issn,
-                                      ),
-                                    ));
-                              }
-                            },
-                            child: Text(
-                              widget.journalTitle,
-                              style: TextStyle(fontSize: 16),
-                              softWrap: true,
-                            ),
-                            style: TextButton.styleFrom(
-                              minimumSize: Size.zero,
-                              padding: EdgeInsets.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                          ))),
-                  Expanded(
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
                         PopupMenuButton<SampleItem>(
                           onSelected: (SampleItem result) {
                             setState(() {
-                              //selectedMenu = result;
                               if (result == SampleItem.itemOne) {
                                 // Send article to Zotero
                                 // Prepare the author names
@@ -208,12 +208,15 @@ class _PublicationCardState extends State<PublicationCard> {
                                 )),
                           ],
                         )
-                      ]))
+                      ],
+                    ),
+                  )
                 ],
               ),
               Text(
                 widget.title,
                 style: TextStyle(fontWeight: FontWeight.bold),
+                softWrap: true,
               ),
               Text(
                 '${AppLocalizations.of(context)!.publishedon} ${formatDate(widget.publishedDate!)}',
@@ -305,10 +308,8 @@ class _PublicationCardState extends State<PublicationCard> {
               if (widget.dateLiked != null)
                 Text(
                   '\n${AppLocalizations.of(context)!.addedtoyourfav} ${widget.dateLiked}',
-                  style: TextStyle(
-                    color: Colors.grey,
-                  ),
-                ),
+                  style: TextStyle(color: Colors.grey),
+                )
             ],
           ),
         ),
