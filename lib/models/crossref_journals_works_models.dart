@@ -123,6 +123,15 @@ class Item {
       journalTitle = (json['container-title'] as List<dynamic>).first ?? '';
     }
 
+    String issn = '';
+    if (json['ISSN'] != null) {
+      if (json['ISSN'] is List && (json['ISSN'] as List).isNotEmpty) {
+        issn = (json['ISSN'] as List<dynamic>).first ?? '';
+      } else {
+        issn = json['ISSN'] ?? '';
+      }
+    }
+
     return Item(
       publisher: json['publisher'] ?? '',
       abstract: _cleanAbstract(json['abstract'] ?? ''),
@@ -135,7 +144,7 @@ class Item {
       primaryUrl: json['resource']['primary']['URL'] ?? '',
       license: licenseUrl,
       licenseName: licenseName,
-      issn: json['issn'] ?? '',
+      issn: issn,
     );
   }
   static Map<String, String> licenseNames = {

@@ -226,7 +226,7 @@ class DatabaseHelper {
         final Map<String, dynamic> journalData = {
           'issn': publicationCard.issn,
           'title': publicationCard.journalTitle, // default title
-          'publisher': '',
+          'publisher': publicationCard.publisher,
         };
 
         journalId = await db.insert('journals', journalData);

@@ -129,6 +129,7 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
                                   url: work.primaryUrl,
                                   license: work.license,
                                   licenseName: work.licenseName,
+                                  publisher: work.publisher,
                                 );
                               }
                             },
@@ -145,6 +146,7 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
                             url: work.primaryUrl,
                             license: work.license,
                             licenseName: work.licenseName,
+                            publisher: work.publisher,
                           );
                         }
                       } else if (hasMoreResults) {
@@ -185,10 +187,11 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
         hasMoreResults = newWorks.hasMore && newWorks.list.isNotEmpty;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(AppLocalizations.of(context)!
-                  .failLoadMorePublication)) //$e')),
-          );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(AppLocalizations.of(context)!.failLoadMorePublication),
+        ));
+      }
     } finally {
       setState(() => isLoading = false);
     }

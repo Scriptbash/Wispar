@@ -70,6 +70,7 @@ class _ArticleSearchFormState extends State<ArticleSearchForm> {
                 url: article.url,
                 license: article.license,
                 licenseName: article.licenseName,
+                publisher: article.publisher,
               ),
             ),
           );

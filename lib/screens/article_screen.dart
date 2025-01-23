@@ -135,10 +135,12 @@ class _ArticleScreenState extends State<ArticleScreen> {
                                 );
                               }
                             },
-                            child: Text(
-                              '${AppLocalizations.of(context)!.publishedin} ${widget.journalTitle}',
-                              style: TextStyle(color: Colors.grey),
-                            ),
+                            child: widget.journalTitle.isNotEmpty
+                                ? Text(
+                                    '${AppLocalizations.of(context)!.publishedin} ${widget.journalTitle}',
+                                    style: TextStyle(color: Colors.grey),
+                                  )
+                                : SizedBox(),
                             style: TextButton.styleFrom(
                               minimumSize: Size.zero,
                               padding: EdgeInsets.zero,
@@ -174,6 +176,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                             url: widget.url,
                             license: widget.license,
                             licenseName: widget.licenseName,
+                            publisher: widget.publisher,
                           ),
                           isLiked: true,
                         );
@@ -240,6 +243,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                             license: widget.license,
                             licenseName: widget.licenseName,
                             abstract: widget.abstract,
+                            publisher: widget.publisher,
                           ),
                         ),
                       ),
