@@ -446,7 +446,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
             SizedBox(height: 16),
             // Collapsible section that shows more search options
             ExpansionTile(
-              title: Text('More options'),
+              title: Text(AppLocalizations.of(context)!.moreOptions),
               leading: Icon(
                 isAdvancedSearchVisible ? Icons.expand_less : Icons.expand_more,
               ),

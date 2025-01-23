@@ -69,12 +69,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       future: getUnpaywallStatus(),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
+                          String status =
+                              snapshot.data ?? '1'; // Default to '1' (Enabled)
+                          String statusText = status == '1'
+                              ? AppLocalizations.of(context)!.enabled
+                              : AppLocalizations.of(context)!.disabled;
+
                           return Center(
-                            child: Text(snapshot.data ?? 'Enabled'),
+                            child: Text(statusText),
                           );
                         } else {
                           return Center(
-                            child: Text('Enabled'),
+                            child: Text(AppLocalizations.of(context)!
+                                .enabled), // Default text
                           );
                         }
                       },
@@ -282,13 +289,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<String?> getUnpaywallStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {});
-    return prefs.getString('unpaywall') ?? 'Enabled';
+    return prefs.getString('unpaywall') ?? '1';
   }
 
   void _showUnpaywallDialog(BuildContext context) async {
     // Fetch the current status of Unpaywall before opening the dialog
     String? currentStatus = await getUnpaywallStatus();
-    currentStatus ??= 'Enabled';
+    currentStatus ??= '1';
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -299,7 +306,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: <Widget>[
               RadioListTile<String>(
                 title: Text(AppLocalizations.of(context)!.enabled),
-                value: "Enabled",
+                value: "1",
                 groupValue: currentStatus,
                 onChanged: (value) {
                   if (value != null) {
@@ -310,7 +317,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               RadioListTile<String>(
                 title: Text(AppLocalizations.of(context)!.disabled),
-                value: "Disabled",
+                value: "0",
                 groupValue: currentStatus,
                 onChanged: (value) {
                   if (value != null) {

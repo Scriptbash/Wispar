@@ -67,10 +67,10 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
 
   Future<void> checkUnpaywallAvailability() async {
     final prefs = await SharedPreferences.getInstance();
-    String unpaywallPrefs = prefs.getString('unpaywall') ?? 'Enabled';
+    String unpaywallPrefs = prefs.getString('unpaywall') ?? '1';
 
     // Check Unpaywall for PDF if enabled in the settings
-    if (unpaywallPrefs == 'Enabled') {
+    if (unpaywallPrefs == '1') {
       final Unpaywall result =
           await UnpaywallService.checkAvailability(widget.publicationCard.doi);
       if (result.pdfUrl.isNotEmpty) {
