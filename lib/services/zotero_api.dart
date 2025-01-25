@@ -222,10 +222,10 @@ class ZoteroService {
       }
 
       if (collectionExists) {
-        print(
+        debugPrint(
             'Wispar collection already exists with key: $wisparCollectionKey');
       } else {
-        print('Wispar collection does not exist yet');
+        debugPrint('Wispar collection does not exist yet');
 
         // Create the "Wispar" collection
         await ZoteroService.createZoteroCollection(apiKey, userId, 'Wispar');

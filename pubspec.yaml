@@ -42,7 +42,7 @@ dependencies:
   sqflite: ^2.4.1
   flutter_localizations:
     sdk: flutter
-  intl: ^0.19.0
+  intl: ^0.20.1
   flutter_inappwebview: ^6.1.5
   url_launcher: ^6.3.1
   http: ^1.2.2
@@ -59,8 +59,9 @@ dev_dependencies:
 
 
 flutter_launcher_icons:
-  android: "launcher_icon"
+  android: true
   ios: true
+  remove_alpha_ios: true
   image_path: "assets/icon/icon.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
 
