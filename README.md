@@ -9,6 +9,10 @@
 <a href="https://hosted.weblate.org/engage/wispar/">
 <img src="https://hosted.weblate.org/widget/wispar/svg-badge.svg" alt="Translation status" />
 </a>
+</br>
+<a href="https://play.google.com/store/apps/details?id=app.wispar.wispar" target="_blank">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play" height="50"/>
+</a>
 </br></br>
 <a href='https://ko-fi.com/A0A6ME7SJ' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi5.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 </p>
