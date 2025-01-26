@@ -322,5 +322,7 @@
   "unknownLicense": "Onbekende licentie",
   "@unknownLicense": {},
   "hours": "uren",
-  "@hours": {}
+  "@hours": {},
+  "madeBy": "Gemaakt door {app_author}",
+  "@madeBy": {}
 }
