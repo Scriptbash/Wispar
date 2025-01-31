@@ -1,1 +1,8 @@
-{}
+{
+  "welcomeWispar": "به ویسپار خوش آمدید!",
+  "@welcomeWispar": {},
+  "appDescription": "با این برنامهٔ متن‌باز، از آخرین مقالات علمی باخبر باشید. سریع راه‌اندازیش می‌کنیم!",
+  "@appDescription": {},
+  "setupInstitutionalAccess": "راه اندازی دسترسی از طریق مؤسسه‌ یا دانشگاه شما (اختیاری)",
+  "@setupInstitutionalAccess": {}
+}
