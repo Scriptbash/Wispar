@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import './institutions_screen.dart';
@@ -239,7 +240,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
               ),
-              ListTile(
+              if (!Platform.isIOS)
+                ListTile(
                   onTap: () {
                     launchUrl(Uri.parse('https://ko-fi.com/scriptbash'),
                         mode: LaunchMode.platformDefault);
@@ -254,7 +256,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: Row(children: [
                     SizedBox(width: 32),
                     Text(AppLocalizations.of(context)!.donateMessage)
-                  ])),
+                  ]),
+                ),
             ],
           ),
         ),
