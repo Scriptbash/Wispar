@@ -13,6 +13,9 @@
 <a href="https://play.google.com/store/apps/details?id=app.wispar.wispar" target="_blank">
   <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play" height="50"/>
 </a>
+<a href="https://apps.apple.com/us/app/wispar/id6741366984" target="_blank">
+  <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store"height="50">
+</a>
 </br></br>
 <a href='https://ko-fi.com/A0A6ME7SJ' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi5.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 </p>
@@ -23,18 +26,6 @@
 <p align="justify">
 Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly searches scientific journals and articles using the Crossref API. Stay updated on your preferred journals by following them and receive new article abstracts in your main feed. No account required. The integration of Unpaywall ensures convenient access to open-access articles, while EZproxy helps overcome subscription barriers.  
 </p>
-
-## Screenshots
-
-
-| Home screen (light)                                       | Search screen (light)                                | Journals screen(dark)                                          |
-|---------------------------------------------------|------------------------------------------------------|---------------------------------------------------------|
-| ![Feed](screenshots/light_ios_feed.png)            | ![Search](screenshots/light_ios_search_screen.png)   | ![Journals](screenshots/dark_ios_library_journals.png)  |
-
-| Queries screen (dark)                              | Journal latest works (dark)                               | Abstract (dark)                                          |
-|---------------------------------------------------|------------------------------------------------------|---------------------------------------------------------|
-| ![Query](screenshots/dark_ios_library_queries.png) | ![JournalDetails](screenshots/dark_ios_journal_details.png) | ![Abstract](screenshots/dark_android_abstract.png)      |
-
 
 ## Features overview
 <ul>
@@ -85,14 +76,16 @@ If you run into any issue while using Wispar, have a question or want to share y
 
 ## Credits
 <ul>
+    <li>Thank you<a href="https://github.com/reds2401" target='_blank'> Sergio </a>for the app icon!</li>
     <li><a href="https://libproxy-db.org/" target='_blank'>Library Proxy URL Database</a></li>
     <li><a href="https://unpaywall.org/" target='_blank'>Unpaywall</a></li>
     <li><a href="https://www.crossref.org/" target='_blank'>Crossref</a></li>
 </ul>
 
-## FAQ
- <b>Q</b>: The journal subjects are missing or are incorrect</br>
-<b>A</b>: This is a problem with the Crossref API that originates from Scopus. The subjects metadata from Crossref may be removed in the future though according to this <a href="https://community.crossref.org/t/retrieve-subjects-and-subject-from-journals-and-works/2403/6" target="_blank">thread</a>. 
+## Screenshots
 
-<b>Q</b>: My institution's EZproxy URL is missing or is incorrect</br>
-<b>A</b>: If you can view the list of proxies correctly in the app but notice that your institution is missing or has an incorrect URL, please report the issue to the EZproxy-db by opening a new <a href="https://github.com/tom5760/ezproxy-db/issues/new/choose" target="_blank">issue</a> in their repository. Otherwise, please open a new issue in Wispar's repository. 
+
+
+| ![Feed](android/fastlane/metadata/android/en-US/images/phoneScreenshots/1_en-US.png) | ![Abstract](android/fastlane/metadata/android/en-US/images/phoneScreenshots/2_en-US.png) | ![Search](android/fastlane/metadata/android/en-US/images/phoneScreenshots/3_en-US.png) |
+|---|---|---|
+| ![Journal latest publications](android/fastlane/metadata/android/en-US/images/phoneScreenshots/4_en-US.png) | ![JournalDetails](android/fastlane/metadata/android/en-US/images/phoneScreenshots/6_en-US.png) | ![Settings](android/fastlane/metadata/android/en-US/images/phoneScreenshots/7_en-US.png) |
