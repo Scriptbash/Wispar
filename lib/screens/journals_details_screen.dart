@@ -60,6 +60,7 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18.0,
+                  color: Colors.white,
                 ),
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.fade,

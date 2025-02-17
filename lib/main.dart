@@ -172,27 +172,27 @@ class _HomeScreenNavigatorState extends State<HomeScreenNavigator> {
             SalomonBottomBarItem(
               icon: const Icon(Icons.home_outlined),
               title: Text(getLocalizedText(bottomBarContext, 'home')),
-              selectedColor: Colors.deepPurpleAccent,
+              selectedColor: Theme.of(context).colorScheme.primary,
             ),
             SalomonBottomBarItem(
               icon: const Icon(Icons.search_outlined),
               title: Text(getLocalizedText(bottomBarContext, 'search')),
-              selectedColor: Colors.deepPurpleAccent,
+              selectedColor: Theme.of(context).colorScheme.primary,
             ),
             SalomonBottomBarItem(
               icon: const Icon(Icons.my_library_books_outlined),
               title: Text(getLocalizedText(bottomBarContext, 'library')),
-              selectedColor: Colors.deepPurpleAccent,
+              selectedColor: Theme.of(context).colorScheme.primary,
             ),
             SalomonBottomBarItem(
               icon: const Icon(Icons.favorite_border),
               title: Text(getLocalizedText(bottomBarContext, 'favorites')),
-              selectedColor: Colors.deepPurpleAccent,
+              selectedColor: Theme.of(context).colorScheme.primary,
             ),
             SalomonBottomBarItem(
               icon: const Icon(Icons.download_outlined),
               title: Text(getLocalizedText(bottomBarContext, 'downloads')),
-              selectedColor: Colors.deepPurpleAccent,
+              selectedColor: Theme.of(context).colorScheme.primary,
             ),
           ],
         ),
