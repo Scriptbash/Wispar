@@ -179,8 +179,18 @@ class _PublicationCardState extends State<PublicationCard> {
                                   duration: const Duration(seconds: 1),
                                 ));
                               } else if (result == SampleItem.itemThree) {
-                                Share.share(
-                                    '${widget.title}\n\n${widget.url}\n\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage} 👻');
+                                final box =
+                                    context.findRenderObject() as RenderBox?;
+                                try {
+                                  Share.share(
+                                    '${widget.title}\n\n${widget.url}\n\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage} 👻',
+                                    sharePositionOrigin:
+                                        box!.localToGlobal(Offset.zero) &
+                                            box.size,
+                                  );
+                                } catch (e) {
+                                  debugPrint('Shared too fast: {$e}');
+                                }
                               }
                             });
                           },

@@ -53,18 +53,31 @@ class _ArticleScreenState extends State<ArticleScreen> {
     checkIfLiked();
   }
 
+  void _onShare(BuildContext context) async {
+    final box = context.findRenderObject() as RenderBox?;
+    try {
+      await Share.share(
+        '${widget.title}\n\n${widget.url}\n\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage} 👻',
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+      );
+    } catch (e) {
+      debugPrint('Shared too fast: {$e}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
-          IconButton(
-              onPressed: () {
-                Share.share(
-                    '${widget.title}\n\n${widget.url}\n\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage} 👻');
-              },
-              icon: Icon(Icons.share_outlined))
+          Builder(
+            builder: (BuildContext context) {
+              return IconButton(
+                  onPressed: () => _onShare(context),
+                  icon: Icon(Icons.share_outlined));
+            },
+          ),
         ],
       ),
       body: SingleChildScrollView(
