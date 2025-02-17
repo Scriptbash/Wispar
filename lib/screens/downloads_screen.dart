@@ -19,18 +19,43 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
   int sortBy = 0; // Set the sort by option to Article title by default
   int sortOrder = 0; // Set the sort order to Ascending by default
 
+  // Variables related to the filter bar in the appbar
+  final TextEditingController _filterController = TextEditingController();
+  List<DownloadedCard> _filteredDownloads = [];
+
   @override
   void initState() {
     super.initState();
     _fetchDownloadedArticles();
+
+    _filterController.addListener(() {
+      _filterDownloads(_filterController.text);
+    });
   }
 
   Future<void> _fetchDownloadedArticles() async {
     final databaseHelper = DatabaseHelper();
     final articles = await databaseHelper.getDownloadedArticles();
     setState(() {
-      _downloadedArticles = articles;
+      _downloadedArticles = _sortDownloads(articles);
+      _filteredDownloads = List.from(_downloadedArticles);
       _isLoading = false;
+    });
+  }
+
+  void _filterDownloads(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredDownloads = List.from(_downloadedArticles);
+      } else {
+        _filteredDownloads = _downloadedArticles.where((article) {
+          final title = article.publicationCard.title.toLowerCase();
+          final journalTitle =
+              article.publicationCard.journalTitle.toLowerCase();
+          return title.contains(query.toLowerCase()) ||
+              journalTitle.contains(query.toLowerCase());
+        }).toList();
+      }
     });
   }
 
@@ -38,48 +63,68 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Container(
+          height: 50.0,
+          child: TextField(
+            controller: _filterController,
+            decoration: InputDecoration(
+                hintText: AppLocalizations.of(context)!.filterDownloads,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(
+                      color: Color.fromARGB(31, 148, 147, 147), width: 0.0),
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                border: OutlineInputBorder(
+                  borderSide: const BorderSide(
+                      color: Color.fromARGB(31, 148, 147, 147), width: 0.0),
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                prefixIcon: Icon(Icons.search),
+                filled: true,
+                fillColor: Color.fromARGB(31, 148, 147, 147),
+                suffixIcon: PopupMenuButton<int>(
+                  icon: Icon(Icons.more_vert),
+                  onSelected: (item) => handleMenuButton(item),
+                  itemBuilder: (context) => [
+                    PopupMenuItem<int>(
+                      value: 0,
+                      child: ListTile(
+                        leading: Icon(Icons.sort),
+                        title: Text(AppLocalizations.of(context)!.sortby),
+                      ),
+                    ),
+                    PopupMenuItem<int>(
+                      value: 1,
+                      child: ListTile(
+                        leading: Icon(Icons.sort_by_alpha),
+                        title: Text(AppLocalizations.of(context)!.sortorder),
+                      ),
+                    ),
+                  ],
+                )),
+          ),
+        ),
         centerTitle: false,
-        title: Text(AppLocalizations.of(context)!.downloads),
-        actions: [
-          PopupMenuButton<int>(
-            icon: Icon(Icons.more_vert),
-            onSelected: (item) => handleMenuButton(item),
-            itemBuilder: (context) => [
-              PopupMenuItem<int>(
-                value: 0,
-                child: ListTile(
-                  leading: Icon(Icons.sort),
-                  title: Text(AppLocalizations.of(context)!.sortby),
-                ),
-              ),
-              PopupMenuItem<int>(
-                value: 1,
-                child: ListTile(
-                  leading: Icon(Icons.sort_by_alpha),
-                  title: Text(AppLocalizations.of(context)!.sortorder),
-                ),
-              ),
-            ],
-          )
-        ],
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : _downloadedArticles.isEmpty
+          : _filteredDownloads.isEmpty
               ? Center(
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Text(
-                      AppLocalizations.of(context)!.noDownloads,
+                      _filterController.text.isEmpty
+                          ? AppLocalizations.of(context)!.noDownloads
+                          : AppLocalizations.of(context)!.filterResultsEmpty,
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 16.0),
                     ),
                   ),
                 )
               : ListView.builder(
-                  itemCount: _downloadedArticles.length,
+                  itemCount: _filteredDownloads.length,
                   itemBuilder: (context, index) {
-                    final article = _downloadedArticles[index];
+                    final article = _filteredDownloads[index];
                     return DownloadedCard(
                       publicationCard: article.publicationCard,
                       pdfPath: article.pdfPath,
@@ -106,6 +151,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
             setState(() {
               sortBy = value;
               _downloadedArticles = _sortDownloads(_downloadedArticles);
+              _filterDownloads(_filterController.text); // Apply filter again
             });
           },
           sortOptions: [
@@ -129,6 +175,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                 setState(() {
                   sortOrder = value;
                   _downloadedArticles = _sortDownloads(_downloadedArticles);
+                  _filterDownloads(_filterController.text);
                 });
               },
             );
@@ -169,5 +216,11 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     }
 
     return downloads;
+  }
+
+  @override
+  void dispose() {
+    _filterController.dispose();
+    super.dispose();
   }
 }
