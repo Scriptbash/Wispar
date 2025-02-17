@@ -229,7 +229,8 @@ class _PublicationCardState extends State<PublicationCard> {
                 softWrap: true,
               ),
               Text(
-                '${AppLocalizations.of(context)!.publishedon} ${formatDate(widget.publishedDate!)}',
+                AppLocalizations.of(context)!
+                    .publishedon(widget.publishedDate!),
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 13,
@@ -317,7 +318,8 @@ class _PublicationCardState extends State<PublicationCard> {
               ),
               if (widget.dateLiked != null)
                 Text(
-                  '\n${AppLocalizations.of(context)!.addedtoyourfav} ${widget.dateLiked}',
+                  AppLocalizations.of(context)!
+                      .addedtoyourfav(DateTime.parse(widget.dateLiked!)),
                   style: TextStyle(color: Colors.grey),
                 )
             ],

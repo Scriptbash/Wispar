@@ -137,8 +137,13 @@
   "@latestpublications": {},
   "authors": "Authors",
   "@authors": {},
-  "publishedon": "Published on",
-  "@publishedon": {},
+  "publishedon": "Published on {date}",
+  "@publishedon": {"placeholders": {
+    "date": {
+      "type": "DateTime",
+      "format": "yMMMMd"
+    }
+  }},
   "abstract": "Abstract",
   "@abstract": {},
   "copydoi": "Copy DOI",
@@ -237,8 +242,13 @@
   "@datepublished": {},
   "dateaddedtofavorites": "Date added to favorites",
   "@dateaddedtofavorites": {},
-  "addedtoyourfav": "Added to your favorites on",
-  "@addedtoyourfav": {},
+  "addedtoyourfav": "Added to your favorites on {date}",
+  "@addedtoyourfav": {"placeholders": {
+    "date": {
+      "type": "DateTime",
+      "format": "yMMMMd"
+    }
+  }},
   "noinstitution": "No institution",
   "@noinstitution": {},
   "buildingfeed": "Building your feed. Please wait…",

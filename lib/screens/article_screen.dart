@@ -86,18 +86,20 @@ class _ArticleScreenState extends State<ArticleScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                AppLocalizations.of(context)!
+                    .publishedon(widget.publishedDate!),
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 13,
+                ),
+              ),
+              SizedBox(height: 5),
               SelectableText(
                 widget.title,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
-                ),
-              ),
-              Text(
-                '${AppLocalizations.of(context)!.publishedon} ${formatDate(widget.publishedDate)}',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 13,
                 ),
               ),
               SizedBox(height: 5),
