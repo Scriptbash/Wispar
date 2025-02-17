@@ -86,7 +86,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           child: TextField(
             controller: _filterController,
             decoration: InputDecoration(
-              hintText: AppLocalizations.of(context)!.filter,
+              hintText: AppLocalizations.of(context)!.filterFavorites,
               enabledBorder: OutlineInputBorder(
                 borderSide: const BorderSide(
                     color: Color.fromARGB(31, 148, 147, 147), width: 0.0),
