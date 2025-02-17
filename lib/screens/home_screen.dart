@@ -76,51 +76,10 @@ class _HomeScreenState extends State<HomeScreen> {
         final List<PublicationCard> cachedFeed =
             await _feedService.getCachedFeed(context);
 
-        // Sort publications
-        List<PublicationCard> sortedFeed = List.from(cachedFeed);
-        sortedFeed.sort((a, b) {
-          switch (sortBy) {
-            case 0: // Sort by published date
-              return a.publishedDate!.compareTo(b.publishedDate!);
-
-            case 1: // Sort by title
-              // If one of the titles is empty, push it to the end
-              if (a.title.isEmpty && b.title.isEmpty) return 0;
-              if (a.title.isEmpty) return 1;
-              if (b.title.isEmpty) return -1;
-              return a.title.compareTo(b.title);
-
-            case 2: // Sort by journal title
-              // If one of the journal titles is empty, push it to the end
-              if (a.journalTitle.isEmpty && b.journalTitle.isEmpty) return 0;
-              if (a.journalTitle.isEmpty) return 1;
-              if (b.journalTitle.isEmpty) return -1;
-              return a.journalTitle.compareTo(b.journalTitle);
-
-            case 3: // Sort by first author's family name
-              // If one of the family names is empty, push it to the end
-              String aFamily =
-                  (a.authors.isNotEmpty ? a.authors[0].family : '');
-              String bFamily =
-                  (b.authors.isNotEmpty ? b.authors[0].family : '');
-              if (aFamily.isEmpty && bFamily.isEmpty) return 0;
-              if (aFamily.isEmpty) return 1;
-              if (bFamily.isEmpty) return -1;
-              return aFamily.compareTo(bFamily);
-
-            default:
-              return 0;
-          }
-        });
-
-        // Reverse the list if sortOrder is descending
-        if (sortOrder == 1) {
-          sortedFeed = sortedFeed.reversed.toList();
-        }
-
         setState(() {
-          _allFeed = sortedFeed;
+          _allFeed = List.from(cachedFeed);
           _filteredFeed = List.from(_allFeed);
+          _sortFeed();
         });
 
         _feedStreamController.add(_filteredFeed);
@@ -130,6 +89,46 @@ class _HomeScreenState extends State<HomeScreen> {
         _feedStreamController.addError(e);
       }
     }
+  }
+
+  void _sortFeed() {
+    setState(() {
+      _filteredFeed.sort((a, b) {
+        switch (sortBy) {
+          case 0: // Sort by published date
+            return a.publishedDate!.compareTo(b.publishedDate!);
+
+          case 1: // Sort by title
+            if (a.title.isEmpty && b.title.isEmpty) return 0;
+            if (a.title.isEmpty) return 1;
+            if (b.title.isEmpty) return -1;
+            return a.title.compareTo(b.title);
+
+          case 2: // Sort by journal title
+            if (a.journalTitle.isEmpty && b.journalTitle.isEmpty) return 0;
+            if (a.journalTitle.isEmpty) return 1;
+            if (b.journalTitle.isEmpty) return -1;
+            return a.journalTitle.compareTo(b.journalTitle);
+
+          case 3: // Sort by first author's family name
+            String aFamily = (a.authors.isNotEmpty ? a.authors[0].family : '');
+            String bFamily = (b.authors.isNotEmpty ? b.authors[0].family : '');
+            if (aFamily.isEmpty && bFamily.isEmpty) return 0;
+            if (aFamily.isEmpty) return 1;
+            if (bFamily.isEmpty) return -1;
+            return aFamily.compareTo(bFamily);
+
+          default:
+            return 0;
+        }
+      });
+
+      if (sortOrder == 1) {
+        _filteredFeed = _filteredFeed.reversed.toList();
+      }
+
+      _feedStreamController.add(_filteredFeed);
+    });
   }
 
   // Filters the feed using the filter bar
@@ -157,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     author.given.toLowerCase().contains(query.toLowerCase())))
             .toList();
       }
-      _feedStreamController.add(_filteredFeed);
+      _sortFeed();
     });
   }
 
@@ -177,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
             setState(() {
               sortBy = value;
             });
-            _buildAndStreamFeed();
+            _sortFeed();
           },
           sortOptions: [
             AppLocalizations.of(context)!.datepublished,
@@ -200,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
               setState(() {
                 sortOrder = value;
               });
-              _buildAndStreamFeed();
+              _sortFeed();
             },
           ),
         );
