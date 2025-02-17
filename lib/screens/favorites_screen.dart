@@ -327,4 +327,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _filterController.dispose();
+    super.dispose();
+  }
 }
