@@ -89,6 +89,10 @@
   "@searchPlaceholder": {
     "description": "Place holder text in the search input widget."
   },
+  "filter": "Filter publication cards",
+  "@filter": {},
+  "filterResultsEmpty": "No publication matches your filter",
+  "@filterResultsEmpty": {},
   "emptyDOIError": "Please enter a DOI",
   "@emptyDOIError": {},
   "searchByQuery": "Search by query",

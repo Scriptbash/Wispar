@@ -26,6 +26,11 @@ class _HomeScreenState extends State<HomeScreen> {
   int fetchIntervalInHours = 6; // Default to 6 hours for API fetch
   String _currentJournalName = '';
 
+  // Variables related to the filter bar in the appbar
+  final TextEditingController _filterController = TextEditingController();
+  List<PublicationCard> _allFeed = [];
+  List<PublicationCard> _filteredFeed = [];
+
   final FeedService _feedService = FeedService();
 
   @override
@@ -33,6 +38,10 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _loadFetchInterval();
     _buildAndStreamFeed();
+
+    _filterController.addListener(() {
+      _filterFeed(_filterController.text);
+    });
   }
 
   Future<void> _loadFetchInterval() async {
@@ -109,13 +118,47 @@ class _HomeScreenState extends State<HomeScreen> {
           sortedFeed = sortedFeed.reversed.toList();
         }
 
-        _feedStreamController.add(sortedFeed);
+        setState(() {
+          _allFeed = sortedFeed;
+          _filteredFeed = List.from(_allFeed);
+        });
+
+        _feedStreamController.add(_filteredFeed);
       }
     } catch (e) {
       if (mounted) {
         _feedStreamController.addError(e);
       }
     }
+  }
+
+  // Filters the feed using the filter bar
+  void _filterFeed(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredFeed = List.from(_allFeed);
+      } else {
+        _filteredFeed = _allFeed
+            .where((publication) =>
+                publication.title.toLowerCase().contains(query.toLowerCase()) ||
+                publication.journalTitle
+                    .toLowerCase()
+                    .contains(query.toLowerCase()) ||
+                publication.abstract
+                    .toLowerCase()
+                    .contains(query.toLowerCase()) ||
+                publication.licenseName
+                    .toLowerCase()
+                    .contains(query.toLowerCase()) ||
+                publication.authors.any((author) => author.family
+                    .toLowerCase()
+                    .contains(query.toLowerCase())) ||
+                publication.authors.any((author) =>
+                    author.given.toLowerCase().contains(query.toLowerCase())))
+            .toList();
+      }
+      _feedStreamController.add(_filteredFeed);
+    });
   }
 
   void handleMenuButton(int item) {
@@ -169,37 +212,56 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.home),
-        centerTitle: false,
-        actions: <Widget>[
-          PopupMenuButton<int>(
-            icon: Icon(Icons.more_vert),
-            onSelected: (item) => handleMenuButton(item),
-            itemBuilder: (context) => [
-              PopupMenuItem<int>(
-                value: 0,
-                child: ListTile(
-                  leading: Icon(Icons.settings_outlined),
-                  title: Text(AppLocalizations.of(context)!.settings),
-                ),
+        title: Container(
+          height: 50.0,
+          child: TextField(
+            controller: _filterController,
+            decoration: InputDecoration(
+              hintText: AppLocalizations.of(context)!.filter,
+              enabledBorder: OutlineInputBorder(
+                borderSide: const BorderSide(
+                    color: Color.fromARGB(31, 148, 147, 147), width: 0.0),
+                borderRadius: BorderRadius.circular(30.0),
               ),
-              PopupMenuItem<int>(
-                value: 1,
-                child: ListTile(
-                  leading: Icon(Icons.sort),
-                  title: Text(AppLocalizations.of(context)!.sortby),
-                ),
+              border: OutlineInputBorder(
+                borderSide: const BorderSide(
+                    color: Color.fromARGB(31, 148, 147, 147), width: 0.0),
+                borderRadius: BorderRadius.circular(30.0),
               ),
-              PopupMenuItem<int>(
-                value: 2,
-                child: ListTile(
-                  leading: Icon(Icons.sort_by_alpha),
-                  title: Text(AppLocalizations.of(context)!.sortorder),
-                ),
+              prefixIcon: Icon(Icons.search),
+              filled: true,
+              fillColor: Color.fromARGB(31, 148, 147, 147),
+              suffixIcon: PopupMenuButton<int>(
+                icon: Icon(Icons.more_vert),
+                onSelected: (item) => handleMenuButton(item),
+                itemBuilder: (context) => [
+                  PopupMenuItem<int>(
+                    value: 0,
+                    child: ListTile(
+                      leading: Icon(Icons.settings_outlined),
+                      title: Text(AppLocalizations.of(context)!.settings),
+                    ),
+                  ),
+                  PopupMenuItem<int>(
+                    value: 1,
+                    child: ListTile(
+                      leading: Icon(Icons.sort),
+                      title: Text(AppLocalizations.of(context)!.sortby),
+                    ),
+                  ),
+                  PopupMenuItem<int>(
+                    value: 2,
+                    child: ListTile(
+                      leading: Icon(Icons.sort_by_alpha),
+                      title: Text(AppLocalizations.of(context)!.sortorder),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ],
+        ),
+        centerTitle: false,
       ),
       body: StreamBuilder<List<PublicationCard>>(
         stream: _feedStreamController.stream,
@@ -235,12 +297,27 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error.toString()}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error.toString()}'));
+          } else if (_allFeed.isEmpty) {
+            // Show a message when allFeed is empty
             return Center(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
                   AppLocalizations.of(context)!.homeFeedEmpty,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16.0),
+                ),
+              ),
+            );
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            // Show a message when filteredFeed is empty
+            return Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  AppLocalizations.of(context)!.filterResultsEmpty,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16.0),
                 ),
@@ -263,6 +340,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _feedStreamController.close();
+    _filterController.dispose();
     super.dispose();
   }
 }
