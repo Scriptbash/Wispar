@@ -29,7 +29,7 @@
   "@latestpublications": {},
   "authors": "Auteurs",
   "@authors": {},
-  "publishedon": "Publié le",
+  "publishedon": "Publié le {date}",
   "@publishedon": {},
   "abstract": "Résumé",
   "@abstract": {},
@@ -79,7 +79,7 @@
   "@firstauthfamname": {},
   "dateaddedtofavorites": "Date d'ajout aux favoris",
   "@dateaddedtofavorites": {},
-  "addedtoyourfav": "Ajouté à vos favoris le",
+  "addedtoyourfav": "Ajouté à vos favoris le {date}",
   "@addedtoyourfav": {},
   "noinstitution": "Aucune institution",
   "@noinstitution": {},
@@ -304,5 +304,13 @@
   "fetchingArticleFromJournal": "Récupération des articles de {journalName}.",
   "@fetchingArticleFromJournal": {},
   "madeBy": "Fait par {app_author}",
-  "@madeBy": {}
+  "@madeBy": {},
+  "filterFavorites": "Filtrer les favoris",
+  "@filterFavorites": {},
+  "filter": "Filtrer les cartes de publications",
+  "@filter": {},
+  "filterResultsEmpty": "Aucune publication ne correspond à votre filtre",
+  "@filterResultsEmpty": {},
+  "filterDownloads": "Filtrer les téléchargements",
+  "@filterDownloads": {}
 }
