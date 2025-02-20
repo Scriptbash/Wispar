@@ -9,6 +9,7 @@
 <a href="https://hosted.weblate.org/engage/wispar/">
 <img src="https://hosted.weblate.org/widget/wispar/svg-badge.svg" alt="Translation status" />
 </a>
+<a href="https://doi.org/10.5281/zenodo.14901602"><img src="https://zenodo.org/badge/732206774.svg" alt="DOI"></a>
 </br>
 <a href="https://play.google.com/store/apps/details?id=app.wispar.wispar" target="_blank">
   <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play" height="50"/>
