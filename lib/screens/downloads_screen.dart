@@ -138,6 +138,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
   void _handleDelete(int index) {
     setState(() {
       _downloadedArticles.removeAt(index); // Remove the article from the list
+      _filterDownloads(_filterController.text);
     });
   }
 
