@@ -4,6 +4,7 @@ import 'package:pdfrx/pdfrx.dart';
 import '../widgets/publication_card.dart';
 import '../services/database_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:open_filex/open_filex.dart';
 
 class PdfReader extends StatefulWidget {
   final String pdfUrl;
@@ -40,6 +41,19 @@ class _PdfReaderState extends State<PdfReader> {
           centerTitle: false,
           title: Text(AppLocalizations.of(context)!.articleViewer),
           actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.open_in_browser),
+              tooltip: AppLocalizations.of(context)!.openExternalPdfApp,
+              onPressed: () async {
+                try {
+                  OpenFilex.open(widget.pdfUrl);
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(AppLocalizations.of(context)!
+                          .errorOpenExternalPdfApp)));
+                }
+              },
+            ),
             isDownloaded == false
                 ? IconButton(
                     icon: const Icon(Icons.download_outlined),
