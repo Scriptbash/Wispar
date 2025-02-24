@@ -119,6 +119,8 @@
   "@saveQuery": {},
   "queryName": "Query name",
   "@queryName": {},
+  "includeInFeed": "Include in feed",
+  "@includeInFeed": {},
   "dateSaved": "Date saved",
   "@dateSaved": {},
   "articles": "Articles",

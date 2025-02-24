@@ -23,12 +23,10 @@ class DatabaseHelper {
     final path = await getDatabasesPath();
     final databasePath = join(path, 'wispar.db');
 
-    return openDatabase(
-      databasePath,
-      version: 1,
-      onCreate: (db, version) async {
-        // Create the journals table
-        await db.execute('''
+    return openDatabase(databasePath, version: 2,
+        onCreate: (db, version) async {
+      // Create the journals table
+      await db.execute('''
         CREATE TABLE journals (
           journal_id INTEGER PRIMARY KEY AUTOINCREMENT,
           issn TEXT,
@@ -39,8 +37,8 @@ class DatabaseHelper {
         )
       ''');
 
-        // Create the 'articles' table
-        await db.execute('''
+      // Create the 'articles' table
+      await db.execute('''
         CREATE TABLE articles (
           article_id INTEGER PRIMARY KEY AUTOINCREMENT,
           doi TEXT,
@@ -60,17 +58,25 @@ class DatabaseHelper {
         )
       ''');
 
-        // Create the table for saved queries
-        await db.execute('''
+      // Create the table for saved queries
+      await db.execute('''
         CREATE TABLE savedQueries (
           query_id INTEGER PRIMARY KEY AUTOINCREMENT,
           queryName TEXT,
           queryParams TEXT,
-          dateSaved TEXT
+          dateSaved TEXT,
+          includeInFeed TEXT,
         )
       ''');
-      },
-    );
+    }, onUpgrade: (db, oldVersion, newVersion) async {
+      debugPrint('Upgrading DB');
+      if (oldVersion < 2) {
+        // Ads the new column to the savedQueries table
+        await db.execute('''
+        ALTER TABLE savedQueries ADD COLUMN includeInFeed TEXT;
+      ''');
+      }
+    });
   }
 
   // Functions for journals
