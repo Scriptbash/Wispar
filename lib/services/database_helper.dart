@@ -65,7 +65,7 @@ class DatabaseHelper {
           queryName TEXT,
           queryParams TEXT,
           dateSaved TEXT,
-          includeInFeed TEXT,
+          includeInFeed INTEGER,
         )
       ''');
     }, onUpgrade: (db, oldVersion, newVersion) async {
@@ -73,7 +73,7 @@ class DatabaseHelper {
       if (oldVersion < 2) {
         // Ads the new column to the savedQueries table
         await db.execute('''
-        ALTER TABLE savedQueries ADD COLUMN includeInFeed TEXT;
+        ALTER TABLE savedQueries ADD COLUMN includeInFeed INTEGER;
       ''');
       }
     });
@@ -460,6 +460,7 @@ class DatabaseHelper {
         'queryName': queryName,
         'queryParams': queryParams,
         'dateSaved': dateSaved,
+        'includeInFeed': 0,
       },
     );
   }
@@ -478,6 +479,33 @@ class DatabaseHelper {
       where: 'query_id = ?',
       whereArgs: [id],
     );
+  }
+
+  // Updates the includeInFeed column in the Saved queries table
+  Future<void> updateIncludeInFeed(int id, bool includeInFeed) async {
+    final db = await database;
+    await db.update(
+      'savedQueries',
+      {'includeInFeed': includeInFeed ? 1 : 0},
+      where: 'query_id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  // Get the inludeInFeed status
+  Future<bool> getIncludeInFeed(int queryId) async {
+    final db = await database;
+    final result = await db.query(
+      'savedQueries',
+      where: 'query_id = ?',
+      whereArgs: [queryId],
+      columns: ['includeInFeed'],
+    );
+
+    if (result.isNotEmpty) {
+      return result.first['includeInFeed'] == 1;
+    }
+    return false;
   }
 
   // Cleanup the database, removing old articles

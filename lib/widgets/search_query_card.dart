@@ -4,8 +4,10 @@ import 'package:flutter/services.dart';
 import '../services/crossref_api.dart';
 import '../services/string_format_helper.dart';
 import '../screens/article_search_results_screen.dart';
+import '../services/database_helper.dart';
 
 class SearchQueryCard extends StatefulWidget {
+  final int? queryId;
   final String queryName;
   final String queryParams;
   final String dateSaved;
@@ -13,6 +15,7 @@ class SearchQueryCard extends StatefulWidget {
 
   const SearchQueryCard({
     Key? key,
+    this.queryId,
     required this.queryName,
     required this.queryParams,
     required this.dateSaved,
@@ -25,6 +28,24 @@ class SearchQueryCard extends StatefulWidget {
 
 class _SearchQueryCardState extends State<SearchQueryCard> {
   bool _includeInFeed = false;
+  late DatabaseHelper databaseHelper;
+
+  @override
+  void initState() {
+    super.initState();
+    databaseHelper = DatabaseHelper();
+    _loadIncludeInFeed();
+  }
+
+  Future<void> _loadIncludeInFeed() async {
+    if (widget.queryId != null) {
+      bool includeInFeed =
+          await databaseHelper.getIncludeInFeed(widget.queryId!);
+      setState(() {
+        _includeInFeed = includeInFeed;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,12 +130,17 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
                   ),
                   Switch(
                     value: _includeInFeed,
-                    onChanged: (bool value) {
+                    onChanged: (bool value) async {
                       setState(() {
                         _includeInFeed = value;
                       });
+
+                      if (widget.queryId != null) {
+                        await databaseHelper.updateIncludeInFeed(
+                            widget.queryId!, _includeInFeed);
+                      }
                     },
-                  ),
+                  )
                 ],
               ),
               const SizedBox(height: 8.0),
