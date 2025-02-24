@@ -312,5 +312,9 @@
   "filterResultsEmpty": "Aucune publication ne correspond à votre filtre",
   "@filterResultsEmpty": {},
   "filterDownloads": "Filtrer les téléchargements",
-  "@filterDownloads": {}
+  "@filterDownloads": {},
+  "errorOpenExternalPdfApp": "Impossible d'ouvrir le fichier dans une autre appli",
+  "@errorOpenExternalPdfApp": {},
+  "openExternalPdfApp": "Ouvrir dans un lecteur PDF externe",
+  "@openExternalPdfApp": {}
 }
