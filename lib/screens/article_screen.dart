@@ -212,78 +212,108 @@ class _ArticleScreenState extends State<ArticleScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        height: 80,
-        color: Theme.of(context).scaffoldBackgroundColor,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Column(
-              children: [
-                IconButton(
-                  iconSize: 30,
-                  icon: Icon(Icons.copy_outlined),
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(text: widget.doi));
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text(AppLocalizations.of(context)!.doicopied),
-                      duration: const Duration(seconds: 1),
-                    ));
-                  },
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(text: widget.doi));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(AppLocalizations.of(context)!.doicopied),
+                        duration: const Duration(seconds: 1),
+                      ));
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    splashColor: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.3),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.copy_outlined, size: 30),
+                          const SizedBox(height: 4),
+                          Text(
+                            AppLocalizations.of(context)!.copydoi,
+                            style: const TextStyle(fontSize: 10),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-                Text(
-                  AppLocalizations.of(context)!.copydoi,
-                  style: TextStyle(fontSize: 10),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                IconButton(
-                  iconSize: 30,
-                  icon: Icon(Icons.description_outlined),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ArticleWebsite(
-                          publicationCard: PublicationCard(
-                            doi: widget.doi,
-                            title: widget.title,
-                            authors: widget.authors,
-                            publishedDate: widget.publishedDate,
-                            journalTitle: widget.journalTitle,
-                            issn: widget.issn,
-                            url: widget.url,
-                            license: widget.license,
-                            licenseName: widget.licenseName,
-                            abstract: widget.abstract,
-                            publisher: widget.publisher,
+              ),
+              Expanded(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ArticleWebsite(
+                            publicationCard: PublicationCard(
+                              doi: widget.doi,
+                              title: widget.title,
+                              authors: widget.authors,
+                              publishedDate: widget.publishedDate,
+                              journalTitle: widget.journalTitle,
+                              issn: widget.issn,
+                              url: widget.url,
+                              license: widget.license,
+                              licenseName: widget.licenseName,
+                              abstract: widget.abstract,
+                              publisher: widget.publisher,
+                            ),
                           ),
                         ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    splashColor: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.3),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.description_outlined, size: 30),
+                          const SizedBox(height: 4),
+                          Text(
+                            AppLocalizations.of(context)!.viewarticle,
+                            style: const TextStyle(fontSize: 10),
+                          ),
+                        ],
                       ),
-                    );
-                  },
+                    ),
+                  ),
                 ),
-                Text(AppLocalizations.of(context)!.viewarticle,
-                    style: TextStyle(fontSize: 10)),
-              ],
-            ),
-            Column(
-              children: [
-                IconButton(
-                  iconSize: 30,
-                  icon: Icon(Icons.book_outlined),
-                  onPressed: () {
-                    List<Map<String, dynamic>> authorsData = [];
-                    for (PublicationAuthor author in widget.authors) {
-                      authorsData.add({
-                        'creatorType': 'author',
-                        'firstName': author.given,
-                        'lastName': author.family,
-                      });
-                    }
-                    ZoteroService.sendToZotero(
+              ),
+              Expanded(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      List<Map<String, dynamic>> authorsData = [];
+                      for (PublicationAuthor author in widget.authors) {
+                        authorsData.add({
+                          'creatorType': 'author',
+                          'firstName': author.given,
+                          'lastName': author.family,
+                        });
+                      }
+                      ZoteroService.sendToZotero(
                         context,
                         authorsData,
                         widget.title,
@@ -291,14 +321,33 @@ class _ArticleScreenState extends State<ArticleScreen> {
                         widget.journalTitle,
                         widget.publishedDate,
                         widget.doi,
-                        widget.issn);
-                  },
+                        widget.issn,
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    splashColor: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.3),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.book_outlined, size: 30),
+                          const SizedBox(height: 4),
+                          Text(
+                            AppLocalizations.of(context)!.sendToZotero,
+                            style: const TextStyle(fontSize: 10),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-                Text(AppLocalizations.of(context)!.sendToZotero,
-                    style: TextStyle(fontSize: 10)),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
