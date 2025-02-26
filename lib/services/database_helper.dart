@@ -53,6 +53,8 @@ class DatabaseHelper {
           dateDownloaded TEXT,
           pdfPath TEXT,
           dateCached TEXT,
+          isSavedQuery INTEGER,
+          query_id INTEGER,
           journal_id,
           FOREIGN KEY (journal_id) REFERENCES journals(journal_id)
         )
@@ -66,6 +68,7 @@ class DatabaseHelper {
           queryParams TEXT,
           dateSaved TEXT,
           includeInFeed INTEGER,
+          lastFetched TEXT
         )
       ''');
     }, onUpgrade: (db, oldVersion, newVersion) async {
@@ -74,6 +77,15 @@ class DatabaseHelper {
         // Ads the new column to the savedQueries table
         await db.execute('''
         ALTER TABLE savedQueries ADD COLUMN includeInFeed INTEGER;
+      ''');
+        await db.execute('''
+        ALTER TABLE savedQueries ADD COLUMN lastFetched TEXT;
+      ''');
+        await db.execute('''
+        ALTER TABLE articles ADD COLUMN isSavedQuery INTEGER;
+      ''');
+        await db.execute('''
+        ALTER TABLE articles ADD COLUMN query_id INTEGER;
       ''');
       }
     });
@@ -174,6 +186,8 @@ class DatabaseHelper {
     bool isLiked = false,
     bool isDownloaded = false,
     bool isCached = false,
+    bool isSavedQuery = false,
+    int? queryId,
     String pdfPath = '',
   }) async {
     final db = await database;
@@ -255,6 +269,8 @@ class DatabaseHelper {
             : null,
         'pdfPath': pdfPath.isNotEmpty ? pdfPath : '',
         'dateCached': isCached ? DateTime.now().toIso8601String() : null,
+        'isSavedQuery': isSavedQuery ? 1 : 0,
+        'query_id': queryId,
         'journal_id': journalId,
       });
     }
@@ -479,6 +495,17 @@ class DatabaseHelper {
       where: 'query_id = ?',
       whereArgs: [id],
     );
+    await deleteArticlesForSavedQuery(id);
+  }
+
+  Future<void> updateSavedQueryLastFetched(int queryId) async {
+    final db = await database;
+    await db.update(
+      'savedQueries',
+      {'lastFetched': DateTime.now().toIso8601String()},
+      where: 'query_id = ?',
+      whereArgs: [queryId],
+    );
   }
 
   // Updates the includeInFeed column in the Saved queries table
@@ -490,6 +517,40 @@ class DatabaseHelper {
       where: 'query_id = ?',
       whereArgs: [id],
     );
+    // Clears the lastFetched when the include in feed toggle is off
+    if (!includeInFeed) {
+      await db.update(
+        'savedQueries',
+        {'lastFetched': null},
+        where: 'query_id = ?',
+        whereArgs: [id],
+      );
+
+      await deleteArticlesForSavedQuery(id);
+    }
+  }
+
+  Future<void> deleteArticlesForSavedQuery(int queryId) async {
+    final db = await database;
+
+    // Delete articles that belong to a specific saved query
+    List<Map<String, dynamic>> articlesToDelete = await db.query(
+      'articles',
+      columns: ['doi'],
+      where:
+          'isSavedQuery = 1 AND query_id = ? AND dateLiked IS NULL AND dateDownloaded IS NULL',
+      whereArgs: [queryId],
+    );
+
+    if (articlesToDelete.isNotEmpty) {
+      for (var article in articlesToDelete) {
+        await db.delete(
+          'articles',
+          where: 'doi = ?',
+          whereArgs: [article['doi']],
+        );
+      }
+    }
   }
 
   // Get the inludeInFeed status
