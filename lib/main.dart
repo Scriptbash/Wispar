@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'theme_provider.dart';
 import 'screens/introduction_screen.dart';
@@ -11,6 +10,7 @@ import 'screens/search_screen.dart';
 import 'screens/favorites_screen.dart';
 import 'screens/library_screen.dart';
 import 'screens/downloads_screen.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 
 void main() {
   runApp(
@@ -145,58 +145,73 @@ class _HomeScreenNavigatorState extends State<HomeScreenNavigator> {
     const DownloadsScreen(),
   ];
 
-  String getLocalizedText(BuildContext context, String key) {
-    switch (key) {
-      case 'home':
-        return AppLocalizations.of(context)!.home;
-      case 'search':
-        return AppLocalizations.of(context)!.search;
-      case 'library':
-        return AppLocalizations.of(context)!.library;
-      case 'favorites':
-        return AppLocalizations.of(context)!.favorites;
-      case 'downloads':
-        return AppLocalizations.of(context)!.downloads;
-      default:
-        return key; // Return the key if the translation is not found
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_currentIndex],
-      bottomNavigationBar: Builder(
-        builder: (BuildContext bottomBarContext) => SalomonBottomBar(
-          currentIndex: _currentIndex,
-          onTap: (i) => setState(() => _currentIndex = i),
-          items: [
-            SalomonBottomBarItem(
-              icon: const Icon(Icons.home_outlined),
-              title: Text(getLocalizedText(bottomBarContext, 'home')),
-              selectedColor: Theme.of(context).colorScheme.primary,
-            ),
-            SalomonBottomBarItem(
-              icon: const Icon(Icons.search_outlined),
-              title: Text(getLocalizedText(bottomBarContext, 'search')),
-              selectedColor: Theme.of(context).colorScheme.primary,
-            ),
-            SalomonBottomBarItem(
-              icon: const Icon(Icons.my_library_books_outlined),
-              title: Text(getLocalizedText(bottomBarContext, 'library')),
-              selectedColor: Theme.of(context).colorScheme.primary,
-            ),
-            SalomonBottomBarItem(
-              icon: const Icon(Icons.favorite_border),
-              title: Text(getLocalizedText(bottomBarContext, 'favorites')),
-              selectedColor: Theme.of(context).colorScheme.primary,
-            ),
-            SalomonBottomBarItem(
-              icon: const Icon(Icons.download_outlined),
-              title: Text(getLocalizedText(bottomBarContext, 'downloads')),
-              selectedColor: Theme.of(context).colorScheme.primary,
-            ),
-          ],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          /*boxShadow: [
+            BoxShadow(
+              blurRadius: 10,
+              color: const Color.fromARGB(43, 0, 0, 0),
+            )
+          ],*/
+        ),
+        child: SafeArea(
+          child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6),
+              child: GNav(
+                rippleColor: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.1),
+                haptic: true,
+                hoverColor: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.1),
+                gap: 4,
+                activeColor: Theme.of(context).colorScheme.primary,
+                iconSize: 24,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                duration: const Duration(milliseconds: 400),
+                tabBackgroundColor: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary,
+                selectedIndex: _currentIndex,
+                onTabChange: (index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                },
+                tabs: [
+                  GButton(
+                    icon: Icons.home_outlined,
+                    text: AppLocalizations.of(context)!.home,
+                  ),
+                  GButton(
+                    icon: Icons.search_outlined,
+                    text: AppLocalizations.of(context)!.search,
+                  ),
+                  GButton(
+                    icon: Icons.my_library_books_outlined,
+                    text: AppLocalizations.of(context)!.library,
+                  ),
+                  GButton(
+                    icon: Icons.favorite_border,
+                    text: AppLocalizations.of(context)!.favorites,
+                  ),
+                  GButton(
+                    icon: Icons.download_outlined,
+                    text: AppLocalizations.of(context)!.downloads,
+                  ),
+                ],
+              )),
         ),
       ),
     );
