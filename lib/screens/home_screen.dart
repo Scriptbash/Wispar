@@ -33,6 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final FeedService _feedService = FeedService();
 
+  List<Map<String, dynamic>> savedQueries = [];
+
   @override
   void initState() {
     super.initState();
@@ -54,10 +56,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _buildAndStreamFeed() async {
     try {
       final followedJournals = await dbHelper.getJournals();
-      final journalsToUpdate = await _feedService.checkJournalsToUpdate(
-          followedJournals, fetchIntervalInHours);
-
-      if (mounted && journalsToUpdate.isNotEmpty) {
+      final db = await dbHelper.database;
+      List<Map<String, dynamic>> savedQueries = await db.query(
+        'savedQueries',
+        columns: ['query_id', 'queryName', 'queryParams', 'lastFetched'],
+        where: 'includeInFeed = ?',
+        whereArgs: [1], // Only include queries with "includeInFeed"
+      );
+      if (mounted && followedJournals.isNotEmpty) {
         await _feedService.updateFeed(
           context,
           followedJournals,
@@ -65,6 +71,21 @@ class _HomeScreenState extends State<HomeScreen> {
             if (mounted) {
               setState(() {
                 _currentJournalName = journalName;
+              });
+            }
+          },
+          fetchIntervalInHours,
+        );
+      }
+
+      if (mounted && savedQueries.isNotEmpty) {
+        await _feedService.updateSavedQueryFeed(
+          context,
+          savedQueries,
+          (String queryName) {
+            if (mounted) {
+              setState(() {
+                _currentJournalName = queryName;
               });
             }
           },

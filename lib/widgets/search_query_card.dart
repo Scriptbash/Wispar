@@ -4,8 +4,10 @@ import 'package:flutter/services.dart';
 import '../services/crossref_api.dart';
 import '../services/string_format_helper.dart';
 import '../screens/article_search_results_screen.dart';
+import '../services/database_helper.dart';
 
-class SearchQueryCard extends StatelessWidget {
+class SearchQueryCard extends StatefulWidget {
+  final int queryId;
   final String queryName;
   final String queryParams;
   final String dateSaved;
@@ -13,6 +15,7 @@ class SearchQueryCard extends StatelessWidget {
 
   const SearchQueryCard({
     Key? key,
+    required this.queryId,
     required this.queryName,
     required this.queryParams,
     required this.dateSaved,
@@ -20,9 +23,32 @@ class SearchQueryCard extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _SearchQueryCardState createState() => _SearchQueryCardState();
+}
+
+class _SearchQueryCardState extends State<SearchQueryCard> {
+  bool _includeInFeed = false;
+  late DatabaseHelper databaseHelper;
+
+  @override
+  void initState() {
+    super.initState();
+    databaseHelper = DatabaseHelper();
+    _loadIncludeInFeed();
+  }
+
+  Future<void> _loadIncludeInFeed() async {
+    bool includeInFeed = await databaseHelper.getIncludeInFeed(widget.queryId);
+    setState(() {
+      _includeInFeed = includeInFeed;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    DateTime? parsedDate = DateTime.tryParse(dateSaved);
+    DateTime? parsedDate = DateTime.tryParse(widget.dateSaved);
     String formattedDate = formatDate(parsedDate);
+
     return GestureDetector(
       onTap: () async {
         // Show loading indicator
@@ -34,7 +60,8 @@ class SearchQueryCard extends StatelessWidget {
           },
         );
         // Convert the params string to the needed mapstring
-        Map<String, dynamic> queryMap = Uri.splitQueryString(queryParams);
+        Map<String, dynamic> queryMap =
+            Uri.splitQueryString(widget.queryParams);
         CrossRefApi.resetWorksQueryCursor(); // Reset the cursor on new search
         var response = await CrossRefApi.getWorksByQuery(queryMap);
 
@@ -53,7 +80,8 @@ class SearchQueryCard extends StatelessWidget {
       },
       onLongPress: () {
         // Copy the API request to clipboard
-        String request = 'https://api.crossref.org/works?$queryParams&rows=50';
+        String request =
+            'https://api.crossref.org/works?${widget.queryParams}&rows=50';
         Clipboard.setData(ClipboardData(text: request));
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.apiQueryCopied)),
@@ -70,23 +98,45 @@ class SearchQueryCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    queryName,
+                    widget.queryName,
                     style: const TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  if (onDelete != null)
+                  if (widget.onDelete != null)
                     IconButton(
                       icon: const Icon(Icons.delete_outline),
-                      onPressed: onDelete,
+                      onPressed: widget.onDelete,
                     ),
                 ],
               ),
               const SizedBox(height: 8.0),
               Text(
-                queryParams,
+                widget.queryParams,
                 style: const TextStyle(fontSize: 14.0),
+              ),
+              const SizedBox(height: 8.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    AppLocalizations.of(context)!.includeInFeed,
+                    style: const TextStyle(
+                        fontSize: 14.0, fontWeight: FontWeight.w500),
+                  ),
+                  Switch(
+                    value: _includeInFeed,
+                    onChanged: (bool value) async {
+                      setState(() {
+                        _includeInFeed = value;
+                      });
+
+                      await databaseHelper.updateIncludeInFeed(
+                          widget.queryId, _includeInFeed);
+                    },
+                  )
+                ],
               ),
               const SizedBox(height: 8.0),
               Text(

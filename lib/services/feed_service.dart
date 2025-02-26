@@ -11,6 +11,7 @@ import '../widgets/publication_card.dart';
 class FeedService {
   final DatabaseHelper _dbHelper = DatabaseHelper();
 
+  // Gather journals that will need to have their articles fetched
   Future<List<String>> checkJournalsToUpdate(
       List<Journal> followedJournals, int fetchIntervalInHours) async {
     final db = await _dbHelper.database;
@@ -37,6 +38,29 @@ class FeedService {
     return journalsToUpdate;
   }
 
+  // Gather savedQueries that will need to have their articles fetched
+  Future<List<Map<String, dynamic>>> checkSavedQueriesToUpdate(
+      List<Map<String, dynamic>> savedQueries, int fetchIntervalInHours) async {
+    List<Map<String, dynamic>> queriesToUpdate = [];
+
+    for (var query in savedQueries) {
+      String? lastFetched = query['lastFetched'] as String?;
+
+      if (lastFetched == null ||
+          lastFetched.isEmpty ||
+          DateTime.now().difference(DateTime.parse(lastFetched)).inHours >=
+              fetchIntervalInHours) {
+        queriesToUpdate.add({
+          'query_id': query['query_id'],
+          'queryParams': query['queryParams'],
+          'queryName': query['queryName'],
+        });
+      }
+    }
+
+    return queriesToUpdate;
+  }
+
   Future<void> updateFeed(
       BuildContext context,
       List<Journal> followedJournals,
@@ -46,6 +70,9 @@ class FeedService {
       // Check which journals need updating
       final journalsToUpdate =
           await checkJournalsToUpdate(followedJournals, fetchIntervalInHours);
+      if (journalsToUpdate.isNotEmpty) {
+        _dbHelper.cleanupOldArticles();
+      }
 
       for (String issn in journalsToUpdate) {
         final journal = followedJournals.firstWhere((j) => j.issn == issn);
@@ -79,9 +106,54 @@ class FeedService {
           );
         }
       }
-      _dbHelper.cleanupOldArticles();
     } catch (e) {
       debugPrint('Error updating feed: $e');
+    }
+  }
+
+  Future<void> updateSavedQueryFeed(
+      BuildContext context,
+      List<Map<String, dynamic>> savedQueries,
+      void Function(String queryName) onQueryUpdate,
+      int fetchIntervalInHours) async {
+    try {
+      // Check which queries need updating
+      final queriesToUpdate =
+          await checkSavedQueriesToUpdate(savedQueries, fetchIntervalInHours);
+
+      for (var query in queriesToUpdate) {
+        debugPrint('Updating query: ${query['queryName']}');
+        onQueryUpdate(query['queryName']);
+        await _dbHelper.updateSavedQueryLastFetched(query['query_id']);
+        Map<String, dynamic> queryMap =
+            Uri.splitQueryString(query['queryParams']);
+        List<journalWorks.Item> queryArticles =
+            await FeedApi.getSavedQueryWorks(queryMap);
+
+        for (journalWorks.Item item in queryArticles) {
+          if (item.title.isNotEmpty && item.journalTitle.isNotEmpty) {
+            await _dbHelper.insertArticle(
+              PublicationCard(
+                title: item.title,
+                abstract: item.abstract,
+                journalTitle: item.journalTitle,
+                issn: item.issn,
+                publishedDate: item.publishedDate,
+                doi: item.doi,
+                authors: item.authors,
+                url: item.primaryUrl,
+                license: item.license,
+                licenseName: item.licenseName,
+              ),
+              isCached: true,
+              isSavedQuery: true,
+              queryId: query['query_id'],
+            );
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error updating saved queries feed: $e');
     }
   }
 

@@ -109,6 +109,7 @@ class _QueriesTabContentState extends State<QueriesTabContent> {
                   itemBuilder: (context, index) {
                     final query = savedQueries[index];
                     return SearchQueryCard(
+                      queryId: query['query_id'],
                       queryName: query['queryName'],
                       queryParams: query['queryParams'],
                       dateSaved: query['dateSaved'],
