@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../widgets/article_main_search_form.dart';
-import '../widgets/author_search_form.dart';
 import '../widgets/journal_search_form.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -16,30 +15,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List<DropdownMenuItem<int>> dropdownItems = [
-      DropdownMenuItem(
-        value: 1,
-        child: Text(
-          AppLocalizations.of(context)!.articles,
-          style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
-        ),
-      ),
-      /*DropdownMenuItem(
-        value: 2,
-        child: Text(
-          AppLocalizations.of(context)!.authors,
-          style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
-        ),
-      ),*/
-      DropdownMenuItem(
-        value: 3,
-        child: Text(
-          AppLocalizations.of(context)!.journals,
-          style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
-        ),
-      ),
-    ];
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -49,26 +24,54 @@ class _SearchScreenState extends State<SearchScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            DropdownButtonFormField<int>(
-              decoration: InputDecoration(
-                labelText: AppLocalizations.of(context)!.category,
-              ),
-              value: selectedSearchType,
-              isExpanded: true,
-              onChanged: (int? newValue) {
-                setState(() {
-                  selectedSearchType = newValue ?? 1;
-                });
+            /*Text(
+              AppLocalizations.of(context)!.category,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),*/
+            LayoutBuilder(
+              builder: (context, constraints) {
+                return ToggleButtons(
+                  borderRadius: BorderRadius.circular(8.0),
+                  isSelected: [
+                    selectedSearchType == 1,
+                    selectedSearchType == 2,
+                  ],
+                  onPressed: (int index) {
+                    setState(() {
+                      selectedSearchType = index == 0 ? 1 : 2;
+                    });
+                  },
+                  children: [
+                    Container(
+                      width: constraints.maxWidth / 2 - 1.5,
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: Text(
+                        AppLocalizations.of(context)!.articles,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    Container(
+                      width: constraints.maxWidth / 2 - 1.5,
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: Text(
+                        AppLocalizations.of(context)!.journals,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                );
               },
-              items: dropdownItems,
             ),
-            SizedBox(height: 20),
-            // Show form based on selected category
+            SizedBox(height: 8),
+            Divider(thickness: 1, color: Colors.grey[300]),
+            SizedBox(height: 8),
             Expanded(
-              child: _getSearchForm(),
-            ),
+                child:
+                    _getSearchForm()), // Show form based on selected category
           ],
         ),
       ),
@@ -81,8 +84,6 @@ class _SearchScreenState extends State<SearchScreen> {
       case 1:
         return ArticleSearchForm();
       case 2:
-        return AuthorSearchForm();
-      case 3:
         return JournalSearchForm();
       default:
         return ArticleSearchForm();
