@@ -7,7 +7,7 @@ import '../screens/article_search_results_screen.dart';
 import '../services/database_helper.dart';
 
 class SearchQueryCard extends StatefulWidget {
-  final int? queryId;
+  final int queryId;
   final String queryName;
   final String queryParams;
   final String dateSaved;
@@ -15,7 +15,7 @@ class SearchQueryCard extends StatefulWidget {
 
   const SearchQueryCard({
     Key? key,
-    this.queryId,
+    required this.queryId,
     required this.queryName,
     required this.queryParams,
     required this.dateSaved,
@@ -38,13 +38,10 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
   }
 
   Future<void> _loadIncludeInFeed() async {
-    if (widget.queryId != null) {
-      bool includeInFeed =
-          await databaseHelper.getIncludeInFeed(widget.queryId!);
-      setState(() {
-        _includeInFeed = includeInFeed;
-      });
-    }
+    bool includeInFeed = await databaseHelper.getIncludeInFeed(widget.queryId);
+    setState(() {
+      _includeInFeed = includeInFeed;
+    });
   }
 
   @override
@@ -135,10 +132,8 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
                         _includeInFeed = value;
                       });
 
-                      if (widget.queryId != null) {
-                        await databaseHelper.updateIncludeInFeed(
-                            widget.queryId!, _includeInFeed);
-                      }
+                      await databaseHelper.updateIncludeInFeed(
+                          widget.queryId, _includeInFeed);
                     },
                   )
                 ],
