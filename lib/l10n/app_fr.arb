@@ -316,5 +316,7 @@
   "errorOpenExternalPdfApp": "Impossible d'ouvrir le fichier dans une autre appli",
   "@errorOpenExternalPdfApp": {},
   "openExternalPdfApp": "Ouvrir dans un lecteur PDF externe",
-  "@openExternalPdfApp": {}
+  "@openExternalPdfApp": {},
+  "includeInFeed": "Inclure dans le flux",
+  "@includeInFeed": {}
 }
