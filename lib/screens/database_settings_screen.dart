@@ -1,6 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:share_plus/share_plus.dart';
 
 class DatabaseSettingsScreen extends StatefulWidget {
   const DatabaseSettingsScreen({Key? key}) : super(key: key);
@@ -37,12 +42,60 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
   Future<void> _saveSettings() async {
     if (_formKey.currentState?.validate() ?? false) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-
       await prefs.setInt('cleanupInterval', _cleanupInterval);
-      await prefs.setInt('fetchInterval', _fetchInterval); // Save as integer
+      await prefs.setInt('fetchInterval', _fetchInterval);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.settingsSaved)),
+      );
+    }
+  }
+
+  /*Future<bool> _requestStoragePermission() async {
+    if (await Permission.storage.request().isGranted) {
+      return true;
+    }
+
+    // On Android 11+, request Manage External Storage permission
+    if (await Permission.manageExternalStorage.request().isGranted) {
+      return true;
+    }
+
+    if (await Permission.storage.isPermanentlyDenied) {
+      openAppSettings();
+    }
+
+    return false;
+  }*/
+
+  Future<void> _exportDatabase() async {
+    try {
+      final databasePath = await getDatabasesPath();
+      String dbPath = '$databasePath/wispar.db';
+      File dbFile = File(dbPath);
+
+      if (!await dbFile.exists()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.databaseNotFound),
+          ),
+        );
+        return;
+      }
+
+      await Share.shareXFiles([XFile(dbPath)], text: 'Wispar backup');
+
+      /*
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.databaseExported),
+        ),
+      );*/
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.databaseExportFailed),
+        ),
       );
     }
   }
@@ -128,6 +181,12 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
               ElevatedButton(
                 onPressed: _saveSettings,
                 child: Text(AppLocalizations.of(context)!.saveSettings),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: _exportDatabase,
+                icon: Icon(Icons.save_alt),
+                label: Text(AppLocalizations.of(context)!.exportDatabase),
               ),
             ],
           ),
