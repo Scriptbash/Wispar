@@ -5,6 +5,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:archive/archive.dart';
 
 class DatabaseSettingsScreen extends StatefulWidget {
   const DatabaseSettingsScreen({Key? key}) : super(key: key);
@@ -50,63 +52,52 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
     }
   }
 
-  /*Future<bool> _requestStoragePermission() async {
-    if (await Permission.storage.request().isGranted) {
-      return true;
-    }
-
-    // On Android 11+, request Manage External Storage permission
-    if (await Permission.manageExternalStorage.request().isGranted) {
-      return true;
-    }
-
-    if (await Permission.storage.isPermanentlyDenied) {
-      openAppSettings();
-    }
-
-    return false;
-  }*/
-
   Future<void> _exportDatabase() async {
     try {
+      final appDir = await getApplicationDocumentsDirectory();
       final databasePath = await getDatabasesPath();
       String dbPath = '$databasePath/wispar.db';
       File dbFile = File(dbPath);
 
+      final archive = Archive();
+
       if (!await dbFile.exists()) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.databaseNotFound),
-          ),
+              content: Text(AppLocalizations.of(context)!.databaseNotFound)),
         );
         return;
       }
 
-      Uint8List fileBytes = await dbFile.readAsBytes();
+      archive.addFile(ArchiveFile(
+          'wispar.db', dbFile.lengthSync(), await dbFile.readAsBytes()));
+
+      for (var file in appDir.listSync()) {
+        if (file is File && file.path.endsWith('.pdf')) {
+          archive.addFile(ArchiveFile(file.uri.pathSegments.last,
+              file.lengthSync(), await file.readAsBytes()));
+        }
+      }
+
+      final zipData = ZipEncoder().encode(archive);
 
       String? outputFile = await FilePicker.platform.saveFile(
         dialogTitle: AppLocalizations.of(context)!.selectDBExportLocation,
-        fileName: 'wispar.db',
-        //type: FileType.custom,
-        //allowedExtensions: ['db'],
-        bytes: fileBytes,
+        fileName: 'wispar_backup.zip',
+        bytes: Uint8List.fromList(zipData),
       );
 
       if (outputFile == null) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.databaseExported),
-        ),
+        SnackBar(content: Text(AppLocalizations.of(context)!.databaseExported)),
       );
     } catch (e) {
       debugPrint("Database export error: $e");
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text("${AppLocalizations.of(context)!.databaseExportFailed}: $e"),
-        ),
+            content: Text(
+                "${AppLocalizations.of(context)!.databaseExportFailed}: $e")),
       );
     }
   }
@@ -114,33 +105,37 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
   Future<void> _importDatabase() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
-          //type: FileType.custom,
-          //allowedExtensions: ['db'], //It's currently broken https://github.com/miguelpruivo/flutter_file_picker/issues/1689
-          );
-
+        type: FileType.custom,
+        allowedExtensions: ['zip'],
+      );
       if (result == null) return;
 
       File selectedFile = File(result.files.single.path!);
+      final appDir = await getApplicationDocumentsDirectory();
       final databasePath = await getDatabasesPath();
-      String dbPath = '$databasePath/wispar.db';
 
-      // Replace the existing database
-      await selectedFile.copy(dbPath);
+      final zipBytes = await selectedFile.readAsBytes();
+      final archive = ZipDecoder().decodeBytes(zipBytes);
+
+      for (final file in archive) {
+        final filePath = file.name == 'wispar.db'
+            ? '$databasePath/${file.name}'
+            : '${appDir.path}/${file.name}';
+        final outFile = File(filePath);
+        await outFile.create(recursive: true);
+        await outFile.writeAsBytes(file.content as List<int>);
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.databaseImported),
-        ),
+        SnackBar(content: Text(AppLocalizations.of(context)!.databaseImported)),
       );
 
-      // Reload the database
-      await openDatabase(dbPath);
+      await openDatabase('$databasePath/wispar.db');
     } catch (e) {
       debugPrint("Database import error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context)!.databaseImportFailed),
-        ),
+            content: Text(AppLocalizations.of(context)!.databaseImportFailed)),
       );
     }
   }
