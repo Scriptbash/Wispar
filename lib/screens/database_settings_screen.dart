@@ -231,6 +231,8 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                   child: Text(AppLocalizations.of(context)!.saveSettings),
                 ),
                 const SizedBox(height: 64),
+                const Divider(),
+                const SizedBox(height: 8),
                 ElevatedButton.icon(
                   onPressed: _exportDatabase,
                   icon: Icon(Icons.save_alt),
