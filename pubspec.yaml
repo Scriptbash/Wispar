@@ -54,6 +54,7 @@ dependencies:
     git:
       url: https://github.com/mufassalhussain/open_filex
   google_nav_bar: ^5.0.7
+  file_picker: ^9.0.1
   
 
 dev_dependencies:
