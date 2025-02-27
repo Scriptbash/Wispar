@@ -1,11 +1,10 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:file_picker/file_picker.dart';
 
 class DatabaseSettingsScreen extends StatefulWidget {
   const DatabaseSettingsScreen({Key? key}) : super(key: key);
@@ -83,18 +82,64 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
         return;
       }
 
-      await Share.shareXFiles([XFile(dbPath)], text: 'Wispar backup');
+      Uint8List fileBytes = await dbFile.readAsBytes();
 
-      /*
+      String? outputFile = await FilePicker.platform.saveFile(
+        dialogTitle: AppLocalizations.of(context)!.selectDBExportLocation,
+        fileName: 'wispar.db',
+        //type: FileType.custom,
+        //allowedExtensions: ['db'],
+        bytes: fileBytes,
+      );
+
+      if (outputFile == null) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(AppLocalizations.of(context)!.databaseExported),
         ),
-      );*/
+      );
     } catch (e) {
+      debugPrint("Database export error: $e");
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context)!.databaseExportFailed),
+          content:
+              Text("${AppLocalizations.of(context)!.databaseExportFailed}: $e"),
+        ),
+      );
+    }
+  }
+
+  Future<void> _importDatabase() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+          //type: FileType.custom,
+          //allowedExtensions: ['db'], //It's currently broken https://github.com/miguelpruivo/flutter_file_picker/issues/1689
+          );
+
+      if (result == null) return;
+
+      File selectedFile = File(result.files.single.path!);
+      final databasePath = await getDatabasesPath();
+      String dbPath = '$databasePath/wispar.db';
+
+      // Replace the existing database
+      await selectedFile.copy(dbPath);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.databaseImported),
+        ),
+      );
+
+      // Reload the database
+      await openDatabase(dbPath);
+    } catch (e) {
+      debugPrint("Database import error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.databaseImportFailed),
         ),
       );
     }
@@ -108,87 +153,97 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextFormField(
-                controller: _cleanupIntervalController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.cleanupInterval,
-                  hintText: AppLocalizations.of(context)!.cleanupIntervalHint,
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextFormField(
+                  controller: _cleanupIntervalController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.cleanupInterval,
+                    hintText: AppLocalizations.of(context)!.cleanupIntervalHint,
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      _cleanupInterval =
+                          int.tryParse(value) ?? _cleanupInterval;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return AppLocalizations.of(context)!
+                          .cleanupIntervalInvalidNumber;
+                    }
+                    final intValue = int.tryParse(value);
+                    if (intValue == null || intValue < 1 || intValue > 365) {
+                      return AppLocalizations.of(context)!
+                          .cleanupIntervalNumberNotBetween;
+                    }
+                    return null;
+                  },
                 ),
-                onChanged: (value) {
-                  setState(() {
-                    _cleanupInterval = int.tryParse(value) ?? _cleanupInterval;
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return AppLocalizations.of(context)!
-                        .cleanupIntervalInvalidNumber;
-                  }
-                  final intValue = int.tryParse(value);
-                  if (intValue == null || intValue < 1 || intValue > 365) {
-                    return AppLocalizations.of(context)!
-                        .cleanupIntervalNumberNotBetween;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<int>(
-                value: _fetchInterval,
-                onChanged: (int? newValue) {
-                  setState(() {
-                    _fetchInterval = newValue!;
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.apiFetchInterval,
-                  hintText: AppLocalizations.of(context)!.apiFetchIntervalHint,
+                const SizedBox(height: 16),
+                DropdownButtonFormField<int>(
+                  value: _fetchInterval,
+                  onChanged: (int? newValue) {
+                    setState(() {
+                      _fetchInterval = newValue!;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.apiFetchInterval,
+                    hintText:
+                        AppLocalizations.of(context)!.apiFetchIntervalHint,
+                  ),
+                  items: [
+                    DropdownMenuItem(
+                      value: 3,
+                      child: Text('3 ${AppLocalizations.of(context)!.hours}'),
+                    ),
+                    DropdownMenuItem(
+                      value: 6,
+                      child: Text('6 ${AppLocalizations.of(context)!.hours}'),
+                    ),
+                    DropdownMenuItem(
+                      value: 12,
+                      child: Text('12 ${AppLocalizations.of(context)!.hours}'),
+                    ),
+                    DropdownMenuItem(
+                      value: 24,
+                      child: Text('24 ${AppLocalizations.of(context)!.hours}'),
+                    ),
+                    DropdownMenuItem(
+                      value: 48,
+                      child: Text('48 ${AppLocalizations.of(context)!.hours}'),
+                    ),
+                    DropdownMenuItem(
+                      value: 72,
+                      child: Text('72 ${AppLocalizations.of(context)!.hours}'),
+                    ),
+                  ],
                 ),
-                items: [
-                  DropdownMenuItem(
-                    value: 3,
-                    child: Text('3 ${AppLocalizations.of(context)!.hours}'),
-                  ),
-                  DropdownMenuItem(
-                    value: 6,
-                    child: Text('6 ${AppLocalizations.of(context)!.hours}'),
-                  ),
-                  DropdownMenuItem(
-                    value: 12,
-                    child: Text('12 ${AppLocalizations.of(context)!.hours}'),
-                  ),
-                  DropdownMenuItem(
-                    value: 24,
-                    child: Text('24 ${AppLocalizations.of(context)!.hours}'),
-                  ),
-                  DropdownMenuItem(
-                    value: 48,
-                    child: Text('48 ${AppLocalizations.of(context)!.hours}'),
-                  ),
-                  DropdownMenuItem(
-                    value: 72,
-                    child: Text('72 ${AppLocalizations.of(context)!.hours}'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _saveSettings,
-                child: Text(AppLocalizations.of(context)!.saveSettings),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: _exportDatabase,
-                icon: Icon(Icons.save_alt),
-                label: Text(AppLocalizations.of(context)!.exportDatabase),
-              ),
-            ],
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: _saveSettings,
+                  child: Text(AppLocalizations.of(context)!.saveSettings),
+                ),
+                const SizedBox(height: 64),
+                ElevatedButton.icon(
+                  onPressed: _exportDatabase,
+                  icon: Icon(Icons.save_alt),
+                  label: Text(AppLocalizations.of(context)!.exportDatabase),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: _importDatabase,
+                  icon: Icon(Icons.upload_file_outlined),
+                  label: Text(AppLocalizations.of(context)!.importDatabase),
+                ),
+              ],
+            ),
           ),
         ),
       ),
