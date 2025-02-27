@@ -230,8 +230,14 @@
   "@sortby": {},
   "sortorder": "Sort order",
   "@sortorder": {},
-  "followingsince": "Following since",
-  "@followingsince": {},
+  "followingsince": "Following since {date}",
+  "@followingsince": {"placeholders": {
+    "date": {
+      "type": "DateTime",
+      "format": "yMMMMd"
+    }
+  }},
+
   "journaltitle": "Journal title",
   "@journaltitle": {},
   "followingdate": "Following date",
@@ -301,8 +307,13 @@
   },
   "save": "Save",
   "@save": {},
-  "savedOn": "Saved on:",
-  "@savedOn": {},
+  "savedOn": "Saved on {date}",
+  "@savedOn": {"placeholders": {
+    "date": {
+      "type": "DateTime",
+      "format": "yMMMMd"
+    }
+  }},
   "sourceCode": "Source code",
   "@sourceCode": {},
   "reportIssue": "Report an issue",

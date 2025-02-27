@@ -58,8 +58,8 @@ class JournalCard extends StatelessWidget {
             Text(
                 '${AppLocalizations.of(context)!.publisher}: ${journal.publisher}'),
             Text('ISSN: ${journal.issn}'),
-            Text(
-                '${AppLocalizations.of(context)!.followingsince} ${journal.dateFollowed}'),
+            Text(AppLocalizations.of(context)!
+                .followingsince(DateTime.parse(journal.dateFollowed!))),
           ],
         ),
       ),

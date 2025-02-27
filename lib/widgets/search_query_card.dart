@@ -140,7 +140,8 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
               ),
               const SizedBox(height: 8.0),
               Text(
-                "${AppLocalizations.of(context)!.savedOn} $formattedDate",
+                AppLocalizations.of(context)!
+                    .savedOn(DateTime.parse(formattedDate)),
                 style: const TextStyle(fontSize: 12.0, color: Colors.grey),
               ),
             ],
