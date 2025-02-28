@@ -91,10 +91,17 @@ class _ArticleScreenState extends State<ArticleScreen> {
 
     AbstractScraper scraper = AbstractScraper();
     String? scraped = await scraper.scrapeAbstract(widget.url);
-
-    String finalAbstract = (scraped != null && scraped.isNotEmpty)
-        ? scraped
-        : AppLocalizations.of(context)!.abstractunavailable;
+    String finalAbstract = '';
+    if (scraped != null && scraped.isNotEmpty) {
+      finalAbstract = scraped;
+      try {
+        databaseHelper.updateArticleAbstract(widget.doi, finalAbstract);
+      } catch (e) {
+        debugPrint("Unable to update the abstract: ${e}");
+      }
+    } else {
+      finalAbstract = AppLocalizations.of(context)!.abstractunavailable;
+    }
 
     setState(() {
       abstract = finalAbstract;

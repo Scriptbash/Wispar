@@ -56,6 +56,11 @@ class AbstractScraper {
               })();
             """,
           );
+          abstractText = abstractText!
+              .replaceAll(RegExp(r'<[^>]*>'), '') // Remove HTML tags
+              .replaceAll(RegExp(r'^\s*abstract[:.\s]*', caseSensitive: false),
+                  '') // Remove leading "Abstract"
+              .trim();
 
           _completer.complete(abstractText);
         } catch (e) {
