@@ -12,7 +12,7 @@ class DisplaySettingsScreen extends StatefulWidget {
 }
 
 class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
-  int _publicationCardOption = 0;
+  int _publicationCardOption = 1;
 
   @override
   void initState() {
@@ -24,7 +24,7 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _publicationCardOption = prefs.getInt('publicationCardAbstractSetting') ??
-          0; // Default to "show all abstracts"
+          1; // Default to "hide missing abstracts"
     });
   }
 

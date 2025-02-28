@@ -7,7 +7,7 @@ enum AbstractSetting { showAll, hideAll, hideMissing }
 class AbstractHelper {
   static Future<AbstractSetting> getAbstractSetting() async {
     final prefs = await SharedPreferences.getInstance();
-    final int setting = prefs.getInt('publicationCardAbstractSetting') ?? 0;
+    final int setting = prefs.getInt('publicationCardAbstractSetting') ?? 1;
 
     switch (setting) {
       case 1:
