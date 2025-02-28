@@ -18,6 +18,7 @@ class DatabaseSettingsScreen extends StatefulWidget {
 class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  bool _scrapeAbstracts = true; // Default to scraping missing abstracts
   int _cleanupInterval = 7; // Default for cleanup interval
   int _fetchInterval = 6; // Default API fetch to 6 hours
   TextEditingController _cleanupIntervalController = TextEditingController();
@@ -35,6 +36,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       // Load the values from SharedPreferences if available
       _cleanupInterval = prefs.getInt('cleanupInterval') ?? 7;
       _fetchInterval = prefs.getInt('fetchInterval') ?? 6;
+      _scrapeAbstracts = prefs.getBool('scrapeAbstracts') ?? true;
     });
     _cleanupIntervalController.text = _cleanupInterval.toString();
   }
@@ -45,6 +47,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setInt('cleanupInterval', _cleanupInterval);
       await prefs.setInt('fetchInterval', _fetchInterval);
+      await prefs.setBool('scrapeAbstracts', _scrapeAbstracts);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.settingsSaved)),
@@ -218,6 +221,22 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                     DropdownMenuItem(
                       value: 72,
                       child: Text('72 ${AppLocalizations.of(context)!.hours}'),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.scrapeAbstracts,
+                    ),
+                    Switch(
+                      value: _scrapeAbstracts,
+                      onChanged: (bool value) async {
+                        setState(() {
+                          _scrapeAbstracts = value;
+                        });
+                      },
                     ),
                   ],
                 ),

@@ -10,6 +10,7 @@ import '../services/zotero_api.dart';
 import '../services/string_format_helper.dart';
 import '../services/abstract_scraper.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ArticleScreen extends StatefulWidget {
   final String doi;
@@ -48,26 +49,15 @@ class _ArticleScreenState extends State<ArticleScreen> {
   late DatabaseHelper databaseHelper;
   String? abstract;
   bool isLoadingAbstract = false;
+  bool _scrapeAbstracts = true;
 
   @override
   void initState() {
     super.initState();
     databaseHelper = DatabaseHelper();
+    _loadScrapingSettings();
     checkIfLiked();
     abstract = widget.abstract;
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final missingAbstractText =
-        AppLocalizations.of(context)!.abstractunavailable;
-
-    if (abstract == null ||
-        abstract!.isEmpty ||
-        abstract == missingAbstractText) {
-      fetchAbstract();
-    }
   }
 
   void _onShare(BuildContext context) async {
@@ -82,6 +72,23 @@ class _ArticleScreenState extends State<ArticleScreen> {
     }
   }
 
+  Future<void> _loadScrapingSettings() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _scrapeAbstracts = prefs.getBool('scrapeAbstracts') ?? true;
+    });
+    if (_scrapeAbstracts) {
+      final missingAbstractText =
+          AppLocalizations.of(context)!.abstractunavailable;
+
+      if (abstract == null ||
+          abstract!.isEmpty ||
+          abstract == missingAbstractText) {
+        fetchAbstract();
+      }
+    }
+  }
+
   Future<void> fetchAbstract() async {
     setState(() {
       isLoadingAbstract = true;
@@ -90,7 +97,12 @@ class _ArticleScreenState extends State<ArticleScreen> {
     debugPrint("Calling scraper for: ${widget.url}");
 
     AbstractScraper scraper = AbstractScraper();
-    String? scraped = await scraper.scrapeAbstract(widget.url);
+    String? scraped;
+    try {
+      scraped = await scraper.scrapeAbstract(widget.url);
+    } catch (e) {
+      scraped = '';
+    }
     String finalAbstract = '';
     if (scraped != null && scraped.isNotEmpty) {
       finalAbstract = scraped;
@@ -159,7 +171,11 @@ class _ArticleScreenState extends State<ArticleScreen> {
                           textAlign: TextAlign.justify,
                           style: TextStyle(fontSize: 16),
                         )
-                      : Text(AppLocalizations.of(context)!.abstractunavailable),
+                      : Text(
+                          AppLocalizations.of(context)!.abstractunavailable,
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(fontSize: 16),
+                        ),
 
               /*SelectableText(
                 widget.abstract.isNotEmpty
