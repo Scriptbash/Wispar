@@ -90,6 +90,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
   }
 
   Future<void> fetchAbstract() async {
+    if (!mounted) return;
     setState(() {
       isLoadingAbstract = true;
     });
@@ -114,7 +115,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
     } else {
       finalAbstract = AppLocalizations.of(context)!.abstractunavailable;
     }
-
+    if (!mounted) return;
     setState(() {
       abstract = finalAbstract;
       isLoadingAbstract = false;
