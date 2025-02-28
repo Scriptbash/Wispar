@@ -149,7 +149,7 @@
   "@sortby": {},
   "sortorder": "Ordenar",
   "@sortorder": {},
-  "followingsince": "Siguiendo desde",
+  "followingsince": "Siguiendo desde {date}",
   "@followingsince": {},
   "journaltitle": "Título de la revista",
   "@journaltitle": {},
