@@ -8,6 +8,7 @@ import '../widgets/publication_card.dart';
 import './journals_details_screen.dart';
 import '../services/zotero_api.dart';
 import '../services/string_format_helper.dart';
+import '../services/abstract_scraper.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ArticleScreen extends StatefulWidget {
@@ -45,12 +46,28 @@ class ArticleScreen extends StatefulWidget {
 class _ArticleScreenState extends State<ArticleScreen> {
   bool isLiked = false;
   late DatabaseHelper databaseHelper;
+  String? abstract;
+  bool isLoadingAbstract = false;
 
   @override
   void initState() {
     super.initState();
     databaseHelper = DatabaseHelper();
     checkIfLiked();
+    abstract = widget.abstract;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final missingAbstractText =
+        AppLocalizations.of(context)!.abstractunavailable;
+
+    if (abstract == null ||
+        abstract!.isEmpty ||
+        abstract == missingAbstractText) {
+      fetchAbstract();
+    }
   }
 
   void _onShare(BuildContext context) async {
@@ -63,6 +80,27 @@ class _ArticleScreenState extends State<ArticleScreen> {
     } catch (e) {
       debugPrint('Shared too fast: {$e}');
     }
+  }
+
+  Future<void> fetchAbstract() async {
+    setState(() {
+      isLoadingAbstract = true;
+    });
+
+    debugPrint("Calling scraper for: ${widget.url}");
+
+    AbstractScraper scraper = AbstractScraper();
+    String? scraped = await scraper.scrapeAbstract(widget.url);
+
+    String finalAbstract = (scraped != null && scraped.isNotEmpty)
+        ? scraped
+        : AppLocalizations.of(context)!.abstractunavailable;
+
+    setState(() {
+      abstract = finalAbstract;
+      isLoadingAbstract = false;
+    });
+    debugPrint("Final Abstract: $abstract");
   }
 
   @override
@@ -106,13 +144,23 @@ class _ArticleScreenState extends State<ArticleScreen> {
               SelectableText(getAuthorsNames(widget.authors),
                   style: TextStyle(color: Colors.grey, fontSize: 15)),
               SizedBox(height: 15),
-              SelectableText(
+              isLoadingAbstract
+                  ? Center(child: CircularProgressIndicator())
+                  : abstract != null && abstract!.isNotEmpty
+                      ? SelectableText(
+                          abstract!,
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(fontSize: 16),
+                        )
+                      : Text(AppLocalizations.of(context)!.abstractunavailable),
+
+              /*SelectableText(
                 widget.abstract.isNotEmpty
                     ? widget.abstract
                     : AppLocalizations.of(context)!.abstractunavailable,
                 textAlign: TextAlign.justify,
                 style: TextStyle(fontSize: 16),
-              ),
+              ),*/
               SizedBox(height: 20),
               Row(
                 children: [
