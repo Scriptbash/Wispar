@@ -10,6 +10,10 @@ class AbstractScraper {
     HeadlessInAppWebView? headlessWebView;
 
     headlessWebView = HeadlessInAppWebView(
+      initialSettings: InAppWebViewSettings(
+        userAgent:
+            "Mozilla/5.0 (Android 15; Mobile; rv:133.0) Gecko/133.0 Firefox/133.0",
+      ),
       initialUrlRequest: URLRequest(url: WebUri(url)),
       onLoadStop: (controller, loadedUrl) async {
         await Future.delayed(Duration(seconds: 3)); // Allow JS-loaded content
