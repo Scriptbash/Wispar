@@ -182,6 +182,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<int>(
+                  isExpanded: true,
                   value: _fetchInterval,
                   onChanged: (int? newValue) {
                     setState(() {
