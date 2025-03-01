@@ -29,6 +29,7 @@ class PublicationCard extends StatefulWidget {
   final String licenseName;
   final String? dateLiked;
   final VoidCallback? onFavoriteChanged;
+  final VoidCallback? onAbstractChanged;
   final String? publisher;
 
   const PublicationCard({
@@ -45,6 +46,7 @@ class PublicationCard extends StatefulWidget {
     required this.licenseName,
     this.dateLiked,
     this.onFavoriteChanged,
+    this.onAbstractChanged,
     this.publisher,
   })  : authors = authors,
         super(key: key);
@@ -90,6 +92,9 @@ class _PublicationCardState extends State<PublicationCard> {
               license: widget.license,
               licenseName: widget.licenseName,
               publisher: widget.publisher,
+              onAbstractChanged: () {
+                widget.onAbstractChanged!();
+              },
             ),
           ),
         );

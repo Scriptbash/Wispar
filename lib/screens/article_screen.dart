@@ -24,6 +24,7 @@ class ArticleScreen extends StatefulWidget {
   final String license;
   final String licenseName;
   final String? publisher;
+  final VoidCallback? onAbstractChanged;
 
   const ArticleScreen({
     Key? key,
@@ -38,6 +39,7 @@ class ArticleScreen extends StatefulWidget {
     required this.license,
     required this.licenseName,
     this.publisher,
+    this.onAbstractChanged,
   }) : super(key: key);
 
   @override
@@ -95,7 +97,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
       isLoadingAbstract = true;
     });
 
-    debugPrint("Calling scraper for: ${widget.url}");
+    //debugPrint("Calling scraper for: ${widget.url}");
 
     AbstractScraper scraper = AbstractScraper();
     String? scraped;
@@ -109,8 +111,9 @@ class _ArticleScreenState extends State<ArticleScreen> {
       finalAbstract = scraped;
       try {
         databaseHelper.updateArticleAbstract(widget.doi, finalAbstract);
+        widget.onAbstractChanged!();
       } catch (e) {
-        debugPrint("Unable to update the abstract: ${e}");
+        // debugPrint("Unable to update the abstract: ${e}");
       }
     } else {
       finalAbstract = AppLocalizations.of(context)!.abstractunavailable;
@@ -120,7 +123,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
       abstract = finalAbstract;
       isLoadingAbstract = false;
     });
-    debugPrint("Final Abstract: $abstract");
+    // debugPrint("Final Abstract: $abstract");
   }
 
   @override
