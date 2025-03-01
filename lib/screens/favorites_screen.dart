@@ -25,6 +25,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   List<PublicationCard> _allFavorites = [];
   List<PublicationCard> _filteredFavorites = [];
 
+  bool _useAndFilter = true;
+
   @override
   void initState() {
     super.initState();
@@ -64,24 +66,28 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       if (query.isEmpty) {
         _filteredFavorites = List.from(_allFavorites);
       } else {
-        _filteredFavorites = _allFavorites
-            .where((publication) =>
-                publication.title.toLowerCase().contains(query.toLowerCase()) ||
-                publication.journalTitle
-                    .toLowerCase()
-                    .contains(query.toLowerCase()) ||
-                publication.abstract
-                    .toLowerCase()
-                    .contains(query.toLowerCase()) ||
-                publication.licenseName
-                    .toLowerCase()
-                    .contains(query.toLowerCase()) ||
-                publication.authors.any((author) => author.family
-                    .toLowerCase()
-                    .contains(query.toLowerCase())) ||
-                publication.authors.any((author) =>
-                    author.given.toLowerCase().contains(query.toLowerCase())))
-            .toList();
+        List<String> keywords = query.toLowerCase().split(' ');
+
+        _filteredFavorites = _allFavorites.where((publication) {
+          bool matchesAnyField(String word, PublicationCard pub) {
+            return pub.title.toLowerCase().contains(word) ||
+                pub.journalTitle.toLowerCase().contains(word) ||
+                pub.abstract.toLowerCase().contains(word) ||
+                pub.licenseName.toLowerCase().contains(word) ||
+                pub.authors.any(
+                    (author) => author.family.toLowerCase().contains(word)) ||
+                pub.authors
+                    .any((author) => author.given.toLowerCase().contains(word));
+          }
+
+          if (_useAndFilter) {
+            return keywords.every(
+                (word) => matchesAnyField(word, publication)); // AND logic
+          } else {
+            return keywords
+                .any((word) => matchesAnyField(word, publication)); // OR logic
+          }
+        }).toList();
       }
       _filteredFavorites = _sortFavorites(_filteredFavorites);
     });
@@ -110,23 +116,39 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               prefixIcon: Icon(Icons.search),
               filled: true,
               fillColor: Color.fromARGB(31, 148, 147, 147),
-              suffixIcon: PopupMenuButton<int>(
-                icon: Icon(Icons.more_vert),
-                onSelected: (item) => handleMenuButton(item),
-                itemBuilder: (context) => [
-                  PopupMenuItem<int>(
-                    value: 0,
-                    child: ListTile(
-                      leading: Icon(Icons.sort),
-                      title: Text(AppLocalizations.of(context)!.sortby),
+              suffixIcon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _useAndFilter = !_useAndFilter;
+                        _filterFeed(_filterController.text);
+                      });
+                    },
+                    child: Text(
+                      _useAndFilter ? 'AND' : 'OR',
                     ),
                   ),
-                  PopupMenuItem<int>(
-                    value: 1,
-                    child: ListTile(
-                      leading: Icon(Icons.sort_by_alpha),
-                      title: Text(AppLocalizations.of(context)!.sortorder),
-                    ),
+                  PopupMenuButton<int>(
+                    icon: Icon(Icons.more_vert),
+                    onSelected: (item) => handleMenuButton(item),
+                    itemBuilder: (context) => [
+                      PopupMenuItem<int>(
+                        value: 0,
+                        child: ListTile(
+                          leading: Icon(Icons.sort),
+                          title: Text(AppLocalizations.of(context)!.sortby),
+                        ),
+                      ),
+                      PopupMenuItem<int>(
+                        value: 1,
+                        child: ListTile(
+                          leading: Icon(Icons.sort_by_alpha),
+                          title: Text(AppLocalizations.of(context)!.sortorder),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

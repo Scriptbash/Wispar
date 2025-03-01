@@ -22,6 +22,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
   // Variables related to the filter bar in the appbar
   final TextEditingController _filterController = TextEditingController();
   List<DownloadedCard> _filteredDownloads = [];
+  bool _useAndFilter = true;
 
   @override
   void initState() {
@@ -48,12 +49,21 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
       if (query.isEmpty) {
         _filteredDownloads = List.from(_downloadedArticles);
       } else {
+        List<String> keywords = query.toLowerCase().split(' ');
+
         _filteredDownloads = _downloadedArticles.where((article) {
-          final title = article.publicationCard.title.toLowerCase();
-          final journalTitle =
-              article.publicationCard.journalTitle.toLowerCase();
-          return title.contains(query.toLowerCase()) ||
-              journalTitle.contains(query.toLowerCase());
+          bool matchesAnyField(String word) {
+            return article.publicationCard.title.toLowerCase().contains(word) ||
+                article.publicationCard.journalTitle
+                    .toLowerCase()
+                    .contains(word);
+          }
+
+          if (_useAndFilter) {
+            return keywords.every(matchesAnyField); // AND logic
+          } else {
+            return keywords.any(matchesAnyField); // OR logic
+          }
         }).toList();
       }
     });
@@ -82,23 +92,40 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                 prefixIcon: Icon(Icons.search),
                 filled: true,
                 fillColor: Color.fromARGB(31, 148, 147, 147),
-                suffixIcon: PopupMenuButton<int>(
-                  icon: Icon(Icons.more_vert),
-                  onSelected: (item) => handleMenuButton(item),
-                  itemBuilder: (context) => [
-                    PopupMenuItem<int>(
-                      value: 0,
-                      child: ListTile(
-                        leading: Icon(Icons.sort),
-                        title: Text(AppLocalizations.of(context)!.sortby),
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _useAndFilter = !_useAndFilter;
+                          _filterDownloads(_filterController.text);
+                        });
+                      },
+                      child: Text(
+                        _useAndFilter ? 'AND' : 'OR',
                       ),
                     ),
-                    PopupMenuItem<int>(
-                      value: 1,
-                      child: ListTile(
-                        leading: Icon(Icons.sort_by_alpha),
-                        title: Text(AppLocalizations.of(context)!.sortorder),
-                      ),
+                    PopupMenuButton<int>(
+                      icon: Icon(Icons.more_vert),
+                      onSelected: (item) => handleMenuButton(item),
+                      itemBuilder: (context) => [
+                        PopupMenuItem<int>(
+                          value: 0,
+                          child: ListTile(
+                            leading: Icon(Icons.sort),
+                            title: Text(AppLocalizations.of(context)!.sortby),
+                          ),
+                        ),
+                        PopupMenuItem<int>(
+                          value: 1,
+                          child: ListTile(
+                            leading: Icon(Icons.sort_by_alpha),
+                            title:
+                                Text(AppLocalizations.of(context)!.sortorder),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 )),
