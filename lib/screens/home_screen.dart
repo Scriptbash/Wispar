@@ -34,12 +34,18 @@ class _HomeScreenState extends State<HomeScreen> {
   final FeedService _feedService = FeedService();
 
   List<Map<String, dynamic>> savedQueries = [];
+  bool _feedLoaded = false; // Needed to avoid conflicts wih onAbstractChanged
 
   @override
   void initState() {
     super.initState();
     _loadFetchInterval();
     _buildAndStreamFeed();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_feedLoaded) {
+        _onAbstractChanged();
+      }
+    });
 
     _filterController.addListener(() {
       _filterFeed(_filterController.text);
@@ -95,12 +101,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (mounted) {
         final List<PublicationCard> cachedFeed =
-            await _feedService.getCachedFeed(context);
+            await _feedService.getCachedFeed(context, _onAbstractChanged);
 
         setState(() {
           _allFeed = List.from(cachedFeed);
           _filteredFeed = List.from(_allFeed);
           _sortFeed();
+          _feedLoaded = true;
         });
 
         _feedStreamController.add(_filteredFeed);
@@ -178,6 +185,17 @@ class _HomeScreenState extends State<HomeScreen> {
             .toList();
       }
       _sortFeed();
+    });
+  }
+
+  void _onAbstractChanged() async {
+    final List<PublicationCard> cachedFeed =
+        await _feedService.getCachedFeed(context, _onAbstractChanged);
+    setState(() {
+      _allFeed = List.from(cachedFeed);
+      _filterFeed(_filterController.text);
+      _sortFeed();
+      _feedStreamController.add(_filteredFeed);
     });
   }
 

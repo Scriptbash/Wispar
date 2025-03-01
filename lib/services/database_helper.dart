@@ -407,16 +407,18 @@ class DatabaseHelper {
     });
   }
 
-  /*Future<void> clearCachedPublications() async {
+  // Updates the abstract of an article after being scraped
+  Future<void> updateArticleAbstract(String doi, String abstract) async {
     final db = await database;
-    await db.delete(
+    await db.update(
       'articles',
-      where:
-          'dateCached IS NOT NULL AND (dateLiked IS NULL AND dateDownloaded IS NULL)',
+      {
+        'abstract': abstract,
+      },
+      where: 'doi = ?',
+      whereArgs: [doi],
     );
-  }*/
-
-// Functions for downloaded articles
+  }
 
   Future<bool> isArticleDownloaded(String doi) async {
     final db = await database;

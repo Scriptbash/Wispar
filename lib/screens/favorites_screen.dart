@@ -15,6 +15,7 @@ class FavoritesScreen extends StatefulWidget {
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
   late Future<List<PublicationCard>> _favoriteArticles;
+  late ScrollController _scrollController;
   int sortBy = 0; // Set the sort by option to Article title by default
   int sortOrder = 0; // Set the sort order to Ascending by default
   Map<String, String> abstractCache = {}; // Cache for abstracts
@@ -27,6 +28,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     _favoriteArticles = _loadFavoriteArticles();
 
     _filterController.addListener(() {
@@ -36,11 +38,19 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   Future<List<PublicationCard>> _loadFavoriteArticles() async {
     try {
+      final double previousOffset = _scrollController.hasClients
+          ? _scrollController.offset
+          : 0; // Save scroll position
       List<PublicationCard> favorites =
           await DatabaseHelper().getFavoriteArticles();
       setState(() {
         _allFavorites = favorites;
         _filteredFavorites = _sortFavorites(favorites); // Apply sorting
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.jumpTo(previousOffset); // Restore scroll position
+        }
       });
       return favorites;
     } catch (e) {
@@ -156,6 +166,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     ),
                   )
                 : ListView.builder(
+                    controller: _scrollController,
                     itemCount: _filteredFavorites.length,
                     itemBuilder: (context, index) {
                       final publicationCard = _filteredFavorites[index];
@@ -178,6 +189,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           dateLiked: publicationCard.dateLiked,
                           onFavoriteChanged: () {
                             _removeFavorite(context, publicationCard);
+                          },
+                          onAbstractChanged: () {
+                            _updateAbstract();
                           },
                         );
                       } else {
@@ -217,6 +231,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                 dateLiked: publicationCard.dateLiked,
                                 onFavoriteChanged: () {
                                   _removeFavorite(context, publicationCard);
+                                },
+                                onAbstractChanged: () {
+                                  _updateAbstract();
                                 },
                               );
                             }
@@ -328,9 +345,17 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     );
   }
 
+  Future<void> _updateAbstract() async {
+    setState(() {
+      abstractCache = {};
+      _favoriteArticles = _loadFavoriteArticles();
+    });
+  }
+
   @override
   void dispose() {
     _filterController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 }

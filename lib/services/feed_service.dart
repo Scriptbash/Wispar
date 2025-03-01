@@ -157,7 +157,8 @@ class FeedService {
     }
   }
 
-  Future<List<PublicationCard>> getCachedFeed(BuildContext context) async {
+  Future<List<PublicationCard>> getCachedFeed(
+      BuildContext context, VoidCallback? onAbstractChanged) async {
     final cachedPublications = await _dbHelper.getCachedPublications();
 
     return Future.wait(cachedPublications.map((item) async {
@@ -172,6 +173,7 @@ class FeedService {
         url: item.url,
         license: item.license,
         licenseName: item.licenseName,
+        onAbstractChanged: onAbstractChanged,
       );
     }).toList());
   }

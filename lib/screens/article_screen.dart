@@ -8,7 +8,9 @@ import '../widgets/publication_card.dart';
 import './journals_details_screen.dart';
 import '../services/zotero_api.dart';
 import '../services/string_format_helper.dart';
+import '../services/abstract_scraper.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ArticleScreen extends StatefulWidget {
   final String doi;
@@ -22,6 +24,7 @@ class ArticleScreen extends StatefulWidget {
   final String license;
   final String licenseName;
   final String? publisher;
+  final VoidCallback? onAbstractChanged;
 
   const ArticleScreen({
     Key? key,
@@ -36,6 +39,7 @@ class ArticleScreen extends StatefulWidget {
     required this.license,
     required this.licenseName,
     this.publisher,
+    this.onAbstractChanged,
   }) : super(key: key);
 
   @override
@@ -45,12 +49,17 @@ class ArticleScreen extends StatefulWidget {
 class _ArticleScreenState extends State<ArticleScreen> {
   bool isLiked = false;
   late DatabaseHelper databaseHelper;
+  String? abstract;
+  bool isLoadingAbstract = false;
+  bool _scrapeAbstracts = true;
 
   @override
   void initState() {
     super.initState();
     databaseHelper = DatabaseHelper();
+    _loadScrapingSettings();
     checkIfLiked();
+    abstract = widget.abstract;
   }
 
   void _onShare(BuildContext context) async {
@@ -63,6 +72,58 @@ class _ArticleScreenState extends State<ArticleScreen> {
     } catch (e) {
       debugPrint('Shared too fast: {$e}');
     }
+  }
+
+  Future<void> _loadScrapingSettings() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _scrapeAbstracts = prefs.getBool('scrapeAbstracts') ?? true;
+    });
+    if (_scrapeAbstracts) {
+      final missingAbstractText =
+          AppLocalizations.of(context)!.abstractunavailable;
+
+      if (abstract == null ||
+          abstract!.isEmpty ||
+          abstract == missingAbstractText) {
+        fetchAbstract();
+      }
+    }
+  }
+
+  Future<void> fetchAbstract() async {
+    if (!mounted) return;
+    setState(() {
+      isLoadingAbstract = true;
+    });
+
+    //debugPrint("Calling scraper for: ${widget.url}");
+
+    AbstractScraper scraper = AbstractScraper();
+    String? scraped;
+    try {
+      scraped = await scraper.scrapeAbstract(widget.url);
+    } catch (e) {
+      scraped = '';
+    }
+    String finalAbstract = '';
+    if (scraped != null && scraped.isNotEmpty) {
+      finalAbstract = scraped;
+      try {
+        databaseHelper.updateArticleAbstract(widget.doi, finalAbstract);
+        widget.onAbstractChanged!();
+      } catch (e) {
+        debugPrint("Unable to update the abstract: ${e}");
+      }
+    } else {
+      finalAbstract = AppLocalizations.of(context)!.abstractunavailable;
+    }
+    if (!mounted) return;
+    setState(() {
+      abstract = finalAbstract;
+      isLoadingAbstract = false;
+    });
+    // debugPrint("Final Abstract: $abstract");
   }
 
   @override
@@ -106,13 +167,27 @@ class _ArticleScreenState extends State<ArticleScreen> {
               SelectableText(getAuthorsNames(widget.authors),
                   style: TextStyle(color: Colors.grey, fontSize: 15)),
               SizedBox(height: 15),
-              SelectableText(
+              isLoadingAbstract
+                  ? Center(child: CircularProgressIndicator())
+                  : abstract != null && abstract!.isNotEmpty
+                      ? SelectableText(
+                          abstract!,
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(fontSize: 16),
+                        )
+                      : Text(
+                          AppLocalizations.of(context)!.abstractunavailable,
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(fontSize: 16),
+                        ),
+
+              /*SelectableText(
                 widget.abstract.isNotEmpty
                     ? widget.abstract
                     : AppLocalizations.of(context)!.abstractunavailable,
                 textAlign: TextAlign.justify,
                 style: TextStyle(fontSize: 16),
-              ),
+              ),*/
               SizedBox(height: 20),
               Row(
                 children: [
