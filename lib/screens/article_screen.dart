@@ -113,7 +113,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
         databaseHelper.updateArticleAbstract(widget.doi, finalAbstract);
         widget.onAbstractChanged!();
       } catch (e) {
-        // debugPrint("Unable to update the abstract: ${e}");
+        debugPrint("Unable to update the abstract: ${e}");
       }
     } else {
       finalAbstract = AppLocalizations.of(context)!.abstractunavailable;

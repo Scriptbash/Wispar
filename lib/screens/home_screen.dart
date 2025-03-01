@@ -34,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final FeedService _feedService = FeedService();
 
   List<Map<String, dynamic>> savedQueries = [];
+  bool _feedLoaded = false; // Needed to avoid conflicts wih onAbstractChanged
 
   @override
   void initState() {
@@ -41,7 +42,9 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadFetchInterval();
     _buildAndStreamFeed();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _onAbstractChanged();
+      if (_feedLoaded) {
+        _onAbstractChanged();
+      }
     });
 
     _filterController.addListener(() {
@@ -104,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _allFeed = List.from(cachedFeed);
           _filteredFeed = List.from(_allFeed);
           _sortFeed();
+          _feedLoaded = true;
         });
 
         _feedStreamController.add(_filteredFeed);
