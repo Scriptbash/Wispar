@@ -49,10 +49,9 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
               child: Text(AppLocalizations.of(context)!.noPublicationFound),
             )
           : ListView.builder(
-              itemCount: items.length + (hasMoreResults ? 1 : 0),
+              itemCount: items.length + (isLoading ? 1 : 0),
               itemBuilder: (context, index) {
-                if (index == items.length) {
-                  // Display a loading indicator at the end of the list
+                if (index == items.length && isLoading) {
                   return Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Center(child: CircularProgressIndicator()),
@@ -92,8 +91,12 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
           await CrossRefApi.queryJournalsByName(query);
 
       setState(() {
-        items.addAll(newResults.list);
-        hasMoreResults = newResults.hasMore && newResults.list.isNotEmpty;
+        if (newResults.list.isNotEmpty) {
+          items.addAll(newResults.list);
+          hasMoreResults = newResults.hasMore;
+        } else {
+          hasMoreResults = false;
+        }
       });
     } catch (e) {
       debugPrint('Error loading more items: $e');
