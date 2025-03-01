@@ -457,6 +457,18 @@ class DatabaseHelper {
     });
   }
 
+  Future<String?> getAbstract(String doi) async {
+    final db = await database;
+    final result = await db.query(
+      'articles',
+      columns: ['abstract'],
+      where: 'doi = ?',
+      whereArgs: [doi],
+    );
+
+    return result.isNotEmpty ? result.first['abstract'] as String? : null;
+  }
+
   Future<void> removeDownloaded(String doi) async {
     final db = await database;
 

@@ -75,7 +75,15 @@ class _PublicationCardState extends State<PublicationCard> {
     }
 
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
+        String finalAbstract = widget.abstract;
+
+        if (widget.abstract.isEmpty) {
+          final dbAbstract = await databaseHelper.getAbstract(widget.doi);
+          if (dbAbstract != null && dbAbstract.isNotEmpty) {
+            finalAbstract = dbAbstract;
+          }
+        }
         // Navigate to the ArticleScreen when the card is tapped
         Navigator.push(
           context,
@@ -84,7 +92,7 @@ class _PublicationCardState extends State<PublicationCard> {
               doi: widget.doi,
               title: widget.title,
               issn: widget.issn,
-              abstract: widget.abstract,
+              abstract: finalAbstract,
               journalTitle: widget.journalTitle,
               publishedDate: widget.publishedDate,
               authors: widget.authors,
