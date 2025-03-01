@@ -40,6 +40,9 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _loadFetchInterval();
     _buildAndStreamFeed();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _onAbstractChanged();
+    });
 
     _filterController.addListener(() {
       _filterFeed(_filterController.text);
@@ -95,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (mounted) {
         final List<PublicationCard> cachedFeed =
-            await _feedService.getCachedFeed(context);
+            await _feedService.getCachedFeed(context, _onAbstractChanged);
 
         setState(() {
           _allFeed = List.from(cachedFeed);
@@ -178,6 +181,17 @@ class _HomeScreenState extends State<HomeScreen> {
             .toList();
       }
       _sortFeed();
+    });
+  }
+
+  void _onAbstractChanged() async {
+    final List<PublicationCard> cachedFeed =
+        await _feedService.getCachedFeed(context, _onAbstractChanged);
+    setState(() {
+      _allFeed = List.from(cachedFeed);
+      _filterFeed(_filterController.text);
+      _sortFeed();
+      _feedStreamController.add(_filteredFeed);
     });
   }
 
