@@ -36,14 +36,15 @@ Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly s
     <li> [x] EZproxy and Unpaywall integration</li>
     <li> [x] Send articles to Zotero</li>
     <li> [x] Share articles</li>
+    <li> [x] Scrape missing abstracts</li>
+    <li> [x] Export/Import the database</li>
+    <li> [x] Filters</li>
 </ul>
-* The download feature is currently limited to open access articles. Flutter tools and publishers like Elsevier and Wiley make it hard to get the PDF file behind their paywall.
+* The download feature is currently limited to some publishers. Flutter tools and publishers like Elsevier and Wiley make it hard to get the PDF file.
 
 ### Planned features
 <ul>
     <li> [ ] Deep links</li>
-    <li> [ ] Export/Import the database</li>
-    <li> [ ] Filters</li>
     <li> [ ] Get downloads working for more publishers</li> 
 </ul>
 
