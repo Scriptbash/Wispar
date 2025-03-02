@@ -24,9 +24,9 @@ platform :android do
       json_key: 'google_service_account.json',
       skip_upload_apk: true,
       validate_only: false,
-      #skip_upload_metadata: true, # Skip uploading metadata
-      #skip_upload_images: true, # Skip uploading screenshots
-      #skip_upload_screenshots: true, # Skip uploading screenshots
+      skip_upload_metadata: true, # Skip uploading metadata
+      skip_upload_images: true, # Skip uploading screenshots
+      skip_upload_screenshots: true, # Skip uploading screenshots
       release_status: "draft", # Can be 'draft', 'completed', 'halted'
       aab: '../build/app/outputs/bundle/release/app-release.aab', # Path to your AAB file
       #version_code: version["version_code"], # From pubspec.yaml
