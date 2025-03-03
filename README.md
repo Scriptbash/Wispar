@@ -17,6 +17,12 @@
 <a href="https://apps.apple.com/us/app/wispar/id6741366984" target="_blank">
   <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store"height="50">
 </a>
+</br>
+<a href="https://f-droid.org/packages/app.wispar.wispar">
+    <img src="https://f-droid.org/badge/get-it-on.png"
+    alt="Get it on F-Droid"
+    height="80">
+</a>
 </br></br>
 <a href='https://ko-fi.com/A0A6ME7SJ' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi5.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 </p>
