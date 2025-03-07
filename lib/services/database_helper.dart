@@ -23,7 +23,7 @@ class DatabaseHelper {
     final path = await getDatabasesPath();
     final databasePath = join(path, 'wispar.db');
 
-    return openDatabase(databasePath, version: 2,
+    return openDatabase(databasePath, version: 3,
         onCreate: (db, version) async {
       // Create the journals table
       await db.execute('''
@@ -87,6 +87,18 @@ class DatabaseHelper {
         await db.execute('''
         ALTER TABLE articles ADD COLUMN query_id INTEGER;
       ''');
+      }
+      if (oldVersion < 3) {
+        debugPrint("Updating db to v3");
+        List<Map<String, dynamic>> articles =
+            await db.rawQuery('SELECT article_id, pdfPath FROM articles');
+        for (var article in articles) {
+          String pdfPath = article['pdfPath'] ?? '';
+          String filename = pdfPath.split('/').last;
+          await db.rawUpdate(
+              'UPDATE articles SET pdfPath = ? WHERE article_id = ?',
+              [filename, article['article_id']]);
+        }
       }
     });
   }
