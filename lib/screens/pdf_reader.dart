@@ -63,7 +63,7 @@ class _PdfReaderState extends State<PdfReader> {
               tooltip: AppLocalizations.of(context)!.openExternalPdfApp,
               onPressed: () async {
                 try {
-                  OpenFilex.open(widget.pdfUrl);
+                  OpenFilex.open(resolvedPdfPath);
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text(AppLocalizations.of(context)!
