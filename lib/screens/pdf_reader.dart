@@ -5,6 +5,8 @@ import '../widgets/publication_card.dart';
 import '../services/database_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 class PdfReader extends StatefulWidget {
   final String pdfUrl;
@@ -20,6 +22,8 @@ class PdfReader extends StatefulWidget {
 class _PdfReaderState extends State<PdfReader> {
   final controller = PdfViewerController();
   late DatabaseHelper databaseHelper;
+  late String resolvedPdfPath = "";
+  bool isPathResolved = false;
   bool isDownloaded = false;
 
   @override
@@ -31,6 +35,19 @@ class _PdfReaderState extends State<PdfReader> {
   void initState() {
     super.initState();
     databaseHelper = DatabaseHelper();
+    resolvePdfPath();
+  }
+
+  void resolvePdfPath() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final pdfFileName = p.basename(widget.pdfUrl);
+    final newPdfPath = p.join(directory.path, pdfFileName);
+
+    setState(() {
+      resolvedPdfPath = newPdfPath;
+      isPathResolved = true;
+    });
+
     checkIfDownloaded();
   }
 
@@ -46,7 +63,7 @@ class _PdfReaderState extends State<PdfReader> {
               tooltip: AppLocalizations.of(context)!.openExternalPdfApp,
               onPressed: () async {
                 try {
-                  OpenFilex.open(widget.pdfUrl);
+                  OpenFilex.open(resolvedPdfPath);
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text(AppLocalizations.of(context)!
@@ -63,7 +80,7 @@ class _PdfReaderState extends State<PdfReader> {
                       await databaseHelper.insertArticle(
                         widget.publicationCard,
                         isDownloaded: true,
-                        pdfPath: widget.pdfUrl,
+                        pdfPath: p.basename(widget.pdfUrl),
                       );
                       setState(() {
                         isDownloaded = true;
@@ -88,36 +105,37 @@ class _PdfReaderState extends State<PdfReader> {
                     },
                   ),
           ]),
-      body: Stack(children: [
-        PdfViewer.file(widget.pdfUrl,
-            controller: controller,
-            params: PdfViewerParams(
-              enableTextSelection: false, // This is not ready yet.
-              maxScale: 8,
-              loadingBannerBuilder: (context, bytesDownloaded, totalBytes) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    // totalBytes may not be available on certain case
-                    value: totalBytes != null
-                        ? bytesDownloaded / totalBytes
-                        : null,
-                    backgroundColor: Colors.grey,
-                  ),
-                );
-              },
-              linkHandlerParams: PdfLinkHandlerParams(
-                linkColor: const Color.fromARGB(20, 255, 235, 59),
-                onLinkTap: (link) {
-                  // handle URL or Dest
-                  if (link.url != null) {
-                    launchUrl(link.url!);
-                  } else if (link.dest != null) {
-                    controller.goToDest(link.dest);
-                  }
-                },
-              ),
-            ))
-      ]),
+      body: isPathResolved
+          ? Stack(children: [
+              PdfViewer.file(resolvedPdfPath,
+                  controller: controller,
+                  params: PdfViewerParams(
+                    enableTextSelection: false,
+                    maxScale: 8,
+                    loadingBannerBuilder:
+                        (context, bytesDownloaded, totalBytes) {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: totalBytes != null
+                              ? bytesDownloaded / totalBytes
+                              : null,
+                          backgroundColor: Colors.grey,
+                        ),
+                      );
+                    },
+                    linkHandlerParams: PdfLinkHandlerParams(
+                      linkColor: const Color.fromARGB(20, 255, 235, 59),
+                      onLinkTap: (link) {
+                        if (link.url != null) {
+                          launchUrl(link.url!);
+                        } else if (link.dest != null) {
+                          controller.goToDest(link.dest);
+                        }
+                      },
+                    ),
+                  ))
+            ])
+          : const Center(child: CircularProgressIndicator()),
     );
   }
 
