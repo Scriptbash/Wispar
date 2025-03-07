@@ -198,5 +198,29 @@
   "reportIssue": "Notificar un problema",
   "@reportIssue": {},
   "about": "Acerca de",
-  "@about": {}
+  "@about": {},
+  "download": "Descargar",
+  "@download": {
+    "description": "The verb to download, without the 'to'."
+  },
+  "delete": "Eliminar",
+  "@delete": {},
+  "setupInstitutionalAccess": "Configure el acceso institucional",
+  "@setupInstitutionalAccess": {},
+  "setupSelectInstitution": "Seleccione su institución",
+  "@setupSelectInstitution": {},
+  "setupSelectedInstitution": "Ha seleccionado:",
+  "@setupSelectedInstitution": {},
+  "setupLinkZotero": "Vincule su cuenta de Zotero",
+  "@setupLinkZotero": {},
+  "setupZoteroLong": "Envíe publicaciones directamente a su biblioteca de Zotero. Se añadirán a una colección especial de Wispar.",
+  "@setupZoteroLong": {},
+  "setupLinkMyZotero": "Vincular mi cuenta de Zotero",
+  "@setupLinkMyZotero": {},
+  "setupOtherSettings": "Otros ajustes",
+  "@setupOtherSettings": {},
+  "setupOtherSettingsLong": "Puede encontrar ajustes adicionales en el menú de configuración de la aplicación. Acceda desde la pantalla de Inicio, pulsando los tres puntos en la esquina superior derecha.",
+  "@setupOtherSettingsLong": {},
+  "skip": "Omitir",
+  "@skip": {}
 }

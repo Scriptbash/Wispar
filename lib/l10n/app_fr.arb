@@ -336,5 +336,7 @@
   "importDatabase": "Importer la base de données",
   "@importDatabase": {},
   "databaseImportFailed": "Échec de l'importation de la base de données.",
-  "@databaseImportFailed": {}
+  "@databaseImportFailed": {},
+  "scrapeAbstracts": "Extraction des résumés manquants",
+  "@scrapeAbstracts": {}
 }
