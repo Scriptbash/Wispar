@@ -153,7 +153,7 @@
   "@authors": {},
   "abstract": "Аннотация",
   "@abstract": {},
-  "publishedon": "Опубликовано {дата}",
+  "publishedon": "Опубликовано {date}",
   "@publishedon": {
     "placeholders": {
       "date": {
@@ -240,7 +240,7 @@
   "@sortby": {},
   "sortorder": "Порядок сортировки",
   "@sortorder": {},
-  "followingsince": "Подписано с {дата}",
+  "followingsince": "Подписано с {date}",
   "@followingsince": {
     "placeholders": {
       "date": {
@@ -261,7 +261,7 @@
   "@articletitle": {},
   "firstauthfamname": "Фамилия первого автора",
   "@firstauthfamname": {},
-  "addedtoyourfav": "Добавлено в избранные {дата}",
+  "addedtoyourfav": "Добавлено в избранные {date}",
   "@addedtoyourfav": {
     "placeholders": {
       "date": {
@@ -314,7 +314,7 @@
   },
   "save": "Сохранить",
   "@save": {},
-  "savedOn": "Сохранено {дата}",
+  "savedOn": "Сохранено {date}",
   "@savedOn": {
     "placeholders": {
       "date": {
