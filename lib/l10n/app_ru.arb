@@ -1,1 +1,390 @@
-{}
+{
+  "download": "Скачать",
+  "@download": {
+    "description": "The verb to download, without the 'to'."
+  },
+  "searchPlaceholder": "Поиск…",
+  "@searchPlaceholder": {
+    "description": "Place holder text in the search input widget."
+  },
+  "searchByQuery": "Поиск по запросу",
+  "@searchByQuery": {},
+  "viewarticle": "Просмотреть статью",
+  "@viewarticle": {},
+  "display": "Вид",
+  "@display": {},
+  "buildingfeed": "Собираем вашу ленту. Пожалуйста подождите…",
+  "@buildingfeed": {},
+  "zoteroValidKey": "API-ключ сохранен!",
+  "@zoteroValidKey": {
+    "description": "Snackbar shown when a valid Zotero API key has been saved."
+  },
+  "saveSettings": "Сохранить настройки",
+  "@saveSettings": {},
+  "setupAlmostSet": "Почти все готово!",
+  "@setupAlmostSet": {},
+  "welcomeWispar": "Добро пожаловать в Wispar!",
+  "@welcomeWispar": {},
+  "appDescription": "Ваша открытая библиотека для ознакомления с научной литературой. Давайте быстро настроим приложение!",
+  "@appDescription": {},
+  "setupInstitutionalAccess": "Настроить доступ к ресурсам учебного заведения",
+  "@setupInstitutionalAccess": {},
+  "setupInstitutionalAccessLong": "Выберите EZproxy своё учебное заведение, чтобы получить доступ к их журнальным подпискам. Это устранит необходимость в использовании VPN или доступе на территории учреждения.",
+  "@setupInstitutionalAccessLong": {},
+  "setupSelectInstitution": "Выберите своё учебное заведение",
+  "@setupSelectInstitution": {},
+  "setupSelectedInstitution": "Вы выбрали:",
+  "@setupSelectedInstitution": {},
+  "setupLinkZotero": "Связать с Zotero",
+  "@setupLinkZotero": {},
+  "setupZoteroLong": "Отправляйте публикации непосредственно в свою библиотеку Zotero. Они будут добавлены в специальную коллекцию Wispar.",
+  "@setupZoteroLong": {},
+  "setupLinkMyZotero": "Связать свою учетную запись Zotero",
+  "@setupLinkMyZotero": {},
+  "setupOtherSettings": "Другие настройки",
+  "@setupOtherSettings": {},
+  "setupOtherSettingsLong": "Дополнительные настройки доступны в меню настроек приложения. Достигните его с главного экрана, нажав меню троеточия в правом верхнем углу.",
+  "@setupOtherSettingsLong": {},
+  "setupAlmostSetLong": "Далее мы перенесем вас на экран поиска, где вы можете подписаться на свои любимые журналы. Не забудьте переключить меню категорий с 'Статьи' на 'Журналы'.",
+  "@setupAlmostSetLong": {},
+  "skip": "Пропустить",
+  "@skip": {},
+  "getStarted": "Начать",
+  "@getStarted": {},
+  "favorites": "Избранные",
+  "@favorites": {
+    "description": "The favorites menu button and the app bar title when in the favorites screen."
+  },
+  "delete": "Удалить",
+  "@delete": {},
+  "downloads": "Скачанные",
+  "@downloads": {
+    "description": "The downloads menu button and the app bar title when in the downloads screen."
+  },
+  "downloadSuccessful": "Статья была скачана успешно!",
+  "@downloadSuccessful": {},
+  "home": "Главная",
+  "@home": {
+    "description": "The home menu button and the app bar title when in the home screen."
+  },
+  "downloadDeleted": "Статья удалена!",
+  "@downloadDeleted": {},
+  "noDownloads": "У вас нет скачанных файлов.",
+  "@noDownloads": {},
+  "settings": "Настройки",
+  "@settings": {
+    "description": "The settings option menu button and the app bar title when in the settings screen."
+  },
+  "journalLibraryEmpty": "Вы не подписаны на журналы. Используйте меню поиска, чтобы найти и подписаться на журналы.",
+  "@journalLibraryEmpty": {
+    "description": "Message shown when the user is not following any journals."
+  },
+  "follow": "Подписаться",
+  "@follow": {
+    "description": "The button text shown on journal cards when it is not followed."
+  },
+  "unfollow": "Отписаться",
+  "@unfollow": {
+    "description": "The button text shown on journal cards when it is followed."
+  },
+  "library": "Библиотека",
+  "@library": {
+    "description": "The library menu button and the app bar title when in the library screen."
+  },
+  "journals": "Журналы",
+  "@journals": {
+    "description": "The journals menu button and the app bar title when in the journals screen."
+  },
+  "queries": "Запросы",
+  "@queries": {
+    "description": "Title of the saved search queries tab."
+  },
+  "search": "Поиск",
+  "@search": {
+    "description": "Text shown inside the search screen app bar and for the seach button."
+  },
+  "filter": "Отфильтровать карточки публикаций",
+  "@filter": {},
+  "filterResultsEmpty": "Нет публикаций, соответствующих вашему фильтру",
+  "@filterResultsEmpty": {},
+  "filterDownloads": "Отфильтровать скачанные",
+  "@filterDownloads": {},
+  "filterFavorites": "Отфильтровать избранные",
+  "@filterFavorites": {},
+  "emptyDOIError": "Введите DOI",
+  "@emptyDOIError": {},
+  "searchByISSN": "Поиск по ISSN",
+  "@searchByISSN": {},
+  "searchByDOI": "Поиск по DOI",
+  "@searchByDOI": {},
+  "queryHasNoNameError": "Вам необходимо ввести имя запроса для его сохранения.",
+  "@queryHasNoNameError": {},
+  "searchByTitle": "Поиск по названию",
+  "@searchByTitle": {},
+  "emptySearchQuery": "Введите запрос для поиска",
+  "@emptySearchQuery": {},
+  "journalSearchError": "Ошибка при попытке поиска журналов.",
+  "@journalSearchError": {},
+  "moreOptions": "Другие варианты",
+  "@moreOptions": {},
+  "saveQuery": "Сохранить этот запрос",
+  "@saveQuery": {},
+  "queryName": "Имя запроса",
+  "@queryName": {},
+  "includeInFeed": "Включить в ленту",
+  "@includeInFeed": {},
+  "dateSaved": "Дата сохранения",
+  "@dateSaved": {},
+  "articles": "Статьи",
+  "@articles": {
+    "description": "As in scientific articles."
+  },
+  "category": "Категория",
+  "@category": {},
+  "publisher": "Издатель",
+  "@publisher": {},
+  "publishedin": "Опубликовано в",
+  "@publishedin": {},
+  "subjects": "Темы/Предметы",
+  "@subjects": {},
+  "latestpublications": "Последние публикации",
+  "@latestpublications": {},
+  "authors": "Авторы",
+  "@authors": {},
+  "abstract": "Аннотация",
+  "@abstract": {},
+  "publishedon": "Опубликовано {дата}",
+  "@publishedon": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMMd"
+      }
+    }
+  },
+  "copydoi": "Скопировать DOI",
+  "@copydoi": {},
+  "doicopied": "DOI скопирован в буфер обмена",
+  "@doicopied": {
+    "description": "Snackbar shown when the Copy DOI button is pressed."
+  },
+  "issnCopied": "ISSN скопирован в буфер обмена",
+  "@issnCopied": {},
+  "apiQueryCopied": "Запрос API скопирован в буфер обмена",
+  "@apiQueryCopied": {},
+  "articleViewer": "Просмотрщик статей",
+  "@articleViewer": {},
+  "openExternalBrowser": "Открыть в другом браузере",
+  "@openExternalBrowser": {},
+  "errorOpenExternalBrowser": "Не удалось открыть ссылку в другом браузере",
+  "@errorOpenExternalBrowser": {},
+  "openExternalPdfApp": "Открыть в другой PDF-читалке",
+  "@openExternalPdfApp": {},
+  "errorOpenExternalPdfApp": "Не удалось открыть PDF-файл в другой программе",
+  "@errorOpenExternalPdfApp": {},
+  "favorite": "Избранные",
+  "@favorite": {},
+  "favoriteadded": "Добавлено в избранные",
+  "@favoriteadded": {
+    "description": "Snackbar shown when an article is added to the user's favorites."
+  },
+  "favoriteremoved": "Удалено из избранных",
+  "@favoriteremoved": {
+    "description": "Snackbar shown when an article is removed from the user's favorites."
+  },
+  "searchresults": "Результаты поиска",
+  "@searchresults": {},
+  "noresultsfound": "Ничего не найдено.",
+  "@noresultsfound": {},
+  "noSavedQueries": "Нет сохраненных запросов.",
+  "@noSavedQueries": {},
+  "abstractunavailable": "Аннотация недоступна. Издатель не предоставляет аннотации Crossref. Полный текст все еще доступен.",
+  "@abstractunavailable": {
+    "description": "Text shown in the place of the abstract when it is unavailable."
+  },
+  "noFavorites": "У вас нет статей в избранных. Используйте значок сердца на карточках публикаций, чтобы добавить их в избранные!",
+  "@noFavorites": {
+    "description": "The message shown when the user has no articles in their favorites."
+  },
+  "displaySettings": "Настройки отображения",
+  "@displaySettings": {},
+  "appearance": "Облик",
+  "@appearance": {},
+  "theme": "Тема",
+  "@theme": {},
+  "light": "Светлая",
+  "@light": {},
+  "dark": "Тёмная",
+  "@dark": {},
+  "systemtheme": "Системная тема",
+  "@systemtheme": {},
+  "publicationCard": "Карточка публикации",
+  "@publicationCard": {},
+  "showAllAbstracts": "Показать все аннотации",
+  "@showAllAbstracts": {},
+  "hideMissingAbstracts": "Скрыть отсутствующие аннотации",
+  "@hideMissingAbstracts": {},
+  "hideAllAbstracts": "Скрыть все аннотации",
+  "@hideAllAbstracts": {},
+  "unpaywallarticle": "Статья предоставлена через UnpaywallСтатья была предоставлена через Unpaywall",
+  "@unpaywallarticle": {
+    "description": "Snackbar shown when an article was fetched from Unpaywall."
+  },
+  "forwardedproxy": "Передано через прокси-сервер вашего учебного заведения.",
+  "@forwardedproxy": {
+    "description": "Snackbar shown when a request is intercepted and sent through the user's institution EZproxy."
+  },
+  "selectinstitution": "Выберите ваше учебное заведение",
+  "@selectinstitution": {},
+  "sortby": "Сортировать по",
+  "@sortby": {},
+  "sortorder": "Порядок сортировки",
+  "@sortorder": {},
+  "followingsince": "Подписано с {дата}",
+  "@followingsince": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMMd"
+      }
+    }
+  },
+  "journaltitle": "Название журнала",
+  "@journaltitle": {},
+  "followingdate": "Дата подписки",
+  "@followingdate": {},
+  "ascending": "По возрастанию",
+  "@ascending": {},
+  "descending": "По убыванию",
+  "@descending": {},
+  "articletitle": "Название статьи",
+  "@articletitle": {},
+  "firstauthfamname": "Фамилия первого автора",
+  "@firstauthfamname": {},
+  "addedtoyourfav": "Добавлено в избранные {дата}",
+  "@addedtoyourfav": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMMd"
+      }
+    }
+  },
+  "noinstitution": "Нет учебного заведения",
+  "@noinstitution": {},
+  "fetchingArticleFromJournal": "Получение статей из {journalName}.",
+  "@fetchingArticleFromJournal": {},
+  "datepublished": "Дата публикации",
+  "@datepublished": {},
+  "dateaddedtofavorites": "Дата добавления в избранные",
+  "@dateaddedtofavorites": {},
+  "noPublicationFound": "Нет публикаций найдено.",
+  "@noPublicationFound": {},
+  "failLoadMorePublication": "Не удалось загрузить больше публикаций.",
+  "@failLoadMorePublication": {},
+  "homeFeedEmpty": "Нет доступных публикаций. Карточки публикаций будут добавлены, как только вы подпишетесь хотя бы на один журнал.",
+  "@homeFeedEmpty": {
+    "description": "The message shown when the feed in the home screen is empty."
+  },
+  "sharedMessage": "Поделиться через приложение Wispar",
+  "@sharedMessage": {
+    "description": "Default sharing text."
+  },
+  "shareArticle": "Поделиться статьей",
+  "@shareArticle": {},
+  "sendToZotero": "Отправить в Zotero",
+  "@sendToZotero": {},
+  "zoteroSettings": "Настройки Zotero",
+  "@zoteroSettings": {},
+  "zoteroPermissions1": "Для использования интеграции Wispar требуется доступ на чтение и запись к вашему аккаунту Zotero.",
+  "@zoteroPermissions1": {},
+  "zoteroPermissions2": "При создании нового ключа API Zotero вы должны выбрать как «Разрешить доступ к библиотеке», так и «Разрешить запись».",
+  "@zoteroPermissions2": {},
+  "zoteroPermissions3": "После создания ключа API скопируйте его значение и вставьте в текстовое поле ниже.",
+  "@zoteroPermissions3": {},
+  "zoteroCreateKey": "Создать новый API-ключ",
+  "@zoteroCreateKey": {},
+  "zoteroEnterKey": "Ввести API-ключ",
+  "@zoteroEnterKey": {
+    "description": "Hint text shown in the text field where users can enter their Zotero API key."
+  },
+  "zoteroInvalidKey": "API-ключ неверен!",
+  "@zoteroInvalidKey": {
+    "description": "Snackbar shown when an attempt to save an invalid Zotero API key is made."
+  },
+  "save": "Сохранить",
+  "@save": {},
+  "savedOn": "Сохранено {дата}",
+  "@savedOn": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMMd"
+      }
+    }
+  },
+  "sourceCode": "Исходный код",
+  "@sourceCode": {},
+  "reportIssue": "Сообщить о проблеме",
+  "@reportIssue": {},
+  "enabled": "Включено",
+  "@enabled": {},
+  "disabled": "Отключено",
+  "@disabled": {},
+  "database": "База данных",
+  "@database": {},
+  "databaseSettings": "Настройки базы данных",
+  "@databaseSettings": {},
+  "scrapeAbstracts": "Соскабливать недостающие аннотации",
+  "@scrapeAbstracts": {},
+  "cleanupInterval": "Интервал очистки (дни)",
+  "@cleanupInterval": {},
+  "cleanupIntervalHint": "Введите количество дней (1-365)",
+  "@cleanupIntervalHint": {},
+  "apiFetchInterval": "Интервал загрузки API",
+  "@apiFetchInterval": {},
+  "apiFetchIntervalHint": "Выберите, как часто загружать статьи",
+  "@apiFetchIntervalHint": {},
+  "cleanupIntervalNumberNotBetween": "Пожалуйста, введите значение между 1 и 365.",
+  "@cleanupIntervalNumberNotBetween": {},
+  "databaseNotFound": "Файл базы данных не найден.",
+  "@databaseNotFound": {},
+  "storagePermissionDenied": "Доступ запрещен.",
+  "@storagePermissionDenied": {},
+  "databaseExported": "База данных экспортирована успешно!",
+  "@databaseExported": {},
+  "cleanupIntervalInvalidNumber": "Пожалуйста, введите допустимое количество дней.",
+  "@cleanupIntervalInvalidNumber": {},
+  "databaseExportFailed": "Не удалось выгрузить базу данных.",
+  "@databaseExportFailed": {},
+  "selectDBExportLocation": "Выберите место для экспорта базы данных.",
+  "@selectDBExportLocation": {},
+  "exportDatabase": "Экспорт базы данных",
+  "@exportDatabase": {},
+  "importDatabase": "Импорт базы данных",
+  "@importDatabase": {},
+  "databaseImportFailed": "Не удалось импортировать базу данных.",
+  "@databaseImportFailed": {},
+  "databaseImported": "База данных импортирована успешно!",
+  "@databaseImported": {},
+  "settingsSaved": "Настройки сохранены успешно!",
+  "@settingsSaved": {},
+  "privacyPolicy": "Политика конфиденциальности",
+  "@privacyPolicy": {},
+  "about": "О приложении",
+  "@about": {},
+  "madeBy": "Создано {app_author}",
+  "@madeBy": {},
+  "donate": "Сделать пожертвование",
+  "@donate": {},
+  "donateMessage": "Поддержите разработку Wispar",
+  "@donateMessage": {
+    "description": "Text shown in the subtitle of the Donate button in the settings."
+  },
+  "otherLicense": "Другие лицензии",
+  "@otherLicense": {},
+  "unknownLicense": "Неизвестная лицензия",
+  "@unknownLicense": {},
+  "hours": "часы",
+  "@hours": {}
+}
