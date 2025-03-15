@@ -5,12 +5,12 @@ import 'article_query_search_form.dart';
 import '../services/crossref_api.dart';
 import '../screens/article_screen.dart';
 
-class ArticleSearchForm extends StatefulWidget {
+class CrossRefSearchForm extends StatefulWidget {
   @override
-  _ArticleSearchFormState createState() => _ArticleSearchFormState();
+  _CrossRefSearchFormState createState() => _CrossRefSearchFormState();
 }
 
-class _ArticleSearchFormState extends State<ArticleSearchForm> {
+class _CrossRefSearchFormState extends State<CrossRefSearchForm> {
   int selectedSearchIndex = 0; // 0 for Query, 1 for DOI
   final TextEditingController doiController = TextEditingController();
   final GlobalKey<QuerySearchFormState> _queryFormKey =
