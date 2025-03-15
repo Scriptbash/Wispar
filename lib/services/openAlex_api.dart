@@ -61,12 +61,35 @@ class SearchResult {
 
 class OpenAlexApi {
   static const String baseUrl = 'https://api.openalex.org';
-  static const String worksEndpoint = '/works?search=';
+  static const String worksEndpoint = '/works?';
   static const String email = 'mailto=wispar-app@protonmail.com';
 
   static Future<List<SearchResult>> getOpenAlexWorksByQuery(
-      String query) async {
-    final url = Uri.parse('$baseUrl$worksEndpoint$query&$email');
+    String query,
+    int scope,
+    String? sortField,
+    String? sortOrder,
+  ) async {
+    final scopeMap = {
+      1: 'search=', // Everything
+      2: 'filter=title_and_abstract.search:', // Title and Abstract
+      3: 'filter=title.search:', // Title only
+      4: 'filter=abstract.search:', // Abstract only
+    };
+    String selectedSortBy = '';
+    String selectedSortOrder = '';
+
+    String searchField = scopeMap[scope] ?? 'search=';
+
+    if (sortField != null) {
+      selectedSortBy = '&sort=$sortField';
+    }
+    if (sortOrder != null) {
+      selectedSortOrder = ':$sortOrder';
+    }
+    final url = Uri.parse(
+        '$baseUrl$worksEndpoint$searchField$query$selectedSortBy$selectedSortOrder&$email');
+
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

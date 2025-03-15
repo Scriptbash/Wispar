@@ -11,6 +11,9 @@ class OpenAlexSearchForm extends StatefulWidget {
 class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
   List<Map<String, dynamic>> queryParts = [];
   String searchScope = 'Everything';
+  String selectedSortField = '-';
+  String selectedSortOrder = '-';
+  bool _filtersExpanded = false;
 
   void _addQueryPart(String type) {
     setState(() {
@@ -46,10 +49,24 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
 
   void _executeSearch() async {
     String query = queryParts.map((part) => part['value']).join(' ');
+    final scopeMap = {
+      'Everything': 1,
+      'Title and Abstract': 2,
+      'Title': 3,
+      'Abstract': 4,
+    };
+    int scope = scopeMap[searchScope] ?? 1;
+
+    String? sortField = selectedSortField == '-' ? null : selectedSortField;
+    String? sortOrder = selectedSortOrder == '-' ? null : selectedSortOrder;
 
     try {
-      List<SearchResult> results =
-          await OpenAlexApi.getOpenAlexWorksByQuery(query);
+      List<SearchResult> results = await OpenAlexApi.getOpenAlexWorksByQuery(
+        query,
+        scope,
+        sortField,
+        sortOrder,
+      );
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -78,7 +95,7 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                       licenseName: result.license ?? '',
                       publisher: result.publisher ?? '',
                       issn: result.issn?.isNotEmpty == true
-                          ? result.issn!.first
+                          ? result.issn!.last
                           : '',
                     ))
                 .toList(),
@@ -119,11 +136,70 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                 );
               }).toList(),
               decoration: InputDecoration(
-                labelText: 'Search scope',
+                labelText: 'Search in',
                 border: OutlineInputBorder(),
               ),
             ),
 
+            SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: selectedSortField,
+                    isExpanded: true,
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          selectedSortField = newValue;
+                        });
+                      }
+                    },
+                    items: [
+                      '-',
+                      'display_name',
+                      'cited_by_count',
+                      'works_count',
+                      'publication_date'
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value.replaceAll('_', ' ').toUpperCase()),
+                      );
+                    }).toList(),
+                    decoration: InputDecoration(
+                      labelText: 'Sort by',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: selectedSortOrder,
+                    isExpanded: true,
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          selectedSortOrder = newValue;
+                        });
+                      }
+                    },
+                    items: [
+                      DropdownMenuItem(value: '-', child: Text('-')),
+                      DropdownMenuItem(value: 'asc', child: Text('Ascending')),
+                      DropdownMenuItem(
+                          value: 'desc', child: Text('Descending')),
+                    ],
+                    decoration: InputDecoration(
+                      labelText: 'Order',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
             SizedBox(height: 10),
 
             // Dynamic query builder
@@ -183,20 +259,46 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 10),
+
+            ExpansionTile(
+              title: Text('Filters'),
+              leading: Icon(
+                _filtersExpanded ? Icons.expand_less : Icons.expand_more,
+              ),
+              trailing: SizedBox(),
+              onExpansionChanged: (bool expanded) {
+                setState(() {
+                  _filtersExpanded = expanded;
+                });
+              },
+              children: [
+                SizedBox(height: 8),
+                Text("Coming soon!"),
+                SizedBox(height: 16),
+              ],
+            ),
+
+            SizedBox(height: 10),
             Text('Query preview:',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             SizedBox(height: 5),
-            Container(
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Text(
-                queryParts.map((part) => part['value']).join(' '),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Text(
+                  queryParts.map((part) => part['value']).join(' '),
+                ),
               ),
             ),
+
+            SizedBox(height: 20),
           ],
         ),
       ),
