@@ -96,7 +96,8 @@ class Item {
     required this.issnType,
   });
 
-  factory Item.fromJson(Map<String, dynamic> json) => Item(
+  factory Item.fromJson(Map<String, dynamic> json, [String? queriedISSN]) =>
+      Item(
         lastStatusCheckTime: json["last-status-check-time"] ?? 0,
         counts: Counts.fromJson(json["counts"] ?? {}),
         breakdowns: Breakdowns.fromJson(json["breakdowns"] ?? {}),
@@ -107,7 +108,9 @@ class Item {
         coverageType: CoverageType.fromJson(json["coverage-type"] ?? {}),
         flags: Map.from(json["flags"] ?? {})
             .map((k, v) => MapEntry<String, bool>(k, v ?? false)),
-        issn: List<String>.from(json["ISSN"]?.map((x) => x) ?? []),
+        issn: (queriedISSN != null && json["ISSN"].contains(queriedISSN))
+            ? <String>[queriedISSN]
+            : List<String>.from(json["ISSN"]?.map((x) => x) ?? []),
         issnType: List<IssnType>.from(
           (json["issn-type"] ?? []).map((x) => IssnType.fromJson(x)),
         ),
