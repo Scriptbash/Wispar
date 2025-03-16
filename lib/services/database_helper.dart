@@ -68,7 +68,8 @@ class DatabaseHelper {
           queryParams TEXT,
           dateSaved TEXT,
           includeInFeed INTEGER,
-          lastFetched TEXT
+          lastFetched TEXT,
+          queryProvider TEXT
         )
       ''');
     }, onUpgrade: (db, oldVersion, newVersion) async {
@@ -99,6 +100,12 @@ class DatabaseHelper {
               'UPDATE articles SET pdfPath = ? WHERE article_id = ?',
               [filename, article['article_id']]);
         }
+        await db.execute('''
+        ALTER TABLE savedQueries ADD COLUMN queryProvider TEXT;
+      ''');
+        await db.rawUpdate('''
+      UPDATE savedQueries SET queryProvider = 'Crossref';
+      ''');
       }
     });
   }
@@ -493,7 +500,8 @@ class DatabaseHelper {
   }
 
   // Insert function for the saved search queries
-  Future<void> saveSearchQuery(String queryName, String queryParams) async {
+  Future<void> saveSearchQuery(
+      String queryName, String queryParams, String provider) async {
     final db = await database;
     final String dateSaved = DateTime.now().toIso8601String();
     await db.insert(
@@ -503,6 +511,7 @@ class DatabaseHelper {
         'queryParams': queryParams,
         'dateSaved': dateSaved,
         'includeInFeed': 0,
+        'queryProvider': provider,
       },
     );
   }

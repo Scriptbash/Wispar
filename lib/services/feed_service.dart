@@ -6,8 +6,6 @@ import '../services/database_helper.dart';
 import '../services/abstract_helper.dart';
 import '../widgets/publication_card.dart';
 
-// TODO fix "hide all abstract" removing abstract from article screen
-
 class FeedService {
   final DatabaseHelper _dbHelper = DatabaseHelper();
 
@@ -54,6 +52,7 @@ class FeedService {
           'query_id': query['query_id'],
           'queryParams': query['queryParams'],
           'queryName': query['queryName'],
+          'queryProvider': query['queryProvider'],
         });
       }
     }
@@ -120,16 +119,24 @@ class FeedService {
       // Check which queries need updating
       final queriesToUpdate =
           await checkSavedQueriesToUpdate(savedQueries, fetchIntervalInHours);
+      List<journalWorks.Item> queryArticles;
 
       for (var query in queriesToUpdate) {
         debugPrint('Updating query: ${query['queryName']}');
         onQueryUpdate(query['queryName']);
         await _dbHelper.updateSavedQueryLastFetched(query['query_id']);
-        Map<String, dynamic> queryMap =
-            Uri.splitQueryString(query['queryParams']);
-        List<journalWorks.Item> queryArticles =
-            await FeedApi.getSavedQueryWorks(queryMap);
-
+        String provider = query['queryProvider'];
+        Map<String, dynamic> queryMap;
+        if (provider == "Crossref") {
+          queryMap = Uri.splitQueryString(query['queryParams']);
+          queryArticles = await FeedApi.getSavedQueryWorks(queryMap);
+        } else if (provider == "OpenAlex") {
+          queryArticles =
+              await FeedApi.getSavedQueryOpenAlex(query['queryParams']);
+        } else {
+          debugPrint("Unknown provider: $provider");
+          continue;
+        }
         for (journalWorks.Item item in queryArticles) {
           if (item.title.isNotEmpty && item.journalTitle.isNotEmpty) {
             await _dbHelper.insertArticle(

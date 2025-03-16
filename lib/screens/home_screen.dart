@@ -66,7 +66,13 @@ class _HomeScreenState extends State<HomeScreen> {
       final db = await dbHelper.database;
       List<Map<String, dynamic>> savedQueries = await db.query(
         'savedQueries',
-        columns: ['query_id', 'queryName', 'queryParams', 'lastFetched'],
+        columns: [
+          'query_id',
+          'queryName',
+          'queryParams',
+          'queryProvider',
+          'lastFetched'
+        ],
         where: 'includeInFeed = ?',
         whereArgs: [1], // Only include queries with "includeInFeed"
       );

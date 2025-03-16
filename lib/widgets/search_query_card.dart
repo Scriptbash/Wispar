@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import '../services/crossref_api.dart';
+import '../services/openAlex_api.dart';
 import '../services/string_format_helper.dart';
 import '../screens/article_search_results_screen.dart';
 import '../services/database_helper.dart';
@@ -10,6 +11,7 @@ class SearchQueryCard extends StatefulWidget {
   final int queryId;
   final String queryName;
   final String queryParams;
+  final String queryProvider;
   final String dateSaved;
   final VoidCallback? onDelete;
 
@@ -18,6 +20,7 @@ class SearchQueryCard extends StatefulWidget {
     required this.queryId,
     required this.queryName,
     required this.queryParams,
+    required this.queryProvider,
     required this.dateSaved,
     this.onDelete,
   }) : super(key: key);
@@ -59,11 +62,24 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
             return const Center(child: CircularProgressIndicator());
           },
         );
-        // Convert the params string to the needed mapstring
-        Map<String, dynamic> queryMap =
-            Uri.splitQueryString(widget.queryParams);
-        CrossRefApi.resetWorksQueryCursor(); // Reset the cursor on new search
-        var response = await CrossRefApi.getWorksByQuery(queryMap);
+        var response;
+        Map<String, String> queryMap = {};
+
+        if (widget.queryProvider == 'Crossref') {
+          // Convert the params string to the needed mapstring
+          queryMap = Uri.splitQueryString(widget.queryParams);
+          CrossRefApi.resetWorksQueryCursor(); // Reset the cursor on new search
+          response = await CrossRefApi.getWorksByQuery(queryMap);
+        } else if (widget.queryProvider == 'OpenAlex') {
+          return; // Todo Finish this once lazy loading is inplemented
+          /*queryMap = Uri.splitQueryString(widget.queryParams);
+
+          String query = queryMap['search'] ?? '';
+          String? sortField = queryMap['sortField'];
+          String? sortOrder = queryMap['sortOrder'];
+          response = await OpenAlexApi.getOpenAlexWorksByQuery(
+              query, scope, sortField, sortOrder);*/
+        }
 
         Navigator.pop(context);
         // Navigate to the search results screen
@@ -138,6 +154,8 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
                   )
                 ],
               ),
+              const SizedBox(height: 8.0),
+              Text('Source: ${widget.queryProvider}'),
               const SizedBox(height: 8.0),
               Text(
                 AppLocalizations.of(context)!
