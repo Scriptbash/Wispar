@@ -64,6 +64,7 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
         );
         var response;
         Map<String, String> queryMap = {};
+        String? query;
 
         if (widget.queryProvider == 'Crossref') {
           // Convert the params string to the needed mapstring
@@ -71,14 +72,42 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
           CrossRefApi.resetWorksQueryCursor(); // Reset the cursor on new search
           response = await CrossRefApi.getWorksByQuery(queryMap);
         } else if (widget.queryProvider == 'OpenAlex') {
-          return; // Todo Finish this once lazy loading is inplemented
-          /*queryMap = Uri.splitQueryString(widget.queryParams);
+          queryMap = Uri.splitQueryString(widget.queryParams);
 
-          String query = queryMap['search'] ?? '';
-          String? sortField = queryMap['sortField'];
+          String? sortField = queryMap['sort'];
           String? sortOrder = queryMap['sortOrder'];
+          int scope = 1;
+          String? query;
+
+          if (queryMap.containsKey('search') &&
+              !queryMap.containsKey('filter')) {
+            query = queryMap['search'];
+            scope = 1;
+          } else if (queryMap.containsKey('filter')) {
+            String filterValue = queryMap['filter'] ?? '';
+
+            if (filterValue.contains('title.search')) {
+              query = filterValue.replaceFirst('title.search:', '').trim();
+              scope = 3;
+            } else if (filterValue.contains('title_and_abstract')) {
+              query = filterValue.replaceFirst('title_and_abstract', '').trim();
+              scope = 2;
+            } else if (filterValue.contains('title')) {
+              query = filterValue.replaceFirst('title', '').trim();
+              scope = 3;
+            } else if (filterValue.contains('abstract')) {
+              query = filterValue.replaceFirst('abstract', '').trim();
+              scope = 4;
+            } else {
+              query = filterValue;
+              scope = 1;
+            }
+          }
+
+          query ??= '';
+
           response = await OpenAlexApi.getOpenAlexWorksByQuery(
-              query, scope, sortField, sortOrder);*/
+              query, scope, sortField, sortOrder);
         }
 
         Navigator.pop(context);
@@ -86,12 +115,23 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ArticleSearchResultsScreen(
-              initialSearchResults: response.list,
-              initialHasMore: response.hasMore,
-              queryParams: queryMap,
-              source: widget.queryProvider,
-            ),
+            builder: (context) {
+              if (widget.queryProvider == 'Crossref') {
+                return ArticleSearchResultsScreen(
+                  initialSearchResults: response.list,
+                  initialHasMore: response.hasMore,
+                  queryParams: queryMap,
+                  source: widget.queryProvider,
+                );
+              } else {
+                return ArticleSearchResultsScreen(
+                  initialSearchResults: response,
+                  initialHasMore: response.isNotEmpty,
+                  queryParams: {'query': query},
+                  source: 'OpenAlex',
+                );
+              }
+            },
           ),
         );
       },
