@@ -339,6 +339,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
             initialSearchResults: response.list,
             initialHasMore: response.hasMore,
             queryParams: queryParams,
+            source: 'Crossref',
           ),
         ),
       );

@@ -90,6 +90,7 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
               initialSearchResults: response.list,
               initialHasMore: response.hasMore,
               queryParams: queryMap,
+              source: widget.queryProvider,
             ),
           ),
         );

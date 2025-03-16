@@ -76,7 +76,7 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
       );
 
       final dbHelper = DatabaseHelper();
-      List<SearchResult> results = [];
+      List<journalsWorks.Item> results = [];
       if (saveQuery) {
         final queryName = queryNameController.text.trim();
         if (queryName != '') {
@@ -126,42 +126,15 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
       }
       Navigator.pop(context);
       Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ArticleSearchResultsScreen(
-            initialSearchResults: results
-                .map((result) => journalsWorks.Item(
-                      title: result.title,
-                      abstract: result.abstract ?? '',
-                      journalTitle: result.journalTitle ?? '',
-                      publishedDate: result.publishedDate != null
-                          ? DateTime.tryParse(result.publishedDate!) ??
-                              DateTime(1970, 1, 1)
-                          : DateTime(1970, 1, 1),
-                      doi: result.doi ?? '',
-                      authors: result.authors.map((fullName) {
-                        List<String> parts = fullName.split(' ');
-                        String given = parts.isNotEmpty ? parts.first : '';
-                        String family =
-                            parts.length > 1 ? parts.sublist(1).join(' ') : '';
-                        return journalsWorks.PublicationAuthor(
-                            given: given, family: family);
-                      }).toList(),
-                      url: result.url ?? '',
-                      primaryUrl: result.url ?? '',
-                      license: '',
-                      licenseName: result.license ?? '',
-                      publisher: result.publisher ?? '',
-                      issn: result.issn?.isNotEmpty == true
-                          ? result.issn!.last
-                          : '',
-                    ))
-                .toList(),
-            initialHasMore: results.isNotEmpty,
-            queryParams: {'query': query},
-          ),
-        ),
-      );
+          context,
+          MaterialPageRoute(
+            builder: (context) => ArticleSearchResultsScreen(
+              initialSearchResults: results,
+              initialHasMore: results.isNotEmpty,
+              queryParams: {'query': query},
+              source: 'OpenAlex',
+            ),
+          ));
     } catch (e) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -309,6 +282,17 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
               }).toList(),
             ),
             SizedBox(height: 20),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () => _addQueryPart('keyword'),
+                  child: Text('Add keyword'),
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
             Text('Query preview:',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 5),
@@ -325,16 +309,6 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                   queryParts.map((part) => part['value']).join(' '),
                 ),
               ),
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () => _addQueryPart('keyword'),
-                  child: Text('Add keyword'),
-                ),
-              ],
             ),
             SizedBox(height: 10),
 
