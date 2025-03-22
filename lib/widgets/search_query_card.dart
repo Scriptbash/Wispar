@@ -128,7 +128,7 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
                   initialSearchResults: response,
                   initialHasMore: response.isNotEmpty,
                   queryParams: {'query': query},
-                  source: 'OpenAlex',
+                  source: widget.queryProvider,
                 );
               }
             },
@@ -173,14 +173,12 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
                 widget.queryParams,
                 style: const TextStyle(fontSize: 14.0),
               ),
-              const SizedBox(height: 8.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     AppLocalizations.of(context)!.includeInFeed,
-                    style: const TextStyle(
-                        fontSize: 14.0, fontWeight: FontWeight.w500),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Switch(
                     value: _includeInFeed,
@@ -195,9 +193,9 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
                   )
                 ],
               ),
-              const SizedBox(height: 8.0),
-              Text('Source: ${widget.queryProvider}'),
-              const SizedBox(height: 8.0),
+              Text(
+                AppLocalizations.of(context)!.source(widget.queryProvider),
+              ),
               Text(
                 AppLocalizations.of(context)!
                     .savedOn(DateTime.parse(formattedDate)),

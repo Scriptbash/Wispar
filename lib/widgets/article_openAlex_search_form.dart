@@ -4,7 +4,6 @@ import '../services/openAlex_api.dart';
 import '../screens/article_search_results_screen.dart';
 import '../models/crossref_journals_works_models.dart' as journalsWorks;
 import '../services/database_helper.dart';
-import '../models/openAlex_works_models.dart';
 
 class OpenAlexSearchForm extends StatefulWidget {
   @override
@@ -160,15 +159,23 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                   });
                 }
               },
-              items: ['Everything', 'Title and Abstract', 'Title', 'Abstract']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
+              items: [
+                DropdownMenuItem(
+                    value: "Everything",
+                    child: Text(AppLocalizations.of(context)!.everything)),
+                DropdownMenuItem(
+                    value: "Title and Abstract",
+                    child:
+                        Text(AppLocalizations.of(context)!.titleAndAbstract)),
+                DropdownMenuItem(
+                    value: "Title",
+                    child: Text(AppLocalizations.of(context)!.title)),
+                DropdownMenuItem(
+                    value: "Abstract",
+                    child: Text(AppLocalizations.of(context)!.abstract)),
+              ],
               decoration: InputDecoration(
-                labelText: 'Search in',
+                labelText: AppLocalizations.of(context)!.searchIn,
                 border: OutlineInputBorder(),
               ),
             ),
@@ -189,19 +196,26 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                       }
                     },
                     items: [
-                      '-',
-                      'display_name',
-                      'cited_by_count',
-                      'works_count',
-                      'publication_date'
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value.replaceAll('_', ' ').toUpperCase()),
-                      );
-                    }).toList(),
+                      DropdownMenuItem(value: "-", child: Text("-")),
+                      DropdownMenuItem(
+                          value: "display_name",
+                          child:
+                              Text(AppLocalizations.of(context)!.displayName)),
+                      DropdownMenuItem(
+                          value: "cited_by_count",
+                          child:
+                              Text(AppLocalizations.of(context)!.citedByCount)),
+                      DropdownMenuItem(
+                          value: "works_count",
+                          child:
+                              Text(AppLocalizations.of(context)!.worksCount)),
+                      DropdownMenuItem(
+                          value: "publication_date",
+                          child: Text(
+                              AppLocalizations.of(context)!.publicationDate)),
+                    ],
                     decoration: InputDecoration(
-                      labelText: 'Sort by',
+                      labelText: AppLocalizations.of(context)!.sortby,
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -220,12 +234,16 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                     },
                     items: [
                       DropdownMenuItem(value: '-', child: Text('-')),
-                      DropdownMenuItem(value: 'asc', child: Text('Ascending')),
                       DropdownMenuItem(
-                          value: 'desc', child: Text('Descending')),
+                          value: 'asc',
+                          child: Text(AppLocalizations.of(context)!.ascending)),
+                      DropdownMenuItem(
+                          value: 'desc',
+                          child:
+                              Text(AppLocalizations.of(context)!.descending)),
                     ],
                     decoration: InputDecoration(
-                      labelText: 'Order',
+                      labelText: AppLocalizations.of(context)!.sortorder,
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -266,7 +284,7 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                     Expanded(
                       child: TextField(
                         decoration: InputDecoration(
-                          hintText: 'Enter keyword...',
+                          hintText: AppLocalizations.of(context)!.enterKeyword,
                           border: OutlineInputBorder(),
                         ),
                         onChanged: (value) => _updateQueryValue(index, value),
@@ -288,12 +306,12 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
               children: [
                 ElevatedButton(
                   onPressed: () => _addQueryPart('keyword'),
-                  child: Text('Add keyword'),
+                  child: Text(AppLocalizations.of(context)!.addKeyword),
                 ),
               ],
             ),
             SizedBox(height: 10),
-            Text('Query preview:',
+            Text(AppLocalizations.of(context)!.queryPreview,
                 style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 5),
             Align(
