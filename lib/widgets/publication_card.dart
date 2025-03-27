@@ -238,11 +238,6 @@ class _PublicationCardState extends State<PublicationCard> {
                 ],
               ),
               Text(
-                widget.title,
-                style: TextStyle(fontWeight: FontWeight.bold),
-                softWrap: true,
-              ),
-              Text(
                 AppLocalizations.of(context)!
                     .publishedon(widget.publishedDate!),
                 style: TextStyle(
@@ -250,11 +245,15 @@ class _PublicationCardState extends State<PublicationCard> {
                   fontSize: 13,
                 ),
               ),
-              SizedBox(height: 5.0),
+              Text(
+                widget.title,
+                style: TextStyle(fontWeight: FontWeight.bold),
+                softWrap: true,
+              ),
               Text(
                 '${getAuthorsNames(widget.authors)}',
                 style: TextStyle(fontSize: 14, color: Colors.grey),
-                maxLines: 4,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ],
