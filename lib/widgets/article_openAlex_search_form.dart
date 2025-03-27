@@ -22,7 +22,8 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
 
   void _addQueryPart(String type) {
     setState(() {
-      if (queryParts.isNotEmpty) {
+      // Avoid adding an operator at the beginning or after a deleted keyword
+      if (queryParts.isNotEmpty && queryParts.last['type'] != 'operator') {
         queryParts
             .add({'type': 'operator', 'value': 'AND'}); // Default operator
       }
@@ -44,11 +45,19 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
 
   void _removeQueryPart(int index) {
     setState(() {
-      if (index > 0 && queryParts[index - 1]['type'] == 'operator') {
-        queryParts.removeAt(index - 1); // Remove preceding operator
-        index--;
+      var removedPart = queryParts.removeAt(index);
+
+      // If the removed part was a keyword and there's an operator right after it, remove that operator
+      if (removedPart['type'] == 'keyword' &&
+          index < queryParts.length &&
+          queryParts[index]['type'] == 'operator') {
+        queryParts.removeAt(index);
       }
-      queryParts.removeAt(index);
+
+      // If the operator is the last item and there's no valid keyword before it, remove it
+      if (queryParts.isNotEmpty && queryParts.last['type'] == 'operator') {
+        queryParts.removeAt(queryParts.length - 1); // Remove the last operator
+      }
     });
   }
 
@@ -259,6 +268,14 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                 var part = entry.value;
 
                 if (part['type'] == 'operator') {
+                  // Only show operator if the previous part is a valid keyword
+                  if (index == 0 ||
+                      queryParts[index - 1]['type'] != 'keyword' ||
+                      part['value'] == '') {
+                    return SizedBox
+                        .shrink(); // Hides the operator if it is not valid
+                  }
+
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
@@ -324,7 +341,17 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Text(
-                  queryParts.map((part) => part['value']).join(' '),
+                  queryParts
+                      .where((part) =>
+                          part['value'] != '' &&
+                          // Ensure that operators are only shown if a keyword comes before it
+                          !(part['type'] == 'operator' &&
+                              (queryParts.indexOf(part) == 0 ||
+                                  queryParts[queryParts.indexOf(part) - 1]
+                                          ['type'] !=
+                                      'keyword')))
+                      .map((part) => part['value'])
+                      .join(' '),
                 ),
               ),
             ),
