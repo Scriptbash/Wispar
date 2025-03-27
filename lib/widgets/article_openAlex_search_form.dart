@@ -357,7 +357,7 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
             ),
             SizedBox(height: 10),
 
-            ExpansionTile(
+            /*ExpansionTile(
               title: Text('Filters'),
               leading: Icon(
                 _filtersExpanded ? Icons.expand_less : Icons.expand_more,
@@ -373,7 +373,7 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                 Text("Coming soon!"),
                 SizedBox(height: 16),
               ],
-            ),
+            ),*/
             SizedBox(height: 20),
             Text(
               AppLocalizations.of(context)!.saveQuery,
