@@ -90,6 +90,7 @@ If you run into any issue while using Wispar, have a question or want to share y
     <li><a href="https://libproxy-db.org/" target='_blank'>Library Proxy URL Database</a></li>
     <li><a href="https://unpaywall.org/" target='_blank'>Unpaywall</a></li>
     <li><a href="https://www.crossref.org/" target='_blank'>Crossref</a></li>
+    <li><a href="https://openalex.org/" target='_blank'>OpenAlex</a></li>
 </ul>
 
 ## Screenshots
