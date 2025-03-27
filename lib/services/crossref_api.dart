@@ -58,7 +58,7 @@ class CrossRefApi {
       var message = jsonResponse['message'];
 
       if (message != null) {
-        Journals.Item item = Journals.Item.fromJson(message);
+        Journals.Item item = Journals.Item.fromJson(message, query);
 
         return ListAndMore(
           list: [item],
