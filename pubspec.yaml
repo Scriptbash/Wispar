@@ -50,9 +50,7 @@ dependencies:
   package_info_plus: ^8.1.1
   share_plus: ^10.1.2
   introduction_screen: ^3.1.14
-  open_filex: # Temporary solution while this PR gets merged : https://github.com/javaherisaber/open_filex/pull/19
-    git:
-      url: https://github.com/mufassalhussain/open_filex
+  open_filex: ^4.7.0
   google_nav_bar: ^5.0.7
   file_picker: ^9.0.1
   
