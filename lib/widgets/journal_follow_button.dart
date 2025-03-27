@@ -32,16 +32,16 @@ class FollowButton extends StatelessWidget {
     final dbHelper = DatabaseHelper();
 
     // Check if the journal is currently followed
-    bool currentlyFollowed = await dbHelper.isJournalFollowed(item.issn.first);
+    bool currentlyFollowed = await dbHelper.isJournalFollowed(item.issn.last);
 
     if (currentlyFollowed) {
       // Unfollow
-      await dbHelper.removeJournal(item.issn.first);
+      await dbHelper.removeJournal(item.issn.last);
     } else {
       // Follow
       await dbHelper.insertJournal(
         Journal(
-          issn: item.issn.first,
+          issn: item.issn.last,
           title: item.title,
           publisher: item.publisher,
         ),

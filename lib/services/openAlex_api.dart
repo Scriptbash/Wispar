@@ -61,7 +61,7 @@ class OpenAlexApi {
                 license: '',
                 licenseName: result.license ?? '',
                 publisher: result.publisher ?? '',
-                issn: result.issn?.isNotEmpty == true ? result.issn!.last : '',
+                issn: result.issn?.isNotEmpty == true ? result.issn! : '',
               ))
           .toList();
     } else {
