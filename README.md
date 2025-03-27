@@ -31,7 +31,7 @@
 
 ## Description
 <p align="justify">
-Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly searches scientific journals and articles using the Crossref API. Stay updated on your preferred journals by following them and receive new article abstracts in your main feed. No account required. The integration of Unpaywall ensures convenient access to open-access articles, while EZproxy helps overcome subscription barriers.  
+Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly searches scientific journals and articles using the Crossref and OpenAlex APIs. Stay updated on your preferred journals by following them and receive new article abstracts in your main feed. No account required. The integration of Unpaywall ensures convenient access to open-access articles, while EZproxy helps overcome subscription barriers.  
 </p>
 
 ## Features overview
