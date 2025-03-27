@@ -57,7 +57,7 @@ class FeedApi {
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       final results = (jsonResponse['results'] as List?)
-              ?.map((item) => SearchResult.fromJson(item))
+              ?.map((item) => OpenAlexWorks.fromJson(item))
               .toList() ??
           [];
 

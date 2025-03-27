@@ -30,6 +30,7 @@ class _ArticleSearchResultsScreenState
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
   bool _hasMoreResults = true;
+  int _currentOpenAlexPage = 1;
 
   @override
   void initState() {
@@ -70,9 +71,15 @@ class _ArticleSearchResultsScreenState
           widget.queryParams['scope'] ?? 1,
           widget.queryParams['sortField'],
           widget.queryParams['sortOrder'],
+          page: _currentOpenAlexPage,
         );
 
-        hasMore = OpenAlexApi.worksQueryCursor != null;
+        if (newResults.isNotEmpty) {
+          _currentOpenAlexPage++;
+        } else {
+          hasMore = false;
+          _isLoadingMore = false;
+        }
       }
 
       setState(() {

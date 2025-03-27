@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-class SearchResult {
+class OpenAlexWorks {
   final String title;
   final String? doi;
   final String? url;
@@ -14,7 +14,7 @@ class SearchResult {
   final String? publisher;
   final String? license;
 
-  SearchResult({
+  OpenAlexWorks({
     required this.title,
     this.doi,
     this.url,
@@ -29,7 +29,7 @@ class SearchResult {
     this.license,
   });
 
-  factory SearchResult.fromJson(Map<String, dynamic> json) {
+  factory OpenAlexWorks.fromJson(Map<String, dynamic> json) {
     final primaryLocation = json['primary_location'];
 
     String? extractedDoi;
@@ -37,7 +37,7 @@ class SearchResult {
       extractedDoi = json['doi'].replaceFirst('https://doi.org/', '');
     }
 
-    return SearchResult(
+    return OpenAlexWorks(
       title: json['title'] ?? 'Untitled',
       doi: extractedDoi ?? json['doi'],
       url: primaryLocation?['landing_page_url'],

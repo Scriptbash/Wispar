@@ -7,16 +7,12 @@ class OpenAlexApi {
   static const String baseUrl = 'https://api.openalex.org';
   static const String worksEndpoint = '/works?';
   static const String email = 'mailto=wispar-app@protonmail.com';
-
-  static String? _worksQueryCursor = '*';
   static String? _currentQuery;
 
   static Future<List<journalWorks.Item>> getOpenAlexWorksByQuery(
-    String query,
-    int scope,
-    String? sortField,
-    String? sortOrder,
-  ) async {
+      String query, int scope, String? sortField, String? sortOrder,
+      {int page = 1} // Default to page 1
+      ) async {
     _currentQuery = query;
 
     final scopeMap = {
@@ -31,23 +27,16 @@ class OpenAlexApi {
     String orderBy = sortOrder != null ? ':$sortOrder' : '';
 
     String apiUrl =
-        '$baseUrl$worksEndpoint$searchField$query$sortBy$orderBy&$email';
-
-    if (_worksQueryCursor != null) {
-      apiUrl += '&cursor=$_worksQueryCursor';
-    }
+        '$baseUrl$worksEndpoint$searchField$query$sortBy$orderBy&$email&page=$page';
 
     final response = await http.get(Uri.parse(apiUrl));
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       final results = (jsonResponse['results'] as List?)
-              ?.map((item) => SearchResult.fromJson(item))
+              ?.map((item) => OpenAlexWorks.fromJson(item))
               .toList() ??
           [];
-
-      _worksQueryCursor = jsonResponse['meta']?['next_cursor'];
-      print(_worksQueryCursor);
 
       return results
           .map((result) => journalWorks.Item(
@@ -78,12 +67,5 @@ class OpenAlexApi {
     } else {
       throw Exception('Failed to fetch results: ${response.reasonPhrase}');
     }
-  }
-
-  static String? get worksQueryCursor => _worksQueryCursor;
-  static String? get currentQuery => _currentQuery;
-
-  static void resetWorksQueryCursor() {
-    _worksQueryCursor = '*';
   }
 }
