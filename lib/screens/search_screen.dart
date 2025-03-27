@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../widgets/article_main_search_form.dart';
+import '../widgets/article_search_form.dart';
 import '../widgets/journal_search_form.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -82,11 +82,11 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget _getSearchForm() {
     switch (selectedSearchType) {
       case 1:
-        return ArticleSearchForm();
+        return ArticleSearchScreen();
       case 2:
         return JournalSearchForm();
       default:
-        return ArticleSearchForm();
+        return ArticleSearchScreen();
     }
   }
 }

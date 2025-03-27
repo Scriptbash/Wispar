@@ -127,7 +127,8 @@ class _PublicationCardState extends State<PublicationCard> {
                           Map<String, dynamic>? journalInfo =
                               await getJournalDetails(widget.issn);
                           if (journalInfo != null && journalInfo.isNotEmpty) {
-                            String journalPublisher = journalInfo['publisher'];
+                            String journalPublisher =
+                                journalInfo['publisher'] ?? 'Unknown Publisher';
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -286,7 +287,8 @@ class _PublicationCardState extends State<PublicationCard> {
                             }
                           },
                           child: Text(
-                            widget.license.isNotEmpty
+                            widget.license.isNotEmpty ||
+                                    widget.licenseName.isNotEmpty
                                 ? (widget.licenseName.isNotEmpty
                                     ? widget.licenseName
                                     : AppLocalizations.of(context)!

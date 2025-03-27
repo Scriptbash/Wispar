@@ -3,17 +3,20 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../widgets/publication_card.dart';
 import '../models/crossref_journals_works_models.dart' as journalsWorks;
 import '../services/crossref_api.dart';
+import '../services/openAlex_api.dart';
 
 class ArticleSearchResultsScreen extends StatefulWidget {
   final List<journalsWorks.Item> initialSearchResults;
   final bool initialHasMore;
   final Map<String, dynamic> queryParams;
+  final String source;
 
   const ArticleSearchResultsScreen({
     Key? key,
     required this.initialSearchResults,
     required this.initialHasMore,
     required this.queryParams,
+    required this.source,
   }) : super(key: key);
 
   @override
@@ -27,6 +30,7 @@ class _ArticleSearchResultsScreenState
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
   bool _hasMoreResults = true;
+  int _currentOpenAlexPage = 1;
 
   @override
   void initState() {
@@ -52,13 +56,35 @@ class _ArticleSearchResultsScreenState
     });
 
     try {
-      final ListAndMore<journalsWorks.Item> newResults =
-          await CrossRefApi.getWorksByQuery(widget.queryParams);
+      List<journalsWorks.Item> newResults;
+      bool hasMore = false;
+
+      if (widget.source == 'Crossref') {
+        final ListAndMore<journalsWorks.Item> response =
+            await CrossRefApi.getWorksByQuery(widget.queryParams);
+        newResults = response.list;
+        hasMore =
+            response.hasMore && _searchResults.length < response.totalResults;
+      } else {
+        newResults = await OpenAlexApi.getOpenAlexWorksByQuery(
+          widget.queryParams['query'] ?? '',
+          widget.queryParams['scope'] ?? 1,
+          widget.queryParams['sortField'],
+          widget.queryParams['sortOrder'],
+          page: _currentOpenAlexPage,
+        );
+
+        if (newResults.isNotEmpty) {
+          _currentOpenAlexPage++;
+        } else {
+          hasMore = false;
+          _isLoadingMore = false;
+        }
+      }
 
       setState(() {
-        _searchResults.addAll(newResults.list);
-        _hasMoreResults = newResults.hasMore &&
-            _searchResults.length < newResults.totalResults;
+        _searchResults.addAll(newResults);
+        _hasMoreResults = hasMore;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

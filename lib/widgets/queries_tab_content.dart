@@ -112,6 +112,7 @@ class _QueriesTabContentState extends State<QueriesTabContent> {
                       queryId: query['query_id'],
                       queryName: query['queryName'],
                       queryParams: query['queryParams'],
+                      queryProvider: query['queryProvider'],
                       dateSaved: query['dateSaved'],
                       onDelete: () async {
                         await dbHelper.deleteQuery(query['query_id']);

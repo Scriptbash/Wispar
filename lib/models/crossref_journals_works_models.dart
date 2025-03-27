@@ -126,7 +126,7 @@ class Item {
     String issn = '';
     if (json['ISSN'] != null) {
       if (json['ISSN'] is List && (json['ISSN'] as List).isNotEmpty) {
-        issn = (json['ISSN'] as List<dynamic>).first ?? '';
+        issn = (json['ISSN'] as List<dynamic>).last ?? '';
       } else {
         issn = json['ISSN'] ?? '';
       }

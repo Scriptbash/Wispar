@@ -311,7 +311,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
               .join('&');
 
           // Call the save query function
-          await dbHelper.saveSearchQuery(queryName, queryString);
+          await dbHelper.saveSearchQuery(queryName, queryString, 'Crossref');
           // Makes the API call
           response = await CrossRefApi.getWorksByQuery(queryParams);
         } else {
@@ -339,6 +339,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
             initialSearchResults: response.list,
             initialHasMore: response.hasMore,
             queryParams: queryParams,
+            source: 'Crossref',
           ),
         ),
       );
@@ -369,6 +370,14 @@ class QuerySearchFormState extends State<QuerySearchForm> {
               controller: titleController,
               decoration: InputDecoration(
                 labelText: 'Article title',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              controller: bibliographicController,
+              decoration: InputDecoration(
+                labelText: "Bibliographic",
                 border: OutlineInputBorder(),
               ),
             ),
@@ -463,14 +472,6 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                   controller: publisherController,
                   decoration: InputDecoration(
                     labelText: 'Publisher',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 16),
-                TextFormField(
-                  controller: bibliographicController,
-                  decoration: InputDecoration(
-                    labelText: "Bibliographic",
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -611,7 +612,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                   border: OutlineInputBorder(),
                 ),
               ),
-            SizedBox(height: 16),
+            SizedBox(height: 70),
           ],
         ),
       ),
