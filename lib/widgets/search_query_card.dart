@@ -137,8 +137,45 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
       },
       onLongPress: () {
         // Copy the API request to clipboard
-        String request =
-            'https://api.crossref.org/works?${widget.queryParams}&rows=50';
+        String request = '';
+        if (widget.queryProvider == "Crossref") {
+          request =
+              'https://api.crossref.org/works?${widget.queryParams}&rows=50';
+          Clipboard.setData(ClipboardData(text: request));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(AppLocalizations.of(context)!.apiQueryCopied)),
+          );
+        } else {
+          Map<String, String> queryMap =
+              Uri.splitQueryString(widget.queryParams);
+
+          String baseUrl = 'https://api.openalex.org/works';
+          String query = queryMap['search'] ?? '';
+          String? sortField = queryMap['sort'];
+          String? sortOrder = queryMap['sortOrder'];
+          String? filterValue = queryMap['filter'];
+
+          List<String> filters = [];
+          if (filterValue != null) {
+            filters.add(filterValue);
+          }
+
+          String filterParam =
+              filters.isNotEmpty ? 'filter=${filters.join(",")}' : '';
+          String sortParam = (sortField != null && sortOrder != null)
+              ? 'sort=$sortField:$sortOrder'
+              : '';
+
+          // Build query string
+          List<String> queryParams = [];
+          if (query.isNotEmpty) queryParams.add('search=$query');
+          if (filterParam.isNotEmpty) queryParams.add(filterParam);
+          if (sortParam.isNotEmpty) queryParams.add(sortParam);
+
+          request = '$baseUrl?${queryParams.join("&")}';
+        }
+
         Clipboard.setData(ClipboardData(text: request));
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.apiQueryCopied)),
