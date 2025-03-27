@@ -76,6 +76,7 @@ Translation status:
         <li>You can help translate Wispar into your language by using our hosted Weblate instance.</li>
         <li>Additionally, providing feedback and reporting bugs are invaluable ways to contribute!</li>
     </ul>
+    <b>If you contribute to the project, feel free to add yourself to the .zenodo.json file to be credited!</b>
 </p>
 
 

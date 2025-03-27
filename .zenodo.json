@@ -1,0 +1,50 @@
+{
+    "title": "Wispar",
+    "description": "Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly searches scientific journals and articles using the Crossref and OpenAlex APIs. Stay updated on your preferred journals by following them and receive new article abstracts in your main feed. No account required. The integration of Unpaywall ensures convenient access to open-access articles, while EZproxy helps overcome subscription barriers.",
+    "license": {"id": "GPL-3.0"},
+    "creators": [
+      {
+        "affiliation": "Université de Sherbrooke",
+        "name": "Francis Lapointe",
+        "orcid": "0000-0002-7638-4018"
+      },
+      {
+        "affiliation": "Université de Sherbrooke",
+        "name": "Sergio Andrés Redondo",
+        "orcid": "0000-0002-2364-5667"
+      },
+      {
+        "affiliation": "Université de Sherbrooke",
+        "name": "Alireza Amani",
+        "orcid": "0000-0002-0011-1945"
+      },
+      {
+        "name": "Allan Nordhøy"
+      },
+      {
+        "name": "தமிழ் நேரம்"
+      },
+      {
+        "name": "Tachi44d"
+      },
+      {
+        "name": "MMignolet"
+      },
+      {
+        "name": "Ale"
+      },
+      {
+        "name": "𝗛𝗼𝗹𝗶"
+      },
+      {
+        "name": "Xapitonov"
+      },
+      {
+        "name": "Arda Arslanbakan"
+      }
+    ],
+    "access_right": "open",
+    "upload_type": "software",
+    "keywords": ["Android", "iOS", "Crossref", "OpenAlex", "Unpaywall", "EZproxy", "Zotero", "science", "journals", "research"]
+  }
+  
