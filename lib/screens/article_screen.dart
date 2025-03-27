@@ -207,11 +207,16 @@ class _ArticleScreenState extends State<ArticleScreen> {
                           alignment: Alignment.centerLeft,
                           child: TextButton(
                             onPressed: () async {
+                              String journalPublisher = "";
                               Map<String, dynamic>? journalInfo =
                                   await getJournalDetails(widget.issn);
-                              if (journalInfo != null) {
-                                String journalPublisher =
-                                    journalInfo['publisher'];
+                              if (widget.publisher == null) {
+                                if (journalInfo != null &&
+                                    journalInfo['publisher'] != null) {
+                                  journalPublisher = journalInfo['publisher'];
+                                } else {
+                                  journalPublisher = widget.publisher ?? "";
+                                }
 
                                 Navigator.push(
                                   context,

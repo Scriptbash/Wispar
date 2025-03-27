@@ -100,6 +100,7 @@ class FeedService {
               url: item.primaryUrl,
               license: item.license,
               licenseName: item.licenseName,
+              publisher: item.publisher,
             ),
             isCached: true,
           );
@@ -151,6 +152,7 @@ class FeedService {
                 url: item.primaryUrl,
                 license: item.license,
                 licenseName: item.licenseName,
+                publisher: item.publisher,
               ),
               isCached: true,
               isSavedQuery: true,
