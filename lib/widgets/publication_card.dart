@@ -287,7 +287,8 @@ class _PublicationCardState extends State<PublicationCard> {
                             }
                           },
                           child: Text(
-                            widget.license.isNotEmpty
+                            widget.license.isNotEmpty ||
+                                    widget.licenseName.isNotEmpty
                                 ? (widget.licenseName.isNotEmpty
                                     ? widget.licenseName
                                     : AppLocalizations.of(context)!

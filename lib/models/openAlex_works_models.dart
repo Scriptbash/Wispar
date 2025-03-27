@@ -37,6 +37,13 @@ class OpenAlexWorks {
       extractedDoi = json['doi'].replaceFirst('https://doi.org/', '');
     }
 
+    String? license = primaryLocation?["license"];
+    if (license == null) {
+      license = "All rights reserved";
+    } else if (license.toLowerCase().contains("cc-by")) {
+      license = "Creative-Commons";
+    }
+
     return OpenAlexWorks(
       title: json['title'] ?? 'Untitled',
       doi: extractedDoi ?? json['doi'],
@@ -56,7 +63,7 @@ class OpenAlexWorks {
               ? (primaryLocation?['source']?['issn'] as List?)?.last
               : null),
       publisher: primaryLocation?['source']?['host_organization_name'],
-      license: primaryLocation?["license"],
+      license: license,
     );
   }
 }
