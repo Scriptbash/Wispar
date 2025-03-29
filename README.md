@@ -100,4 +100,4 @@ If you run into any issue while using Wispar, have a question or want to share y
 
 | ![Feed](android/fastlane/metadata/android/en-US/images/phoneScreenshots/1_en-US.png) | ![Abstract](android/fastlane/metadata/android/en-US/images/phoneScreenshots/2_en-US.png) | ![Search](android/fastlane/metadata/android/en-US/images/phoneScreenshots/3_en-US.png) |
 |---|---|---|
-| ![Journal latest publications](android/fastlane/metadata/android/en-US/images/phoneScreenshots/4_en-US.png) | ![JournalDetails](android/fastlane/metadata/android/en-US/images/phoneScreenshots/6_en-US.png) | ![Settings](android/fastlane/metadata/android/en-US/images/phoneScreenshots/7_en-US.png) |
+| ![Journal latest publications](android/fastlane/metadata/android/en-US/images/phoneScreenshots/4_en-US.png) | ![JournalDetails](android/fastlane/metadata/android/en-US/images/phoneScreenshots/5_en-US.png) | ![Settings](android/fastlane/metadata/android/en-US/images/phoneScreenshots/7_en-US.png) |
