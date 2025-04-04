@@ -387,7 +387,7 @@
   "@unknownLicense": {},
   "hours": "часы",
   "@hours": {},
-  "worksCount": "Кол-во произведений",
+  "worksCount": "Кол-во работ",
   "@worksCount": {},
   "searchOpenAlex": "OpenAlex (рекомендуется)",
   "@searchOpenAlex": {},
@@ -411,6 +411,6 @@
   "@citedByCount": {},
   "publicationDate": "Дата публикации",
   "@publicationDate": {},
-  "queryPreview": "Просмотр запроса:",
+  "queryPreview": "Предпросмотр запроса:",
   "@queryPreview": {}
 }
