@@ -52,7 +52,13 @@ class _CrossRefSearchFormState extends State<CrossRefSearchForm> {
           return;
         }
         try {
-          final article = await CrossRefApi.getWorkByDOI(doi);
+          String extractedDoi;
+          if (doi.startsWith('https://doi.org/')) {
+            extractedDoi = doi.replaceFirst('https://doi.org/', '');
+          } else {
+            extractedDoi = doi;
+          }
+          final article = await CrossRefApi.getWorkByDOI(extractedDoi);
 
           // Dismiss the loading dialog
           Navigator.pop(context);
