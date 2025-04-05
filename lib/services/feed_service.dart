@@ -61,7 +61,7 @@ class FeedService {
   }
 
   Future<void> updateFeed(
-      BuildContext context,
+      BuildContext? context,
       List<Journal> followedJournals,
       void Function(String journalName) onJournalUpdate,
       int fetchIntervalInHours) async {
@@ -112,7 +112,7 @@ class FeedService {
   }
 
   Future<void> updateSavedQueryFeed(
-      BuildContext context,
+      BuildContext? context,
       List<Map<String, dynamic>> savedQueries,
       void Function(String queryName) onQueryUpdate,
       int fetchIntervalInHours) async {

@@ -11,6 +11,8 @@ import 'screens/favorites_screen.dart';
 import 'screens/library_screen.dart';
 import 'screens/downloads_screen.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import './services/background_fetch_service.dart';
+import 'package:background_fetch/background_fetch.dart';
 
 void main() {
   runApp(
@@ -19,6 +21,8 @@ void main() {
       child: const Wispar(),
     ),
   );
+  BackgroundFetch.registerHeadlessTask(
+      BackgroundFetchService.backgroundFetchHeadlessTask);
 }
 
 class Wispar extends StatefulWidget {
@@ -30,13 +34,28 @@ class Wispar extends StatefulWidget {
   _WisparState createState() => _WisparState();
 }
 
-class _WisparState extends State<Wispar> {
+class _WisparState extends State<Wispar> with WidgetsBindingObserver {
   bool _hasSeenIntro = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _checkIntroPreference();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      debugPrint('[Lifecycle] App paused — scheduling background fetch');
+      BackgroundFetchService.startBackgroundFetch();
+    }
   }
 
   // Load the intro preference
