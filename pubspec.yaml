@@ -52,7 +52,7 @@ dependencies:
   introduction_screen: ^3.1.14
   open_filex: ^4.7.0
   google_nav_bar: ^5.0.7
-  file_picker: ^9.0.1
+  file_picker: ^10.0.0
   
 
 dev_dependencies:
