@@ -15,25 +15,35 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
   String searchScope = 'Everything';
   String selectedSortField = '-';
   String selectedSortOrder = '-';
-  bool _filtersExpanded = false;
+  // bool _filtersExpanded = false;
   bool saveQuery = false;
+  List<TextEditingController> controllers = [];
 
   final TextEditingController queryNameController = TextEditingController();
 
   void _addQueryPart(String type) {
     setState(() {
-      // Avoid adding an operator at the beginning or after a deleted keyword
       if (queryParts.isNotEmpty && queryParts.last['type'] != 'operator') {
-        queryParts
-            .add({'type': 'operator', 'value': 'AND'}); // Default operator
+        queryParts.add({'type': 'operator', 'value': 'AND'});
       }
       queryParts.add({'type': type, 'value': ''});
+      if (type == 'keyword') {
+        controllers.add(TextEditingController());
+      }
     });
   }
 
-  void _updateQueryValue(int index, String value) {
+  void _updateQueryValue(
+      int queryPartIndex, int controllerIndex, String value) {
     setState(() {
-      queryParts[index]['value'] = value;
+      if (queryParts[queryPartIndex]['type'] == 'keyword' &&
+          controllerIndex < controllers.length) {
+        controllers[controllerIndex].text = value;
+        controllers[controllerIndex].selection = TextSelection.fromPosition(
+          TextPosition(offset: value.length),
+        );
+      }
+      queryParts[queryPartIndex]['value'] = value;
     });
   }
 
@@ -45,18 +55,27 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
 
   void _removeQueryPart(int index) {
     setState(() {
-      var removedPart = queryParts.removeAt(index);
+      final removedPart = queryParts.removeAt(index);
 
-      // If the removed part was a keyword and there's an operator right after it, remove that operator
-      if (removedPart['type'] == 'keyword' &&
-          index < queryParts.length &&
-          queryParts[index]['type'] == 'operator') {
-        queryParts.removeAt(index);
+      if (removedPart['type'] == 'keyword') {
+        // Remove matching controller
+        int keywordCount = 0;
+        for (int i = 0; i < index; i++) {
+          if (queryParts[i]['type'] == 'keyword') keywordCount++;
+        }
+        if (keywordCount < controllers.length) {
+          controllers.removeAt(keywordCount);
+        }
+
+        // Remove preceding operator if it exists
+        if (index > 0 && queryParts[index - 1]['type'] == 'operator') {
+          queryParts.removeAt(index - 1);
+        }
       }
 
-      // If the operator is the last item and there's no valid keyword before it, remove it
+      // Remove dangling operator at end
       if (queryParts.isNotEmpty && queryParts.last['type'] == 'operator') {
-        queryParts.removeAt(queryParts.length - 1); // Remove the last operator
+        queryParts.removeLast();
       }
     });
   }
@@ -263,58 +282,74 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
 
             // Dynamic query builder
             Column(
-              children: queryParts.asMap().entries.map((entry) {
-                int index = entry.key;
-                var part = entry.value;
+              children: () {
+                int keywordControllerIndex = 0;
+                return queryParts.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  var part = entry.value;
 
-                if (part['type'] == 'operator') {
-                  // Only show operator if the previous part is a valid keyword
-                  if (index == 0 ||
-                      queryParts[index - 1]['type'] != 'keyword' ||
-                      part['value'] == '') {
-                    return SizedBox
-                        .shrink(); // Hides the operator if it is not valid
+                  if (part['type'] == 'keyword' &&
+                      controllers.length <= keywordControllerIndex) {
+                    controllers.add(TextEditingController());
                   }
 
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ToggleButtons(
-                          isSelected: [
-                            part['value'] == 'AND',
-                            part['value'] == 'OR',
-                            part['value'] == 'NOT'
-                          ],
-                          onPressed: (int i) => _toggleOperator(index, i),
-                          borderRadius: BorderRadius.circular(8),
-                          children: [Text('AND'), Text('OR'), Text('NOT')],
-                        ),
-                      ],
-                    ),
-                  );
-                }
+                  final controller = part['type'] == 'keyword'
+                      ? controllers[keywordControllerIndex]
+                      : null;
 
-                return Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)!.enterKeyword,
-                          border: OutlineInputBorder(),
-                        ),
-                        onChanged: (value) => _updateQueryValue(index, value),
+                  if (part['type'] == 'operator') {
+                    if (index == 0 ||
+                        queryParts[index - 1]['type'] != 'keyword' ||
+                        part['value'] == '') {
+                      return SizedBox.shrink();
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ToggleButtons(
+                            isSelected: [
+                              part['value'] == 'AND',
+                              part['value'] == 'OR',
+                              part['value'] == 'NOT'
+                            ],
+                            onPressed: (int i) => _toggleOperator(index, i),
+                            borderRadius: BorderRadius.circular(8),
+                            children: [Text('AND'), Text('OR'), Text('NOT')],
+                          ),
+                        ],
                       ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.delete,
-                          color: Theme.of(context).colorScheme.primary),
-                      onPressed: () => _removeQueryPart(index),
-                    ),
-                  ],
-                );
-              }).toList(),
+                    );
+                  }
+
+                  final widget = Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: controller,
+                          decoration: InputDecoration(
+                            hintText:
+                                AppLocalizations.of(context)!.enterKeyword,
+                            border: OutlineInputBorder(),
+                          ),
+                          onChanged: (value) => _updateQueryValue(
+                              index, keywordControllerIndex, value),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete,
+                            color: Theme.of(context).colorScheme.primary),
+                        onPressed: () => _removeQueryPart(index),
+                      ),
+                    ],
+                  );
+
+                  keywordControllerIndex++;
+                  return widget;
+                }).toList();
+              }(),
             ),
             SizedBox(height: 20),
 
