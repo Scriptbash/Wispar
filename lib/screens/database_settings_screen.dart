@@ -229,7 +229,8 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                 ),
                 SizedBox(height: 16),
                 Text(
-                  'Concurrent API requests: $_concurrentFetches',
+                  AppLocalizations.of(context)!
+                      .concurrentFetches(_concurrentFetches),
                 ),
                 Slider(
                   value: _concurrentFetches.toDouble(),
