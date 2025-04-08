@@ -21,6 +21,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
   bool _scrapeAbstracts = true; // Default to scraping missing abstracts
   int _cleanupInterval = 7; // Default for cleanup interval
   int _fetchInterval = 6; // Default API fetch to 6 hours
+  int _concurrentFetches = 3; // Default to 3 concurrent fetches
   TextEditingController _cleanupIntervalController = TextEditingController();
 
   @override
@@ -37,6 +38,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       _cleanupInterval = prefs.getInt('cleanupInterval') ?? 7;
       _fetchInterval = prefs.getInt('fetchInterval') ?? 6;
       _scrapeAbstracts = prefs.getBool('scrapeAbstracts') ?? true;
+      _concurrentFetches = prefs.getInt('concurrentFetches') ?? 3;
     });
     _cleanupIntervalController.text = _cleanupInterval.toString();
   }
@@ -48,6 +50,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       await prefs.setInt('cleanupInterval', _cleanupInterval);
       await prefs.setInt('fetchInterval', _fetchInterval);
       await prefs.setBool('scrapeAbstracts', _scrapeAbstracts);
+      await prefs.setInt('concurrentFetches', _concurrentFetches);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.settingsSaved)),
@@ -224,6 +227,23 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                     ),
                   ],
                 ),
+                SizedBox(height: 16),
+                Text(
+                  'Concurrent API requests: $_concurrentFetches',
+                ),
+                Slider(
+                  value: _concurrentFetches.toDouble(),
+                  min: 1,
+                  max: 5,
+                  divisions: 4,
+                  label: _concurrentFetches.toString(),
+                  onChanged: (double value) {
+                    setState(() {
+                      _concurrentFetches = value.toInt();
+                    });
+                  },
+                ),
+                SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

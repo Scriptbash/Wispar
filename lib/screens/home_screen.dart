@@ -24,7 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int sortBy = 0; // Set the default sort by to published date
   int sortOrder = 1; // Set the default sort order to descending
   int fetchIntervalInHours = 6; // Default to 6 hours for API fetch
-  String _currentJournalName = '';
+  int _concurrentFetches = 3; // Default to 3 concurrent requests
+  List<String> _currentJournalNames = [];
 
   // Variables related to the filter bar in the appbar
   final TextEditingController _filterController = TextEditingController();
@@ -40,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadFetchInterval();
+    _loadPreferences();
     _buildAndStreamFeed();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_feedLoaded) {
@@ -53,10 +54,11 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Future<void> _loadFetchInterval() async {
+  Future<void> _loadPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       fetchIntervalInHours = prefs.getInt('fetchInterval') ?? 6;
+      _concurrentFetches = prefs.getInt('concurrentFetches') ?? 3;
     });
   }
 
@@ -80,30 +82,27 @@ class _HomeScreenState extends State<HomeScreen> {
         await _feedService.updateFeed(
           context,
           followedJournals,
-          (String journalName) {
+          (List<String> journalNames) {
             if (mounted) {
               setState(() {
-                _currentJournalName = journalName;
+                _currentJournalNames = journalNames;
               });
             }
           },
           fetchIntervalInHours,
+          _concurrentFetches,
         );
       }
 
       if (mounted && savedQueries.isNotEmpty) {
-        await _feedService.updateSavedQueryFeed(
-          context,
-          savedQueries,
-          (String queryName) {
-            if (mounted) {
-              setState(() {
-                _currentJournalName = queryName;
-              });
-            }
-          },
-          fetchIntervalInHours,
-        );
+        await _feedService.updateSavedQueryFeed(context, savedQueries,
+            (List<String> queryNames) {
+          if (mounted) {
+            setState(() {
+              _currentJournalNames = queryNames;
+            });
+          }
+        }, fetchIntervalInHours, _concurrentFetches);
       }
 
       if (mounted) {
@@ -347,12 +346,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(height: 16),
                   CircularProgressIndicator(),
                   SizedBox(height: 16),
-                  if (_currentJournalName.isNotEmpty)
+                  if (_currentJournalNames.isNotEmpty)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
                         AppLocalizations.of(context)!
-                            .fetchingArticleFromJournal(_currentJournalName),
+                            .fetchingArticleFromJournal(
+                                _currentJournalNames.toSet().length == 1
+                                    ? _currentJournalNames[0]
+                                    : _currentJournalNames.toSet().join(', ')),
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 16.0),
                       ),

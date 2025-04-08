@@ -61,10 +61,12 @@ class FeedService {
   }
 
   Future<void> updateFeed(
-      BuildContext context,
-      List<Journal> followedJournals,
-      void Function(String journalName) onJournalUpdate,
-      int fetchIntervalInHours) async {
+    BuildContext context,
+    List<Journal> followedJournals,
+    void Function(List<String> journalNames) onJournalUpdate,
+    int fetchIntervalInHours,
+    int maxConcurrentUpdates,
+  ) async {
     try {
       // Check which journals need updating
       final journalsToUpdate =
@@ -73,79 +75,40 @@ class FeedService {
         _dbHelper.cleanupOldArticles();
       }
 
-      for (String issn in journalsToUpdate) {
-        final journal = followedJournals.firstWhere((j) => j.issn == issn);
+      for (int i = 0; i < journalsToUpdate.length; i += maxConcurrentUpdates) {
+        final batch = journalsToUpdate.sublist(
+            i,
+            (i + maxConcurrentUpdates) > journalsToUpdate.length
+                ? journalsToUpdate.length
+                : i + maxConcurrentUpdates);
 
-        // Notify the UI of the current journal being updated
-        onJournalUpdate(journal.title);
+        // Collect all journal names for the current batch
+        List<String> journalNamesToUpdate = batch.map((issn) {
+          final journal = followedJournals.firstWhere((j) => j.issn == issn);
+          return journal.title;
+        }).toList();
 
-        // Update journal's last updated time
-        await _dbHelper.updateJournalLastUpdated(journal.issn);
+        // Notify the UI with the list of journal names
+        onJournalUpdate(journalNamesToUpdate);
 
-        // Fetch recent feed from API
-        List<journalWorks.Item> recentFeed =
-            await FeedApi.getRecentFeed(journal.issn);
+        await Future.wait(batch.map((issn) async {
+          final journal = followedJournals.firstWhere((j) => j.issn == issn);
 
-        // Cache the articles into the DB
-        for (journalWorks.Item item in recentFeed) {
-          await _dbHelper.insertArticle(
-            PublicationCard(
-              title: item.title,
-              abstract: item.abstract,
-              journalTitle: item.journalTitle,
-              issn: journal.issn,
-              publishedDate: item.publishedDate,
-              doi: item.doi,
-              authors: item.authors,
-              url: item.primaryUrl,
-              license: item.license,
-              licenseName: item.licenseName,
-              publisher: item.publisher,
-            ),
-            isCached: true,
-          );
-        }
-      }
-    } catch (e) {
-      debugPrint('Error updating feed: $e');
-    }
-  }
+          // Update journal's last updated time
+          await _dbHelper.updateJournalLastUpdated(journal.issn);
 
-  Future<void> updateSavedQueryFeed(
-      BuildContext context,
-      List<Map<String, dynamic>> savedQueries,
-      void Function(String queryName) onQueryUpdate,
-      int fetchIntervalInHours) async {
-    try {
-      // Check which queries need updating
-      final queriesToUpdate =
-          await checkSavedQueriesToUpdate(savedQueries, fetchIntervalInHours);
-      List<journalWorks.Item> queryArticles;
+          // Fetch recent feed from API
+          List<journalWorks.Item> recentFeed =
+              await FeedApi.getRecentFeed(journal.issn);
 
-      for (var query in queriesToUpdate) {
-        debugPrint('Updating query: ${query['queryName']}');
-        onQueryUpdate(query['queryName']);
-        await _dbHelper.updateSavedQueryLastFetched(query['query_id']);
-        String provider = query['queryProvider'];
-        Map<String, dynamic> queryMap;
-        if (provider == "Crossref") {
-          queryMap = Uri.splitQueryString(query['queryParams']);
-          queryArticles = await FeedApi.getSavedQueryWorks(queryMap);
-        } else if (provider == "OpenAlex") {
-          queryArticles =
-              await FeedApi.getSavedQueryOpenAlex(query['queryParams']);
-        } else {
-          debugPrint("Unknown provider: $provider");
-          continue;
-        }
-        for (journalWorks.Item item in queryArticles) {
-          if (item.title.isNotEmpty && item.journalTitle.isNotEmpty) {
+          // Cache the articles into the DB
+          for (journalWorks.Item item in recentFeed) {
             await _dbHelper.insertArticle(
               PublicationCard(
                 title: item.title,
                 abstract: item.abstract,
                 journalTitle: item.journalTitle,
-                issn: item.issn,
+                issn: journal.issn,
                 publishedDate: item.publishedDate,
                 doi: item.doi,
                 authors: item.authors,
@@ -155,10 +118,84 @@ class FeedService {
                 publisher: item.publisher,
               ),
               isCached: true,
-              isSavedQuery: true,
-              queryId: query['query_id'],
             );
           }
+        }));
+      }
+    } catch (e) {
+      debugPrint('Error updating feed: $e');
+    }
+  }
+
+  Future<void> updateSavedQueryFeed(
+      BuildContext context,
+      List<Map<String, dynamic>> savedQueries,
+      void Function(List<String> queryNames) onQueryUpdate,
+      int fetchIntervalInHours,
+      int maxConcurrentUpdates) async {
+    try {
+      // Check which queries need updating
+      final queriesToUpdate =
+          await checkSavedQueriesToUpdate(savedQueries, fetchIntervalInHours);
+
+      if (queriesToUpdate.isNotEmpty) {
+        // Loop through the queries in batches
+        for (int i = 0; i < queriesToUpdate.length; i += maxConcurrentUpdates) {
+          final batch = queriesToUpdate.sublist(
+              i,
+              (i + maxConcurrentUpdates) > queriesToUpdate.length
+                  ? queriesToUpdate.length
+                  : i + maxConcurrentUpdates);
+
+          // Collect all the query names for the current batch
+          List<String> queryNamesToUpdate =
+              batch.map((query) => query['queryName'] as String).toList();
+
+          // Notify the UI with the list of query names
+          onQueryUpdate(queryNamesToUpdate);
+
+          await Future.wait(batch.map((query) async {
+            // Update saved query's last fetched time
+            await _dbHelper.updateSavedQueryLastFetched(query['query_id']);
+
+            String provider = query['queryProvider'];
+            List<journalWorks.Item> queryArticles = [];
+
+            if (provider == "Crossref") {
+              Map<String, dynamic> queryMap =
+                  Uri.splitQueryString(query['queryParams']);
+              queryArticles = await FeedApi.getSavedQueryWorks(queryMap);
+            } else if (provider == "OpenAlex") {
+              queryArticles =
+                  await FeedApi.getSavedQueryOpenAlex(query['queryParams']);
+            } else {
+              debugPrint("Unknown provider: $provider");
+              return;
+            }
+
+            for (journalWorks.Item item in queryArticles) {
+              if (item.title.isNotEmpty && item.journalTitle.isNotEmpty) {
+                await _dbHelper.insertArticle(
+                  PublicationCard(
+                    title: item.title,
+                    abstract: item.abstract,
+                    journalTitle: item.journalTitle,
+                    issn: item.issn,
+                    publishedDate: item.publishedDate,
+                    doi: item.doi,
+                    authors: item.authors,
+                    url: item.primaryUrl,
+                    license: item.license,
+                    licenseName: item.licenseName,
+                    publisher: item.publisher,
+                  ),
+                  isCached: true,
+                  isSavedQuery: true,
+                  queryId: query['query_id'],
+                );
+              }
+            }
+          }));
         }
       }
     } catch (e) {
