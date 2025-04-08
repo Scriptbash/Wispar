@@ -352,6 +352,8 @@
   "@database": {},
   "databaseSettings": "Database settings",
   "@databaseSettings": {},
+  "concurrentFetches": "Concurrent API requests: {number}",
+  "@concurrentFetches": {},
   "scrapeAbstracts": "Scrape missing abstracts",
   "@scrapeAbstracts":{},
   "cleanupInterval": "Cleanup interval (days)",
