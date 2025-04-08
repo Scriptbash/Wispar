@@ -1,0 +1,77 @@
+{
+  "save": "保存",
+  "@save": {},
+  "home": "ホーム",
+  "@home": {
+    "description": "The home menu button and the app bar title when in the home screen."
+  },
+  "getStarted": "始める",
+  "@getStarted": {},
+  "light": "明るい",
+  "@light": {},
+  "setupOtherSettings": "その他の設定",
+  "@setupOtherSettings": {},
+  "setupLinkZotero": "Zoteroをリンクする",
+  "@setupLinkZotero": {},
+  "favorites": "お気に入り",
+  "@favorites": {
+    "description": "The favorites menu button and the app bar title when in the favorites screen."
+  },
+  "downloads": "ダウンロード",
+  "@downloads": {
+    "description": "The downloads menu button and the app bar title when in the downloads screen."
+  },
+  "downloadSuccessful": "論文がダウンロードされました！",
+  "@downloadSuccessful": {},
+  "library": "ライブラリ",
+  "@library": {
+    "description": "The library menu button and the app bar title when in the library screen."
+  },
+  "settings": "設定",
+  "@settings": {
+    "description": "The settings option menu button and the app bar title when in the settings screen."
+  },
+  "noDownloads": "ダウンロードがありません。",
+  "@noDownloads": {},
+  "skip": "スキップ",
+  "@skip": {},
+  "delete": "削除",
+  "@delete": {},
+  "everything": "すべて",
+  "@everything": {},
+  "viewarticle": "論文を読む",
+  "@viewarticle": {},
+  "dark": "暗い",
+  "@dark": {},
+  "zoteroSettings": "Zoteroの設定",
+  "@zoteroSettings": {},
+  "savedOn": "{date}に保存済み",
+  "@savedOn": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMMd"
+      }
+    }
+  },
+  "hours": "時間",
+  "@hours": {},
+  "saveSettings": "設定を保存",
+  "@saveSettings": {},
+  "settingsSaved": "設定を保存しました！",
+  "@settingsSaved": {},
+  "download": "ダウンロードする",
+  "@download": {
+    "description": "The verb to download, without the 'to'."
+  },
+  "welcomeWispar": "Wisparにようこそ！",
+  "@welcomeWispar": {},
+  "articles": "論文",
+  "@articles": {
+    "description": "As in scientific articles."
+  },
+  "sendToZotero": "Zoteroに送る",
+  "@sendToZotero": {},
+  "setupLinkMyZotero": "私のZoteroアカウントをリンクする",
+  "@setupLinkMyZotero": {}
+}
