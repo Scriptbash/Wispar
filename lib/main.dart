@@ -70,6 +70,7 @@ class _WisparState extends State<Wispar> {
         Locale('tr'), // Turkish
         Locale('ru'), // Russian
         Locale('ja'), // Japanese
+        Locale('id'), // Indonesian
       ],
       theme: ThemeData(
         colorSchemeSeed: Colors.deepPurple,
