@@ -141,5 +141,128 @@
         "format": "yMMMMd"
       }
     }
+  },
+  "zoteroCreateKey": "Buat kunci API baru",
+  "@zoteroCreateKey": {},
+  "showAllAbstracts": "Tampilkan semua abstrak",
+  "@showAllAbstracts": {},
+  "shareArticle": "Bagikan artikel",
+  "@shareArticle": {},
+  "favoriteadded": "ditambahkan ke favorit",
+  "@favoriteadded": {
+    "description": "Snackbar shown when an article is added to the user's favorites."
+  },
+  "favoriteremoved": "dihapus dari favorit",
+  "@favoriteremoved": {
+    "description": "Snackbar shown when an article is removed from the user's favorites."
+  },
+  "searchresults": "Hasil pencarian",
+  "@searchresults": {},
+  "noresultsfound": "Tidak ada hasil pencarian.",
+  "@noresultsfound": {},
+  "theme": "Tema",
+  "@theme": {},
+  "light": "Terang",
+  "@light": {},
+  "dark": "Gelap",
+  "@dark": {},
+  "systemtheme": "Tema sistem",
+  "@systemtheme": {},
+  "hideAllAbstracts": "Sembunyikan semua abstrak",
+  "@hideAllAbstracts": {},
+  "selectinstitution": "Pilih institusi anda",
+  "@selectinstitution": {},
+  "sortby": "Urutkan berdasarkan",
+  "@sortby": {},
+  "journaltitle": "Judul jurnal",
+  "@journaltitle": {},
+  "articletitle": "Judul artikel",
+  "@articletitle": {},
+  "datepublished": "Tanggal publikasi",
+  "@datepublished": {},
+  "noPublicationFound": "Publikasi tidak ditemukan.",
+  "@noPublicationFound": {},
+  "sharedMessage": "Bagikan melalui aplikasi Wispar",
+  "@sharedMessage": {
+    "description": "Default sharing text."
+  },
+  "reportIssue": "Laporkan masalah",
+  "@reportIssue": {},
+  "database": "Basisdata",
+  "@database": {},
+  "databaseSettings": "Pengaturan basisdata",
+  "@databaseSettings": {},
+  "cleanupIntervalHint": "Masukkan jumlah hari (1 sampai 365)",
+  "@cleanupIntervalHint": {},
+  "databaseNotFound": "Berkas basisdata tidak ditemukan.",
+  "@databaseNotFound": {},
+  "databaseExported": "Basisdata berhasil diekspor!",
+  "@databaseExported": {},
+  "databaseExportFailed": "Gagal mengekspor basisdata.",
+  "@databaseExportFailed": {},
+  "selectDBExportLocation": "Pilih lokasi hasil ekspor basisdata.",
+  "@selectDBExportLocation": {},
+  "exportDatabase": "Ekspor basisdata",
+  "@exportDatabase": {},
+  "importDatabase": "Impor basisdata",
+  "@importDatabase": {},
+  "databaseImportFailed": "Gagal mengimpor basisdata.",
+  "@databaseImportFailed": {},
+  "databaseImported": "Basisdata berhasil diimpor!",
+  "@databaseImported": {},
+  "saveSettings": "Simpan pengaturan",
+  "@saveSettings": {},
+  "settingsSaved": "Pengaturan berhasil disimpan!",
+  "@settingsSaved": {},
+  "privacyPolicy": "Kebijakan privasi",
+  "@privacyPolicy": {},
+  "about": "Tentang",
+  "@about": {},
+  "madeBy": "Dibuat oleh {app_author}",
+  "@madeBy": {},
+  "donate": "Donasi",
+  "@donate": {},
+  "donateMessage": "Bantu pengembangan Wispar",
+  "@donateMessage": {
+    "description": "Text shown in the subtitle of the Donate button in the settings."
+  },
+  "otherLicense": "Lisensi lainnya",
+  "@otherLicense": {},
+  "unknownLicense": "Lisensi tidak diketahui",
+  "@unknownLicense": {},
+  "hours": "jam",
+  "@hours": {},
+  "zoteroValidKey": "Kunci API disimpan!",
+  "@zoteroValidKey": {
+    "description": "Snackbar shown when a valid Zotero API key has been saved."
+  },
+  "savedOn": "Disimpan pada {date}",
+  "@savedOn": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMMd"
+      }
+    }
+  },
+  "noinstitution": "Tidak ada institusi",
+  "@noinstitution": {},
+  "failLoadMorePublication": "Gagal memuat publikasi lainnya.",
+  "@failLoadMorePublication": {},
+  "save": "Simpan",
+  "@save": {},
+  "sourceCode": "Kode sumber",
+  "@sourceCode": {},
+  "zoteroInvalidKey": "Kunci API tidak valid!",
+  "@zoteroInvalidKey": {
+    "description": "Snackbar shown when an attempt to save an invalid Zotero API key is made."
+  },
+  "sendToZotero": "Kirim ke Zotero",
+  "@sendToZotero": {},
+  "zoteroSettings": "Pengaturan Zotero",
+  "@zoteroSettings": {},
+  "zoteroEnterKey": "Masukkan kunci API",
+  "@zoteroEnterKey": {
+    "description": "Hint text shown in the text field where users can enter their Zotero API key."
   }
 }
