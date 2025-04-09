@@ -1,1 +1,80 @@
-{}
+{
+  "downloads": "Unduhan",
+  "@downloads": {
+    "description": "The downloads menu button and the app bar title when in the downloads screen."
+  },
+  "searchByQuery": "Cari berdasarkan query",
+  "@searchByQuery": {},
+  "downloadDeleted": "Artikel telah dihapus!",
+  "@downloadDeleted": {},
+  "setupInstitutionalAccess": "Atur Akses Institusional",
+  "@setupInstitutionalAccess": {},
+  "setupSelectInstitution": "Pilih institusi saya",
+  "@setupSelectInstitution": {},
+  "setupSelectedInstitution": "Anda telah memilih:",
+  "@setupSelectedInstitution": {},
+  "setupLinkZotero": "Hubungkan Zotero",
+  "@setupLinkZotero": {},
+  "setupOtherSettings": "Pengaturan Lainnya",
+  "@setupOtherSettings": {},
+  "skip": "Lewati",
+  "@skip": {},
+  "getStarted": "Mulai",
+  "@getStarted": {},
+  "home": "Beranda",
+  "@home": {
+    "description": "The home menu button and the app bar title when in the home screen."
+  },
+  "favorites": "Favorit",
+  "@favorites": {
+    "description": "The favorites menu button and the app bar title when in the favorites screen."
+  },
+  "download": "Unduh",
+  "@download": {
+    "description": "The verb to download, without the 'to'."
+  },
+  "delete": "Hapus",
+  "@delete": {},
+  "noDownloads": "Anda belum memiliki unduhan.",
+  "@noDownloads": {},
+  "settings": "Pengaturan",
+  "@settings": {
+    "description": "The settings option menu button and the app bar title when in the settings screen."
+  },
+  "follow": "Ikuti",
+  "@follow": {
+    "description": "The button text shown on journal cards when it is not followed."
+  },
+  "unfollow": "Berhenti mengikuti",
+  "@unfollow": {
+    "description": "The button text shown on journal cards when it is followed."
+  },
+  "library": "Pustaka",
+  "@library": {
+    "description": "The library menu button and the app bar title when in the library screen."
+  },
+  "journals": "Jurnal",
+  "@journals": {
+    "description": "The journals menu button and the app bar title when in the journals screen."
+  },
+  "search": "Cari",
+  "@search": {
+    "description": "Text shown inside the search screen app bar and for the seach button."
+  },
+  "searchPlaceholder": "Cari…",
+  "@searchPlaceholder": {
+    "description": "Place holder text in the search input widget."
+  },
+  "filterDownloads": "Filter unduhan",
+  "@filterDownloads": {},
+  "filterFavorites": "Filter favorit",
+  "@filterFavorites": {},
+  "emptyDOIError": "Silakan masukkan DOI",
+  "@emptyDOIError": {},
+  "welcomeWispar": "Selamat datang di Wispar!",
+  "@welcomeWispar": {},
+  "setupLinkMyZotero": "Hubungkan akun Zotero saya",
+  "@setupLinkMyZotero": {},
+  "downloadSuccessful": "Artikel berhasil diunduh!",
+  "@downloadSuccessful": {}
+}
