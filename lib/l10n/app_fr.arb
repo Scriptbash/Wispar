@@ -364,5 +364,7 @@
   "scrapeAbstracts": "Extraction des résumés manquants",
   "@scrapeAbstracts": {},
   "searchOpenAlex": "OpenAlex (recommendé)",
-  "@searchOpenAlex": {}
+  "@searchOpenAlex": {},
+  "concurrentFetches": "Requêtes API simultanées : {number}",
+  "@concurrentFetches": {}
 }
