@@ -76,5 +76,70 @@
   "setupLinkMyZotero": "Hubungkan akun Zotero saya",
   "@setupLinkMyZotero": {},
   "downloadSuccessful": "Artikel berhasil diunduh!",
-  "@downloadSuccessful": {}
+  "@downloadSuccessful": {},
+  "authors": "Penulis",
+  "@authors": {},
+  "searchOpenAlex": "OpenAlex (direkomendasikan)",
+  "@searchOpenAlex": {},
+  "source": "Sumber:{search_provider}",
+  "@source": {},
+  "everything": "Semua",
+  "@everything": {},
+  "titleAndAbstract": "Judul dan abstrak",
+  "@titleAndAbstract": {},
+  "title": "Judul",
+  "@title": {},
+  "searchIn": "Cari dalam",
+  "@searchIn": {},
+  "addKeyword": "Tambah kata kunci",
+  "@addKeyword": {},
+  "enterKeyword": "Masukkan kata kunci",
+  "@enterKeyword": {},
+  "publicationDate": "Tanggal publikasi",
+  "@publicationDate": {},
+  "searchByDOI": "Cari berdasarkan DOI",
+  "@searchByDOI": {},
+  "searchByTitle": "Cari berdasarkan judul",
+  "@searchByTitle": {},
+  "searchByISSN": "Cari berdasarkan ISSN",
+  "@searchByISSN": {},
+  "moreOptions": "Opsi lainnya",
+  "@moreOptions": {},
+  "articles": "Artikel",
+  "@articles": {
+    "description": "As in scientific articles."
+  },
+  "category": "Kategori",
+  "@category": {},
+  "publisher": "Penerbit",
+  "@publisher": {},
+  "latestpublications": "Publikasi terakhir",
+  "@latestpublications": {},
+  "abstract": "Abstrak",
+  "@abstract": {},
+  "copydoi": "Salin DOI",
+  "@copydoi": {},
+  "doicopied": "DOI tera",
+  "@doicopied": {
+    "description": "Snackbar shown when the Copy DOI button is pressed."
+  },
+  "issnCopied": "DOI tersalin ke papan baki",
+  "@issnCopied": {},
+  "viewarticle": "Lihat artikel",
+  "@viewarticle": {},
+  "openExternalBrowser": "Buka di peramban eksternal",
+  "@openExternalBrowser": {},
+  "openExternalPdfApp": "Buka di pembaca PDF eksternal",
+  "@openExternalPdfApp": {},
+  "favorite": "Favorit",
+  "@favorite": {},
+  "publishedon": "Terbit pada {date}",
+  "@publishedon": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMMd"
+      }
+    }
+  }
 }
