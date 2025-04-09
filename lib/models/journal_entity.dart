@@ -1,6 +1,6 @@
 class Journal {
   final int? id;
-  final String issn;
+  final List<String> issn;
   final String title;
   final String publisher;
   final String? dateFollowed;

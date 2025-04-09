@@ -77,7 +77,7 @@ class Item {
   final String primaryUrl;
   final String license;
   final String licenseName;
-  final String issn;
+  final List<String> issn;
 
   Item({
     required this.publisher,
@@ -123,12 +123,12 @@ class Item {
       journalTitle = (json['container-title'] as List<dynamic>).first ?? '';
     }
 
-    String issn = '';
+    List<String> issn = [];
     if (json['ISSN'] != null) {
-      if (json['ISSN'] is List && (json['ISSN'] as List).isNotEmpty) {
-        issn = (json['ISSN'] as List<dynamic>).last ?? '';
-      } else {
-        issn = json['ISSN'] ?? '';
+      if (json['ISSN'] is List) {
+        issn = List<String>.from(json['ISSN']);
+      } else if (json['ISSN'] is String) {
+        issn = [json['ISSN']];
       }
     }
 

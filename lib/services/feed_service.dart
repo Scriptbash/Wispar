@@ -28,7 +28,7 @@ class FeedService {
         if (lastUpdated == null ||
             DateTime.now().difference(DateTime.parse(lastUpdated)).inHours >=
                 fetchIntervalInHours) {
-          journalsToUpdate.add(journal.issn);
+          journalsToUpdate.add(journal.issn.last);
         }
       }
     }
@@ -95,7 +95,7 @@ class FeedService {
           final journal = followedJournals.firstWhere((j) => j.issn == issn);
 
           // Update journal's last updated time
-          await _dbHelper.updateJournalLastUpdated(journal.issn);
+          await _dbHelper.updateJournalLastUpdated(journal.issn.last);
 
           // Fetch recent feed from API
           List<journalWorks.Item> recentFeed =

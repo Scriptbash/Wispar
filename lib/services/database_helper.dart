@@ -118,7 +118,7 @@ class DatabaseHelper {
       'journals',
       columns: ['journal_id', 'dateFollowed'],
       where: 'issn = ?',
-      whereArgs: [journal.issn],
+      whereArgs: [journal.issn.last],
     );
 
     if (journalMaps.isNotEmpty) {
@@ -153,7 +153,7 @@ class DatabaseHelper {
     return List.generate(maps.length, (i) {
       return Journal(
         id: maps[i]['id'],
-        issn: maps[i]['issn'],
+        issn: [maps[i]['issn']], // Todo temporary, will refactor the db
         title: maps[i]['title'],
         publisher: maps[i]['publisher'],
         dateFollowed: maps[i]['dateFollowed'],

@@ -41,7 +41,7 @@ class FollowButton extends StatelessWidget {
       // Follow
       await dbHelper.insertJournal(
         Journal(
-          issn: item.issn.last,
+          issn: item.issn,
           title: item.title,
           publisher: item.publisher,
         ),

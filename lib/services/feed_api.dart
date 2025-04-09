@@ -12,9 +12,11 @@ class FeedApi {
   static const String baseUrlOpenAlex = 'https://api.openalex.org';
   static const String worksEndpointOpenAlex = '/works?';
 
-  static Future<List<journalWorks.Item>> getRecentFeed(String issn) async {
+  static Future<List<journalWorks.Item>> getRecentFeed(
+      List<String> issn) async {
+    final String issnFilter = issn.map((e) => 'issn:$e').join(',');
     final response = await http.get(Uri.parse(
-        '$baseUrl$journalsEndpoint/$issn/works?rows=100&sort=created&order=desc&$email'));
+        '$baseUrl$worksEndpoint?rows=100&sort=created&order=desc&$email&filter=$issnFilter'));
 
     if (response.statusCode == 200) {
       final responseData =
@@ -84,7 +86,7 @@ class FeedApi {
                 license: '',
                 licenseName: result.license ?? '',
                 publisher: result.publisher ?? '',
-                issn: result.issn?.isNotEmpty == true ? result.issn! : '',
+                issn: result.issn ?? [],
               ))
           .toList();
     } else {

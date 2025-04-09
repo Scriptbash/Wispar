@@ -15,7 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ArticleScreen extends StatefulWidget {
   final String doi;
   final String title;
-  final String issn;
+  final List<String> issn;
   final String abstract;
   final String journalTitle;
   final DateTime? publishedDate;
@@ -208,8 +208,16 @@ class _ArticleScreenState extends State<ArticleScreen> {
                           child: TextButton(
                             onPressed: () async {
                               String journalPublisher = "";
-                              Map<String, dynamic>? journalInfo =
-                                  await getJournalDetails(widget.issn);
+                              Map<String, dynamic>? journalInfo;
+
+                              for (final singleIssn in widget.issn) {
+                                journalInfo =
+                                    await getJournalDetails(singleIssn);
+                                if (journalInfo != null &&
+                                    journalInfo.isNotEmpty) {
+                                  break;
+                                }
+                              }
                               if (widget.publisher == null) {
                                 if (journalInfo != null &&
                                     journalInfo['publisher'] != null) {

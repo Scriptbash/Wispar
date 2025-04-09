@@ -203,7 +203,7 @@ class ZoteroService {
       String journalTitle,
       DateTime? publishedDate,
       String doi,
-      String issn) async {
+      List<String> issn) async {
     String? apiKey = await ZoteroService.loadApiKey();
     String? userId = await ZoteroService.loadUserId();
     String? wisparCollectionKey;
@@ -260,7 +260,7 @@ class ZoteroService {
           'journalAbbreviation': '', //'Journal Abbreviation',
           'language': '', //'Language',
           'DOI': doi,
-          'ISSN': issn,
+          'ISSN': issn.first, // Todo check the format since ISSN is now a list
           'shortTitle': '', //'Short Title',
           'url': '',
           'accessDate': formatDate(DateTime.now()),

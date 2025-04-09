@@ -20,7 +20,7 @@ class PublicationCard extends StatefulWidget {
   final String title;
   final String abstract;
   final String journalTitle;
-  final String issn;
+  final List<String> issn;
   final DateTime? publishedDate;
   final String doi;
   final List<PublicationAuthor> authors;
@@ -124,8 +124,15 @@ class _PublicationCardState extends State<PublicationCard> {
                       alignment: Alignment.centerLeft,
                       child: TextButton(
                         onPressed: () async {
-                          Map<String, dynamic>? journalInfo =
-                              await getJournalDetails(widget.issn);
+                          Map<String, dynamic>? journalInfo;
+
+                          for (final singleIssn in widget.issn) {
+                            journalInfo = await getJournalDetails(singleIssn);
+                            if (journalInfo != null && journalInfo.isNotEmpty) {
+                              break;
+                            }
+                          }
+
                           if (journalInfo != null && journalInfo.isNotEmpty) {
                             String journalPublisher =
                                 journalInfo['publisher'] ?? 'Unknown Publisher';

@@ -60,9 +60,17 @@ class _DownloadedCardState extends State<DownloadedCard> {
                           alignment: Alignment.centerLeft,
                           child: TextButton(
                             onPressed: () async {
-                              Map<String, dynamic>? journalInfo =
-                                  await getJournalDetails(
-                                      widget.publicationCard.issn);
+                              Map<String, dynamic>? journalInfo;
+
+                              for (final singleIssn
+                                  in widget.publicationCard.issn) {
+                                journalInfo =
+                                    await getJournalDetails(singleIssn);
+                                if (journalInfo != null &&
+                                    journalInfo.isNotEmpty) {
+                                  break;
+                                }
+                              }
                               if (journalInfo != Null) {
                                 String journalPublisher =
                                     journalInfo?['publisher'];
