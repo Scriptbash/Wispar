@@ -17,7 +17,6 @@ class Journal {
 
   Map<String, dynamic> toMap() {
     return {
-      'issn': issn,
       'title': title,
       'publisher': publisher,
       'dateFollowed': DateTime.now().toIso8601String().substring(0, 10),

@@ -62,15 +62,9 @@ class _DownloadedCardState extends State<DownloadedCard> {
                             onPressed: () async {
                               Map<String, dynamic>? journalInfo;
 
-                              for (final singleIssn
-                                  in widget.publicationCard.issn) {
-                                journalInfo =
-                                    await getJournalDetails(singleIssn);
-                                if (journalInfo != null &&
-                                    journalInfo.isNotEmpty) {
-                                  break;
-                                }
-                              }
+                              journalInfo = await getJournalDetails(
+                                  widget.publicationCard.issn);
+
                               if (journalInfo != Null) {
                                 String journalPublisher =
                                     journalInfo?['publisher'];
@@ -155,13 +149,14 @@ class _DownloadedCardState extends State<DownloadedCard> {
     );
   }
 
-  Future<Map<String, dynamic>?> getJournalDetails(String issn) async {
+  Future<Map<String, dynamic>?> getJournalDetails(List<String> issn) async {
     final db = await databaseHelper.database;
+    final id = await databaseHelper.getJournalIdByIssns(issn);
     final List<Map<String, dynamic>> rows = await db.query(
       'journals',
       columns: ['publisher'],
-      where: 'issn = ?',
-      whereArgs: [issn],
+      where: 'journal_id = ?',
+      whereArgs: [id],
     );
 
     return rows.isNotEmpty ? rows.first : null;

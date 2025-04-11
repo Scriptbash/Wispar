@@ -29,7 +29,11 @@ class _JournalsSearchResultCardState extends State<JournalsSearchResultCard> {
 
   Future<void> _initFollowStatus() async {
     final dbHelper = DatabaseHelper();
-    bool isFollowed = await dbHelper.isJournalFollowed(widget.item.issn.last);
+    int? journalId = await dbHelper.getJournalIdByIssns(widget.item.issn);
+    bool isFollowed = false;
+    if (journalId != null) {
+      isFollowed = await dbHelper.isJournalFollowed(journalId);
+    }
 
     if (mounted) {
       setState(() {

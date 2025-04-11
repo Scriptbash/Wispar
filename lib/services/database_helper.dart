@@ -23,7 +23,7 @@ class DatabaseHelper {
     final path = await getDatabasesPath();
     final databasePath = join(path, 'wispar.db');
 
-    return openDatabase(databasePath, version: 3,
+    return openDatabase(databasePath, version: 4,
         onCreate: (db, version) async {
       // Create the journals table
       await db.execute('''
@@ -34,6 +34,14 @@ class DatabaseHelper {
           publisher TEXT,
           dateFollowed TEXT,
           lastUpdated TEXT
+        )
+      ''');
+      // Create the journal_issns table
+      await db.execute('''
+       CREATE TABLE journal_issns (
+          issn TEXT PRIMARY KEY,
+          journal_id INTEGER,
+          FOREIGN KEY (journal_id) REFERENCES journals(journal_id)
         )
       ''');
 
@@ -107,26 +115,54 @@ class DatabaseHelper {
       UPDATE savedQueries SET queryProvider = 'Crossref';
       ''');
       }
+      if (oldVersion < 4) {
+        debugPrint("Updating db to v4");
+        await db.execute('''
+        CREATE TABLE journal_issns (
+          issn TEXT PRIMARY KEY,
+          journal_id INTEGER,
+           FOREIGN KEY (journal_id) REFERENCES journals(journal_id)
+        );
+        ''');
+
+        // Migrate existing ISSNs
+        final journals = await db.query('journals');
+        for (final journal in journals) {
+          final issn = journal['issn'];
+          final journalId = journal['journal_id'];
+          if (issn != null) {
+            await db.insert('journal_issns', {
+              'issn': issn,
+              'journal_id': journalId,
+            });
+          }
+        }
+
+        // I should probably drop the issn column from the journals table
+      }
     });
   }
 
   // Functions for journals
   Future<void> insertJournal(Journal journal) async {
     final db = await database;
-    // Check if the journal is already in the database
-    final List<Map<String, dynamic>> journalMaps = await db.query(
-      'journals',
-      columns: ['journal_id', 'dateFollowed'],
+
+    final existingIssn = await db.query(
+      'journal_issns',
       where: 'issn = ?',
       whereArgs: [journal.issn.last],
     );
 
-    if (journalMaps.isNotEmpty) {
-      // Journal found, retrieve its ID
-      final int journalId = journalMaps.first['journal_id'];
+    if (existingIssn.isNotEmpty) {
+      final int journalId = existingIssn.first['journal_id'] as int;
 
-      // If the journal wasn't followed before, update the dateFollowed
-      if (journalMaps.first['dateFollowed'] == null) {
+      final journalMap = await db.query(
+        'journals',
+        where: 'journal_id = ?',
+        whereArgs: [journalId],
+      );
+
+      if (journalMap.isNotEmpty && journalMap.first['dateFollowed'] == null) {
         await db.update(
           'journals',
           {
@@ -139,21 +175,32 @@ class DatabaseHelper {
         );
       }
     } else {
-      // Journal not found, insert it
-      await db.insert('journals', journal.toMap());
+      final journalId = await db.insert('journals', journal.toMap());
+
+      for (final issn in journal.issn) {
+        await db.insert('journal_issns', {
+          'issn': issn,
+          'journal_id': journalId,
+        });
+      }
     }
   }
 
   Future<List<Journal>> getJournals() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.rawQuery('''
-    SELECT * FROM journals
-    WHERE dateFollowed IS NOT NULL
-  ''');
+      SELECT j.journal_id, j.title, j.publisher, j.dateFollowed, j.lastUpdated, 
+            GROUP_CONCAT(ji.issn) as issns
+      FROM journals j
+      JOIN journal_issns ji ON j.journal_id = ji.journal_id
+      WHERE j.dateFollowed IS NOT NULL
+      GROUP BY j.journal_id
+    ''');
+
     return List.generate(maps.length, (i) {
       return Journal(
-        id: maps[i]['id'],
-        issn: [maps[i]['issn']], // Todo temporary, will refactor the db
+        id: maps[i]['journal_id'],
+        issn: (maps[i]['issns'] as String).split(','),
         title: maps[i]['title'],
         publisher: maps[i]['publisher'],
         dateFollowed: maps[i]['dateFollowed'],
@@ -162,40 +209,100 @@ class DatabaseHelper {
     });
   }
 
-  Future<void> removeJournal(String issn) async {
+  Future<int?> getJournalIdByIssns(List<String> issns) async {
     final db = await database;
 
-    await db.update(
-      'articles',
-      {'dateCached': null},
-      where: 'journal_id IN (SELECT journal_id FROM journals WHERE issn = ?)',
-      whereArgs: [issn],
+    String whereClause =
+        'issn IN (${List.filled(issns.length, '?').join(', ')})';
+
+    List<Map<String, dynamic>> result = await db.query(
+      'journal_issns',
+      columns: ['journal_id'],
+      where: whereClause,
+      whereArgs: issns,
     );
 
-    await db.update(
-      'journals',
-      {'dateFollowed': null, 'lastUpdated': null},
-      where: 'issn = ?',
-      whereArgs: [issn],
-    );
+    if (result.isNotEmpty) {
+      return result.first['journal_id'] as int;
+    }
+    return null;
   }
 
-  Future<bool> isJournalFollowed(String issn) async {
+  Future<String?> getJournalTitleById(int journalId) async {
     final db = await database;
+    final result = await db.query(
+      'journals',
+      columns: ['title'],
+      where: 'journal_id = ?',
+      whereArgs: [journalId],
+    );
+
+    if (result.isNotEmpty) {
+      return result.first['title'] as String?;
+    }
+
+    return null;
+  }
+
+  Future<List<String>> getIssnsByJournalId(int journalId) async {
+    final db = await database;
+
+    final result = await db.query(
+      'journal_issns',
+      columns: ['issn'],
+      where: 'journal_id = ?',
+      whereArgs: [journalId],
+    );
+
+    if (result.isNotEmpty) {
+      return result.map((row) => row['issn'] as String).toList();
+    }
+    return [];
+  }
+
+  Future<void> removeJournal(List<String> issns) async {
+    final db = await database;
+
+    int? journalId = await getJournalIdByIssns(issns);
+
+    if (journalId != null) {
+      await db.update(
+        'articles',
+        {'dateCached': null},
+        where: 'journal_id = ?',
+        whereArgs: [journalId],
+      );
+
+      await db.update(
+        'journals',
+        {'dateFollowed': null, 'lastUpdated': null},
+        where: 'journal_id = ?',
+        whereArgs: [journalId],
+      );
+    }
+  }
+
+  Future<bool> isJournalFollowed(int journalId) async {
+    final db = await database;
+
+    final query = 'SELECT COUNT(*) FROM journals '
+        'WHERE journal_id = ? AND dateFollowed IS NOT NULL';
+
     final count = Sqflite.firstIntValue(await db.rawQuery(
-      'SELECT COUNT(*) FROM journals WHERE issn = ? AND dateFollowed IS NOT NULL',
-      [issn],
+      query,
+      [journalId],
     ))!;
+
     return count > 0;
   }
 
-  Future<void> updateJournalLastUpdated(String issn) async {
+  Future<void> updateJournalLastUpdated(int journalId) async {
     final db = await database;
     await db.update(
       'journals',
       {'lastUpdated': DateTime.now().toIso8601String()},
-      where: 'issn = ?',
-      whereArgs: [issn],
+      where: 'journal_id = ?',
+      whereArgs: [journalId],
     );
   }
 
@@ -247,29 +354,26 @@ class DatabaseHelper {
         );
       }
     } else {
-      // Article does not exist, proceed with inserting
-      final List<Map<String, dynamic>> journalMaps = await db.query(
-        'journals',
-        columns: ['journal_id'],
-        where: 'issn = ?',
-        whereArgs: [publicationCard.issn],
-      );
-
-      int journalId;
-
-      if (journalMaps.isNotEmpty) {
-        // Journal found, retrieve its ID
-        journalId = journalMaps.first['journal_id'];
-      } else {
+      int? journalId = await getJournalIdByIssns(publicationCard.issn);
+      if (journalId == null) {
         // Journal not found, insert it
         final Map<String, dynamic> journalData = {
-          'issn': publicationCard.issn,
-          'title': publicationCard.journalTitle, // default title
+          'title': publicationCard.journalTitle,
           'publisher': publicationCard.publisher,
         };
 
         journalId = await db.insert('journals', journalData);
+
+        // Insert the ISSNs into the journal_issns table
+        for (final issn in publicationCard.issn) {
+          await db.insert('journal_issns', {
+            'issn': issn,
+            'journal_id': journalId,
+          });
+        }
       }
+
+      // Insert the article
       await db.insert('articles', {
         'doi': publicationCard.doi,
         'title': publicationCard.title,
@@ -296,25 +400,31 @@ class DatabaseHelper {
   }
 
   Future<List<PublicationCard>> getFavoriteArticles() async {
-    final db = await database;
+    final Database db = await DatabaseHelper().database;
+
     final List<Map<String, dynamic>> maps = await db.rawQuery('''
-    SELECT articles.*, journals.title AS journalTitle, journals.issn
+    SELECT articles.*, journals.title AS journalTitle, 
+           GROUP_CONCAT(journal_issns.issn) AS issns
     FROM articles
     JOIN journals ON articles.journal_id = journals.journal_id
+    JOIN journal_issns ON journals.journal_id = journal_issns.journal_id  -- Join the journal_issns table for the correct ISSNs
     WHERE articles.dateLiked IS NOT NULL
+    GROUP BY articles.article_id  -- Group by article_id to ensure one entry per article
   ''');
 
     return List.generate(maps.length, (i) {
+      List<String> issns = (maps[i]['issns'] as String?)?.split(',') ?? [];
+
       return PublicationCard(
         doi: maps[i]['doi'],
         title: maps[i]['title'],
-        issn: maps[i]['issn'],
+        issn: issns,
         abstract: maps[i]['abstract'],
         publishedDate: DateTime.parse(maps[i]['publishedDate']),
         authors: List<PublicationAuthor>.from(
           (jsonDecode(maps[i]['authors']) as List<dynamic>)
               .map((authorJson) => PublicationAuthor.fromJson(authorJson)),
-        ), // Deserialize authors from JSON
+        ),
         dateLiked: maps[i]['dateLiked'],
         journalTitle: maps[i]['journalTitle'],
         url: maps[i]['url'],
@@ -359,17 +469,19 @@ class DatabaseHelper {
 
       // If the publication wasn't cached before, update the dateCached
       if (publicationMaps.first['dateCached'] == null) {
+        final int? journalId = await getJournalIdByIssns(publicationCard.issn);
+
+        if (journalId == null) {
+          throw Exception('No matching journal found for the given ISSNs.');
+        }
+
         await db.update(
           'articles',
           {
             'dateCached': DateTime.now().toIso8601String(),
             'title': publicationCard.title,
             'abstract': publicationCard.abstract,
-            'journal_id': // Get the corresponding journal_id based on issn
-                (await db.query('journals',
-                    columns: ['journal_id'],
-                    where: 'issn = ?',
-                    whereArgs: [publicationCard.issn]))[0]['journal_id'],
+            'journal_id': journalId,
             'publishedDate': publicationCard.publishedDate?.toIso8601String(),
             'authors': jsonEncode(
               publicationCard.authors.map((author) => author.toJson()).toList(),
@@ -381,15 +493,17 @@ class DatabaseHelper {
       }
     } else {
       // Publication not found, insert it
+      final int? journalId = await getJournalIdByIssns(publicationCard.issn);
+
+      if (journalId == null) {
+        throw Exception('No matching journal found for the given ISSNs.');
+      }
+
       await db.insert('articles', {
         'doi': publicationCard.doi,
         'title': publicationCard.title,
         'abstract': publicationCard.abstract,
-        'journal_id': // Get the corresponding journal_id based on issn
-            (await db.query('journals',
-                columns: ['journal_id'],
-                where: 'issn = ?',
-                whereArgs: [publicationCard.issn]))[0]['journal_id'],
+        'journal_id': journalId,
         'publishedDate': publicationCard.publishedDate?.toIso8601String(),
         'authors': jsonEncode(
           publicationCard.authors.map((author) => author.toJson()).toList(),
@@ -402,16 +516,29 @@ class DatabaseHelper {
   Future<List<PublicationCard>> getCachedPublications() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.rawQuery('''
-    SELECT articles.*, journals.title AS journalTitle, journals.issn
-    FROM articles
-    JOIN journals ON articles.journal_id = journals.journal_id
-    WHERE articles.dateCached IS NOT NULL
+  SELECT articles.*, journals.title AS journalTitle, articles.journal_id
+  FROM articles
+  JOIN journals ON articles.journal_id = journals.journal_id
+  WHERE articles.dateCached IS NOT NULL
   ''');
-    return List.generate(maps.length, (i) {
-      return PublicationCard(
+
+    List<PublicationCard> publicationCards = [];
+
+    for (var i = 0; i < maps.length; i++) {
+      final List<Map<String, dynamic>> issnMaps = await db.query(
+        'journal_issns',
+        columns: ['issn'],
+        where: 'journal_id = ?',
+        whereArgs: [maps[i]['journal_id']],
+      );
+
+      final List<String> issns =
+          issnMaps.map((issnMap) => issnMap['issn'] as String).toList();
+
+      publicationCards.add(PublicationCard(
         doi: maps[i]['doi'],
         title: maps[i]['title'],
-        issn: maps[i]['issn'],
+        issn: issns,
         abstract: maps[i]['abstract'],
         journalTitle: maps[i]['journalTitle'],
         publishedDate: DateTime.parse(maps[i]['publishedDate']),
@@ -422,8 +549,10 @@ class DatabaseHelper {
         url: maps[i]['url'],
         license: maps[i]['license'],
         licenseName: maps[i]['licenseName'],
-      );
-    });
+      ));
+    }
+
+    return publicationCards;
   }
 
   // Updates the abstract of an article after being scraped
@@ -451,18 +580,24 @@ class DatabaseHelper {
   Future<List<DownloadedCard>> getDownloadedArticles() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.rawQuery('''
-    SELECT articles.*, journals.title AS journalTitle, journals.issn
+    SELECT articles.*, journals.title AS journalTitle, 
+           GROUP_CONCAT(journal_issns.issn) AS issns
     FROM articles
     JOIN journals ON articles.journal_id = journals.journal_id
+    JOIN journal_issns ON journals.journal_id = journal_issns.journal_id  -- Join the journal_issns table
     WHERE articles.dateDownloaded IS NOT NULL
+    GROUP BY articles.article_id  -- Group by article_id to ensure one entry per article
   ''');
+
     return List.generate(maps.length, (i) {
+      List<String> issns = (maps[i]['issns'] as String?)?.split(',') ?? [];
+
       return DownloadedCard(
         pdfPath: maps[i]['pdfPath'],
         publicationCard: PublicationCard(
           doi: maps[i]['doi'],
           title: maps[i]['title'],
-          issn: maps[i]['issn'],
+          issn: issns,
           abstract: maps[i]['abstract'],
           journalTitle: maps[i]['journalTitle'],
           publishedDate: DateTime.parse(maps[i]['publishedDate']),

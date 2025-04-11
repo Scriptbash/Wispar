@@ -160,9 +160,7 @@ class _JournalsTabContentState extends State<JournalsTabContent> {
   }
 
   Future<void> _unfollowJournal(BuildContext context, Journal journal) async {
-    for (final issn in journal.issn) {
-      await dbHelper.removeJournal(issn);
-    }
+    await dbHelper.removeJournal(journal.issn);
     setState(() {});
   }
 }
