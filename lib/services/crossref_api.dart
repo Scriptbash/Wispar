@@ -75,16 +75,16 @@ class CrossRefApi {
 
   // Query works for a specific journal by ISSN
   static Future<ListAndMore<journalsWorks.Item>> getJournalWorks(
-      String issn) async {
+      List<String> issn) async {
+    final String issnFilter = issn.map((e) => 'issn:$e').join(',');
     String apiUrl =
-        '$baseUrl$journalsEndpoint/$issn/works?rows=30&sort=created&order=desc&$email';
+        '$baseUrl$worksEndpoint?rows=30&sort=created&order=desc&$email&filter=$issnFilter';
 
     if (_journalWorksCursor != null) {
       apiUrl += '&cursor=$_journalWorksCursor';
     }
 
     final response = await http.get(Uri.parse(apiUrl));
-
     if (response.statusCode == 200) {
       final crossrefWorks =
           journalsWorks.JournalWork.fromJson(json.decode(response.body));

@@ -95,7 +95,9 @@ class _JournalsTabContentState extends State<JournalsTabContent> {
                     case 2:
                       return a.dateFollowed!.compareTo(b.dateFollowed!);
                     case 3:
-                      return a.issn.compareTo(b.issn);
+                      final aIssn = a.issn.isNotEmpty ? a.issn.first : '';
+                      final bIssn = b.issn.isNotEmpty ? b.issn.first : '';
+                      return aIssn.compareTo(bIssn);
                     default:
                       return 0;
                   }

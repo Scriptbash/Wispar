@@ -1,6 +1,6 @@
 class Journal {
   final int? id;
-  final String issn;
+  final List<String> issn;
   final String title;
   final String publisher;
   final String? dateFollowed;
@@ -17,7 +17,6 @@ class Journal {
 
   Map<String, dynamic> toMap() {
     return {
-      'issn': issn,
       'title': title,
       'publisher': publisher,
       'dateFollowed': DateTime.now().toIso8601String().substring(0, 10),
