@@ -356,7 +356,7 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
+                FilledButton(
                   onPressed: () => _addQueryPart('keyword'),
                   child: Text(AppLocalizations.of(context)!.addKeyword),
                 ),
