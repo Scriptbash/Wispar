@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../generated_l10n/app_localizations.dart';
 import 'article_doi_search_form.dart';
 import 'article_query_search_form.dart';
 import '../services/crossref_api.dart';

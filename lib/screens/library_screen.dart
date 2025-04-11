@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../generated_l10n/app_localizations.dart';
 import '../services/database_helper.dart';
 import '../widgets/journals_tab_content.dart';
-//import '../widgets/authors_tab_content.dart';
 import '../widgets/queries_tab_content.dart';
 
 class LibraryScreen extends StatefulWidget {

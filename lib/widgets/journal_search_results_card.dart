@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../generated_l10n/app_localizations.dart';
 import '../models/crossref_journals_models.dart' as Journals;
 import '../services/database_helper.dart';
 import '../screens/journals_details_screen.dart';
