@@ -53,7 +53,7 @@ class _ZoteroSettingsState extends State<ZoteroSettings> {
                     ),
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
+                      child: FilledButton.tonal(
                         onPressed: () {
                           launchUrl(
                             Uri.parse(
@@ -90,7 +90,7 @@ class _ZoteroSettingsState extends State<ZoteroSettings> {
                     SizedBox(height: 16),
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
+                      child: FilledButton(
                         onPressed: () async {
                           String apiKey = _apiKeyController.text;
                           if (apiKey.isNotEmpty) {

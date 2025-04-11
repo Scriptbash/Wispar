@@ -262,20 +262,20 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                ElevatedButton(
+                FilledButton(
                   onPressed: _saveSettings,
                   child: Text(AppLocalizations.of(context)!.saveSettings),
                 ),
                 const SizedBox(height: 64),
                 const Divider(),
                 const SizedBox(height: 8),
-                ElevatedButton.icon(
+                FilledButton.tonalIcon(
                   onPressed: _exportDatabase,
                   icon: Icon(Icons.save_alt),
                   label: Text(AppLocalizations.of(context)!.exportDatabase),
                 ),
                 const SizedBox(height: 16),
-                ElevatedButton.icon(
+                FilledButton.tonalIcon(
                   onPressed: _importDatabase,
                   icon: Icon(Icons.upload_file_outlined),
                   label: Text(AppLocalizations.of(context)!.importDatabase),

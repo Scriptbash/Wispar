@@ -89,7 +89,7 @@ class _IntroScreenState extends State<IntroScreen> {
               children: [
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
+                  child: FilledButton.tonal(
                     onPressed: () async {
                       final Map<String, dynamic>? result = await Navigator.push(
                         context,
@@ -146,7 +146,7 @@ class _IntroScreenState extends State<IntroScreen> {
             padding: const EdgeInsets.only(bottom: 30),
             child: SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
+              child: FilledButton.tonal(
                 onPressed: () async {
                   await Navigator.push(
                     context,
