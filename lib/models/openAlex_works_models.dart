@@ -10,7 +10,7 @@ class OpenAlexWorks {
   final String? publishedDate;
   final String? landingPageUrl;
   final String? displayName;
-  final String? issn;
+  final List<String>? issn;
   final String? publisher;
   final String? license;
 
@@ -58,10 +58,8 @@ class OpenAlexWorks {
         primaryLocation?['source']?['display_name'],
       ),
       publishedDate: json['publication_date'],
-      issn: primaryLocation?['source']?['issn_l'] as String? ??
-          ((primaryLocation?['source']?['issn'] as List?)?.isNotEmpty == true
-              ? (primaryLocation?['source']?['issn'] as List?)?.last
-              : null),
+      issn:
+          (primaryLocation?['source']?['issn'] as List?)?.cast<String>() ?? [],
       publisher: primaryLocation?['source']?['host_organization_name'],
       license: license,
     );

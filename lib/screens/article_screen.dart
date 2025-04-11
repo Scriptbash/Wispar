@@ -15,7 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ArticleScreen extends StatefulWidget {
   final String doi;
   final String title;
-  final String issn;
+  final List<String> issn;
   final String abstract;
   final String journalTitle;
   final DateTime? publishedDate;
@@ -208,9 +208,13 @@ class _ArticleScreenState extends State<ArticleScreen> {
                           child: TextButton(
                             onPressed: () async {
                               String journalPublisher = "";
-                              Map<String, dynamic>? journalInfo =
+                              Map<String, dynamic>? journalInfo;
+
+                              journalInfo =
                                   await getJournalDetails(widget.issn);
+
                               if (widget.publisher == null) {
+                                debugPrint("publisher is null");
                                 if (journalInfo != null &&
                                     journalInfo['publisher'] != null) {
                                   journalPublisher = journalInfo['publisher'];
@@ -440,18 +444,19 @@ class _ArticleScreenState extends State<ArticleScreen> {
     });
   }
 
-  Future<Map<String, dynamic>?> getJournalDetails(String issn) async {
+  Future<Map<String, dynamic>?> getJournalDetails(List<String> issn) async {
     if (widget.publisher != null) {
       return {'publisher': widget.publisher};
     }
 
     // If publisher is not passed, fetch from the database
     final db = await databaseHelper.database;
+    final id = await databaseHelper.getJournalIdByIssns(issn);
     final List<Map<String, dynamic>> rows = await db.query(
       'journals',
       columns: ['publisher'],
-      where: 'issn = ?',
-      whereArgs: [issn],
+      where: 'journal_id = ?',
+      whereArgs: [id],
     );
 
     return rows.isNotEmpty ? rows.first : null;

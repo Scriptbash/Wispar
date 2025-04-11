@@ -29,7 +29,11 @@ class _JournalsSearchResultCardState extends State<JournalsSearchResultCard> {
 
   Future<void> _initFollowStatus() async {
     final dbHelper = DatabaseHelper();
-    bool isFollowed = await dbHelper.isJournalFollowed(widget.item.issn.last);
+    int? journalId = await dbHelper.getJournalIdByIssns(widget.item.issn);
+    bool isFollowed = false;
+    if (journalId != null) {
+      isFollowed = await dbHelper.isJournalFollowed(journalId);
+    }
 
     if (mounted) {
       setState(() {
@@ -55,7 +59,7 @@ class _JournalsSearchResultCardState extends State<JournalsSearchResultCard> {
             Text(
                 '${AppLocalizations.of(context)!.publisher}: ${widget.item.publisher}'),
             if (widget.item.issn.isNotEmpty)
-              Text('ISSN: ${widget.item.issn.last}'),
+              Text('ISSN: ${widget.item.issn.toSet().join(',')}'),
           ],
         ),
         trailing: FollowButton(
@@ -76,7 +80,7 @@ class _JournalsSearchResultCardState extends State<JournalsSearchResultCard> {
               builder: (context) => JournalDetailsScreen(
                 title: widget.item.title,
                 publisher: widget.item.publisher,
-                issn: widget.item.issn.last,
+                issn: widget.item.issn,
               ),
             ),
           );

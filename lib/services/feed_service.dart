@@ -10,29 +10,41 @@ class FeedService {
   final DatabaseHelper _dbHelper = DatabaseHelper();
 
   // Gather journals that will need to have their articles fetched
-  Future<List<String>> checkJournalsToUpdate(
+  Future<List<int>> checkJournalsToUpdate(
       List<Journal> followedJournals, int fetchIntervalInHours) async {
     final db = await _dbHelper.database;
-    List<String> journalsToUpdate = [];
+    List<int> journalsToUpdate = [];
 
     for (Journal journal in followedJournals) {
-      List<Map<String, dynamic>> result = await db.query(
-        'journals',
-        columns: ['issn', 'lastUpdated'],
-        where: 'issn = ?',
-        whereArgs: [journal.issn],
-      );
+      try {
+        final journalId = await _dbHelper.getJournalIdByIssns(journal.issn);
 
-      if (result.isNotEmpty) {
-        String? lastUpdated = result.first['lastUpdated'] as String?;
-        if (lastUpdated == null ||
-            DateTime.now().difference(DateTime.parse(lastUpdated)).inHours >=
-                fetchIntervalInHours) {
-          journalsToUpdate.add(journal.issn);
+        if (journalId != null) {
+          List<Map<String, dynamic>> result = await db.rawQuery('''
+        SELECT journals.lastUpdated
+        FROM journals
+        WHERE journals.journal_id = ?
+      ''', [journalId]);
+
+          if (result.isNotEmpty) {
+            String? lastUpdated = result.first['lastUpdated'] as String?;
+            if (lastUpdated == null ||
+                DateTime.now()
+                        .difference(DateTime.parse(lastUpdated))
+                        .inHours >=
+                    fetchIntervalInHours) {
+              journalsToUpdate.add(journalId);
+            }
+          } else {
+            debugPrint('No journal found for journal_id: $journalId');
+          }
+        } else {
+          debugPrint('No journalId found for ISSN: ${journal.issn}');
         }
+      } catch (e) {
+        debugPrint('Error retrieving journal_id for ISSN ${journal.issn}: $e');
       }
     }
-
     return journalsToUpdate;
   }
 
@@ -83,21 +95,26 @@ class FeedService {
                 : i + maxConcurrentUpdates);
 
         // Collect all journal names for the current batch
-        List<String> journalNamesToUpdate = batch.map((issn) {
-          final journal = followedJournals.firstWhere((j) => j.issn == issn);
-          return journal.title;
-        }).toList();
+        List<String> journalNamesToUpdate =
+            await Future.wait(batch.map((journalIdInBatch) async {
+          final journalTitle =
+              await _dbHelper.getJournalTitleById(journalIdInBatch);
+          return journalTitle ?? 'Unknown Journal';
+        }).toList());
 
         // Notify the UI with the list of journal names
         onJournalUpdate(journalNamesToUpdate);
 
-        await Future.wait(batch.map((issn) async {
-          final journal = followedJournals.firstWhere((j) => j.issn == issn);
+        await Future.wait(batch.map((journalIdInBatch) async {
+          final journalIssns =
+              await _dbHelper.getIssnsByJournalId(journalIdInBatch);
+          final journal = followedJournals.firstWhere(
+            (j) => journalIssns.any((issn) => j.issn.contains(issn)),
+          );
+          final journalTitle =
+              await _dbHelper.getJournalTitleById(journalIdInBatch);
+          await _dbHelper.updateJournalLastUpdated(journalIdInBatch);
 
-          // Update journal's last updated time
-          await _dbHelper.updateJournalLastUpdated(journal.issn);
-
-          // Fetch recent feed from API
           List<journalWorks.Item> recentFeed =
               await FeedApi.getRecentFeed(journal.issn);
 
@@ -107,7 +124,7 @@ class FeedService {
               PublicationCard(
                 title: item.title,
                 abstract: item.abstract,
-                journalTitle: item.journalTitle,
+                journalTitle: journalTitle ?? 'Unknown Journal',
                 issn: journal.issn,
                 publishedDate: item.publishedDate,
                 doi: item.doi,
