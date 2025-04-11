@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme_provider.dart';
+import '../locale_provider.dart';
 
 class DisplaySettingsScreen extends StatefulWidget {
   const DisplaySettingsScreen({super.key});
@@ -13,6 +14,34 @@ class DisplaySettingsScreen extends StatefulWidget {
 
 class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
   int _publicationCardOption = 1;
+
+  final Map<String, String> _languageLabels = {
+    'en': 'English',
+    'fr': 'Français',
+    'es': 'Español',
+    'nb': 'Norsk bokmål',
+    'ta': 'தமிழ்',
+    'nl': 'Nederlands',
+    'fa': 'فارسی',
+    'tr': 'Türkçe',
+    'ru': 'Русский',
+    'ja': '日本語',
+    'id': 'Bahasa Indonesia',
+  };
+
+  final List<Locale> _supportedLocales = [
+    Locale('en'),
+    Locale('fr'),
+    Locale('es'),
+    Locale('nb'),
+    Locale('ta'),
+    Locale('nl'),
+    Locale('fa'),
+    Locale('tr'),
+    Locale('ru'),
+    Locale('ja'),
+    Locale('id'),
+  ];
 
   @override
   void initState() {
@@ -75,6 +104,22 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
                 SizedBox(width: 32),
                 Text(_getPublicationCardSubtitle(
                     context, _publicationCardOption)),
+              ],
+            ),
+          ),
+          ListTile(
+            onTap: () => _showLanguageDialog(context),
+            title: Row(
+              children: [
+                const Icon(Icons.language),
+                const SizedBox(width: 8),
+                Text(AppLocalizations.of(context)!.language),
+              ],
+            ),
+            subtitle: Row(
+              children: [
+                const SizedBox(width: 32),
+                Text(_getLocaleLabel(context)),
               ],
             ),
           ),
@@ -191,6 +236,62 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
         );
       },
     );
+  }
+
+  void _showLanguageDialog(BuildContext context) {
+    final provider = Provider.of<LocaleProvider>(context, listen: false);
+    final currentLang = provider.locale?.languageCode ?? 'system';
+
+    // Sort languagea alphabetically
+    final sortedLocales = [..._supportedLocales]..sort((a, b) {
+        final labelA = _languageLabels[a.languageCode] ?? a.languageCode;
+        final labelB = _languageLabels[b.languageCode] ?? b.languageCode;
+        return labelA.compareTo(labelB);
+      });
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.language),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ...sortedLocales.map((locale) {
+                final code = locale.languageCode;
+                return RadioListTile<String>(
+                  title: Text(_languageLabels[code] ?? code),
+                  value: code,
+                  groupValue: currentLang,
+                  onChanged: (value) {
+                    provider.setLocale(value!);
+                    Navigator.of(context).pop();
+                  },
+                );
+              }),
+              RadioListTile<String>(
+                title: Text(AppLocalizations.of(context)!.system),
+                value: 'system',
+                groupValue: currentLang,
+                onChanged: (_) {
+                  provider.clearLocale();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  String _getLocaleLabel(BuildContext context) {
+    final locale = Provider.of<LocaleProvider>(context).locale;
+    if (locale == null) {
+      return AppLocalizations.of(context)!.system;
+    }
+    return _languageLabels[locale.languageCode] ??
+        AppLocalizations.of(context)!.system;
   }
 
   void _savePublicationCardOption(int value) async {
