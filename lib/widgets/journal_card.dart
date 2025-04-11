@@ -28,7 +28,8 @@ class JournalCard extends StatelessWidget {
           );
         },
         onLongPress: () {
-          Clipboard.setData(ClipboardData(text: journal.issn));
+          Clipboard.setData(
+              ClipboardData(text: journal.issn.toSet().join(', ')));
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(AppLocalizations.of(context)!.issnCopied)),
           );
@@ -57,7 +58,7 @@ class JournalCard extends StatelessWidget {
           children: [
             Text(
                 '${AppLocalizations.of(context)!.publisher}: ${journal.publisher}'),
-            Text('ISSN: ${journal.issn}'),
+            Text('ISSN: ${journal.issn.toSet().join(',')}'),
             Text(AppLocalizations.of(context)!
                 .followingsince(DateTime.parse(journal.dateFollowed!))),
           ],

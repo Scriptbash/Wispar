@@ -10,7 +10,7 @@ import '../widgets/latest_works_header.dart';
 class JournalDetailsScreen extends StatefulWidget {
   final String title;
   final String publisher;
-  final String issn;
+  final List<String> issn;
 
   const JournalDetailsScreen({
     Key? key,
@@ -71,7 +71,7 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
           SliverPersistentHeader(
             delegate: JournalInfoHeader(
               publisher: widget.publisher,
-              issn: widget.issn,
+              issn: widget.issn.toSet().join(', '),
             ),
             pinned: false,
           ),

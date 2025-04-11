@@ -60,9 +60,11 @@ class _DownloadedCardState extends State<DownloadedCard> {
                           alignment: Alignment.centerLeft,
                           child: TextButton(
                             onPressed: () async {
-                              Map<String, dynamic>? journalInfo =
-                                  await getJournalDetails(
-                                      widget.publicationCard.issn);
+                              Map<String, dynamic>? journalInfo;
+
+                              journalInfo = await getJournalDetails(
+                                  widget.publicationCard.issn);
+
                               if (journalInfo != Null) {
                                 String journalPublisher =
                                     journalInfo?['publisher'];
@@ -147,13 +149,14 @@ class _DownloadedCardState extends State<DownloadedCard> {
     );
   }
 
-  Future<Map<String, dynamic>?> getJournalDetails(String issn) async {
+  Future<Map<String, dynamic>?> getJournalDetails(List<String> issn) async {
     final db = await databaseHelper.database;
+    final id = await databaseHelper.getJournalIdByIssns(issn);
     final List<Map<String, dynamic>> rows = await db.query(
       'journals',
       columns: ['publisher'],
-      where: 'issn = ?',
-      whereArgs: [issn],
+      where: 'journal_id = ?',
+      whereArgs: [id],
     );
 
     return rows.isNotEmpty ? rows.first : null;

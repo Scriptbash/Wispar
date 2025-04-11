@@ -20,7 +20,7 @@ class PublicationCard extends StatefulWidget {
   final String title;
   final String abstract;
   final String journalTitle;
-  final String issn;
+  final List<String> issn;
   final DateTime? publishedDate;
   final String doi;
   final List<PublicationAuthor> authors;
@@ -124,8 +124,10 @@ class _PublicationCardState extends State<PublicationCard> {
                       alignment: Alignment.centerLeft,
                       child: TextButton(
                         onPressed: () async {
-                          Map<String, dynamic>? journalInfo =
-                              await getJournalDetails(widget.issn);
+                          Map<String, dynamic>? journalInfo;
+
+                          journalInfo = await getJournalDetails(widget.issn);
+
                           if (journalInfo != null && journalInfo.isNotEmpty) {
                             String journalPublisher =
                                 journalInfo['publisher'] ?? 'Unknown Publisher';
@@ -354,17 +356,18 @@ class _PublicationCardState extends State<PublicationCard> {
     }
   }
 
-  Future<Map<String, dynamic>?> getJournalDetails(String issn) async {
+  Future<Map<String, dynamic>?> getJournalDetails(List<String> issn) async {
     if (widget.publisher != null) {
       return {'publisher': widget.publisher};
     }
     // If publisher is not passed, fetch from the database
     final db = await databaseHelper.database;
+    final id = await databaseHelper.getJournalIdByIssns(issn);
     final List<Map<String, dynamic>> rows = await db.query(
       'journals',
       columns: ['publisher'],
-      where: 'issn = ?',
-      whereArgs: [issn],
+      where: 'journal_id = ?',
+      whereArgs: [id],
     );
 
     return rows.isNotEmpty ? rows.first : null;
