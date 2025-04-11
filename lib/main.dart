@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'theme_provider.dart';
+import 'locale_provider.dart';
 import 'screens/introduction_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/search_screen.dart';
@@ -14,8 +15,11 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
+      ],
       child: const Wispar(),
     ),
   );
@@ -49,10 +53,12 @@ class _WisparState extends State<Wispar> {
 
   @override
   Widget build(BuildContext context) {
+    final localeProvider = Provider.of<LocaleProvider>(context);
     return MaterialApp(
       debugShowCheckedModeBanner:
           false, // remove debug watermark for screenshots
       title: Wispar.title,
+      locale: localeProvider.locale,
       localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
