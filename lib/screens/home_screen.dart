@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../generated_l10n/app_localizations.dart';
 import 'settings_screen.dart';
 import '../services/database_helper.dart';
 import '../services/feed_service.dart';

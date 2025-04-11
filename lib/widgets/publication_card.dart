@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../generated_l10n/app_localizations.dart';
 import '../models/crossref_journals_works_models.dart';
 import '../screens/article_screen.dart';
 import '../screens/journals_details_screen.dart';
