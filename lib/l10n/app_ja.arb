@@ -73,5 +73,9 @@
   "sendToZotero": "Zoteroに送る",
   "@sendToZotero": {},
   "setupLinkMyZotero": "私のZoteroアカウントをリンクする",
-  "@setupLinkMyZotero": {}
+  "@setupLinkMyZotero": {},
+  "abstract": "抄録",
+  "@abstract": {},
+  "language": "言語",
+  "@language": {}
 }
