@@ -541,43 +541,36 @@ class DatabaseHelper {
   Future<List<PublicationCard>> getCachedPublications() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.rawQuery('''
-  SELECT articles.*, journals.title AS journalTitle, articles.journal_id
-  FROM articles
-  JOIN journals ON articles.journal_id = journals.journal_id
-  WHERE articles.dateCached IS NOT NULL
-  ''');
+      SELECT 
+        articles.*,
+        journals.title AS journalTitle,
+        GROUP_CONCAT(journal_issns.issn) AS issns
+      FROM articles
+      JOIN journals ON articles.journal_id = journals.journal_id
+      LEFT JOIN journal_issns ON articles.journal_id = journal_issns.journal_id
+      WHERE articles.dateCached IS NOT NULL
+      GROUP BY articles.doi
+      ''');
 
-    List<PublicationCard> publicationCards = [];
+    return maps.map((map) {
+      final List<String> issns = (map['issns'] as String?)?.split(',') ?? [];
 
-    for (var i = 0; i < maps.length; i++) {
-      final List<Map<String, dynamic>> issnMaps = await db.query(
-        'journal_issns',
-        columns: ['issn'],
-        where: 'journal_id = ?',
-        whereArgs: [maps[i]['journal_id']],
-      );
-
-      final List<String> issns =
-          issnMaps.map((issnMap) => issnMap['issn'] as String).toList();
-
-      publicationCards.add(PublicationCard(
-        doi: maps[i]['doi'],
-        title: maps[i]['title'],
+      return PublicationCard(
+        doi: map['doi'],
+        title: map['title'],
         issn: issns,
-        abstract: maps[i]['abstract'],
-        journalTitle: maps[i]['journalTitle'],
-        publishedDate: DateTime.parse(maps[i]['publishedDate']),
+        abstract: map['abstract'],
+        journalTitle: map['journalTitle'],
+        publishedDate: DateTime.parse(map['publishedDate']),
         authors: List<PublicationAuthor>.from(
-          (jsonDecode(maps[i]['authors']) as List<dynamic>)
+          (jsonDecode(map['authors']) as List<dynamic>)
               .map((authorJson) => PublicationAuthor.fromJson(authorJson)),
         ),
-        url: maps[i]['url'],
-        license: maps[i]['license'],
-        licenseName: maps[i]['licenseName'],
-      ));
-    }
-
-    return publicationCards;
+        url: map['url'],
+        license: map['license'],
+        licenseName: map['licenseName'],
+      );
+    }).toList();
   }
 
   // Updates the abstract of an article after being scraped
