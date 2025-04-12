@@ -366,5 +366,9 @@
   "searchOpenAlex": "OpenAlex (recommendé)",
   "@searchOpenAlex": {},
   "concurrentFetches": "Requêtes API simultanées : {number}",
-  "@concurrentFetches": {}
+  "@concurrentFetches": {},
+  "system": "Système",
+  "@system": {},
+  "language": "Langue",
+  "@language": {}
 }
