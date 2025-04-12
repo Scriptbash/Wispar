@@ -207,12 +207,6 @@ class DatabaseHelper {
           },
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
-        await db.update(
-          'journal_issns',
-          {'journal_id': journalId},
-          where: 'issn = ?',
-          whereArgs: [issn],
-        );
       }
     }
   }
