@@ -185,20 +185,34 @@ class DatabaseHelper {
         );
 
         for (final issn in journal.issn) {
-          await db.insert('journal_issns', {
-            'issn': issn,
-            'journal_id': journalId,
-          });
+          await db.insert(
+            'journal_issns',
+            {
+              'issn': issn,
+              'journal_id': journalId,
+            },
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
         }
       }
     } else {
       final journalId = await db.insert('journals', journal.toMap());
 
       for (final issn in journal.issn) {
-        await db.insert('journal_issns', {
-          'issn': issn,
-          'journal_id': journalId,
-        });
+        await db.insert(
+          'journal_issns',
+          {
+            'issn': issn,
+            'journal_id': journalId,
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+        await db.update(
+          'journal_issns',
+          {'journal_id': journalId},
+          where: 'issn = ?',
+          whereArgs: [issn],
+        );
       }
     }
   }
