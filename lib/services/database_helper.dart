@@ -23,8 +23,11 @@ class DatabaseHelper {
     final path = await getDatabasesPath();
     final databasePath = join(path, 'wispar.db');
 
-    return openDatabase(databasePath, version: 4,
-        onCreate: (db, version) async {
+    return openDatabase(databasePath, version: 4, onOpen: (db) async {
+      await db.execute('PRAGMA foreign_keys = ON');
+    }, onCreate: (db, version) async {
+      await db.execute('PRAGMA foreign_keys = ON');
+
       // Create the journals table
       await db.execute('''
         CREATE TABLE journals (
@@ -82,6 +85,7 @@ class DatabaseHelper {
       ''');
     }, onUpgrade: (db, oldVersion, newVersion) async {
       debugPrint('Upgrading DB');
+      await db.execute('PRAGMA foreign_keys = ON');
       if (oldVersion < 2) {
         // Ads the new column to the savedQueries table
         await db.execute('''
@@ -149,8 +153,8 @@ class DatabaseHelper {
 
     final existingIssn = await db.query(
       'journal_issns',
-      where: 'issn = ?',
-      whereArgs: [journal.issn.last],
+      where: 'issn IN (${List.filled(journal.issn.length, '?').join(',')})',
+      whereArgs: journal.issn,
     );
 
     if (existingIssn.isNotEmpty) {
@@ -173,6 +177,19 @@ class DatabaseHelper {
           where: 'journal_id = ?',
           whereArgs: [journalId],
         );
+
+        await db.delete(
+          'journal_issns',
+          where: 'journal_id = ?',
+          whereArgs: [journalId],
+        );
+
+        for (final issn in journal.issn) {
+          await db.insert('journal_issns', {
+            'issn': issn,
+            'journal_id': journalId,
+          });
+        }
       }
     } else {
       final journalId = await db.insert('journals', journal.toMap());
