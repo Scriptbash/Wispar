@@ -6,17 +6,20 @@ import '../models/crossref_journals_works_models.dart' as journalsWorks;
 import '../widgets/publication_card.dart';
 import '../widgets/journal_header.dart';
 import '../widgets/latest_works_header.dart';
+import '../services/database_helper.dart';
 
 class JournalDetailsScreen extends StatefulWidget {
   final String title;
   final String publisher;
   final List<String> issn;
+  final Function(bool)? onFollowStatusChanged;
 
   const JournalDetailsScreen({
     Key? key,
     required this.title,
     required this.publisher,
     required this.issn,
+    this.onFollowStatusChanged,
   }) : super(key: key);
 
   @override
@@ -29,15 +32,32 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
   late ScrollController _scrollController;
   bool hasMoreResults = true;
   Map<String, String> abstractCache = {};
+  late bool _isFollowed = false;
 
   @override
   void initState() {
     super.initState();
+    _initFollowStatus();
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
     allWorks = [];
     CrossRefApi.resetJournalWorksCursor();
     _loadMoreWorks();
+  }
+
+  Future<void> _initFollowStatus() async {
+    final dbHelper = DatabaseHelper();
+    int? journalId = await dbHelper.getJournalIdByIssns(widget.issn);
+    bool isFollowed = false;
+    if (journalId != null) {
+      isFollowed = await dbHelper.isJournalFollowed(journalId);
+    }
+
+    if (mounted) {
+      setState(() {
+        _isFollowed = isFollowed;
+      });
+    }
   }
 
   @override
@@ -70,8 +90,16 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
           ),
           SliverPersistentHeader(
             delegate: JournalInfoHeader(
+              title: widget.title,
               publisher: widget.publisher,
               issn: widget.issn.toSet().join(', '),
+              isFollowed: _isFollowed,
+              onFollowStatusChanged: (isFollowed) {
+                setState(() {
+                  _isFollowed = isFollowed;
+                  widget.onFollowStatusChanged?.call(isFollowed);
+                });
+              },
             ),
             pinned: false,
           ),
@@ -194,7 +222,9 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
         ));
       }
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 

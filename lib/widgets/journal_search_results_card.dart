@@ -81,6 +81,11 @@ class _JournalsSearchResultCardState extends State<JournalsSearchResultCard> {
                 title: widget.item.title,
                 publisher: widget.item.publisher,
                 issn: widget.item.issn,
+                onFollowStatusChanged: (isFollowed) {
+                  setState(() {
+                    _isFollowed = isFollowed;
+                  });
+                },
               ),
             ),
           );
