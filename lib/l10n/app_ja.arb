@@ -97,5 +97,19 @@
   "databaseSettings": "データベースの設定",
   "@databaseSettings": {},
   "system": "システム",
-  "@system": {}
+  "@system": {},
+  "queries": "クエリ",
+  "@queries": {
+    "description": "Title of the saved search queries tab."
+  },
+  "saveQuery": "クエリを保存",
+  "@saveQuery": {},
+  "queryName": "クエリの名前",
+  "@queryName": {},
+  "noSavedQueries": "保存されたクエリがありません。",
+  "@noSavedQueries": {},
+  "zoteroValidKey": "APIキーが保存された！",
+  "@zoteroValidKey": {
+    "description": "Snackbar shown when a valid Zotero API key has been saved."
+  }
 }
