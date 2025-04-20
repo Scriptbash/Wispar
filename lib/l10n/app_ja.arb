@@ -111,5 +111,25 @@
   "zoteroValidKey": "APIキーが保存された！",
   "@zoteroValidKey": {
     "description": "Snackbar shown when a valid Zotero API key has been saved."
-  }
+  },
+  "journals": "学術誌",
+  "@journals": {
+    "description": "The journals menu button and the app bar title when in the journals screen."
+  },
+  "follow": "フォロー",
+  "@follow": {
+    "description": "The button text shown on journal cards when it is not followed."
+  },
+  "unfollow": "フォロー解除",
+  "@unfollow": {
+    "description": "The button text shown on journal cards when it is followed."
+  },
+  "titleAndAbstract": "論文名と抄録",
+  "@titleAndAbstract": {},
+  "title": "論文名",
+  "@title": {},
+  "journaltitle": "学術誌名",
+  "@journaltitle": {},
+  "articletitle": "論文名",
+  "@articletitle": {}
 }
