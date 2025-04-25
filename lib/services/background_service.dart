@@ -68,10 +68,20 @@ Future<void> runFeedJob(
 
   final int articleCountBefore = await dbHelper.getArticleCount();
 
+  // Update journals
   List<Journal> followedJournals = await dbHelper.getJournals();
   await feedService.updateFeed(
     followedJournals,
     (journalNames) {},
+    fetchIntervalInHours,
+    maxConcurrentUpdates,
+  );
+
+  // Update saved queries
+  final savedQueries = await dbHelper.getSavedQueriesToUpdate();
+  await feedService.updateSavedQueryFeed(
+    savedQueries,
+    (queryNames) {},
     fetchIntervalInHours,
     maxConcurrentUpdates,
   );

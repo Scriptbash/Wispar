@@ -692,6 +692,22 @@ class DatabaseHelper {
     await deleteArticlesForSavedQuery(id);
   }
 
+  Future<List<Map<String, dynamic>>> getSavedQueriesToUpdate() async {
+    final db = await database;
+    return await db.query(
+      'savedQueries',
+      columns: [
+        'query_id',
+        'queryName',
+        'queryParams',
+        'queryProvider',
+        'lastFetched'
+      ],
+      where: 'includeInFeed = ?',
+      whereArgs: [1], // Only include queries with "includeInFeed"
+    );
+  }
+
   Future<void> updateSavedQueryLastFetched(int queryId) async {
     final db = await database;
     await db.update(

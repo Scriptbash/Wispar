@@ -93,19 +93,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _buildAndStreamFeed() async {
     try {
       final followedJournals = await dbHelper.getJournals();
-      final db = await dbHelper.database;
-      List<Map<String, dynamic>> savedQueries = await db.query(
-        'savedQueries',
-        columns: [
-          'query_id',
-          'queryName',
-          'queryParams',
-          'queryProvider',
-          'lastFetched'
-        ],
-        where: 'includeInFeed = ?',
-        whereArgs: [1], // Only include queries with "includeInFeed"
-      );
+      List<Map<String, dynamic>> savedQueries =
+          await dbHelper.getSavedQueriesToUpdate();
       if (mounted && followedJournals.isNotEmpty) {
         await _feedService.updateFeed(
           followedJournals,
