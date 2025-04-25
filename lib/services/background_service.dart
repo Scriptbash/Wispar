@@ -37,7 +37,7 @@ void onStart(ServiceInstance service) async {
   final fetchIntervalInHours = 6;
   final maxConcurrentUpdates = Platform.isAndroid ? 3 : 1;
 
-  const interval = Duration(minutes: 2); // Todo change this to a few hours
+  const interval = Duration(hours: 2);
   Timer.periodic(interval, (_) async {
     await runFeedJob(
         dbHelper, feedService, fetchIntervalInHours, maxConcurrentUpdates);
