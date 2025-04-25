@@ -77,5 +77,59 @@
   "abstract": "抄録",
   "@abstract": {},
   "language": "言語",
-  "@language": {}
+  "@language": {},
+  "search": "検索",
+  "@search": {
+    "description": "Text shown inside the search screen app bar and for the seach button."
+  },
+  "searchPlaceholder": "検索…",
+  "@searchPlaceholder": {
+    "description": "Place holder text in the search input widget."
+  },
+  "theme": "テーマ",
+  "@theme": {},
+  "systemtheme": "システムのテーマ",
+  "@systemtheme": {},
+  "database": "データベース",
+  "@database": {},
+  "sourceCode": "ソースコード",
+  "@sourceCode": {},
+  "databaseSettings": "データベースの設定",
+  "@databaseSettings": {},
+  "system": "システム",
+  "@system": {},
+  "queries": "クエリ",
+  "@queries": {
+    "description": "Title of the saved search queries tab."
+  },
+  "saveQuery": "クエリを保存",
+  "@saveQuery": {},
+  "queryName": "クエリの名前",
+  "@queryName": {},
+  "noSavedQueries": "保存されたクエリがありません。",
+  "@noSavedQueries": {},
+  "zoteroValidKey": "APIキーが保存された！",
+  "@zoteroValidKey": {
+    "description": "Snackbar shown when a valid Zotero API key has been saved."
+  },
+  "journals": "学術誌",
+  "@journals": {
+    "description": "The journals menu button and the app bar title when in the journals screen."
+  },
+  "follow": "フォロー",
+  "@follow": {
+    "description": "The button text shown on journal cards when it is not followed."
+  },
+  "unfollow": "フォロー解除",
+  "@unfollow": {
+    "description": "The button text shown on journal cards when it is followed."
+  },
+  "titleAndAbstract": "論文名と抄録",
+  "@titleAndAbstract": {},
+  "title": "論文名",
+  "@title": {},
+  "journaltitle": "学術誌名",
+  "@journaltitle": {},
+  "articletitle": "論文名",
+  "@articletitle": {}
 }
