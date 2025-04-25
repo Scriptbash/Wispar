@@ -27,6 +27,8 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
     'ru': 'Русский',
     'ja': '日本語',
     'id': 'Bahasa Indonesia',
+    'pt': 'Português',
+    'zh': '中文',
   };
 
   final List<Locale> _supportedLocales = [
@@ -41,6 +43,8 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
     Locale('ru'),
     Locale('ja'),
     Locale('id'),
+    Locale('pt'),
+    Locale('zh'),
   ];
 
   @override
@@ -242,7 +246,7 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
     final provider = Provider.of<LocaleProvider>(context, listen: false);
     final currentLang = provider.locale?.languageCode ?? 'system';
 
-    // Sort languagea alphabetically
+    // Sort languages alphabetically
     final sortedLocales = [..._supportedLocales]..sort((a, b) {
         final labelA = _languageLabels[a.languageCode] ?? a.languageCode;
         final labelB = _languageLabels[b.languageCode] ?? b.languageCode;
@@ -254,31 +258,33 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.language),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ...sortedLocales.map((locale) {
-                final code = locale.languageCode;
-                return RadioListTile<String>(
-                  title: Text(_languageLabels[code] ?? code),
-                  value: code,
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ...sortedLocales.map((locale) {
+                  final code = locale.languageCode;
+                  return RadioListTile<String>(
+                    title: Text(_languageLabels[code] ?? code),
+                    value: code,
+                    groupValue: currentLang,
+                    onChanged: (value) {
+                      provider.setLocale(value!);
+                      Navigator.of(context).pop();
+                    },
+                  );
+                }),
+                RadioListTile<String>(
+                  title: Text(AppLocalizations.of(context)!.system),
+                  value: 'system',
                   groupValue: currentLang,
-                  onChanged: (value) {
-                    provider.setLocale(value!);
+                  onChanged: (_) {
+                    provider.clearLocale();
                     Navigator.of(context).pop();
                   },
-                );
-              }),
-              RadioListTile<String>(
-                title: Text(AppLocalizations.of(context)!.system),
-                value: 'system',
-                groupValue: currentLang,
-                onChanged: (_) {
-                  provider.clearLocale();
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         );
       },
