@@ -19,7 +19,7 @@ void onStart(ServiceInstance service) async {
   final locale = PlatformDispatcher.instance.locale;
   final localizations = lookupAppLocalizations(locale);
   final notificationContent = localizations.notificationContent;
-  final notificationTitle = localizations.notificationTitle;
+  final notificationTitle = localizations.notificationTitleJournal;
 
   if (service is AndroidServiceInstance) {
     service.setAsForegroundService();
@@ -52,7 +52,7 @@ Future<void> runFeedJob(
 ) async {
   debugPrint('Feed updated in background at ${DateTime.now()}');
 
-  final int articleCountBefore = await dbHelper.getArticleCount();
+  int articleCountBefore = await dbHelper.getArticleCount();
 
   // Update journals
   List<Journal> followedJournals = await dbHelper.getJournals();
@@ -63,7 +63,15 @@ Future<void> runFeedJob(
     maxConcurrentUpdates,
   );
 
+  int articleCountAfter = await dbHelper.getArticleCount();
+  if (articleCountBefore < articleCountAfter) {
+    await showNewJournalArticlesNotification();
+  } else {
+    debugPrint("No new articles from journals received");
+  }
+
   // Update saved queries
+  articleCountBefore = await dbHelper.getArticleCount();
   final savedQueries = await dbHelper.getSavedQueriesToUpdate();
   await feedService.updateSavedQueryFeed(
     savedQueries,
@@ -72,11 +80,11 @@ Future<void> runFeedJob(
     maxConcurrentUpdates,
   );
 
-  final int articleCountAfter = await dbHelper.getArticleCount();
+  articleCountAfter = await dbHelper.getArticleCount();
   if (articleCountBefore < articleCountAfter) {
-    await showNewArticlesNotification();
+    await showNewQueryArticlesNotification();
   } else {
-    debugPrint("No new articles received");
+    debugPrint("No new articles from queries received");
   }
 }
 
@@ -130,16 +138,17 @@ Future<void> initializeNotifications() async {
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 }
 
-Future<void> showNewArticlesNotification() async {
+Future<void> showNewJournalArticlesNotification() async {
   final locale = PlatformDispatcher.instance.locale;
   final localizations = lookupAppLocalizations(locale);
   final notificationContent = localizations.notificationContent;
-  final notificationTitle = localizations.notificationTitle;
+  final notificationTitle = localizations.notificationTitleJournal;
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
     'wispar_channel',
     'Wispar Updates',
-    channelDescription: 'Notification when new articles are available',
+    channelDescription:
+        'Notification when new articles from followed journals are available',
     importance: Importance.defaultImportance,
     priority: Priority.defaultPriority,
     icon: 'ic_bg_service_small',
@@ -151,6 +160,34 @@ Future<void> showNewArticlesNotification() async {
 
   await flutterLocalNotificationsPlugin.show(
     0,
+    notificationTitle,
+    notificationContent,
+    platformChannelSpecifics,
+  );
+}
+
+Future<void> showNewQueryArticlesNotification() async {
+  final locale = PlatformDispatcher.instance.locale;
+  final localizations = lookupAppLocalizations(locale);
+  final notificationContent = localizations.notificationContent;
+  final notificationTitle = localizations.notificationTitleQuery;
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+    'wispar_channel',
+    'Wispar Updates',
+    channelDescription:
+        'Notification when new articles from saved queries are available',
+    importance: Importance.defaultImportance,
+    priority: Priority.defaultPriority,
+    icon: 'ic_bg_service_small',
+    color: Color.fromARGB(255, 118, 54, 219),
+  );
+
+  const NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
+
+  await flutterLocalNotificationsPlugin.show(
+    1,
     notificationTitle,
     notificationContent,
     platformChannelSpecifics,
