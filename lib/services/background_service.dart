@@ -16,13 +16,18 @@ void onStart(ServiceInstance service) async {
 
   await initializeNotifications();
 
+  final locale = PlatformDispatcher.instance.locale;
+  final localizations = lookupAppLocalizations(locale);
+  final notificationContent = localizations.notificationContent;
+  final notificationTitle = localizations.notificationTitle;
+
   if (service is AndroidServiceInstance) {
     service.setAsForegroundService();
 
     // Set the notification for the foreground service
     service.setForegroundNotificationInfo(
-      title: 'Wispar',
-      content: 'Wispar is running in the background.',
+      title: notificationTitle,
+      content: notificationContent,
     );
     service.on('stopService').listen((event) {
       service.stopSelf();
@@ -134,7 +139,7 @@ Future<void> showNewArticlesNotification() async {
     importance: Importance.defaultImportance,
     priority: Priority.defaultPriority,
     icon: 'ic_bg_service_small',
-    color: Color(0xFF3F51B5),
+    color: Color.fromARGB(255, 118, 54, 219),
   );
 
   const NotificationDetails platformChannelSpecifics =
