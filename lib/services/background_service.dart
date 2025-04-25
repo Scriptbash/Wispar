@@ -124,7 +124,8 @@ Future<void> initializeNotifications() async {
 Future<void> showNewArticlesNotification() async {
   final locale = PlatformDispatcher.instance.locale;
   final localizations = lookupAppLocalizations(locale);
-  final message = localizations.selectDBExportLocation;
+  final notificationContent = localizations.notificationContent;
+  final notificationTitle = localizations.notificationTitle;
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
     'wispar_channel',
@@ -133,6 +134,7 @@ Future<void> showNewArticlesNotification() async {
     importance: Importance.defaultImportance,
     priority: Priority.defaultPriority,
     icon: 'ic_bg_service_small',
+    color: Color(0xFF3F51B5),
   );
 
   const NotificationDetails platformChannelSpecifics =
@@ -140,8 +142,8 @@ Future<void> showNewArticlesNotification() async {
 
   await flutterLocalNotificationsPlugin.show(
     0,
-    'Wispar',
-    message,
+    notificationTitle,
+    notificationContent,
     platformChannelSpecifics,
   );
 }

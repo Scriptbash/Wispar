@@ -29,6 +29,10 @@
   "@skip": {},
   "getStarted": "Get Started",
   "@getStarted": {},
+  "notificationContent": "New articles are available!",
+  "@notificationContent": {},
+  "notificationTitle": "Journals were updated",
+  "@notificationTitle": {},
   "home": "Home",
   "@home": {
     "description": "The home menu button and the app bar title when in the home screen."

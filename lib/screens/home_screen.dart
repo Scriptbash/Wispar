@@ -9,6 +9,7 @@ import '../widgets/publication_card.dart';
 import '../widgets/sortbydialog.dart';
 import '../widgets/sortorderdialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -44,7 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _loadPreferences();
     _buildAndStreamFeed();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await checkAndSetNotificationPermissions();
       if (_feedLoaded) {
         _onAbstractChanged();
       }
@@ -61,6 +63,31 @@ class _HomeScreenState extends State<HomeScreen> {
       fetchIntervalInHours = prefs.getInt('fetchInterval') ?? 6;
       _concurrentFetches = prefs.getInt('concurrentFetches') ?? 3;
     });
+  }
+
+  Future<void> checkAndSetNotificationPermissions() async {
+    final prefs = await SharedPreferences.getInstance();
+    final bool deniedBefore = prefs.getBool('notification_perms') ?? false;
+
+    if (deniedBefore) return; // Don't ask if user denied before
+
+    final permissionGranted = await _requestNotificationPermission();
+
+    if (!permissionGranted) {
+      await prefs.setBool('notification_perms', true);
+    } else {
+      await prefs.setBool('notification_perms', false);
+    }
+  }
+
+  Future<bool> _requestNotificationPermission() async {
+    final status = await Permission.notification.status;
+    if (status.isGranted) return true;
+    if (status.isDenied || status.isLimited) {
+      final result = await Permission.notification.request();
+      return result.isGranted;
+    }
+    return false;
   }
 
   Future<void> _buildAndStreamFeed() async {
