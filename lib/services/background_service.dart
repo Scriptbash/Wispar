@@ -42,20 +42,6 @@ void onStart(ServiceInstance service) async {
     await runFeedJob(
         dbHelper, feedService, fetchIntervalInHours, maxConcurrentUpdates);
   });
-
-  // Saved queries
-  /*final savedQueries = await dbHelper.getSavedQueriesToIncludeInFeed();
-  await feedService.updateSavedQueryFeed(
-    savedQueries,
-    (queryNames) {
-    },
-    fetchIntervalInHours,
-    maxConcurrentUpdates,
-  );
-
-  service.invoke('update', {
-    "status": "Background feed update completed at ${DateTime.now()}",
-  });*/
 }
 
 Future<void> runFeedJob(

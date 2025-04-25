@@ -3,7 +3,6 @@ import '../models/journal_entity.dart';
 import '../models/crossref_journals_works_models.dart' as journalWorks;
 import '../services/feed_api.dart';
 import '../services/database_helper.dart';
-import '../services/abstract_helper.dart';
 import '../widgets/publication_card.dart';
 
 class FeedService {
