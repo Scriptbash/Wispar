@@ -73,7 +73,6 @@ class FeedService {
   }
 
   Future<void> updateFeed(
-    BuildContext context,
     List<Journal> followedJournals,
     void Function(List<String> journalNames) onJournalUpdate,
     int fetchIntervalInHours,
@@ -145,7 +144,6 @@ class FeedService {
   }
 
   Future<void> updateSavedQueryFeed(
-      BuildContext context,
       List<Map<String, dynamic>> savedQueries,
       void Function(List<String> queryNames) onQueryUpdate,
       int fetchIntervalInHours,
@@ -218,26 +216,5 @@ class FeedService {
     } catch (e) {
       debugPrint('Error updating saved queries feed: $e');
     }
-  }
-
-  Future<List<PublicationCard>> getCachedFeed(
-      BuildContext context, VoidCallback? onAbstractChanged) async {
-    final cachedPublications = await _dbHelper.getCachedPublications();
-
-    return Future.wait(cachedPublications.map((item) async {
-      return PublicationCard(
-        title: item.title,
-        abstract: await AbstractHelper.buildAbstract(context, item.abstract),
-        journalTitle: item.journalTitle,
-        issn: item.issn,
-        publishedDate: item.publishedDate,
-        doi: item.doi,
-        authors: item.authors,
-        url: item.url,
-        license: item.license,
-        licenseName: item.licenseName,
-        onAbstractChanged: onAbstractChanged,
-      );
-    }).toList());
   }
 }

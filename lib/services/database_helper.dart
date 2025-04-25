@@ -459,6 +459,12 @@ class DatabaseHelper {
     });
   }
 
+  Future<int> getArticleCount() async {
+    final db = await database;
+    final result = await db.rawQuery('SELECT COUNT(*) as count FROM articles');
+    return Sqflite.firstIntValue(result) ?? 0;
+  }
+
   Future<void> removeFavorite(String doi) async {
     final db = await database;
 

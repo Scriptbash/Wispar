@@ -53,7 +53,8 @@ dependencies:
   open_filex: ^4.7.0
   google_nav_bar: ^5.0.7
   file_picker: ^10.0.0
-  
+  flutter_background_service: ^5.1.0  
+  flutter_local_notifications: ^19.1.0
 
 dev_dependencies:
   flutter_test:
