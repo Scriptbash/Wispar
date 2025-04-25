@@ -80,6 +80,11 @@ class _WisparState extends State<Wispar> {
         Locale('ru'), // Russian
         Locale('ja'), // Japanese
         Locale('id'), // Indonesian
+        Locale('pt'), // Portuguese
+        Locale.fromSubtags(
+          languageCode: 'zh',
+          scriptCode: 'Hans',
+        ), // simplified Chinese
       ],
       theme: ThemeData(
         colorSchemeSeed: Colors.deepPurple,
