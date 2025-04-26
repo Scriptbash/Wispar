@@ -7,6 +7,7 @@ import '../services/database_helper.dart';
 import 'feed_service.dart';
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 import '../generated_l10n/app_localizations.dart';
 
 @pragma('vm:entry-point')
@@ -18,8 +19,8 @@ void onStart(ServiceInstance service) async {
 
   final locale = PlatformDispatcher.instance.locale;
   final localizations = lookupAppLocalizations(locale);
-  final notificationContent = localizations.notificationContent;
-  final notificationTitle = localizations.notificationTitleJournal;
+  final notificationContent = localizations.fgNotificationContent;
+  final notificationTitle = localizations.fgNotificationTitle;
 
   if (service is AndroidServiceInstance) {
     service.setAsForegroundService();
@@ -143,7 +144,7 @@ Future<void> showNewJournalArticlesNotification() async {
   final localizations = lookupAppLocalizations(locale);
   final notificationContent = localizations.notificationContent;
   final notificationTitle = localizations.notificationTitleJournal;
-  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+  AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
     'wispar_channel',
     'Wispar Updates',
@@ -153,9 +154,11 @@ Future<void> showNewJournalArticlesNotification() async {
     priority: Priority.defaultPriority,
     icon: 'ic_bg_service_small',
     color: Color.fromARGB(255, 118, 54, 219),
+    enableVibration: true,
+    vibrationPattern: Int64List.fromList([0, 300, 100, 100, 100, 100, 300]),
   );
 
-  const NotificationDetails platformChannelSpecifics =
+  NotificationDetails platformChannelSpecifics =
       NotificationDetails(android: androidPlatformChannelSpecifics);
 
   await flutterLocalNotificationsPlugin.show(
@@ -171,7 +174,7 @@ Future<void> showNewQueryArticlesNotification() async {
   final localizations = lookupAppLocalizations(locale);
   final notificationContent = localizations.notificationContent;
   final notificationTitle = localizations.notificationTitleQuery;
-  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+  AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
     'wispar_channel',
     'Wispar Updates',
@@ -181,9 +184,11 @@ Future<void> showNewQueryArticlesNotification() async {
     priority: Priority.defaultPriority,
     icon: 'ic_bg_service_small',
     color: Color.fromARGB(255, 118, 54, 219),
+    enableVibration: true,
+    vibrationPattern: Int64List.fromList([0, 300, 100, 100, 100, 100, 300]),
   );
 
-  const NotificationDetails platformChannelSpecifics =
+  NotificationDetails platformChannelSpecifics =
       NotificationDetails(android: androidPlatformChannelSpecifics);
 
   await flutterLocalNotificationsPlugin.show(

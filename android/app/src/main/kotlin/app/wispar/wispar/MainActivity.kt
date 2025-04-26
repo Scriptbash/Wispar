@@ -15,7 +15,7 @@ class MainActivity: FlutterActivity() {
             val channel = NotificationChannel(
                 "wispar_channel", // Must match the channelId in Flutter code
                 "Wispar Background Service", // Channel name
-                NotificationManager.IMPORTANCE_LOW
+                NotificationManager.IMPORTANCE_DEFAULT
             )
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)
