@@ -23,7 +23,7 @@ class DatabaseHelper {
     final path = await getDatabasesPath();
     final databasePath = join(path, 'wispar.db');
 
-    return openDatabase(databasePath, version: 4, onOpen: (db) async {
+    return openDatabase(databasePath, version: 5, onOpen: (db) async {
       await db.execute('PRAGMA foreign_keys = ON');
     }, onCreate: (db, version) async {
       await db.execute('PRAGMA foreign_keys = ON');
@@ -65,6 +65,7 @@ class DatabaseHelper {
           pdfPath TEXT,
           dateCached TEXT,
           isSavedQuery INTEGER,
+          isHidden INTEGER,
           query_id INTEGER,
           journal_id,
           FOREIGN KEY (journal_id) REFERENCES journals(journal_id)
@@ -143,6 +144,12 @@ class DatabaseHelper {
         }
 
         // I should probably drop the issn column from the journals table
+      }
+      if (oldVersion < 5) {
+        debugPrint("Updating db to v5");
+        await db.execute('''
+        ALTER TABLE articles ADD COLUMN isHidden INTEGER;
+      ''');
       }
     });
   }
@@ -554,7 +561,8 @@ class DatabaseHelper {
       FROM articles
       JOIN journals ON articles.journal_id = journals.journal_id
       LEFT JOIN journal_issns ON articles.journal_id = journal_issns.journal_id
-      WHERE articles.dateCached IS NOT NULL
+      WHERE articles.dateCached IS NOT NULL 
+      AND (articles.isHidden = 0 OR articles.isHidden IS NULL)
       GROUP BY articles.doi
       ''');
 
@@ -577,6 +585,62 @@ class DatabaseHelper {
         licenseName: map['licenseName'],
       );
     }).toList();
+  }
+
+  Future<List<PublicationCard>> getHiddenPublications() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+      SELECT 
+        articles.*,
+        journals.title AS journalTitle,
+        GROUP_CONCAT(journal_issns.issn) AS issns
+      FROM articles
+      JOIN journals ON articles.journal_id = journals.journal_id
+      LEFT JOIN journal_issns ON articles.journal_id = journal_issns.journal_id
+      WHERE articles.dateCached IS NOT NULL 
+      AND articles.isHidden = 1
+      GROUP BY articles.doi
+      ''');
+
+    return maps.map((map) {
+      final List<String> issns = (map['issns'] as String?)?.split(',') ?? [];
+
+      return PublicationCard(
+        doi: map['doi'],
+        title: map['title'],
+        issn: issns,
+        abstract: map['abstract'],
+        journalTitle: map['journalTitle'],
+        publishedDate: DateTime.parse(map['publishedDate']),
+        authors: List<PublicationAuthor>.from(
+          (jsonDecode(map['authors']) as List<dynamic>)
+              .map((authorJson) => PublicationAuthor.fromJson(authorJson)),
+        ),
+        url: map['url'],
+        license: map['license'],
+        licenseName: map['licenseName'],
+      );
+    }).toList();
+  }
+
+  Future<void> hideArticle(String doi) async {
+    final db = await database;
+    await db.update(
+      'articles',
+      {'isHidden': 1},
+      where: 'doi = ?',
+      whereArgs: [doi],
+    );
+  }
+
+  Future<void> unhideArticle(String doi) async {
+    final db = await database;
+    await db.update(
+      'articles',
+      {'isHidden': 0},
+      where: 'doi = ?',
+      whereArgs: [doi],
+    );
   }
 
   // Updates the abstract of an article after being scraped
@@ -796,7 +860,7 @@ class DatabaseHelper {
     try {
       final List<Map<String, dynamic>> oldArticles = await db.rawQuery('''
       SELECT * FROM articles
-      WHERE dateCached < ? AND dateLiked IS NULL AND dateDownloaded IS NULL
+      WHERE dateCached < ? AND dateLiked IS NULL AND dateDownloaded IS NULL AND (isHidden IS NULL OR isHidden = 0)
     ''', [thresholdDateString]);
 
       // Delete the old articles
