@@ -860,7 +860,7 @@ class DatabaseHelper {
     try {
       final List<Map<String, dynamic>> oldArticles = await db.rawQuery('''
       SELECT * FROM articles
-      WHERE dateCached < ? AND dateLiked IS NULL AND dateDownloaded IS NULL AND (isHidden IS NULL OR isHidden = 0
+      WHERE dateCached < ? AND dateLiked IS NULL AND dateDownloaded IS NULL AND (isHidden IS NULL OR isHidden = 0)
     ''', [thresholdDateString]);
 
       // Delete the old articles
