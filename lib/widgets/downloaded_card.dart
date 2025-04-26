@@ -55,62 +55,57 @@ class _DownloadedCardState extends State<DownloadedCard> {
               Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  Expanded(
-                      child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: TextButton(
-                            onPressed: () async {
-                              Map<String, dynamic>? journalInfo;
-
-                              journalInfo = await getJournalDetails(
+                  Flexible(
+                    flex: 4,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton(
+                        onPressed: () async {
+                          Map<String, dynamic>? journalInfo =
+                              await getJournalDetails(
                                   widget.publicationCard.issn);
 
-                              if (journalInfo != Null) {
-                                String journalPublisher =
-                                    journalInfo?['publisher'];
-
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          JournalDetailsScreen(
-                                        title:
-                                            widget.publicationCard.journalTitle,
-                                        publisher: journalPublisher,
-                                        issn: widget.publicationCard.issn,
-                                      ),
-                                    ));
-                              }
-                            },
-                            child: Text(
-                              widget.publicationCard.journalTitle,
-                              style: TextStyle(fontSize: 16),
-                              softWrap: true,
-                            ),
-                            style: TextButton.styleFrom(
-                              minimumSize: Size.zero,
-                              padding: EdgeInsets.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                          ))),
-                  Expanded(
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                        IconButton(
-                          onPressed: () async {
-                            await databaseHelper
-                                .removeDownloaded(widget.publicationCard.doi);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text(AppLocalizations.of(context)!
-                                      .downloadDeleted)),
+                          if (journalInfo != null) {
+                            String journalPublisher = journalInfo['publisher'];
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => JournalDetailsScreen(
+                                  title: widget.publicationCard.journalTitle,
+                                  publisher: journalPublisher,
+                                  issn: widget.publicationCard.issn,
+                                ),
+                              ),
                             );
-                            widget.onDelete();
-                          },
-                          icon: Icon(Icons.delete_outline),
+                          }
+                        },
+                        child: Text(
+                          widget.publicationCard.journalTitle,
+                          style: TextStyle(fontSize: 16),
+                          softWrap: true,
                         ),
-                      ]))
+                        style: TextButton.styleFrom(
+                          minimumSize: Size.zero,
+                          padding: EdgeInsets.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () async {
+                      await databaseHelper
+                          .removeDownloaded(widget.publicationCard.doi);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              AppLocalizations.of(context)!.downloadDeleted),
+                        ),
+                      );
+                      widget.onDelete();
+                    },
+                    icon: Icon(Icons.delete_outline),
+                  ),
                 ],
               ),
               Text(
