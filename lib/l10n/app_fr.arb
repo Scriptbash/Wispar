@@ -390,5 +390,15 @@
   "notificationSettingsMessage": "Les notifications sont désactivées de façon permanente. Pour les activer, allez dans les réglages de notifications de l'appli.",
   "@notificationSettingsMessage": {},
   "notifications": "Notifications",
-  "@notifications": {}
+  "@notifications": {},
+  "hiddenArticles": "Publications cachées",
+  "@hiddenArticles": {},
+  "noHiddenArticles": "Aucune publication cachée",
+  "@noHiddenArticles": {},
+  "hideArticle": "Cacher cette publication",
+  "@hideArticle": {},
+  "viewHiddenArticles": "Voir les publications cachées",
+  "@viewHiddenArticles": {},
+  "unhideArticle": "Rendre cette publication visible",
+  "@unhideArticle": {}
 }
