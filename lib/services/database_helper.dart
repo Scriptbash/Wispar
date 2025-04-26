@@ -459,6 +459,12 @@ class DatabaseHelper {
     });
   }
 
+  Future<int> getArticleCount() async {
+    final db = await database;
+    final result = await db.rawQuery('SELECT COUNT(*) as count FROM articles');
+    return Sqflite.firstIntValue(result) ?? 0;
+  }
+
   Future<void> removeFavorite(String doi) async {
     final db = await database;
 
@@ -684,6 +690,22 @@ class DatabaseHelper {
       whereArgs: [id],
     );
     await deleteArticlesForSavedQuery(id);
+  }
+
+  Future<List<Map<String, dynamic>>> getSavedQueriesToUpdate() async {
+    final db = await database;
+    return await db.query(
+      'savedQueries',
+      columns: [
+        'query_id',
+        'queryName',
+        'queryParams',
+        'queryProvider',
+        'lastFetched'
+      ],
+      where: 'includeInFeed = ?',
+      whereArgs: [1], // Only include queries with "includeInFeed"
+    );
   }
 
   Future<void> updateSavedQueryLastFetched(int queryId) async {

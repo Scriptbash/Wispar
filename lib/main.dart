@@ -12,8 +12,11 @@ import 'screens/favorites_screen.dart';
 import 'screens/library_screen.dart';
 import 'screens/downloads_screen.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import './services/background_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeService();
   runApp(
     MultiProvider(
       providers: [

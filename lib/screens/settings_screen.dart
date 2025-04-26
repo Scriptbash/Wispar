@@ -8,6 +8,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import './database_settings_screen.dart';
 import './display_settings_screen.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -18,10 +19,57 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   late Future<List<String>> appInfo;
+  bool isNotificationEnabled = false;
 
   @override
   void initState() {
     super.initState();
+    _loadNotificationPermissionStatus();
+  }
+
+  Future<void> _loadNotificationPermissionStatus() async {
+    final status = await Permission.notification.status;
+    setState(() {
+      isNotificationEnabled = status.isGranted;
+    });
+  }
+
+  Future<void> _checkNotificationPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    final status = await Permission.notification.status;
+
+    if (status.isPermanentlyDenied) {
+      _showPermissionSettingsDialog();
+      return;
+    }
+
+    final bool deniedBefore = prefs.getBool('notification_perms') ?? false;
+
+    if (deniedBefore) {
+      await prefs.remove('notification_perms');
+    }
+
+    final permissionGranted = await _requestNotificationPermission();
+
+    if (!permissionGranted) {
+      await prefs.setBool('notification_perms', true);
+    } else {
+      await prefs.setBool('notification_perms', false);
+    }
+
+    setState(() {
+      isNotificationEnabled = permissionGranted;
+    });
+  }
+
+  Future<bool> _requestNotificationPermission() async {
+    final status = await Permission.notification.status;
+    if (status.isGranted) return true;
+    if (status.isDenied || status.isLimited) {
+      final result = await Permission.notification.request();
+      return result.isGranted;
+    }
+    return false;
   }
 
   @override
@@ -179,6 +227,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               ListTile(
+                  onTap: () async {
+                    _checkNotificationPermission();
+                  },
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.notifications_outlined),
+                          SizedBox(width: 8),
+                          Text(AppLocalizations.of(context)!.notifications),
+                        ],
+                      ),
+                    ],
+                  ),
+                  subtitle: Row(
+                    children: [
+                      SizedBox(width: 32),
+                      Text(
+                        isNotificationEnabled
+                            ? AppLocalizations.of(context)!.notifPermsGranted
+                            : AppLocalizations.of(context)!
+                                .notifPermsNotGranted,
+                      ),
+                    ],
+                  )),
+              ListTile(
                 onTap: () {
                   launchUrl(
                       Uri.parse(
@@ -331,6 +406,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  void _showPermissionSettingsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.notifications),
+          content:
+              Text(AppLocalizations.of(context)!.notificationSettingsMessage),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await openAppSettings();
+                Navigator.of(context).pop();
+              },
+              child: Text(AppLocalizations.of(context)!.openAppSettings),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+            ),
+          ],
         );
       },
     );

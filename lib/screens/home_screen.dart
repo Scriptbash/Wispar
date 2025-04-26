@@ -4,10 +4,12 @@ import '../generated_l10n/app_localizations.dart';
 import 'settings_screen.dart';
 import '../services/database_helper.dart';
 import '../services/feed_service.dart';
+import '../services/abstract_helper.dart';
 import '../widgets/publication_card.dart';
 import '../widgets/sortbydialog.dart';
 import '../widgets/sortorderdialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -43,7 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _loadPreferences();
     _buildAndStreamFeed();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await checkAndSetNotificationPermissions();
       if (_feedLoaded) {
         _onAbstractChanged();
       }
@@ -62,25 +65,38 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> checkAndSetNotificationPermissions() async {
+    final prefs = await SharedPreferences.getInstance();
+    final bool deniedBefore = prefs.getBool('notification_perms') ?? false;
+
+    if (deniedBefore) return; // Don't ask if user denied before
+
+    final permissionGranted = await _requestNotificationPermission();
+
+    if (!permissionGranted) {
+      await prefs.setBool('notification_perms', true);
+    } else {
+      await prefs.setBool('notification_perms', false);
+    }
+  }
+
+  Future<bool> _requestNotificationPermission() async {
+    final status = await Permission.notification.status;
+    if (status.isGranted) return true;
+    if (status.isDenied || status.isLimited) {
+      final result = await Permission.notification.request();
+      return result.isGranted;
+    }
+    return false;
+  }
+
   Future<void> _buildAndStreamFeed() async {
     try {
       final followedJournals = await dbHelper.getJournals();
-      final db = await dbHelper.database;
-      List<Map<String, dynamic>> savedQueries = await db.query(
-        'savedQueries',
-        columns: [
-          'query_id',
-          'queryName',
-          'queryParams',
-          'queryProvider',
-          'lastFetched'
-        ],
-        where: 'includeInFeed = ?',
-        whereArgs: [1], // Only include queries with "includeInFeed"
-      );
+      List<Map<String, dynamic>> savedQueries =
+          await dbHelper.getSavedQueriesToUpdate();
       if (mounted && followedJournals.isNotEmpty) {
         await _feedService.updateFeed(
-          context,
           followedJournals,
           (List<String> journalNames) {
             if (mounted) {
@@ -95,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
 
       if (mounted && savedQueries.isNotEmpty) {
-        await _feedService.updateSavedQueryFeed(context, savedQueries,
+        await _feedService.updateSavedQueryFeed(savedQueries,
             (List<String> queryNames) {
           if (mounted) {
             setState(() {
@@ -107,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (mounted) {
         final List<PublicationCard> cachedFeed =
-            await _feedService.getCachedFeed(context, _onAbstractChanged);
+            await _getCachedFeed(context, _onAbstractChanged);
 
         setState(() {
           _allFeed = List.from(cachedFeed);
@@ -198,9 +214,30 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<List<PublicationCard>> _getCachedFeed(
+      BuildContext context, VoidCallback? onAbstractChanged) async {
+    final cachedPublications = await dbHelper.getCachedPublications();
+
+    return Future.wait(cachedPublications.map((item) async {
+      return PublicationCard(
+        title: item.title,
+        abstract: await AbstractHelper.buildAbstract(context, item.abstract),
+        journalTitle: item.journalTitle,
+        issn: item.issn,
+        publishedDate: item.publishedDate,
+        doi: item.doi,
+        authors: item.authors,
+        url: item.url,
+        license: item.license,
+        licenseName: item.licenseName,
+        onAbstractChanged: onAbstractChanged,
+      );
+    }).toList());
+  }
+
   void _onAbstractChanged() async {
     final List<PublicationCard> cachedFeed =
-        await _feedService.getCachedFeed(context, _onAbstractChanged);
+        await _getCachedFeed(context, _onAbstractChanged);
     setState(() {
       _allFeed = List.from(cachedFeed);
       _filterFeed(_filterController.text);
