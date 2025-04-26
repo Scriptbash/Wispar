@@ -26,13 +26,23 @@ void onStart(ServiceInstance service) async {
     service.setAsForegroundService();
 
     // Set the notification for the foreground service
-    service.setForegroundNotificationInfo(
-      title: notificationTitle,
-      content: notificationContent,
+    await flutterLocalNotificationsPlugin.show(
+      24,
+      notificationTitle,
+      notificationContent,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          'wispar_channel',
+          'Wispar Updates',
+          channelDescription: 'Background service for Wispar.',
+          importance: Importance.defaultImportance,
+          priority: Priority.defaultPriority,
+          icon: 'ic_bg_service_small',
+          color: Color.fromARGB(255, 118, 54, 219),
+          enableVibration: false,
+        ),
+      ),
     );
-    service.on('stopService').listen((event) {
-      service.stopSelf();
-    });
   }
 
   final fetchIntervalInHours = 6;
@@ -101,6 +111,7 @@ Future<void> initializeService() async {
       notificationChannelId: 'wispar_channel',
       initialNotificationTitle: 'Wispar',
       initialNotificationContent: 'Initializing Wispar background services.',
+      foregroundServiceNotificationId: 24,
     ),
     iosConfiguration: IosConfiguration(
       autoStart: true,
@@ -150,7 +161,7 @@ Future<void> showNewJournalArticlesNotification() async {
     'Wispar Updates',
     channelDescription:
         'Notification when new articles from followed journals are available',
-    importance: Importance.defaultImportance,
+    importance: Importance.high,
     priority: Priority.defaultPriority,
     icon: 'ic_bg_service_small',
     color: Color.fromARGB(255, 118, 54, 219),
@@ -180,7 +191,7 @@ Future<void> showNewQueryArticlesNotification() async {
     'Wispar Updates',
     channelDescription:
         'Notification when new articles from saved queries are available',
-    importance: Importance.defaultImportance,
+    importance: Importance.high,
     priority: Priority.defaultPriority,
     icon: 'ic_bg_service_small',
     color: Color.fromARGB(255, 118, 54, 219),
