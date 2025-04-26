@@ -10,11 +10,7 @@ import '../services/string_format_helper.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-enum SampleItem {
-  itemOne,
-  itemTwo,
-  itemThree,
-}
+enum SampleItem { itemOne, itemTwo, itemThree, itemFour }
 
 class PublicationCard extends StatefulWidget {
   final String title;
@@ -31,6 +27,9 @@ class PublicationCard extends StatefulWidget {
   final VoidCallback? onFavoriteChanged;
   final VoidCallback? onAbstractChanged;
   final String? publisher;
+  final bool? showHideBtn;
+  final bool? isHidden;
+  final VoidCallback? onHide;
 
   const PublicationCard({
     Key? key,
@@ -48,6 +47,9 @@ class PublicationCard extends StatefulWidget {
     this.onFavoriteChanged,
     this.onAbstractChanged,
     this.publisher,
+    this.showHideBtn,
+    this.isHidden,
+    this.onHide,
   })  : authors = authors,
         super(key: key);
 
@@ -162,7 +164,7 @@ class _PublicationCardState extends State<PublicationCard> {
                       children: [
                         PopupMenuButton<SampleItem>(
                           onSelected: (SampleItem result) {
-                            setState(() {
+                            if (result == SampleItem.itemOne) {
                               if (result == SampleItem.itemOne) {
                                 // Send article to Zotero
                                 // Prepare the author names
@@ -184,54 +186,80 @@ class _PublicationCardState extends State<PublicationCard> {
                                     widget.publishedDate,
                                     widget.doi,
                                     widget.issn);
-                              } else if (result == SampleItem.itemTwo) {
-                                // Copy DOI
-                                Clipboard.setData(
-                                    ClipboardData(text: widget.doi));
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
+                              }
+                            } else if (result == SampleItem.itemTwo) {
+                              Clipboard.setData(
+                                  ClipboardData(text: widget.doi));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
                                   content: Text(
                                       AppLocalizations.of(context)!.doicopied),
                                   duration: const Duration(seconds: 1),
-                                ));
-                              } else if (result == SampleItem.itemThree) {
-                                final box =
-                                    context.findRenderObject() as RenderBox?;
-                                try {
-                                  Share.share(
-                                    '${widget.title}\n\n${widget.url}\n\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage} 👻',
-                                    sharePositionOrigin:
-                                        box!.localToGlobal(Offset.zero) &
-                                            box.size,
-                                  );
-                                } catch (e) {
-                                  debugPrint('Shared too fast: {$e}');
-                                }
+                                ),
+                              );
+                            } else if (result == SampleItem.itemThree) {
+                              final box =
+                                  context.findRenderObject() as RenderBox?;
+                              try {
+                                Share.share(
+                                  '${widget.title}\n\n${widget.url}\n\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage} 👻',
+                                  sharePositionOrigin:
+                                      box!.localToGlobal(Offset.zero) &
+                                          box.size,
+                                );
+                              } catch (e) {
+                                debugPrint('Shared too fast: {$e}');
                               }
-                            });
+                            } else if (result == SampleItem.itemFour) {
+                              databaseHelper.hideArticle(widget.doi).then((_) {
+                                if (widget.onHide != null) {
+                                  widget.onHide!(); // Notify parent to refresh
+                                }
+                              });
+                            }
                           },
                           itemBuilder: (BuildContext context) =>
                               <PopupMenuEntry<SampleItem>>[
                             PopupMenuItem<SampleItem>(
-                                value: SampleItem.itemOne,
-                                child: ListTile(
-                                    leading: Icon(Icons.book_outlined),
-                                    title: Text(AppLocalizations.of(context)!
-                                        .sendToZotero))),
+                              value: SampleItem.itemOne,
+                              child: ListTile(
+                                leading: Icon(Icons.book_outlined),
+                                title: Text(
+                                    AppLocalizations.of(context)!.sendToZotero),
+                              ),
+                            ),
                             PopupMenuItem<SampleItem>(
-                                value: SampleItem.itemTwo,
+                              value: SampleItem.itemTwo,
+                              child: ListTile(
+                                leading: Icon(Icons.copy),
+                                title:
+                                    Text(AppLocalizations.of(context)!.copydoi),
+                              ),
+                            ),
+                            PopupMenuItem<SampleItem>(
+                              value: SampleItem.itemThree,
+                              child: ListTile(
+                                leading: Icon(Icons.share_outlined),
+                                title: Text(
+                                    AppLocalizations.of(context)!.shareArticle),
+                              ),
+                            ),
+                            if (widget.showHideBtn == true)
+                              PopupMenuItem<SampleItem>(
+                                value: SampleItem.itemFour,
                                 child: ListTile(
-                                  leading: Icon(Icons.copy),
+                                  leading: widget.isHidden == true
+                                      ? Icon(Icons.visibility_outlined)
+                                      : Icon(Icons.visibility_off_outlined),
                                   title: Text(
-                                      AppLocalizations.of(context)!.copydoi),
-                                )),
-                            PopupMenuItem<SampleItem>(
-                                value: SampleItem.itemThree,
-                                child: ListTile(
-                                  leading: Icon(Icons.share_outlined),
-                                  title: Text(AppLocalizations.of(context)!
-                                      .shareArticle),
-                                )),
+                                    widget.isHidden == true
+                                        ? AppLocalizations.of(context)!
+                                            .unhideArticle
+                                        : AppLocalizations.of(context)!
+                                            .hideArticle,
+                                  ),
+                                ),
+                              ),
                           ],
                         )
                       ],

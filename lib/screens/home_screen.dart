@@ -8,6 +8,7 @@ import '../services/abstract_helper.dart';
 import '../widgets/publication_card.dart';
 import '../widgets/sortbydialog.dart';
 import '../widgets/sortorderdialog.dart';
+import './hidden_articles_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -231,6 +232,8 @@ class _HomeScreenState extends State<HomeScreen> {
         license: item.license,
         licenseName: item.licenseName,
         onAbstractChanged: onAbstractChanged,
+        showHideBtn: true,
+        onHide: _onAbstractChanged,
       );
     }).toList());
   }
@@ -246,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void handleMenuButton(int item) {
+  void handleMenuButton(int item) async {
     switch (item) {
       case 0:
         Navigator.push(
@@ -289,6 +292,13 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
         );
+        break;
+      case 3:
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HiddenArticlesScreen()),
+        );
+        _onAbstractChanged();
         break;
     }
   }
@@ -353,6 +363,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: ListTile(
                           leading: Icon(Icons.sort_by_alpha),
                           title: Text(AppLocalizations.of(context)!.sortorder),
+                        ),
+                      ),
+                      PopupMenuItem<int>(
+                        value: 3,
+                        child: ListTile(
+                          leading: Icon(Icons.layers_clear_outlined),
+                          title: Text(
+                              AppLocalizations.of(context)!.viewHiddenArticles),
                         ),
                       ),
                     ],
