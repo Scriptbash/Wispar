@@ -1,7 +1,7 @@
 <p align="center">
 <img alt="Wispar" src= "https://github.com/Scriptbash/Wispar/blob/main/assets/icon/icon.png?raw=true" width="100">
 </p>
-<h3 align="center">Stay up-to-date with articles in your field of study!</h3>
+<h3 align="center">Stay up-to-date with academic journals and the latest research articles!</h3>
 <p align="center">
 <a href="https://github.com/Scriptbash/Wispar/actions/workflows/build.yml">
     <img alt="GitHub Workflow Status" src="https://github.com/Scriptbash/Wispar/actions/workflows/build.yml/badge.svg">
@@ -37,13 +37,14 @@ Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly s
 ## Features overview
 <ul>
     <li> [x] Search and follow journals</li>
-    <li> [x] Search for articles and save the queries for easy access later</li>
+    <li> [x] Search for articles and save the queries for easy access later. You can even include them in your feed!</li>
     <li> [x] Download articles for offline access *</li>
     <li> [x] EZproxy and Unpaywall integration</li>
     <li> [x] Send articles to Zotero</li>
     <li> [x] Share articles</li>
     <li> [x] Scrape missing abstracts</li>
     <li> [x] Export/Import the database</li>
+    <li> [x] Notifications and background journals updates</li>
     <li> [x] Filters</li>
 </ul>
 * The download feature is currently limited to some publishers. Flutter tools and publishers like Elsevier and Wiley make it hard to get the PDF file.
@@ -52,7 +53,6 @@ Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly s
 <ul>
     <li> [ ] Deep links</li>
     <li> [ ] Get downloads working for more publishers</li>
-    <li> [ ] Notifications and background journals updates</li> 
 </ul>
 </ul>
 

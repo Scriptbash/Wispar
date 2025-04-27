@@ -1,5 +1,17 @@
-Wispar is a user-friendly and privacy-friendly app that seamlessly searches scientific journals and articles using the Crossref and OpenAlex API. Stay updated on your preferred journals by following them and receive new article abstracts in your main feed. No account required. The integration of Unpaywall ensures convenient access to open-access articles, while EZproxy helps overcome subscription barriers.
+Wispar is your personal research companion — a privacy-friendly app for exploring academic journals and scientific articles.
 
-This is an open-source project, and contributions are welcome! If you'd like to contribute, please visit our GitHub repository: https://github.com/Scriptbash/Wispar
+Using the Crossref and OpenAlex APIs, Wispar helps you stay updated on your favourite journals. Follow journals to receive the latest research abstracts in your main feed — no account required.
+
+- Search scholarly articles and journals
+- Follow journals to stay updated
+- Add custom keywords and queries to your feed
+- Access open-access articles via Unpaywall
+- Use EZproxy to unlock paywalled research
+- Send articles to your Zotero library
+- Built for researchers, students, and the academically curious
+
+Wispar is user-friendly, open-source, and designed to respect your privacy.
+
+As a community-built project, contributions are always welcome! If you'd like to contribute, please visit our GitHub repository: https://github.com/Scriptbash/Wispar
 
 If the app isn't available in your language, please consider helping with translations by visiting our hosted Weblate instance: https://hosted.weblate.org/engage/wispar
