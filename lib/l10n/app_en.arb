@@ -285,7 +285,23 @@
       "format": "yMMMMd"
     }
   }},
-
+  "lastUpdatedMinutes": "Last updated {minutes} minutes ago",
+  "@lastUpdatedMinutes": {
+  "placeholders": {
+    "minutes": {
+      "type": "int"}}},
+"lastUpdatedHours": "Last updated {hours} hours ago",
+"@lastUpdatedHours": {
+  "placeholders": {
+    "hours": {
+      "type": "int"}}},
+"lastUpdatedDays": "Last updated {days} days ago",
+"@lastUpdatedDays": {
+  "placeholders": {
+    "days": {
+      "type": "int"}}},
+  "pendingUpdate": "Pending update",
+  "@pendingUpdate": {},
   "journaltitle": "Journal title",
   "@journaltitle": {},
   "followingdate": "Following date",

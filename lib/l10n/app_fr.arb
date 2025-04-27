@@ -123,7 +123,7 @@
   },
   "sortorder": "Ordre de tri",
   "@sortorder": {},
-  "followingsince": "Suivis depuis {date}",
+  "followingsince": "Suivis depuis le {date}",
   "@followingsince": {},
   "ascending": "Ascendant",
   "@ascending": {},
