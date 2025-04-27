@@ -59,7 +59,7 @@ class _JournalsSearchResultCardState extends State<JournalsSearchResultCard> {
             Text(
                 '${AppLocalizations.of(context)!.publisher}: ${widget.item.publisher}'),
             if (widget.item.issn.isNotEmpty)
-              Text('ISSN: ${widget.item.issn.toSet().join(',')}'),
+              Text('ISSN: ${widget.item.issn.toSet().join(', ')}'),
           ],
         ),
         trailing: FollowButton(

@@ -12,6 +12,23 @@ class JournalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lastUpdatedText = journal.lastUpdated != null
+        ? () {
+            final updated = DateTime.parse(journal.lastUpdated!);
+            final now = DateTime.now();
+            final diff = now.difference(updated);
+
+            if (diff.inMinutes < 60) {
+              return AppLocalizations.of(context)!
+                  .lastUpdatedMinutes(diff.inMinutes);
+            } else if (diff.inHours < 24) {
+              return AppLocalizations.of(context)!
+                  .lastUpdatedHours(diff.inHours);
+            } else {
+              return AppLocalizations.of(context)!.lastUpdatedDays(diff.inDays);
+            }
+          }()
+        : AppLocalizations.of(context)!.pendingUpdate;
     return Card(
       margin: EdgeInsets.all(8.0),
       child: ListTile(
@@ -58,9 +75,10 @@ class JournalCard extends StatelessWidget {
           children: [
             Text(
                 '${AppLocalizations.of(context)!.publisher}: ${journal.publisher}'),
-            Text('ISSN: ${journal.issn.toSet().join(',')}'),
+            Text('ISSN: ${journal.issn.toSet().join(', ')}'),
             Text(AppLocalizations.of(context)!
                 .followingsince(DateTime.parse(journal.dateFollowed!))),
+            Text(lastUpdatedText),
           ],
         ),
       ),
