@@ -400,5 +400,31 @@
   "viewHiddenArticles": "Voir les publications cachées",
   "@viewHiddenArticles": {},
   "unhideArticle": "Rendre cette publication visible",
-  "@unhideArticle": {}
+  "@unhideArticle": {},
+  "pendingUpdate": "Mise à jour en attente",
+  "@pendingUpdate": {},
+  "lastUpdatedHours": "{hours, plural, one{Mis à jour il y a 1 heure} other{Mis à jour il y a {hours} heures}}",
+  "@lastUpdatedHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "lastUpdatedDays": "{days, plural, one{Mis à jour il y a 1 jour} other{Mis à jour il y a {days} jours}}",
+  "@lastUpdatedDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "lastUpdatedMinutes": "{minutes, plural, one{Mis à jour il y a 1 minute} other{Mis à jour il y a {minutes} minutes}}",
+  "@lastUpdatedMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  }
 }
