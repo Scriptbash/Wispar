@@ -285,17 +285,17 @@
       "format": "yMMMMd"
     }
   }},
-  "lastUpdatedMinutes": "Last updated {minutes} minutes ago",
+  "lastUpdatedMinutes": "{minutes, plural, one{Last updated 1 minute ago} other{Last updated {minutes} minutes ago}}",
   "@lastUpdatedMinutes": {
   "placeholders": {
     "minutes": {
       "type": "int"}}},
-"lastUpdatedHours": "Last updated {hours} hours ago",
+"lastUpdatedHours": "{hours, plural, one{Last updated 1 hour ago} other{Last updated {hours} hours ago}}",
 "@lastUpdatedHours": {
   "placeholders": {
     "hours": {
       "type": "int"}}},
-"lastUpdatedDays": "Last updated {days} days ago",
+"lastUpdatedDays": "{days, plural, one{Last updated 1 day ago} other{Last updated {days} days ago}}",
 "@lastUpdatedDays": {
   "placeholders": {
     "days": {
