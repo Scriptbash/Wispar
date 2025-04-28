@@ -418,5 +418,61 @@
   "hours": "小时",
   "@hours": {},
   "queryHasNoNameError": "您必须输入查询名称以保存。",
-  "@queryHasNoNameError": {}
+  "@queryHasNoNameError": {},
+  "notifications": "通知",
+  "@notifications": {},
+  "notifPermsGranted": "权限已授予",
+  "@notifPermsGranted": {},
+  "notifPermsNotGranted": "权限未授予",
+  "@notifPermsNotGranted": {},
+  "openAppSettings": "打开设置",
+  "@openAppSettings": {},
+  "pendingUpdate": "更新待处理",
+  "@pendingUpdate": {},
+  "hiddenArticles": "已隐藏的出版物",
+  "@hiddenArticles": {},
+  "noHiddenArticles": "无隐藏出版物",
+  "@noHiddenArticles": {},
+  "hideArticle": "隐藏此出版物",
+  "@hideArticle": {},
+  "viewHiddenArticles": "查看隐藏出版物",
+  "@viewHiddenArticles": {},
+  "unhideArticle": "取消隐藏此出版物",
+  "@unhideArticle": {},
+  "notificationSettingsMessage": "通知被永久关闭。若要启用，请前往应用的通知设置。",
+  "@notificationSettingsMessage": {},
+  "notificationContent": "有新文章可供阅读！",
+  "@notificationContent": {},
+  "notificationTitleJournal": "期刊已更新",
+  "@notificationTitleJournal": {},
+  "notificationTitleQuery": "查询已更新",
+  "@notificationTitleQuery": {},
+  "fgNotificationContent": "Wispar 正在后台运行以更新您的期刊",
+  "@fgNotificationContent": {},
+  "fgNotificationTitle": "后台更新服务",
+  "@fgNotificationTitle": {},
+  "lastUpdatedMinutes": "{minutes, plural, one{1分钟前更新} other{{minutes}分钟前更新}}",
+  "@lastUpdatedMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "lastUpdatedHours": "{hours, plural, one{1小时前更新} other{{hours}小时前更新}}",
+  "@lastUpdatedHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "lastUpdatedDays": "{days, plural, one{1天前更新} other{{days}天前更新}}",
+  "@lastUpdatedDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  }
 }

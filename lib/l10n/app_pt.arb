@@ -418,5 +418,61 @@
   "cleanupIntervalHint": "Insira um número de dias (1 a 365)",
   "@cleanupIntervalHint": {},
   "publicationDate": "Data da publicação",
-  "@publicationDate": {}
+  "@publicationDate": {},
+  "notifications": "Notificações",
+  "@notifications": {},
+  "notifPermsGranted": "Permissão concedida",
+  "@notifPermsGranted": {},
+  "notifPermsNotGranted": "Permissão não concedida",
+  "@notifPermsNotGranted": {},
+  "notificationContent": "Novos artigos disponíveis!",
+  "@notificationContent": {},
+  "notificationTitleJournal": "As revistas foram atualizadas",
+  "@notificationTitleJournal": {},
+  "notificationTitleQuery": "As consultas foram atualizadas",
+  "@notificationTitleQuery": {},
+  "fgNotificationTitle": "Serviço de atualização em segundo plano",
+  "@fgNotificationTitle": {},
+  "pendingUpdate": "Atualização pendente",
+  "@pendingUpdate": {},
+  "hiddenArticles": "Publicações ocultas",
+  "@hiddenArticles": {},
+  "noHiddenArticles": "Nenhuma publicação oculta",
+  "@noHiddenArticles": {},
+  "hideArticle": "Ocultar esta publicação",
+  "@hideArticle": {},
+  "viewHiddenArticles": "Ver publicações ocultas",
+  "@viewHiddenArticles": {},
+  "unhideArticle": "Revelar esta publicação",
+  "@unhideArticle": {},
+  "lastUpdatedDays": "{days, plural, one{Última atualização há 1 dia} other{Última atualização há {days} dias atrás}}",
+  "@lastUpdatedDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "lastUpdatedMinutes": "{minutes, plural, one{Última atualização há 1 minuto} other{Última atualização há {minutes} minutos atrás}}",
+  "@lastUpdatedMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "openAppSettings": "Abrir configurações",
+  "@openAppSettings": {},
+  "lastUpdatedHours": "{hours, plural, one{Última atualização há 1 hora} other{Última atualização há {hours} horas atrás}}",
+  "@lastUpdatedHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationSettingsMessage": "As notificações estão permanentemente desativadas. Para habilitar, vá para as configurações de notificação do APP.",
+  "@notificationSettingsMessage": {},
+  "fgNotificationContent": "Wispar está rodando em segundo plano para atualizar as suas revistas",
+  "@fgNotificationContent": {}
 }
