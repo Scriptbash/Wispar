@@ -48,7 +48,7 @@ dependencies:
   http: ^1.2.2
   pdfrx: ^1.0.88
   package_info_plus: ^8.1.1
-  share_plus: ^10.1.2
+  share_plus: ^11.0.0
   introduction_screen: ^3.1.14
   open_filex: ^4.7.0
   google_nav_bar: ^5.0.7
