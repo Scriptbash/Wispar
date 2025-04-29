@@ -65,10 +65,11 @@ class _ArticleScreenState extends State<ArticleScreen> {
   void _onShare(BuildContext context) async {
     final box = context.findRenderObject() as RenderBox?;
     try {
-      await Share.share(
-        '${widget.title}\n\n${widget.url}\n\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage} 👻',
+      await SharePlus.instance.share(ShareParams(
+        text:
+            '${widget.title}\n\n${widget.url}\n\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage} 👻',
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
-      );
+      ));
     } catch (e) {
       debugPrint('Shared too fast: {$e}');
     }
