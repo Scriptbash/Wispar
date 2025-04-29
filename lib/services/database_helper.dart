@@ -436,12 +436,12 @@ class DatabaseHelper {
 
     final List<Map<String, dynamic>> maps = await db.rawQuery('''
     SELECT articles.*, journals.title AS journalTitle, 
-           GROUP_CONCAT(journal_issns.issn) AS issns
-    FROM articles
-    JOIN journals ON articles.journal_id = journals.journal_id
-    JOIN journal_issns ON journals.journal_id = journal_issns.journal_id  -- Join the journal_issns table for the correct ISSNs
-    WHERE articles.dateLiked IS NOT NULL
-    GROUP BY articles.article_id  -- Group by article_id to ensure one entry per article
+       GROUP_CONCAT(journal_issns.issn) AS issns
+        FROM articles
+        LEFT JOIN journals ON articles.journal_id = journals.journal_id
+        LEFT JOIN journal_issns ON journals.journal_id = journal_issns.journal_id
+        WHERE articles.dateLiked IS NOT NULL
+        GROUP BY articles.article_id
   ''');
 
     return List.generate(maps.length, (i) {
@@ -669,12 +669,13 @@ class DatabaseHelper {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.rawQuery('''
     SELECT articles.*, journals.title AS journalTitle, 
-           GROUP_CONCAT(journal_issns.issn) AS issns
-    FROM articles
-    JOIN journals ON articles.journal_id = journals.journal_id
-    JOIN journal_issns ON journals.journal_id = journal_issns.journal_id  -- Join the journal_issns table
-    WHERE articles.dateDownloaded IS NOT NULL
-    GROUP BY articles.article_id  -- Group by article_id to ensure one entry per article
+       GROUP_CONCAT(journal_issns.issn) AS issns
+      FROM articles
+      LEFT JOIN journals ON articles.journal_id = journals.journal_id
+      LEFT JOIN journal_issns ON journals.journal_id = journal_issns.journal_id
+      WHERE articles.dateDownloaded IS NOT NULL
+      GROUP BY articles.article_id
+
   ''');
 
     return List.generate(maps.length, (i) {
