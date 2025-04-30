@@ -21,7 +21,8 @@ class ProxyService {
         await http.get(Uri.parse('https://libproxy-db.org/proxies.json'));
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonList = json.decode(response.body);
+      final decoded = utf8.decode(response.bodyBytes);
+      final List<dynamic> jsonList = json.decode(decoded);
 
       return jsonList.map((json) => ProxyData.fromJson(json)).toList();
     } else {
