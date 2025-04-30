@@ -149,142 +149,154 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.databaseSettings),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextFormField(
-                  controller: _cleanupIntervalController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.cleanupInterval,
-                    hintText: AppLocalizations.of(context)!.cleanupIntervalHint,
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      _cleanupInterval =
-                          int.tryParse(value) ?? _cleanupInterval;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return AppLocalizations.of(context)!
-                          .cleanupIntervalInvalidNumber;
-                    }
-                    final intValue = int.tryParse(value);
-                    if (intValue == null || intValue < 1 || intValue > 365) {
-                      return AppLocalizations.of(context)!
-                          .cleanupIntervalNumberNotBetween;
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<int>(
-                  isExpanded: true,
-                  value: _fetchInterval,
-                  onChanged: (int? newValue) {
-                    setState(() {
-                      _fetchInterval = newValue!;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.apiFetchInterval,
-                    hintText:
-                        AppLocalizations.of(context)!.apiFetchIntervalHint,
-                  ),
-                  items: [
-                    DropdownMenuItem(
-                      value: 3,
-                      child: Text('3 ${AppLocalizations.of(context)!.hours}'),
-                    ),
-                    DropdownMenuItem(
-                      value: 6,
-                      child: Text('6 ${AppLocalizations.of(context)!.hours}'),
-                    ),
-                    DropdownMenuItem(
-                      value: 12,
-                      child: Text('12 ${AppLocalizations.of(context)!.hours}'),
-                    ),
-                    DropdownMenuItem(
-                      value: 24,
-                      child: Text('24 ${AppLocalizations.of(context)!.hours}'),
-                    ),
-                    DropdownMenuItem(
-                      value: 48,
-                      child: Text('48 ${AppLocalizations.of(context)!.hours}'),
-                    ),
-                    DropdownMenuItem(
-                      value: 72,
-                      child: Text('72 ${AppLocalizations.of(context)!.hours}'),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16),
-                Text(
-                  AppLocalizations.of(context)!
-                      .concurrentFetches(_concurrentFetches),
-                ),
-                Slider(
-                  value: _concurrentFetches.toDouble(),
-                  min: 1,
-                  max: 5,
-                  divisions: 4,
-                  label: _concurrentFetches.toString(),
-                  onChanged: (double value) {
-                    setState(() {
-                      _concurrentFetches = value.toInt();
-                    });
-                  },
-                ),
-                SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context)!.databaseSettings),
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      AppLocalizations.of(context)!.scrapeAbstracts,
-                    ),
-                    Switch(
-                      value: _scrapeAbstracts,
-                      onChanged: (bool value) async {
+                    TextFormField(
+                      controller: _cleanupIntervalController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText:
+                            AppLocalizations.of(context)!.cleanupInterval,
+                        hintText:
+                            AppLocalizations.of(context)!.cleanupIntervalHint,
+                      ),
+                      onChanged: (value) {
                         setState(() {
-                          _scrapeAbstracts = value;
+                          _cleanupInterval =
+                              int.tryParse(value) ?? _cleanupInterval;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return AppLocalizations.of(context)!
+                              .cleanupIntervalInvalidNumber;
+                        }
+                        final intValue = int.tryParse(value);
+                        if (intValue == null ||
+                            intValue < 1 ||
+                            intValue > 365) {
+                          return AppLocalizations.of(context)!
+                              .cleanupIntervalNumberNotBetween;
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<int>(
+                      isExpanded: true,
+                      value: _fetchInterval,
+                      onChanged: (int? newValue) {
+                        setState(() {
+                          _fetchInterval = newValue!;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText:
+                            AppLocalizations.of(context)!.apiFetchInterval,
+                        hintText:
+                            AppLocalizations.of(context)!.apiFetchIntervalHint,
+                      ),
+                      items: [
+                        DropdownMenuItem(
+                          value: 3,
+                          child:
+                              Text('3 ${AppLocalizations.of(context)!.hours}'),
+                        ),
+                        DropdownMenuItem(
+                          value: 6,
+                          child:
+                              Text('6 ${AppLocalizations.of(context)!.hours}'),
+                        ),
+                        DropdownMenuItem(
+                          value: 12,
+                          child:
+                              Text('12 ${AppLocalizations.of(context)!.hours}'),
+                        ),
+                        DropdownMenuItem(
+                          value: 24,
+                          child:
+                              Text('24 ${AppLocalizations.of(context)!.hours}'),
+                        ),
+                        DropdownMenuItem(
+                          value: 48,
+                          child:
+                              Text('48 ${AppLocalizations.of(context)!.hours}'),
+                        ),
+                        DropdownMenuItem(
+                          value: 72,
+                          child:
+                              Text('72 ${AppLocalizations.of(context)!.hours}'),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      AppLocalizations.of(context)!
+                          .concurrentFetches(_concurrentFetches),
+                    ),
+                    Slider(
+                      value: _concurrentFetches.toDouble(),
+                      min: 1,
+                      max: 5,
+                      divisions: 4,
+                      label: _concurrentFetches.toString(),
+                      onChanged: (double value) {
+                        setState(() {
+                          _concurrentFetches = value.toInt();
                         });
                       },
                     ),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)!.scrapeAbstracts,
+                        ),
+                        Switch(
+                          value: _scrapeAbstracts,
+                          onChanged: (bool value) async {
+                            setState(() {
+                              _scrapeAbstracts = value;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: _saveSettings,
+                      child: Text(AppLocalizations.of(context)!.saveSettings),
+                    ),
+                    const SizedBox(height: 64),
+                    const Divider(),
+                    const SizedBox(height: 8),
+                    FilledButton.tonalIcon(
+                      onPressed: _exportDatabase,
+                      icon: Icon(Icons.save_alt),
+                      label: Text(AppLocalizations.of(context)!.exportDatabase),
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton.tonalIcon(
+                      onPressed: _importDatabase,
+                      icon: Icon(Icons.upload_file_outlined),
+                      label: Text(AppLocalizations.of(context)!.importDatabase),
+                    ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: _saveSettings,
-                  child: Text(AppLocalizations.of(context)!.saveSettings),
-                ),
-                const SizedBox(height: 64),
-                const Divider(),
-                const SizedBox(height: 8),
-                FilledButton.tonalIcon(
-                  onPressed: _exportDatabase,
-                  icon: Icon(Icons.save_alt),
-                  label: Text(AppLocalizations.of(context)!.exportDatabase),
-                ),
-                const SizedBox(height: 16),
-                FilledButton.tonalIcon(
-                  onPressed: _importDatabase,
-                  icon: Icon(Icons.upload_file_outlined),
-                  label: Text(AppLocalizations.of(context)!.importDatabase),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }

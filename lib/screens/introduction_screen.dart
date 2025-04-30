@@ -45,48 +45,76 @@ class _IntroScreenState extends State<IntroScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return IntroductionScreen(
+    return SafeArea(
+        child: IntroductionScreen(
       pages: [
         PageViewModel(
-            title: AppLocalizations.of(context)!.welcomeWispar,
-            body: AppLocalizations.of(context)!.appDescription,
-            image: Center(
-                child: Image.asset(
-              'assets/icon/icon.png',
-              width: 100,
-              height: 100,
-              fit: BoxFit.contain,
-            )),
-            decoration: const PageDecoration(
-              titleTextStyle: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurpleAccent),
-              bodyTextStyle: TextStyle(fontSize: 16),
-              imagePadding: EdgeInsets.only(bottom: 20),
-            ),
-            footer: Padding(
-              padding: const EdgeInsets.only(bottom: 30),
-            )),
-        PageViewModel(
-          title: AppLocalizations.of(context)!.setupInstitutionalAccess,
-          body: AppLocalizations.of(context)!.setupInstitutionalAccessLong,
-          image: Center(
-              child: Icon(Icons.school,
-                  size: 100, color: Colors.deepPurpleAccent)),
-          decoration: const PageDecoration(
-            titleTextStyle: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurpleAccent),
-            bodyTextStyle: TextStyle(fontSize: 16),
-            imagePadding: EdgeInsets.only(bottom: 20),
-          ),
-          footer: Padding(
-            padding: const EdgeInsets.only(bottom: 30),
+          titleWidget: const SizedBox.shrink(),
+          bodyWidget: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                const SizedBox(height: 20),
+                Image.asset(
+                  'assets/icon/icon.png',
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  AppLocalizations.of(context)!.welcomeWispar,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  AppLocalizations.of(context)!.appDescription,
+                  style: const TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+          decoration: const PageDecoration(
+            contentMargin: EdgeInsets.zero,
+            imagePadding: EdgeInsets.zero,
+            bodyFlex: 1,
+          ),
+        ),
+        PageViewModel(
+          titleWidget: const SizedBox.shrink(),
+          bodyWidget: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 20),
+                const Icon(Icons.school,
+                    size: 100, color: Colors.deepPurpleAccent),
+                const SizedBox(height: 20),
+                Text(
+                  AppLocalizations.of(context)!.setupInstitutionalAccess,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  AppLocalizations.of(context)!.setupInstitutionalAccessLong,
+                  style: const TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.tonal(
@@ -116,82 +144,148 @@ class _IntroScreenState extends State<IntroScreen> {
                         AppLocalizations.of(context)!.setupSelectInstitution),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
                   '${AppLocalizations.of(context)!.setupSelectedInstitution} $institutionName',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.blueGrey,
                     fontWeight: FontWeight.w500,
                   ),
+                  textAlign: TextAlign.center,
                 ),
+                const SizedBox(height: 20),
               ],
             ),
           ),
-        ),
-        PageViewModel(
-          title: AppLocalizations.of(context)!.setupLinkZotero,
-          body: AppLocalizations.of(context)!.setupZoteroLong,
-          image: Center(
-              child:
-                  Icon(Icons.book, size: 100, color: Colors.deepPurpleAccent)),
           decoration: const PageDecoration(
-            titleTextStyle: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurpleAccent),
-            bodyTextStyle: TextStyle(fontSize: 16),
-          ),
-          footer: Padding(
-            padding: const EdgeInsets.only(bottom: 30),
-            child: SizedBox(
-              width: double.infinity,
-              child: FilledButton.tonal(
-                onPressed: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ZoteroSettings(),
-                    ),
-                  );
-                },
-                child: Text(AppLocalizations.of(context)!.setupLinkMyZotero),
-              ),
-            ),
+            contentMargin: EdgeInsets.zero,
+            imagePadding: EdgeInsets.zero,
+            bodyFlex: 1,
           ),
         ),
         PageViewModel(
-            title: AppLocalizations.of(context)!.setupOtherSettings,
-            body: AppLocalizations.of(context)!.setupOtherSettingsLong,
-            image: Center(
-                child: Icon(Icons.settings,
-                    size: 100, color: Colors.deepPurpleAccent)),
-            decoration: const PageDecoration(
-              titleTextStyle: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurpleAccent),
-              bodyTextStyle: TextStyle(fontSize: 16),
+          titleWidget: const SizedBox.shrink(),
+          bodyWidget: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 20),
+                Icon(Icons.book, size: 100, color: Colors.deepPurpleAccent),
+                const SizedBox(height: 20),
+                Text(
+                  AppLocalizations.of(context)!.setupLinkZotero,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  AppLocalizations.of(context)!.setupZoteroLong,
+                  style: const TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.tonal(
+                    onPressed: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ZoteroSettings(),
+                        ),
+                      );
+                    },
+                    child:
+                        Text(AppLocalizations.of(context)!.setupLinkMyZotero),
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
             ),
-            footer: Padding(
-              padding: const EdgeInsets.only(bottom: 30),
-            )),
+          ),
+          decoration: const PageDecoration(
+            contentMargin: EdgeInsets.zero,
+            imagePadding: EdgeInsets.zero,
+            bodyFlex: 1,
+          ),
+        ),
         PageViewModel(
-            title: AppLocalizations.of(context)!.setupAlmostSet,
-            body: AppLocalizations.of(context)!.setupAlmostSetLong,
-            image: Center(
-                child: Icon(Icons.check_circle,
-                    size: 100, color: Colors.deepPurpleAccent)),
-            decoration: const PageDecoration(
-              titleTextStyle: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurpleAccent),
-              bodyTextStyle: TextStyle(fontSize: 16),
+          titleWidget: const SizedBox.shrink(),
+          bodyWidget: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 20),
+                Icon(Icons.settings, size: 100, color: Colors.deepPurpleAccent),
+                const SizedBox(height: 20),
+                Text(
+                  AppLocalizations.of(context)!.setupOtherSettings,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  AppLocalizations.of(context)!.setupOtherSettingsLong,
+                  style: const TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+              ],
             ),
-            footer: Padding(
-              padding: const EdgeInsets.only(bottom: 30),
-            )),
+          ),
+          decoration: const PageDecoration(
+            contentMargin: EdgeInsets.zero,
+            imagePadding: EdgeInsets.zero,
+            bodyFlex: 1,
+          ),
+        ),
+        PageViewModel(
+          titleWidget: const SizedBox.shrink(),
+          bodyWidget: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 20),
+                Icon(Icons.check_circle,
+                    size: 100, color: Colors.deepPurpleAccent),
+                const SizedBox(height: 20),
+                Text(
+                  AppLocalizations.of(context)!.setupAlmostSet,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  AppLocalizations.of(context)!.setupAlmostSetLong,
+                  style: const TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+              ],
+            ),
+          ),
+          decoration: const PageDecoration(
+            contentMargin: EdgeInsets.zero,
+            imagePadding: EdgeInsets.zero,
+            bodyFlex: 1,
+          ),
+        ),
       ],
       onDone: widget.onDone,
       showSkipButton: true,
@@ -213,6 +307,6 @@ class _IntroScreenState extends State<IntroScreen> {
           borderRadius: BorderRadius.all(Radius.circular(25.0)),
         ),
       ),
-    );
+    ));
   }
 }
