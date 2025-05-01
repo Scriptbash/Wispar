@@ -457,5 +457,7 @@
   "queryHasNoNameError": "Debe introducir un nombre de consulta para guardarla.",
   "@queryHasNoNameError": {},
   "emptySearchQuery": "Introduzca una consulta de búsqueda",
-  "@emptySearchQuery": {}
+  "@emptySearchQuery": {},
+  "errorOpenExternalBrowser": "No se pudo abrir el enlace en un navegador diferente",
+  "@errorOpenExternalBrowser": {}
 }
