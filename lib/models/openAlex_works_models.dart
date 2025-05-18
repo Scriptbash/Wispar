@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../services/string_format_helper.dart';
 
 class OpenAlexWorks {
   final String title;
@@ -45,7 +46,7 @@ class OpenAlexWorks {
     }
 
     return OpenAlexWorks(
-      title: json['title'] ?? 'Untitled',
+      title: cleanTitle(json['title']) ?? 'Untitled',
       doi: extractedDoi ?? json['doi'],
       url: primaryLocation?['landing_page_url'],
       authors: (json['authorships'] as List?)
@@ -81,14 +82,8 @@ String? reconstructAbstract(Map<String, dynamic>? invertedIndex) {
     }
   });
 
-  String cleanedAbstract = words.join(' ');
-  cleanedAbstract = cleanedAbstract
-      .replaceAll(RegExp(r'<[^>]*>'), '') // Remove HTML tags
-      .replaceAll(RegExp(r'^\s*abstract[:.\s]*', caseSensitive: false),
-          '') // Remove leading "Abstract"
-      .trim();
-
-  return cleanedAbstract;
+  String rawAbstract = words.join(' ');
+  return cleanAbstract(rawAbstract);
 }
 
 String cleanText(String? text) {

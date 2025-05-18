@@ -11,6 +11,7 @@ import '../services/string_format_helper.dart';
 import '../services/abstract_scraper.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:latext/latext.dart';
 
 class ArticleScreen extends StatefulWidget {
   final String doi;
@@ -157,13 +158,14 @@ class _ArticleScreenState extends State<ArticleScreen> {
                 ),
               ),
               SizedBox(height: 5),
-              SelectableText(
+              LaTexT(
+                  laTeXCode: Text(
                 widget.title,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                 ),
-              ),
+              )),
               SizedBox(height: 5),
               SelectableText(getAuthorsNames(widget.authors),
                   style: TextStyle(color: Colors.grey, fontSize: 15)),
@@ -171,24 +173,17 @@ class _ArticleScreenState extends State<ArticleScreen> {
               isLoadingAbstract
                   ? Center(child: CircularProgressIndicator())
                   : abstract != null && abstract!.isNotEmpty
-                      ? SelectableText(
+                      ? LaTexT(
+                          laTeXCode: Text(
                           abstract!,
                           textAlign: TextAlign.justify,
                           style: TextStyle(fontSize: 16),
-                        )
+                        ))
                       : Text(
                           AppLocalizations.of(context)!.abstractunavailable,
                           textAlign: TextAlign.justify,
                           style: TextStyle(fontSize: 16),
                         ),
-
-              /*SelectableText(
-                widget.abstract.isNotEmpty
-                    ? widget.abstract
-                    : AppLocalizations.of(context)!.abstractunavailable,
-                textAlign: TextAlign.justify,
-                style: TextStyle(fontSize: 16),
-              ),*/
               SizedBox(height: 20),
               Row(
                 children: [
