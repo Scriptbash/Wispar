@@ -300,7 +300,7 @@ class _PublicationCardState extends State<PublicationCard> {
                     laTeXCode: Text(
                   widget.abstract,
                   maxLines: 10,
-                  overflow: TextOverflow.fade,
+                  overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.justify,
                   style: TextStyle(fontSize: 16),
                 )),
