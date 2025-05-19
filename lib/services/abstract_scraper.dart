@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import './string_format_helper.dart';
 
 class AbstractScraper {
   Completer<String?> _completer = Completer<String?>();
@@ -60,11 +61,7 @@ class AbstractScraper {
               })();
             """,
           );
-          abstractText = abstractText!
-              .replaceAll(RegExp(r'<[^>]*>'), '') // Remove HTML tags
-              .replaceAll(RegExp(r'^\s*abstract[:.\s]*', caseSensitive: false),
-                  '') // Remove leading "Abstract"
-              .trim();
+          abstractText = cleanAbstract(abstractText!);
 
           _completer.complete(abstractText);
         } catch (e) {

@@ -5,6 +5,7 @@ import '../screens/journals_details_screen.dart';
 import 'publication_card.dart';
 import '../services/database_helper.dart';
 import '../services/string_format_helper.dart';
+import 'package:latext/latext.dart';
 
 class DownloadedCard extends StatefulWidget {
   final pdfPath;
@@ -116,9 +117,11 @@ class _DownloadedCardState extends State<DownloadedCard> {
                 ),
               ),
               SizedBox(height: 8.0),
-              Text(
-                widget.publicationCard.title,
-                style: TextStyle(fontWeight: FontWeight.bold),
+              LaTexT(
+                laTeXCode: Text(
+                  widget.publicationCard.title,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
               SizedBox(height: 5.0),
             ],
