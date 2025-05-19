@@ -11,6 +11,11 @@ String getAuthorsNames(List<PublicationAuthor> authors) {
 }
 
 String cleanAbstract(String rawAbstract) {
+  rawAbstract = rawAbstract.replaceAll(
+    RegExp(r'<jats:title>.*?</jats:title>', dotAll: true),
+    '',
+  );
+
   // Replace LaTeX equations from <jats:inline-formula> with <jats:tex-math> into $...$
   rawAbstract = rawAbstract.replaceAllMapped(
     RegExp(
