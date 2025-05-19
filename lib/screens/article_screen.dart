@@ -159,13 +159,14 @@ class _ArticleScreenState extends State<ArticleScreen> {
               ),
               SizedBox(height: 5),
               LaTexT(
+                  breakDelimiter: r'\nl',
                   laTeXCode: Text(
-                widget.title,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              )),
+                    widget.title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  )),
               SizedBox(height: 5),
               SelectableText(getAuthorsNames(widget.authors),
                   style: TextStyle(color: Colors.grey, fontSize: 15)),
@@ -174,11 +175,13 @@ class _ArticleScreenState extends State<ArticleScreen> {
                   ? Center(child: CircularProgressIndicator())
                   : abstract != null && abstract!.isNotEmpty
                       ? LaTexT(
+                          breakDelimiter: r'\nl',
                           laTeXCode: Text(
-                          abstract!,
-                          textAlign: TextAlign.justify,
-                          style: TextStyle(fontSize: 16),
-                        ))
+                            abstract!,
+                            textAlign: TextAlign.justify,
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        )
                       : Text(
                           AppLocalizations.of(context)!.abstractunavailable,
                           textAlign: TextAlign.justify,

@@ -278,11 +278,12 @@ class _PublicationCardState extends State<PublicationCard> {
                 ),
               ),
               LaTexT(
+                  breakDelimiter: r'\nl',
                   laTeXCode: Text(
-                widget.title,
-                style: TextStyle(fontWeight: FontWeight.bold),
-                softWrap: true,
-              )),
+                    widget.title,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                    softWrap: true,
+                  )),
               Text(
                 '${getAuthorsNames(widget.authors)}',
                 style: TextStyle(fontSize: 14, color: Colors.grey),
@@ -297,13 +298,14 @@ class _PublicationCardState extends State<PublicationCard> {
               SizedBox(height: 8),
               if (widget.abstract.isNotEmpty)
                 LaTexT(
+                    breakDelimiter: r'\nl',
                     laTeXCode: Text(
-                  widget.abstract,
-                  maxLines: 10,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.justify,
-                  style: TextStyle(fontSize: 16),
-                )),
+                      widget.abstract,
+                      maxLines: 10,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.justify,
+                      style: TextStyle(fontSize: 16),
+                    )),
               Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
