@@ -132,7 +132,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: LaTexT(breakDelimiter: r'\nl', laTeXCode: (Text(widget.title))),
         actions: [
           Builder(
             builder: (BuildContext context) {

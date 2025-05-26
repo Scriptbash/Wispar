@@ -1,4 +1,8 @@
+import 'package:flutter/material.dart';
+
 import '../models/crossref_journals_works_models.dart';
+import './mathml_converter.dart';
+import 'package:html/parser.dart' as html;
 
 // Formats a given date to yyyy-mm-dd
 String formatDate(DateTime? date) {
@@ -11,6 +15,9 @@ String getAuthorsNames(List<PublicationAuthor> authors) {
 }
 
 String cleanAbstract(String rawAbstract) {
+  final converter = MathmlToLatexConverter();
+  rawAbstract = converter.convert(rawAbstract);
+  rawAbstract = html.parse(rawAbstract).body!.text;
   rawAbstract = rawAbstract.replaceAll(
     RegExp(r'<jats:title>.*?</jats:title>', dotAll: true),
     '',
@@ -46,6 +53,11 @@ String cleanAbstract(String rawAbstract) {
     '',
   );
 
+  rawAbstract = rawAbstract
+      .replaceAll('&gt;', '>')
+      .replaceAll('&lt;', '<')
+      .replaceAll('&amp;', '&');
+
   // Remove extra spaces
   rawAbstract = rawAbstract.replaceAll(RegExp(r'\s+'), ' ');
 
@@ -53,8 +65,15 @@ String cleanAbstract(String rawAbstract) {
 }
 
 String cleanTitle(String rawTitle) {
+  final converter = MathmlToLatexConverter();
+  rawTitle = converter.convert(rawTitle);
+  rawTitle = html.parse(rawTitle).body!.text;
   // Remove all HTML tags
   rawTitle = rawTitle.replaceAll(RegExp(r'<[^>]+>'), '');
+  rawTitle = rawTitle
+      .replaceAll('&gt;', '>')
+      .replaceAll('&lt;', '<')
+      .replaceAll('&amp;', '&');
 
   // Remove extra spaces
   rawTitle = rawTitle.replaceAll(RegExp(r'\s+'), ' ');
