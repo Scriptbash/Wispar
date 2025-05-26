@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import '../models/crossref_journals_works_models.dart';
 import './mathml_converter.dart';
 import 'package:html/parser.dart' as html;
