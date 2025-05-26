@@ -57,6 +57,8 @@ dependencies:
   flutter_local_notifications: ^19.1.0
   permission_handler: ^12.0.0+1
   latext: ^0.5.0
+  html: ^0.15.6
+  xml: ^6.5.0
 
 dev_dependencies:
   flutter_test:
