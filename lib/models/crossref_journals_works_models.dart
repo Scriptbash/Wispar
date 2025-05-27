@@ -1,3 +1,5 @@
+import '../services/string_format_helper.dart';
+
 class JournalWork {
   final String status;
   final String messageType;
@@ -134,8 +136,8 @@ class Item {
 
     return Item(
       publisher: json['publisher'] ?? '',
-      abstract: _cleanAbstract(json['abstract'] ?? ''),
-      title: _extractTitle(json['title']),
+      abstract: cleanAbstract(json['abstract'] ?? ''),
+      title: cleanTitle(_extractTitle(json['title'])),
       publishedDate: _parseDate(json['created']),
       journalTitle: journalTitle,
       doi: json['DOI'] ?? '',
@@ -182,16 +184,6 @@ class Item {
     'https://www.nrcresearchpress.com/page/about/CorporateTextAndDataMining':
         'Canadian Science Publishing TDM policy'
   };
-
-  static String _cleanAbstract(String rawAbstract) {
-    rawAbstract = rawAbstract
-        .replaceAll(RegExp(r'<[^>]*>'), '') // Remove HTML tags
-        .replaceAll(RegExp(r'^\s*abstract[:.\s]*', caseSensitive: false),
-            '') // Remove leading "Abstract"
-        .trim();
-
-    return rawAbstract;
-  }
 
   static String _extractTitle(dynamic title) {
     // Extract the title if it's not null and is a non-empty list

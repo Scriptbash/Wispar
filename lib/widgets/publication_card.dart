@@ -9,6 +9,7 @@ import '../services/zotero_api.dart';
 import '../services/string_format_helper.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:latext/latext.dart';
 
 enum SampleItem { itemOne, itemTwo, itemThree, itemFour }
 
@@ -276,11 +277,13 @@ class _PublicationCardState extends State<PublicationCard> {
                   fontSize: 13,
                 ),
               ),
-              Text(
-                widget.title,
-                style: TextStyle(fontWeight: FontWeight.bold),
-                softWrap: true,
-              ),
+              LaTexT(
+                  breakDelimiter: r'\nl',
+                  laTeXCode: Text(
+                    widget.title,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                    softWrap: true,
+                  )),
               Text(
                 '${getAuthorsNames(widget.authors)}',
                 style: TextStyle(fontSize: 14, color: Colors.grey),
@@ -294,13 +297,15 @@ class _PublicationCardState extends State<PublicationCard> {
             children: [
               SizedBox(height: 8),
               if (widget.abstract.isNotEmpty)
-                Text(
-                  widget.abstract,
-                  maxLines: 10,
-                  overflow: TextOverflow.fade,
-                  textAlign: TextAlign.justify,
-                  style: TextStyle(fontSize: 16),
-                ),
+                LaTexT(
+                    breakDelimiter: r'\nl',
+                    laTeXCode: Text(
+                      widget.abstract,
+                      maxLines: 10,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.justify,
+                      style: TextStyle(fontSize: 16),
+                    )),
               Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [

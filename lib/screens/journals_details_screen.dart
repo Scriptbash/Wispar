@@ -217,6 +217,7 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
       });
     } catch (e) {
       if (mounted) {
+        debugPrint("Couldn't load more publications : ${e}");
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(AppLocalizations.of(context)!.failLoadMorePublication),
         ));
