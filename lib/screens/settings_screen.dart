@@ -8,6 +8,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import './database_settings_screen.dart';
 import './display_settings_screen.dart';
+import './logs_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -271,6 +272,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ],
                     ),
                   ),
+                  ListTile(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LogsScreen()),
+                        );
+                      },
+                      title: Row(
+                        children: [
+                          Icon(Icons.warning_amber),
+                          SizedBox(width: 8),
+                          Text(AppLocalizations.of(context)!.logs),
+                        ],
+                      )),
                   ListTile(
                     onTap: () async {
                       List<String> appInfo = await getAppVersion();

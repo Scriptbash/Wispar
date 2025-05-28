@@ -7,6 +7,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:archive/archive.dart';
+import '../services/logs_helper.dart';
 
 class DatabaseSettingsScreen extends StatefulWidget {
   const DatabaseSettingsScreen({Key? key}) : super(key: key);
@@ -16,6 +17,7 @@ class DatabaseSettingsScreen extends StatefulWidget {
 }
 
 class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
+  final logger = LogsService().logger;
   final _formKey = GlobalKey<FormState>();
 
   bool _scrapeAbstracts = true; // Default to scraping missing abstracts
@@ -98,8 +100,9 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.databaseExported)),
       );
-    } catch (e) {
-      debugPrint("Database export error: $e");
+      logger.info('The database was successfully exported to ${outputFile}');
+    } catch (e, stackTrace) {
+      logger.severe('Database export error.', e, stackTrace);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(
@@ -132,13 +135,16 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
         await outFile.writeAsBytes(file.content as List<int>);
       }
 
+      logger
+          .info('The database was successfully imported from ${selectedFile}');
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.databaseImported)),
       );
 
       await openDatabase('$databasePath/wispar.db');
-    } catch (e) {
-      debugPrint("Database import error: $e");
+    } catch (e, stackTrace) {
+      logger.severe('Database import error.', e, stackTrace);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(AppLocalizations.of(context)!.databaseImportFailed)),

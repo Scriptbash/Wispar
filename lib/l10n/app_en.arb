@@ -457,5 +457,11 @@
   "unknownLicense": "Unkown license",
   "@unknownLicense": {},
   "hours": "hours",
-  "@hours": {}
+  "@hours": {},
+  "failedLoadMoreResults": "Failed to load more results. Please check the logs and consider reporting the issue.",
+  "@failedLoadMoreResults":{},
+  "failedToLoadFavorites": "Failed to load favorites. Please check the logs and consider reporting the issue.",
+  "@failedToLoadFavorites":{},
+  "logs": "View logs",
+  "@logs":{}
 }
