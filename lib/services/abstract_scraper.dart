@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import './string_format_helper.dart';
+import './logs_helper.dart';
 
 class AbstractScraper {
   Completer<String?> _completer = Completer<String?>();
 
   Future<String?> scrapeAbstract(String url) async {
+    final logger = LogsService().logger;
     _completer = Completer<String?>();
 
     HeadlessInAppWebView? headlessWebView;
@@ -22,6 +24,8 @@ class AbstractScraper {
         if (_completer.isCompleted) return;
 
         try {
+          logger
+              .info("Attempting to scrape missing abstract from ${loadedUrl}");
           String? abstractText = await controller.evaluateJavascript(
             source: """
               (() => {
@@ -64,8 +68,11 @@ class AbstractScraper {
           abstractText = cleanAbstract(abstractText!);
 
           _completer.complete(abstractText);
-        } catch (e) {
+          logger.info('The missing abstract was successfully scraped.');
+        } catch (e, stackTrace) {
           _completer.completeError(e);
+          logger.severe(
+              'The missing abstract could not be scraped.', e, stackTrace);
         } finally {
           await InAppWebViewController.clearAllCache();
           headlessWebView?.dispose();

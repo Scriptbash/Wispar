@@ -7,6 +7,7 @@ import '../widgets/publication_card.dart';
 import '../widgets/journal_header.dart';
 import '../widgets/latest_works_header.dart';
 import '../services/database_helper.dart';
+import '../services/logs_helper.dart';
 
 class JournalDetailsScreen extends StatefulWidget {
   final String title;
@@ -27,6 +28,7 @@ class JournalDetailsScreen extends StatefulWidget {
 }
 
 class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
+  final logger = LogsService().logger;
   late List<journalsWorks.Item> allWorks;
   bool isLoading = false;
   late ScrollController _scrollController;
@@ -215,9 +217,12 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
         allWorks.addAll(newWorks.list);
         hasMoreResults = newWorks.hasMore && newWorks.list.isNotEmpty;
       });
-    } catch (e) {
+    } catch (e, stackTrace) {
+      logger.severe(
+          'Failed to load more publications for journal ${widget.issn}.',
+          e,
+          stackTrace);
       if (mounted) {
-        debugPrint("Couldn't load more publications : ${e}");
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(AppLocalizations.of(context)!.failLoadMorePublication),
         ));

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../generated_l10n/app_localizations.dart';
 import '../services/libproxydb_api.dart';
+import '../services/logs_helper.dart';
 
 class InstitutionScreen extends StatefulWidget {
   @override
@@ -8,6 +9,7 @@ class InstitutionScreen extends StatefulWidget {
 }
 
 class _InstitutionScreenState extends State<InstitutionScreen> {
+  final logger = LogsService().logger;
   List<ProxyData> allProxies = [];
   List<ProxyData> filteredProxies = [];
   TextEditingController searchController = TextEditingController();
@@ -30,8 +32,8 @@ class _InstitutionScreenState extends State<InstitutionScreen> {
         allProxies = proxies;
         filteredProxies = proxies;
       });
-    } catch (e) {
-      debugPrint('Error: $e');
+    } catch (e, stackTrace) {
+      logger.severe('Unable to load the proxy list', e, stackTrace);
     }
   }
 

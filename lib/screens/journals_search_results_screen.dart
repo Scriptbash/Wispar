@@ -3,6 +3,7 @@ import '../generated_l10n/app_localizations.dart';
 import '../services/crossref_api.dart';
 import '../models/crossref_journals_models.dart' as Journals;
 import '../widgets/journal_search_results_card.dart';
+import '../services/logs_helper.dart';
 
 class SearchResultsScreen extends StatefulWidget {
   final ListAndMore<Journals.Item> searchResults;
@@ -19,6 +20,7 @@ class SearchResultsScreen extends StatefulWidget {
 }
 
 class _SearchResultsScreenState extends State<SearchResultsScreen> {
+  final logger = LogsService().logger;
   List<Journals.Item> items = [];
   bool isLoading = false;
   late ScrollController _scrollController;
@@ -98,8 +100,8 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
           hasMoreResults = false;
         }
       });
-    } catch (e) {
-      debugPrint('Error loading more items: $e');
+    } catch (e, stackTrace) {
+      logger.severe('Failed to load more journals.', e, stackTrace);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content:
               Text(AppLocalizations.of(context)!.failLoadMorePublication)));

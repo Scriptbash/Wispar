@@ -462,6 +462,8 @@
   "@failedLoadMoreResults":{},
   "failedToLoadFavorites": "Failed to load favorites. Please check the logs and consider reporting the issue.",
   "@failedToLoadFavorites":{},
+  "errorOccured": "An error occured. Please check the logs and consider reporting the issue on Github.",
+  "@errorOccured":{},
   "logs": "View logs",
   "@logs":{}
 }
