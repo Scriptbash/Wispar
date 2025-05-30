@@ -4,6 +4,7 @@ import 'article_doi_search_form.dart';
 import 'article_query_search_form.dart';
 import '../services/crossref_api.dart';
 import '../screens/article_screen.dart';
+import '../services/logs_helper.dart';
 
 class CrossRefSearchForm extends StatefulWidget {
   @override
@@ -11,6 +12,7 @@ class CrossRefSearchForm extends StatefulWidget {
 }
 
 class _CrossRefSearchFormState extends State<CrossRefSearchForm> {
+  final logger = LogsService().logger;
   int selectedSearchIndex = 0; // 0 for Query, 1 for DOI
   final TextEditingController doiController = TextEditingController();
   final GlobalKey<QuerySearchFormState> _queryFormKey =
@@ -80,20 +82,22 @@ class _CrossRefSearchFormState extends State<CrossRefSearchForm> {
               ),
             ),
           );
-        } catch (e) {
+        } catch (e, stackTrace) {
+          logger.severe(
+              'Error searching by DOI for DOI ${doi}.', e, stackTrace);
           Navigator.pop(context); // Close loading dialog
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.errorOccured)),
           );
-          debugPrint('Error: $e');
         }
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      logger.severe('Error searching articles using ${selectedSearchIndex}.', e,
+          stackTrace);
       Navigator.pop(context); // Close loading dialog
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.errorOccured)),
       );
-      debugPrint('Error: $e');
     }
   }
 

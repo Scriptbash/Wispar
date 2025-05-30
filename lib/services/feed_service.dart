@@ -4,8 +4,10 @@ import '../models/crossref_journals_works_models.dart' as journalWorks;
 import '../services/feed_api.dart';
 import '../services/database_helper.dart';
 import '../widgets/publication_card.dart';
+import '../services/logs_helper.dart';
 
 class FeedService {
+  final logger = LogsService().logger;
   final DatabaseHelper _dbHelper = DatabaseHelper();
 
   // Gather journals that will need to have their articles fetched
@@ -35,15 +37,17 @@ class FeedService {
               journalsToUpdate.add(journalId);
             }
           } else {
-            debugPrint('No journal found for journal_id: $journalId');
+            logger.warning('No journal found for journal_id ${journalId}');
           }
         } else {
-          debugPrint('No journalId found for ISSN: ${journal.issn}');
+          logger.warning('No journal_id found for ISSN ${journal.issn}');
         }
-      } catch (e) {
-        debugPrint('Error retrieving journal_id for ISSN ${journal.issn}: $e');
+      } catch (e, stackTrace) {
+        logger.severe('Error retrieving journal_id for ISSN ${journal.issn}.',
+            e, stackTrace);
       }
     }
+    logger.info('Found journals to update : $journalsToUpdate');
     return journalsToUpdate;
   }
 
@@ -51,23 +55,26 @@ class FeedService {
   Future<List<Map<String, dynamic>>> checkSavedQueriesToUpdate(
       List<Map<String, dynamic>> savedQueries, int fetchIntervalInHours) async {
     List<Map<String, dynamic>> queriesToUpdate = [];
+    try {
+      for (var query in savedQueries) {
+        String? lastFetched = query['lastFetched'] as String?;
 
-    for (var query in savedQueries) {
-      String? lastFetched = query['lastFetched'] as String?;
-
-      if (lastFetched == null ||
-          lastFetched.isEmpty ||
-          DateTime.now().difference(DateTime.parse(lastFetched)).inHours >=
-              fetchIntervalInHours) {
-        queriesToUpdate.add({
-          'query_id': query['query_id'],
-          'queryParams': query['queryParams'],
-          'queryName': query['queryName'],
-          'queryProvider': query['queryProvider'],
-        });
+        if (lastFetched == null ||
+            lastFetched.isEmpty ||
+            DateTime.now().difference(DateTime.parse(lastFetched)).inHours >=
+                fetchIntervalInHours) {
+          queriesToUpdate.add({
+            'query_id': query['query_id'],
+            'queryParams': query['queryParams'],
+            'queryName': query['queryName'],
+            'queryProvider': query['queryProvider'],
+          });
+        }
       }
+    } catch (e, stackTrace) {
+      logger.severe('Error retrieving saved queries to update.', e, stackTrace);
     }
-
+    logger.info('Found saved queries to update ${savedQueries}');
     return queriesToUpdate;
   }
 
@@ -137,8 +144,8 @@ class FeedService {
           }
         }));
       }
-    } catch (e) {
-      debugPrint('Error updating feed: $e');
+    } catch (e, stackTrace) {
+      logger.severe('Error updating the journals feed.', e, stackTrace);
     }
   }
 
@@ -212,7 +219,8 @@ class FeedService {
           }));
         }
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      logger.severe('Error updating the saved queries feed.', e, stackTrace);
       debugPrint('Error updating saved queries feed: $e');
     }
   }

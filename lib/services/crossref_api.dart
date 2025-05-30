@@ -42,7 +42,8 @@ class CrossRefApi {
         totalResults: crossrefJournals.message.totalResults,
       );
     } else {
-      throw Exception('Failed to query journals');
+      throw Exception(
+          'Failed to query journals by name. Status code: ${response.statusCode}');
     }
   }
 
@@ -69,7 +70,8 @@ class CrossRefApi {
         throw Exception('Message object missing in response');
       }
     } else {
-      throw Exception('Failed to query journals: ${response.statusCode}');
+      throw Exception(
+          'Failed to query journals by ISSN. Status code: ${response.statusCode}');
     }
   }
 
@@ -103,7 +105,8 @@ class CrossRefApi {
         totalResults: crossrefWorks.message.totalResults,
       );
     } else {
-      throw Exception('Failed to query journal works');
+      throw Exception(
+          'Failed to query journal works: Status code: ${response.statusCode}');
     }
   }
 
@@ -145,7 +148,8 @@ class CrossRefApi {
         throw Exception('Invalid response format for work by DOI');
       }
     } else {
-      throw Exception('Failed to load work by DOI');
+      throw Exception(
+          'Failed to get work by DOI. Status code: ${response.statusCode}');
     }
   }
 
@@ -177,7 +181,8 @@ class CrossRefApi {
         totalResults: responseData.message.totalResults,
       );
     } else {
-      throw Exception('Failed to fetch results');
+      throw Exception(
+          'Failed to fetch results. Status code: ${response.statusCode}');
     }
   }
 }

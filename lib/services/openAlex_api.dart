@@ -7,14 +7,11 @@ class OpenAlexApi {
   static const String baseUrl = 'https://api.openalex.org';
   static const String worksEndpoint = '/works?';
   static const String email = 'mailto=wispar-app@protonmail.com';
-  static String? _currentQuery;
 
   static Future<List<journalWorks.Item>> getOpenAlexWorksByQuery(
       String query, int scope, String? sortField, String? sortOrder,
       {int page = 1} // Default to page 1
       ) async {
-    _currentQuery = query;
-
     final scopeMap = {
       1: 'search=', // Everything
       2: 'filter=title_and_abstract.search:', // Title and Abstract

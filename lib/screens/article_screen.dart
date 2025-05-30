@@ -12,6 +12,7 @@ import '../services/abstract_scraper.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:latext/latext.dart';
+import '../services/logs_helper.dart';
 
 class ArticleScreen extends StatefulWidget {
   final String doi;
@@ -50,6 +51,7 @@ class ArticleScreen extends StatefulWidget {
 class _ArticleScreenState extends State<ArticleScreen> {
   bool isLiked = false;
   late DatabaseHelper databaseHelper;
+  final logger = LogsService().logger;
   String? abstract;
   bool isLoadingAbstract = false;
   bool _scrapeAbstracts = true;
@@ -71,8 +73,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
             '${widget.title}\n\n${widget.url}\n\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage} 👻',
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
       ));
-    } catch (e) {
-      debugPrint('Shared too fast: {$e}');
+    } catch (e, stackTrace) {
+      logger.severe('Sharing failed.', e, stackTrace);
     }
   }
 
@@ -114,8 +116,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
       try {
         databaseHelper.updateArticleAbstract(widget.doi, finalAbstract);
         widget.onAbstractChanged!();
-      } catch (e) {
-        debugPrint("Unable to update the abstract: ${e}");
+      } catch (e, stackTrace) {
+        logger.warning('Unable to update the abstract.', e, stackTrace);
       }
     } else {
       finalAbstract = AppLocalizations.of(context)!.abstractunavailable;
@@ -125,7 +127,6 @@ class _ArticleScreenState extends State<ArticleScreen> {
       abstract = finalAbstract;
       isLoadingAbstract = false;
     });
-    // debugPrint("Final Abstract: $abstract");
   }
 
   @override

@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import '../services/logs_helper.dart';
 
 class PdfReader extends StatefulWidget {
   final String pdfUrl;
@@ -20,6 +21,7 @@ class PdfReader extends StatefulWidget {
 }
 
 class _PdfReaderState extends State<PdfReader> {
+  final logger = LogsService().logger;
   final controller = PdfViewerController();
   late DatabaseHelper databaseHelper;
   late String resolvedPdfPath = "";
@@ -64,7 +66,11 @@ class _PdfReaderState extends State<PdfReader> {
               onPressed: () async {
                 try {
                   OpenFilex.open(resolvedPdfPath);
-                } catch (e) {
+                } catch (e, stackTrace) {
+                  logger.severe(
+                      'Unable to open the PDF file in an external app.',
+                      e,
+                      stackTrace);
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text(AppLocalizations.of(context)!
                           .errorOpenExternalPdfApp)));

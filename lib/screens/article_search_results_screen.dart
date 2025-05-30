@@ -4,6 +4,7 @@ import '../widgets/publication_card.dart';
 import '../models/crossref_journals_works_models.dart' as journalsWorks;
 import '../services/crossref_api.dart';
 import '../services/openAlex_api.dart';
+import '../services/logs_helper.dart';
 
 class ArticleSearchResultsScreen extends StatefulWidget {
   final List<journalsWorks.Item> initialSearchResults;
@@ -26,6 +27,7 @@ class ArticleSearchResultsScreen extends StatefulWidget {
 
 class _ArticleSearchResultsScreenState
     extends State<ArticleSearchResultsScreen> {
+  final logger = LogsService().logger;
   late List<journalsWorks.Item> _searchResults;
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
@@ -86,10 +88,13 @@ class _ArticleSearchResultsScreenState
         _searchResults.addAll(newResults);
         _hasMoreResults = hasMore;
       });
-    } catch (e) {
+    } catch (e, stackTrace) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load more results')),
+        SnackBar(
+            content: Text(AppLocalizations.of(context)!.failedLoadMoreResults)),
       );
+      logger.severe(
+          'Failed to load more article search results.', e, stackTrace);
     } finally {
       setState(() {
         _isLoadingMore = false;

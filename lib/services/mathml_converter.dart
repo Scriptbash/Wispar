@@ -1,15 +1,16 @@
-import 'package:flutter/material.dart';
 import 'package:xml/xml.dart';
+import './logs_helper.dart';
 
 // Converts MathML to latex equations so that they can be rendered with Latext
 class MathmlToLatexConverter {
+  final logger = LogsService().logger;
   String convert(String raw) {
     try {
       final wrapped = '<root>$raw</root>';
       final document = XmlDocument.parse(wrapped);
       return _convertChildren(document.rootElement.children);
-    } catch (e) {
-      debugPrint("Unable to convert MathML: ${e}");
+    } catch (e, stackTrace) {
+      logger.warning('Unable to convert MathML to Latex.', e, stackTrace);
       return raw;
     }
   }
