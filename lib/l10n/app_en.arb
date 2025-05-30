@@ -483,6 +483,8 @@
   "logsExportedSuccessfully": "Successfully saved the logs!",
   "@logsExportedSuccessfully":{},
   "logsExportedError": "Unable to save the logs.",
-  "@logsExportedError":{}
+  "@logsExportedError":{},
+  "shareLogs": "Share logs",
+  "@shareLogs":{}
 
 }

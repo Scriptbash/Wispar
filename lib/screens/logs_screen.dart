@@ -23,6 +23,14 @@ class LogsScreen extends StatelessWidget {
             },
           ),
           IconButton(
+            icon:
+                Icon(Icons.share, color: Theme.of(context).colorScheme.primary),
+            tooltip: AppLocalizations.of(context)!.shareLogs,
+            onPressed: () async {
+              await LogsService().shareLogs(context);
+            },
+          ),
+          IconButton(
             icon: Icon(Icons.delete,
                 color: Theme.of(context).colorScheme.primary),
             tooltip: AppLocalizations.of(context)!.deleteLogs,
