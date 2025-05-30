@@ -284,7 +284,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         children: [
                           Icon(Icons.warning_amber),
                           SizedBox(width: 8),
-                          Text(AppLocalizations.of(context)!.logs),
+                          Text(AppLocalizations.of(context)!.viewLogs),
                         ],
                       )),
                   ListTile(

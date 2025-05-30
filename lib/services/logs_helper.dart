@@ -1,12 +1,15 @@
-import 'package:logging/logging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:logging/logging.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
 
 class LogsService {
   static final LogsService _instance = LogsService._internal();
   factory LogsService() => _instance;
 
   final Logger _logger = Logger('Wispar');
-  final List<LogRecord> _logRecords = [];
+  final ValueNotifier<List<LogRecord>> logsNotifier = ValueNotifier([]);
 
   LogsService._internal() {
     _init();
@@ -15,7 +18,7 @@ class LogsService {
   void _init() {
     Logger.root.level = Level.ALL;
     Logger.root.onRecord.listen((record) {
-      _logRecords.add(record);
+      logsNotifier.value = [...logsNotifier.value, record];
 
       if (kDebugMode) {
         print(
@@ -29,7 +32,47 @@ class LogsService {
 
   Logger get logger => _logger;
 
-  List<LogRecord> getLogs() => List.unmodifiable(_logRecords);
+  void clearLogs() {
+    logsNotifier.value = [];
+  }
 
-  void clearLogs() => _logRecords.clear();
+  Future<void> saveLogsToFile(context) async {
+    final logs = LogsService().logsNotifier.value;
+    final buffer = StringBuffer();
+
+    try {
+      for (var record in logs) {
+        buffer.writeln(
+            '${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}');
+        if (record.error != null) buffer.writeln('Error: ${record.error}');
+        if (record.stackTrace != null)
+          buffer.writeln('Stacktrace: ${record.stackTrace}');
+        buffer.writeln();
+      }
+
+      final Uint8List logBytes =
+          Uint8List.fromList(buffer.toString().codeUnits);
+
+      final String? outputPath = await FilePicker.platform.saveFile(
+        dialogTitle: AppLocalizations.of(context)!.selectLogsLocation,
+        fileName: 'wispar_logs.txt',
+        bytes: logBytes,
+      );
+
+      if (outputPath == null) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content:
+                Text(AppLocalizations.of(context)!.logsExportedSuccessfully)),
+      );
+    } catch (e, stackTrace) {
+      logger.severe('Error saving logs.', e, stackTrace);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(AppLocalizations.of(context)!.logsExportedError)),
+      );
+    }
+  }
 }

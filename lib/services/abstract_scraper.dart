@@ -66,13 +66,12 @@ class AbstractScraper {
             """,
           );
           abstractText = cleanAbstract(abstractText!);
-
-          _completer.complete(abstractText);
           logger.info('The missing abstract was successfully scraped.');
+          _completer.complete(abstractText);
         } catch (e, stackTrace) {
-          _completer.completeError(e);
           logger.severe(
               'The missing abstract could not be scraped.', e, stackTrace);
+          _completer.completeError(e);
         } finally {
           await InAppWebViewController.clearAllCache();
           headlessWebView?.dispose();

@@ -464,6 +464,25 @@
   "@failedToLoadFavorites":{},
   "errorOccured": "An error occured. Please check the logs and consider reporting the issue on Github.",
   "@errorOccured":{},
-  "logs": "View logs",
-  "@logs":{}
+  "logs": "Logs",
+  "@logs":{},
+  "viewLogs": "View logs",
+  "@viewLogs":{},
+  "deleteLogs": "Delete logs",
+  "@deleteLogs":{},
+  "logsDeleted": "Logs deleted",
+  "@logsDeleted":{},
+  "logsUnavailable": "No logs available.",
+  "@logsUnavailable":{},
+  "logCopied": "Log copied to clipboard",
+  "@logCopied":{},
+  "saveLogs": "Save logs",
+  "@saveLogs":{},
+  "selectLogsLocation": "Select a location where to save the logs",
+  "@selectLogsLocation":{},
+  "logsExportedSuccessfully": "Successfully saved the logs!",
+  "@logsExportedSuccessfully":{},
+  "logsExportedError": "Unable to save the logs.",
+  "@logsExportedError":{}
+
 }

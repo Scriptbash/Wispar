@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:flutter/services.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
 import '../services/logs_helper.dart';
 
 class LogsScreen extends StatelessWidget {
@@ -7,33 +9,60 @@ class LogsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<LogRecord> logs = LogsService().getLogs();
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Logs'),
+        title: Text(AppLocalizations.of(context)!.logs),
+        centerTitle: false,
         actions: [
           IconButton(
-            icon: Icon(Icons.delete_outline,
+            icon: Icon(Icons.download,
                 color: Theme.of(context).colorScheme.primary),
-            tooltip: 'Delete logs',
+            tooltip: AppLocalizations.of(context)!.saveLogs,
+            onPressed: () async {
+              await LogsService().saveLogsToFile(context);
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.delete,
+                color: Theme.of(context).colorScheme.primary),
+            tooltip: AppLocalizations.of(context)!.deleteLogs,
             onPressed: () {
               LogsService().clearLogs();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Logs deleted')),
+                SnackBar(
+                  content: Text(AppLocalizations.of(context)!.logsDeleted),
+                ),
               );
             },
           ),
         ],
       ),
-      body: logs.isEmpty
-          ? const Center(child: Text('No logs available.'))
-          : ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: logs.length,
-              itemBuilder: (context, index) {
-                final log = logs[index];
-                return Card(
+      body: ValueListenableBuilder<List<LogRecord>>(
+        valueListenable: LogsService().logsNotifier,
+        builder: (context, logs, _) {
+          if (logs.isEmpty) {
+            return Center(
+                child: Text(AppLocalizations.of(context)!.logsUnavailable));
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(8),
+            itemCount: logs.length,
+            itemBuilder: (context, index) {
+              final log = logs[index];
+              return GestureDetector(
+                onLongPress: () {
+                  final content =
+                      '[${log.level.name}] ${log.time.toLocal()} — ${log.message}'
+                      '${log.error != null ? '\nError: ${log.error}' : ''}'
+                      '${log.stackTrace != null ? '\nStack trace:\n${log.stackTrace}' : ''}';
+                  Clipboard.setData(ClipboardData(text: content));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text(AppLocalizations.of(context)!.logCopied)),
+                  );
+                },
+                child: Card(
                   color: _logColor(log.level),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -67,9 +96,12 @@ class LogsScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 
