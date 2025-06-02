@@ -406,7 +406,7 @@
   "@fgNotificationTitle": {},
   "enterKeyword": "ஒரு முக்கிய சொல்லை உள்ளிடவும்",
   "@enterKeyword": {},
-  "lastUpdatedHours": "{மணிநேரம், பன்மை, ஒன்று {Last updated 1 hour ago} மற்றவை {கடைசி புதுப்பிக்கப்பட்ட {hours} மணிநேரங்களுக்கு முன்பு}}",
+  "lastUpdatedHours": "{hours, plural, one{கடைசி புதுப்பிக்கப்பட்டது 1 மணிநேரத்துக்கு முன்பு} other{கடைசி புதுப்பிக்கப்பட்டது {hours} மணிநேரங்களுக்கு முன்பு}}",
   "@lastUpdatedHours": {
     "placeholders": {
       "hours": {
@@ -414,7 +414,7 @@
       }
     }
   },
-  "lastUpdatedDays": "{நாட்கள், பன்மை, ஒன்று {Last updated 1 day ago} மற்ற {கடைசி புதுப்பிக்கப்பட்ட {days} நாட்கள் முன்பு}}",
+  "lastUpdatedDays": "{days, plural, one{கடைசி புதுப்பிக்கப்பட்டது 1 நாள் முன்பு} other{கடைசி புதுப்பிக்கப்பட்டது {days} நாட்கள் முன்பு}}",
   "@lastUpdatedDays": {
     "placeholders": {
       "days": {
@@ -424,9 +424,9 @@
   },
   "noHiddenArticles": "மறைக்கப்பட்ட வெளியீடுகள் இல்லை",
   "@noHiddenArticles": {},
-  "unhideArticle": "இந்த வெளியீட்டை மறைக்கவும்",
+  "unhideArticle": "இந்த வெளியீட்டை மறைவிலகு",
   "@unhideArticle": {},
-  "hideArticle": "இந்த வெளியீட்டை மறைக்கவும்",
+  "hideArticle": "இந்த வெளியீட்டை மறை",
   "@hideArticle": {},
   "viewHiddenArticles": "மறைக்கப்பட்ட வெளியீடுகளைக் காண்க",
   "@viewHiddenArticles": {},
