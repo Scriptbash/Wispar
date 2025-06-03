@@ -60,8 +60,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     } catch (e, stackTrace) {
       logger.severe('Failed to load favorite articles.', e, stackTrace);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(AppLocalizations.of(context)!.failedToLoadFavorites)),
+        SnackBar(content: Text(AppLocalizations.of(context)!.errorOccured)),
       );
       return [];
     }

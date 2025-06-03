@@ -379,6 +379,10 @@
   "@zoteroInvalidKey": {
     "description": "Snackbar shown when an attempt to save an invalid Zotero API key is made."
   },
+  "zoteroApiKeyEmpty": "The Zotero API key has not been set yet. Please configure the API key in the app settings.",
+  "@zoteroApiKeyEmpty":{},
+  "zoteroArticleSent": "The article was sent to Zotero.",
+  "@zoteroArticleSent":{},
   "save": "Save",
   "@save": {},
   "savedOn": "Saved on {date}",
@@ -460,8 +464,6 @@
   "@hours": {},
   "failedLoadMoreResults": "Failed to load more results. Please check the logs and consider reporting the issue.",
   "@failedLoadMoreResults":{},
-  "failedToLoadFavorites": "Failed to load favorites. Please check the logs and consider reporting the issue.",
-  "@failedToLoadFavorites":{},
   "errorOccured": "An error occured. Please check the logs and consider reporting the issue on Github.",
   "@errorOccured":{},
   "logs": "Logs",

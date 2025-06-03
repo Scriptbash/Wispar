@@ -3,6 +3,7 @@ import '../generated_l10n/app_localizations.dart';
 import '../screens/journals_search_results_screen.dart';
 import '../services/crossref_api.dart';
 import '../models/crossref_journals_models.dart' as Journals;
+import '../services/logs_helper.dart';
 
 class JournalSearchForm extends StatefulWidget {
   @override
@@ -10,6 +11,7 @@ class JournalSearchForm extends StatefulWidget {
 }
 
 class _JournalSearchFormState extends State<JournalSearchForm> {
+  final logger = LogsService().logger;
   bool saveQuery = false;
   int selectedSearchIndex = 0; // 0 for 'name', 1 for 'issn'
   late Journals.Item selectedJournal;
@@ -157,8 +159,8 @@ class _JournalSearchFormState extends State<JournalSearchForm> {
           ),
         ),
       );
-    } catch (e) {
-      debugPrint('Error handling search: $e');
+    } catch (e, stackTrace) {
+      logger.severe("Unable to search for journals.", e, stackTrace);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(AppLocalizations.of(context)!.journalSearchError)),

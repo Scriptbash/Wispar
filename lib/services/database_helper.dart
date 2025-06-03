@@ -8,9 +8,11 @@ import '../models/journal_entity.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
+import './logs_helper.dart';
 
 class DatabaseHelper {
   static Database? _database;
+  final logger = LogsService().logger;
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -85,7 +87,7 @@ class DatabaseHelper {
         )
       ''');
     }, onUpgrade: (db, oldVersion, newVersion) async {
-      debugPrint('Upgrading DB');
+      logger.info("Upgrading DB from ${oldVersion} to ${newVersion}");
       await db.execute('PRAGMA foreign_keys = ON');
       if (oldVersion < 2) {
         // Ads the new column to the savedQueries table
@@ -103,7 +105,6 @@ class DatabaseHelper {
       ''');
       }
       if (oldVersion < 3) {
-        debugPrint("Updating db to v3");
         List<Map<String, dynamic>> articles =
             await db.rawQuery('SELECT article_id, pdfPath FROM articles');
         for (var article in articles) {
@@ -121,7 +122,6 @@ class DatabaseHelper {
       ''');
       }
       if (oldVersion < 4) {
-        debugPrint("Updating db to v4");
         await db.execute('''
         CREATE TABLE journal_issns (
           issn TEXT PRIMARY KEY,
@@ -146,7 +146,6 @@ class DatabaseHelper {
         // I should probably drop the issn column from the journals table
       }
       if (oldVersion < 5) {
-        debugPrint("Updating db to v5");
         await db.execute('''
         ALTER TABLE articles ADD COLUMN isHidden INTEGER;
       ''');
@@ -643,6 +642,22 @@ class DatabaseHelper {
     );
   }
 
+  Future<bool> checkIfDoiExists(String doi) async {
+    final db = await database;
+    final result = await db.query(
+      'articles',
+      columns: ['doi'],
+      where: 'doi = ?',
+      whereArgs: [doi],
+    );
+
+    if (result.isNotEmpty) {
+      return true;
+    }
+
+    return false;
+  }
+
   // Updates the abstract of an article after being scraped
   Future<void> updateArticleAbstract(String doi, String abstract) async {
     final db = await database;
@@ -875,8 +890,9 @@ class DatabaseHelper {
               if (await file.exists()) {
                 await file.delete();
               }
-            } catch (e) {
-              debugPrint('Error deleting PDF file at $pdfPath: $e');
+            } catch (e, stackTrace) {
+              logger.severe(
+                  'Error deleting PDF file at $pdfPath', e, stackTrace);
             }
           }
 
@@ -888,10 +904,10 @@ class DatabaseHelper {
           );
         }
       } else {
-        debugPrint("No old articles to clean up.");
+        logger.info("No old articles to clean up");
       }
-    } catch (e) {
-      debugPrint('Error cleaning up the database : ${e}');
+    } catch (e, stackTrace) {
+      logger.severe('Error cleaning up the database', e, stackTrace);
     }
   }
 }

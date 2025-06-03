@@ -114,10 +114,19 @@ class _ArticleScreenState extends State<ArticleScreen> {
     if (scraped != null && scraped.isNotEmpty) {
       finalAbstract = scraped;
       try {
-        databaseHelper.updateArticleAbstract(widget.doi, finalAbstract);
-        widget.onAbstractChanged!();
+        bool isArticleInDb = await databaseHelper.checkIfDoiExists(widget.doi);
+        if (isArticleInDb) {
+          databaseHelper.updateArticleAbstract(widget.doi, finalAbstract);
+          widget.onAbstractChanged!();
+        } else {
+          logger.warning(
+              'Unable to update the abstract for DOI ${widget.doi}. The article is not in the database.');
+        }
       } catch (e, stackTrace) {
-        logger.warning('Unable to update the abstract.', e, stackTrace);
+        logger.severe(
+            'An error occured while updating the abstract for DOI ${widget.doi}.',
+            e,
+            stackTrace);
       }
     } else {
       finalAbstract = AppLocalizations.of(context)!.abstractunavailable;

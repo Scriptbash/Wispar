@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import './string_format_helper.dart';
+import './logs_helper.dart';
+import '../generated_l10n/app_localizations.dart';
 
 class Zotero {
   final String doiUrl;
@@ -144,6 +146,7 @@ class ZoteroService {
 
   static Future<void> createZoteroCollection(
       String apiKey, String userId, String collectionName) async {
+    final logger = LogsService().logger;
     final url = 'https://api.zotero.org/users/$userId/collections';
     final headers = {
       'Content-Type': 'application/json',
@@ -164,15 +167,18 @@ class ZoteroService {
     );
 
     if (response.statusCode == 200) {
-      // print('Collection created successfully');
+      logger.info("Wispar collection created successfully");
     } else {
-      // print('Failed to create collection. Status code: ${response.statusCode}');
-      // print('Response body: ${response.body}');
+      logger.severe(
+          "Failed to create Wispar collection.",
+          "Status code:${response.statusCode}",
+          StackTrace.fromString("Response body: ${response.body}"));
     }
   }
 
   static Future<void> createZoteroItem(
       String apiKey, String userId, Map<String, dynamic> itemData) async {
+    final logger = LogsService().logger;
     final url = 'https://api.zotero.org/users/$userId/items';
     final headers = {
       'Content-Type': 'application/json',
@@ -189,9 +195,10 @@ class ZoteroService {
       //print('Article item created successfully');
       //print(response.body);
     } else {
-      //print(
-      //    'Failed to create article item. Status code: ${response.statusCode}');
-      //print('Response body: ${response.body}');
+      logger.severe(
+          "Failed to create Zotero item.",
+          "Status code:${response.statusCode}",
+          StackTrace.fromString("Response body: ${response.body}"));
     }
   }
 
@@ -204,6 +211,7 @@ class ZoteroService {
       DateTime? publishedDate,
       String doi,
       List<String> issn) async {
+    final logger = LogsService().logger;
     String? apiKey = await ZoteroService.loadApiKey();
     String? userId = await ZoteroService.loadUserId();
     String? wisparCollectionKey;
@@ -221,11 +229,8 @@ class ZoteroService {
         }
       }
 
-      if (collectionExists) {
-        debugPrint(
-            'Wispar collection already exists with key: $wisparCollectionKey');
-      } else {
-        debugPrint('Wispar collection does not exist yet');
+      if (!collectionExists) {
+        logger.warning("Wispar collection does not exist yet... creating it.");
 
         // Create the "Wispar" collection
         await ZoteroService.createZoteroCollection(apiKey, userId, 'Wispar');
@@ -288,15 +293,15 @@ class ZoteroService {
       await ZoteroService.createZoteroItem(apiKey, userId, articleData);
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('The article was sent to Zotero'),
+        content: Text(AppLocalizations.of(context)!.zoteroArticleSent),
         duration: const Duration(seconds: 1),
       ));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(
-          'API key is null or empty. Please configure the API key in the settings.',
+          AppLocalizations.of(context)!.zoteroApiKeyEmpty,
         ),
-        duration: const Duration(seconds: 5),
+        duration: const Duration(seconds: 3),
       ));
     }
   }

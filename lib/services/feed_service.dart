@@ -47,7 +47,9 @@ class FeedService {
             e, stackTrace);
       }
     }
-    logger.info('Found journals to update : $journalsToUpdate');
+    if (journalsToUpdate.isNotEmpty) {
+      logger.info('Found journals to update : $journalsToUpdate');
+    }
     return journalsToUpdate;
   }
 
@@ -190,7 +192,8 @@ class FeedService {
               queryArticles =
                   await FeedApi.getSavedQueryOpenAlex(query['queryParams']);
             } else {
-              debugPrint("Unknown provider: $provider");
+              logger
+                  .warning("Unknown provider in feed_service.dart: $provider");
               return;
             }
 
@@ -221,7 +224,6 @@ class FeedService {
       }
     } catch (e, stackTrace) {
       logger.severe('Error updating the saved queries feed.', e, stackTrace);
-      debugPrint('Error updating saved queries feed: $e');
     }
   }
 }
