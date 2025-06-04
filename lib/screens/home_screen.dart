@@ -11,6 +11,7 @@ import '../widgets/sortorderdialog.dart';
 import './hidden_articles_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../services/logs_helper.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final logger = LogsService().logger;
   final DatabaseHelper dbHelper = DatabaseHelper();
   final StreamController<List<PublicationCard>> _feedStreamController =
       StreamController<List<PublicationCard>>();
@@ -135,7 +137,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
         _feedStreamController.add(_filteredFeed);
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      logger.severe("Unable to build the feed.", e, stackTrace);
       if (mounted) {
         _feedStreamController.addError(e);
       }
@@ -418,8 +421,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error.toString()}'));
-          } else if (snapshot.hasError) {
+            logger.severe("Home feed snapshot error.",
+                snapshot.error.toString(), snapshot.stackTrace);
             return Center(child: Text('Error: ${snapshot.error.toString()}'));
           } else if (_allFeed.isEmpty) {
             // Show a message when allFeed is empty

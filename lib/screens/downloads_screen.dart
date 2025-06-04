@@ -47,6 +47,9 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
       });
     } catch (e, stackTrace) {
       logger.severe('Failed to load downloaded articles.', e, stackTrace);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.errorOccured)),
+      );
     }
   }
 
