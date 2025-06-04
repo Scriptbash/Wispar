@@ -118,6 +118,7 @@ class _DownloadedCardState extends State<DownloadedCard> {
               ),
               SizedBox(height: 8.0),
               LaTexT(
+                breakDelimiter: r'\nl',
                 laTeXCode: Text(
                   widget.publicationCard.title,
                   style: TextStyle(fontWeight: FontWeight.bold),

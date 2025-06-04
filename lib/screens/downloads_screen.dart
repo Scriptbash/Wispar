@@ -4,6 +4,7 @@ import '../widgets/downloaded_card.dart';
 import '../services/database_helper.dart';
 import '../widgets/sortbydialog.dart';
 import '../widgets/sortorderdialog.dart';
+import '../services/logs_helper.dart';
 
 class DownloadsScreen extends StatefulWidget {
   const DownloadsScreen({Key? key}) : super(key: key);
@@ -13,6 +14,7 @@ class DownloadsScreen extends StatefulWidget {
 }
 
 class _DownloadsScreenState extends State<DownloadsScreen> {
+  final logger = LogsService().logger;
   List<DownloadedCard> _downloadedArticles = [];
   bool _isLoading = true;
 
@@ -35,13 +37,20 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
   }
 
   Future<void> _fetchDownloadedArticles() async {
-    final databaseHelper = DatabaseHelper();
-    final articles = await databaseHelper.getDownloadedArticles();
-    setState(() {
-      _downloadedArticles = _sortDownloads(articles);
-      _filteredDownloads = List.from(_downloadedArticles);
-      _isLoading = false;
-    });
+    try {
+      final databaseHelper = DatabaseHelper();
+      final articles = await databaseHelper.getDownloadedArticles();
+      setState(() {
+        _downloadedArticles = _sortDownloads(articles);
+        _filteredDownloads = List.from(_downloadedArticles);
+        _isLoading = false;
+      });
+    } catch (e, stackTrace) {
+      logger.severe('Failed to load downloaded articles.', e, stackTrace);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.errorOccured)),
+      );
+    }
   }
 
   void _filterDownloads(String query) {

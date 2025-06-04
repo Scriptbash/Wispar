@@ -5,6 +5,7 @@ import '../services/database_helper.dart';
 import '../services/abstract_helper.dart';
 import '../widgets/sortbydialog.dart';
 import '../widgets/sortorderdialog.dart';
+import '../services/logs_helper.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({Key? key}) : super(key: key);
@@ -14,6 +15,7 @@ class FavoritesScreen extends StatefulWidget {
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
+  final logger = LogsService().logger;
   late Future<List<PublicationCard>> _favoriteArticles;
   late ScrollController _scrollController;
   int sortBy = 0; // Set the sort by option to Article title by default
@@ -55,8 +57,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         }
       });
       return favorites;
-    } catch (e) {
-      throw Exception('Failed to load favorite articles: $e');
+    } catch (e, stackTrace) {
+      logger.severe('Failed to load favorite articles.', e, stackTrace);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.errorOccured)),
+      );
+      return [];
     }
   }
 

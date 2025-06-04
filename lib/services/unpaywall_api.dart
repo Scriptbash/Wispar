@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import './logs_helper.dart';
 
 class Unpaywall {
   final String doiUrl;
@@ -17,6 +18,8 @@ class Unpaywall {
 
 class UnpaywallService {
   static Future<Unpaywall> checkAvailability(String doi) async {
+    final logger = LogsService().logger;
+
     try {
       final response = await http.get(Uri.parse(
           'https://api.unpaywall.org/v2/$doi?email=wispar-app@protonmail.com'));
@@ -28,7 +31,8 @@ class UnpaywallService {
       } else {
         return Unpaywall.fromJson({});
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      logger.severe('Error querying Unpaywall for DOI: ${doi}.', e, stackTrace);
       return Unpaywall.fromJson({});
     }
   }

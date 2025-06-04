@@ -46,7 +46,7 @@ class OpenAlexWorks {
     }
 
     return OpenAlexWorks(
-      title: cleanTitle(json['title']) ?? 'Untitled',
+      title: cleanTitle(json['title']),
       doi: extractedDoi ?? json['doi'],
       url: primaryLocation?['landing_page_url'],
       authors: (json['authorships'] as List?)
