@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import '../models/journal_entity.dart';
 import '../models/crossref_journals_works_models.dart' as journalWorks;
 import '../services/feed_api.dart';
@@ -76,7 +75,9 @@ class FeedService {
     } catch (e, stackTrace) {
       logger.severe('Error retrieving saved queries to update.', e, stackTrace);
     }
-    logger.info('Found saved queries to update ${savedQueries}');
+    if (savedQueries.isNotEmpty) {
+      logger.info('Found saved queries to update ${savedQueries}');
+    }
     return queriesToUpdate;
   }
 

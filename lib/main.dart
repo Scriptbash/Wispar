@@ -17,7 +17,7 @@ import './services/logs_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeService();
+  await initBackgroundFetch();
   LogsService();
   runApp(
     MultiProvider(
