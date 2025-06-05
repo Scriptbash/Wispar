@@ -474,5 +474,35 @@
         "type": "int"
       }
     }
-  }
+  },
+  "logs": "日志",
+  "@logs": {},
+  "viewLogs": "查看日志",
+  "@viewLogs": {},
+  "deleteLogs": "删除日志",
+  "@deleteLogs": {},
+  "zoteroArticleSent": "文章已发送到 Zotero。",
+  "@zoteroArticleSent": {},
+  "zoteroApiKeyEmpty": "Zotero API 密钥尚未设置。请在应用设置中配置 API 密钥。",
+  "@zoteroApiKeyEmpty": {},
+  "failedLoadMoreResults": "加载更多结果失败。请检查日志并考虑在 GitHub 上报告问题。",
+  "@failedLoadMoreResults": {},
+  "errorOccured": "发生错误。请检查日志并考虑在 GitHub 上报告问题。",
+  "@errorOccured": {},
+  "logsDeleted": "日志已删除！",
+  "@logsDeleted": {},
+  "logsUnavailable": "没有可用的日志。",
+  "@logsUnavailable": {},
+  "logCopied": "日志已复制到剪贴板！",
+  "@logCopied": {},
+  "saveLogs": "保存日志",
+  "@saveLogs": {},
+  "selectLogsLocation": "选择保存日志的位置。",
+  "@selectLogsLocation": {},
+  "logsExportedSuccessfully": "成功保存日志！",
+  "@logsExportedSuccessfully": {},
+  "logsExportedError": "无法保存日志。",
+  "@logsExportedError": {},
+  "shareLogs": "分享日志",
+  "@shareLogs": {}
 }
