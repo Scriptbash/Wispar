@@ -426,5 +426,35 @@
         "type": "int"
       }
     }
-  }
+  },
+  "viewLogs": "Voir les journaux",
+  "@viewLogs": {},
+  "failedLoadMoreResults": "Échec du chargement de résultats supplémentaires. Veuillez consulter les journaux d'erreurs de l'application et envisager de signaler le problème sur GitHub.",
+  "@failedLoadMoreResults": {},
+  "errorOccured": "Un problème est survenu. Veuillez consulter les journaux d'erreurs de l'application et envisager de signaler le problème sur GitHub.",
+  "@errorOccured": {},
+  "logCopied": "Entrée du journal copiée dans le presse-papier !",
+  "@logCopied": {},
+  "zoteroApiKeyEmpty": "La clé API de Zotero n'a pas encore été configurée. Veuillez configurer la clé API dans les paramètres de l'appli.",
+  "@zoteroApiKeyEmpty": {},
+  "deleteLogs": "Supprimer les journaux",
+  "@deleteLogs": {},
+  "logsUnavailable": "Aucun journal disponible.",
+  "@logsUnavailable": {},
+  "zoteroArticleSent": "L'article a été envoyé vers Zotero.",
+  "@zoteroArticleSent": {},
+  "logs": "Journaux",
+  "@logs": {},
+  "logsDeleted": "Journaux supprimés !",
+  "@logsDeleted": {},
+  "saveLogs": "Enregistrer les journaux",
+  "@saveLogs": {},
+  "selectLogsLocation": "Sélectionner un emplacement où enregistrer les journaux.",
+  "@selectLogsLocation": {},
+  "logsExportedSuccessfully": "Les journaux ont été enregistrés avec succès !",
+  "@logsExportedSuccessfully": {},
+  "shareLogs": "Partager les journaux",
+  "@shareLogs": {},
+  "logsExportedError": "Impossible d’enregistrer les journaux.",
+  "@logsExportedError": {}
 }
