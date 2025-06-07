@@ -13,7 +13,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 
 Future<void> initializeNotifications() async {
   const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('ic_bg_service_small');
+      AndroidInitializationSettings('@mipmap/ic_launcher');
 
   const DarwinInitializationSettings initializationSettingsDarwin =
       DarwinInitializationSettings(
@@ -44,7 +44,7 @@ Future<void> showNewJournalArticlesNotification() async {
         'Notification when new articles from followed journals are available',
     importance: Importance.high,
     priority: Priority.defaultPriority,
-    icon: 'ic_bg_service_small',
+    icon: '@mipmap/ic_launcher',
     color: Color.fromARGB(255, 118, 54, 219),
     enableVibration: true,
     vibrationPattern: Int64List.fromList([0, 300, 100, 100, 100, 100, 300]),
@@ -75,7 +75,7 @@ Future<void> showNewQueryArticlesNotification() async {
         'Notification when new articles from saved queries are available',
     importance: Importance.high,
     priority: Priority.defaultPriority,
-    icon: 'ic_bg_service_small',
+    icon: '@mipmap/ic_launcher',
     color: Color.fromARGB(255, 118, 54, 219),
     enableVibration: true,
     vibrationPattern: Int64List.fromList([0, 300, 100, 100, 100, 100, 300]),
@@ -100,7 +100,7 @@ Future<void> runFeedJob(
 ) async {
   debugPrint('Feed updated in background at ${DateTime.now()}');
 
-  int articleCountBefore = await dbHelper.getArticleCount();
+  int journalArticleCountBefore = await dbHelper.getArticleCount();
 
   List<Journal> followedJournals = await dbHelper.getJournals();
   await feedService.updateFeed(
@@ -110,14 +110,14 @@ Future<void> runFeedJob(
     maxConcurrentUpdates,
   );
 
-  int articleCountAfter = await dbHelper.getArticleCount();
-  if (articleCountBefore < articleCountAfter) {
+  int journalArticleCountAfter = await dbHelper.getArticleCount();
+  if (journalArticleCountBefore < journalArticleCountAfter) {
     await showNewJournalArticlesNotification();
   } else {
     debugPrint("No new articles from journals received");
   }
 
-  articleCountBefore = await dbHelper.getArticleCount();
+  int queryArticleCountBefore = await dbHelper.getArticleCount();
   final savedQueries = await dbHelper.getSavedQueriesToUpdate();
   await feedService.updateSavedQueryFeed(
     savedQueries,
@@ -126,8 +126,8 @@ Future<void> runFeedJob(
     maxConcurrentUpdates,
   );
 
-  articleCountAfter = await dbHelper.getArticleCount();
-  if (articleCountBefore < articleCountAfter) {
+  int queryArticleCountAfter = await dbHelper.getArticleCount();
+  if (queryArticleCountBefore < queryArticleCountAfter) {
     await showNewQueryArticlesNotification();
   } else {
     debugPrint("No new articles from queries received");
@@ -164,8 +164,6 @@ Future<void> initBackgroundFetch() async {
       BackgroundFetch.finish(taskId);
     },
   );
-
-  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
 
 @pragma('vm:entry-point')
