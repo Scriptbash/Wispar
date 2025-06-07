@@ -13,10 +13,13 @@ class MainActivity: FlutterActivity() {
         // Create notification channel for foreground service on Android 8.0 and above
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                "wispar_channel", // Must match the channelId in Flutter code
-                "Wispar Background Service", // Channel name
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
+                "wispar_channel",
+                "Wispar Updates",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notification when new articles from followed journals and saved queries are available"
+            }
+
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)
         }

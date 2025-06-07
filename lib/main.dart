@@ -14,10 +14,10 @@ import 'screens/downloads_screen.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import './services/background_service.dart';
 import './services/logs_helper.dart';
+import 'package:background_fetch/background_fetch.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeService();
   LogsService();
   runApp(
     MultiProvider(
@@ -28,6 +28,8 @@ void main() async {
       child: const Wispar(),
     ),
   );
+  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
+  await initBackgroundFetch();
 }
 
 class Wispar extends StatefulWidget {

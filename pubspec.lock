@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.13.0"
+  background_fetch:
+    dependency: "direct main"
+    description:
+      name: background_fetch
+      sha256: "442e82f508708be89fd0cc7e1dc3b27bc7c6c8c39a47967ccb7ed1c57b9108b5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.3.8"
   boolean_selector:
     dependency: transitive
     description:
@@ -45,10 +53,10 @@ packages:
     dependency: transitive
     description:
       name: checked_yaml
-      sha256: feb6bed21949061731a7a75fc5d2aa727cf160b91af9a3e464c5e3a32e28b5ff
+      sha256: "959525d3162f249993882720d52b7e0c833978df229be20702b33d48d91de70f"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.3"
+    version: "2.0.4"
   cli_util:
     dependency: transitive
     description:
@@ -166,38 +174,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_background_service:
-    dependency: "direct main"
-    description:
-      name: flutter_background_service
-      sha256: "70a1c185b1fa1a44f8f14ecd6c86f6e50366e3562f00b2fa5a54df39b3324d3d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.1.0"
-  flutter_background_service_android:
-    dependency: transitive
-    description:
-      name: flutter_background_service_android
-      sha256: b73d903056240e23a5c56d9e52d3a5d02ae41cb18b2988a97304ae37b2bae4bf
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.3.0"
-  flutter_background_service_ios:
-    dependency: transitive
-    description:
-      name: flutter_background_service_ios
-      sha256: "6037ffd45c4d019dab0975c7feb1d31012dd697e25edc05505a4a9b0c7dc9fba"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.3"
-  flutter_background_service_platform_interface:
-    dependency: transitive
-    description:
-      name: flutter_background_service_platform_interface
-      sha256: ca74aa95789a8304f4d3f57f07ba404faa86bed6e415f83e8edea6ad8b904a41
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.1.2"
   flutter_inappwebview:
     dependency: "direct main"
     description:
@@ -625,10 +601,10 @@ packages:
     dependency: "direct main"
     description:
       name: pdfrx
-      sha256: "90747e916a64366b8beb69e9ac175e9134df520110543ab284b839102bf4b7e1"
+      sha256: "8e4a4dbb19c8af3a098bcdaac388fb41b30c53a8d9ce52a7620ba33d5d222ed0"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.29"
+    version: "1.1.33"
   permission_handler:
     dependency: "direct main"
     description:
@@ -1083,5 +1059,5 @@ packages:
     source: hosted
     version: "3.1.3"
 sdks:
-  dart: ">=3.7.0 <4.0.0"
+  dart: ">=3.8.0 <4.0.0"
   flutter: ">=3.32.2"
