@@ -182,7 +182,7 @@
   "@openExternalPdfApp": {},
   "errorOpenExternalPdfApp": "Не удалось открыть PDF-файл в другой программе",
   "@errorOpenExternalPdfApp": {},
-  "favorite": "Избранные",
+  "favorite": "Избранное",
   "@favorite": {},
   "favoriteadded": "Добавлено в избранные",
   "@favoriteadded": {
@@ -230,7 +230,7 @@
   "@unpaywallarticle": {
     "description": "Snackbar shown when an article was fetched from Unpaywall."
   },
-  "forwardedproxy": "Передано через прокси-сервер вашего учебного заведения.",
+  "forwardedproxy": "Передано через прокси-сервер вашего учебного заведения",
   "@forwardedproxy": {
     "description": "Snackbar shown when a request is intercepted and sent through the user's institution EZproxy."
   },
@@ -405,12 +405,104 @@
   "@addKeyword": {},
   "enterKeyword": "Введите ключевое слово",
   "@enterKeyword": {},
-  "displayName": "Показать имя",
+  "displayName": "Показать название",
   "@displayName": {},
-  "citedByCount": "Кол-во цитат",
+  "citedByCount": "Количество цитирований",
   "@citedByCount": {},
   "publicationDate": "Дата публикации",
   "@publicationDate": {},
   "queryPreview": "Предпросмотр запроса:",
-  "@queryPreview": {}
+  "@queryPreview": {},
+  "zoteroArticleSent": "Статья была отправлена в Zotero.",
+  "@zoteroArticleSent": {},
+  "deleteLogs": "Удалить журналы отладки",
+  "@deleteLogs": {},
+  "logsDeleted": "Журналы отладки удалены!",
+  "@logsDeleted": {},
+  "logsUnavailable": "Нет журналов отладки.",
+  "@logsUnavailable": {},
+  "logCopied": "Журнал скопирован в буфер обмена!",
+  "@logCopied": {},
+  "saveLogs": "Сохранить журналы отладки",
+  "@saveLogs": {},
+  "selectLogsLocation": "Выберите место, где сохранить журналы.",
+  "@selectLogsLocation": {},
+  "logsExportedSuccessfully": "Журналы сохранены успешно!",
+  "@logsExportedSuccessfully": {},
+  "shareLogs": "Поделиться журналами отладки",
+  "@shareLogs": {},
+  "errorOccured": "Произошла ошибка. Пожалуйста, проверьте журналы и подумайте о том, чтобы сообщить о проблеме на GitHub.",
+  "@errorOccured": {},
+  "logsExportedError": "Невозможно сохранить журналы отладки.",
+  "@logsExportedError": {},
+  "lastUpdatedMinutes": "{minutes, plural, one{Последнее обновление 1 минуту назад} other{Последнее обновление {minutes} минут}}",
+  "@lastUpdatedMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "zoteroApiKeyEmpty": "Ключ Zotero API ещё не установлен. Настройте ключ API в настройках приложения.",
+  "@zoteroApiKeyEmpty": {},
+  "lastUpdatedHours": "{hours, plural, one{Последнее обновление 1 час назад} other{Последнее обновление {hours} часов назад}}",
+  "@lastUpdatedHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "lastUpdatedDays": "{days, plural, one{Последнее обновление 1 день назад} other{Последнее обновление{days} дней назад}}",
+  "@lastUpdatedDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "hideArticle": "Скрыть эту публикацию",
+  "@hideArticle": {},
+  "viewLogs": "Просмотр журналов отладки",
+  "@viewLogs": {},
+  "logs": "Журналы отладки",
+  "@logs": {},
+  "failedLoadMoreResults": "Не удалось загрузить больше результатов. Пожалуйста, проверьте журналы и подумайте о том, чтобы сообщить о проблеме на GitHub.",
+  "@failedLoadMoreResults": {},
+  "viewHiddenArticles": "Просмотр скрытых публикаций",
+  "@viewHiddenArticles": {},
+  "notifications": "Уведомления",
+  "@notifications": {},
+  "notifPermsGranted": "Разрешение дано",
+  "@notifPermsGranted": {},
+  "notifPermsNotGranted": "Разрешение не дано",
+  "@notifPermsNotGranted": {},
+  "openAppSettings": "Открыть настройки",
+  "@openAppSettings": {},
+  "notificationSettingsMessage": "Уведомления постоянно отключены. Чтобы включить их, переходите к настройкам уведомления приложения.",
+  "@notificationSettingsMessage": {},
+  "notificationContent": "Доступны новые статьи!",
+  "@notificationContent": {},
+  "notificationTitleJournal": "Журналы обновлялись",
+  "@notificationTitleJournal": {},
+  "notificationTitleQuery": "Запросы были обновлены",
+  "@notificationTitleQuery": {},
+  "fgNotificationContent": "Wispar работает на фоне для обновления ваших журналов",
+  "@fgNotificationContent": {},
+  "fgNotificationTitle": "Служба обновления в фоне",
+  "@fgNotificationTitle": {},
+  "system": "Система",
+  "@system": {},
+  "concurrentFetches": "Одновременные запросы к API: {number}",
+  "@concurrentFetches": {},
+  "language": "Язык",
+  "@language": {},
+  "unhideArticle": "Открыть эту публикацию",
+  "@unhideArticle": {},
+  "pendingUpdate": "Ожидаемое обновление",
+  "@pendingUpdate": {},
+  "hiddenArticles": "Скрытые публикации",
+  "@hiddenArticles": {},
+  "noHiddenArticles": "Нет скрытых публикаций",
+  "@noHiddenArticles": {}
 }
