@@ -199,7 +199,7 @@ class FeedService {
             }
 
             for (journalWorks.Item item in queryArticles) {
-              if (item.title.isNotEmpty && item.journalTitle.isNotEmpty) {
+              if (item.title.isNotEmpty) {
                 await _dbHelper.insertArticle(
                   PublicationCard(
                     title: item.title,
