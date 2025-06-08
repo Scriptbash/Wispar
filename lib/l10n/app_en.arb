@@ -487,6 +487,25 @@
   "logsExportedError": "Unable to save the logs.",
   "@logsExportedError":{},
   "shareLogs": "Share logs",
-  "@shareLogs":{}
-
+  "@shareLogs":{},
+  "copyTitle": "Copy title",
+  "@copyTitle":{},
+  "copyAbstract":"Copy abstract",
+  "@copyAbstract":{},
+  "copyUrl": "Copy URL",
+  "@copyUrl":{},
+  "copiedToClipboard":"Copied to clipboard!",
+  "@copiedToClipboard":{},
+  "translate": "Translate",
+  "@translate":{},
+  "swapLanguages": "Swap languages",
+  "@swapLanguages":{},
+  "deleteLanguageModel": "Delete language model",
+  "@deleteLanguageModel":{},
+  "deleteLanguageModelLong": "Do you want to delete the offline model for {language}? You will no longer be able to use this language for offline translations.",
+  "@deleteLanguageModelLong":{},
+  "downloadLanguageModel":" Download model for offline use",
+  "@downloadLanguageModel":{},
+  "cancel":"Cancel",
+  "@cancel":{}  
 }

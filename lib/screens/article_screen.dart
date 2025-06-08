@@ -13,6 +13,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:latext/latext.dart';
 import '../services/logs_helper.dart';
+import '../widgets/translate_sheet.dart';
 
 class ArticleScreen extends StatefulWidget {
   final String doi;
@@ -52,6 +53,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
   bool isLiked = false;
   late DatabaseHelper databaseHelper;
   final logger = LogsService().logger;
+  String? title;
   String? abstract;
   bool isLoadingAbstract = false;
   bool _scrapeAbstracts = true;
@@ -62,6 +64,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
     databaseHelper = DatabaseHelper();
     _loadScrapingSettings();
     checkIfLiked();
+    title = widget.title;
     abstract = widget.abstract;
   }
 
@@ -142,13 +145,80 @@ class _ArticleScreenState extends State<ArticleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: LaTexT(breakDelimiter: r'\nl', laTeXCode: (Text(widget.title))),
+        title: LaTexT(
+            breakDelimiter: r'\nl', laTeXCode: (Text(title ?? widget.title))),
         actions: [
+          IconButton(
+              icon: Icon(Icons.copy_outlined),
+              tooltip: AppLocalizations.of(context)!.copydoi,
+              onPressed: () async {
+                final choice = await showModalBottomSheet<String>(
+                  context: context,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(16)),
+                  ),
+                  builder: (BuildContext context) {
+                    return Wrap(
+                      children: [
+                        ListTile(
+                          leading: const Icon(Icons.short_text),
+                          title: Text(AppLocalizations.of(context)!.copyTitle),
+                          onTap: () => Navigator.pop(context, 'title'),
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.article),
+                          title:
+                              Text(AppLocalizations.of(context)!.copyAbstract),
+                          onTap: () => Navigator.pop(context, 'abstract'),
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.numbers),
+                          title: Text(AppLocalizations.of(context)!.copydoi),
+                          onTap: () => Navigator.pop(context, 'doi'),
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.link),
+                          title: Text(AppLocalizations.of(context)!.copyUrl),
+                          onTap: () => Navigator.pop(context, 'url'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+
+                if (choice != null) {
+                  String contentToCopy = '';
+                  switch (choice) {
+                    case 'title':
+                      contentToCopy = title ?? widget.title;
+                      break;
+                    case 'abstract':
+                      contentToCopy = abstract ?? '';
+                      break;
+                    case 'doi':
+                      contentToCopy = widget.doi;
+                      break;
+                    case 'url':
+                      contentToCopy = widget.url;
+                      break;
+                  }
+
+                  await Clipboard.setData(ClipboardData(text: contentToCopy));
+
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content:
+                        Text(AppLocalizations.of(context)!.copiedToClipboard),
+                    duration: const Duration(seconds: 1),
+                  ));
+                }
+              }),
           Builder(
             builder: (BuildContext context) {
               return IconButton(
-                  onPressed: () => _onShare(context),
-                  icon: Icon(Icons.share_outlined));
+                onPressed: () => _onShare(context),
+                icon: Icon(Icons.share_outlined),
+              );
             },
           ),
         ],
@@ -171,7 +241,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
               LaTexT(
                   breakDelimiter: r'\nl',
                   laTeXCode: Text(
-                    widget.title,
+                    title ?? widget.title,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
@@ -316,12 +386,31 @@ class _ArticleScreenState extends State<ArticleScreen> {
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () {
-                      Clipboard.setData(ClipboardData(text: widget.doi));
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(AppLocalizations.of(context)!.doicopied),
-                        duration: const Duration(seconds: 1),
-                      ));
+                    onTap: () async {
+                      final result =
+                          await showModalBottomSheet<Map<String, String?>>(
+                        context: context,
+                        isScrollControlled: true,
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(16)),
+                        ),
+                        builder: (_) => TranslateOptionsSheet(
+                          title: widget.title,
+                          abstractText: abstract ?? '',
+                        ),
+                      );
+
+                      if (result != null) {
+                        setState(() {
+                          if (result['title'] != null) {
+                            title = result['title'];
+                          }
+                          if (result['abstract'] != null) {
+                            abstract = result['abstract'];
+                          }
+                        });
+                      }
                     },
                     borderRadius: BorderRadius.circular(8),
                     splashColor: Theme.of(context)
@@ -333,10 +422,10 @@ class _ArticleScreenState extends State<ArticleScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.copy_outlined, size: 30),
+                          Icon(Icons.translate, size: 30),
                           const SizedBox(height: 4),
                           Text(
-                            AppLocalizations.of(context)!.copydoi,
+                            AppLocalizations.of(context)!.translate,
                             style: const TextStyle(fontSize: 10),
                           ),
                         ],

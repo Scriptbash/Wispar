@@ -15,6 +15,7 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import './services/background_service.dart';
 import './services/logs_helper.dart';
 import 'package:background_fetch/background_fetch.dart';
+import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,6 +72,7 @@ class _WisparState extends State<Wispar> {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
+        LocaleNamesLocalizationsDelegate()
       ],
       supportedLocales: const [
         Locale('en'), // English
