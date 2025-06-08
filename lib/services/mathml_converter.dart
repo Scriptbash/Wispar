@@ -39,8 +39,15 @@ class MathmlToLatexConverter {
           formulaBuffer.write(trimmed.trim());
         } else {
           // Flush formula if any
-          if (insideFormula) {
-            buffer.write('\$${formulaBuffer.toString()}\$');
+          if (insideFormula && formulaBuffer.isNotEmpty) {
+            final formula = '\$${formulaBuffer.toString()}\$';
+            if (buffer.isNotEmpty && !buffer.toString().endsWith(' ')) {
+              buffer.write(' ');
+            }
+            buffer.write(formula);
+            if (!formula.endsWith('.')) {
+              buffer.write(' ');
+            }
             formulaBuffer.clear();
             insideFormula = false;
           }
@@ -54,20 +61,35 @@ class MathmlToLatexConverter {
         }
         formulaBuffer.write(mathContent);
 
-        // Look ahead, if next is not another <math>, flush now
+        // Look ahead: is next another <math> or chemical formula?
         final next = i + 1 < nodes.length ? nodes[i + 1] : null;
         final isNextMath = next is XmlElement && next.name.local == 'math';
         final isNextChemText = next is XmlText &&
             RegExp(r'^[A-Z][a-z]?$').hasMatch(next.value.trim());
 
         if (!isNextMath && !isNextChemText) {
-          buffer.write('\$${formulaBuffer.toString()}\$');
+          final formula = '\$${formulaBuffer.toString()}\$';
+          if (buffer.isNotEmpty && !buffer.toString().endsWith(' ')) {
+            buffer.write(' ');
+          }
+          buffer.write(formula);
+          if (!formula.endsWith('.') &&
+              (next == null || !_startsWithSpace(next))) {
+            buffer.write(' ');
+          }
           formulaBuffer.clear();
           insideFormula = false;
         }
       } else {
-        if (insideFormula) {
-          buffer.write('\$${formulaBuffer.toString()}\$');
+        if (insideFormula && formulaBuffer.isNotEmpty) {
+          final formula = '\$${formulaBuffer.toString()}\$';
+          if (buffer.isNotEmpty && !buffer.toString().endsWith(' ')) {
+            buffer.write(' ');
+          }
+          buffer.write(formula);
+          if (!formula.endsWith('.')) {
+            buffer.write(' ');
+          }
           formulaBuffer.clear();
           insideFormula = false;
         }
@@ -77,10 +99,24 @@ class MathmlToLatexConverter {
 
     // Final flush
     if (insideFormula && formulaBuffer.isNotEmpty) {
-      buffer.write('\$${formulaBuffer.toString()}\$');
+      final formula = '\$${formulaBuffer.toString()}\$';
+      if (buffer.isNotEmpty && !buffer.toString().endsWith(' ')) {
+        buffer.write(' ');
+      }
+      buffer.write(formula);
+      if (!formula.endsWith('.')) {
+        buffer.write(' ');
+      }
     }
 
     return buffer.toString();
+  }
+
+  bool _startsWithSpace(XmlNode node) {
+    if (node is XmlText) {
+      return node.value.startsWith(RegExp(r'\s'));
+    }
+    return false;
   }
 
   String _convertNode(XmlNode node) {
