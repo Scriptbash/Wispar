@@ -15,7 +15,7 @@ class _ArticleSearchScreenState extends State<ArticleSearchScreen> {
     return Column(
       children: [
         ToggleButtons(
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(15.0),
           isSelected: [selectedProviderIndex == 0, selectedProviderIndex == 1],
           onPressed: (int index) {
             setState(() {

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import '../generated_l10n/app_localizations.dart';
 import '../widgets/downloaded_card.dart';
 import '../services/database_helper.dart';
-import '../widgets/sortbydialog.dart';
-import '../widgets/sortorderdialog.dart';
+import '../widgets/sort_dialog.dart';
 import '../services/logs_helper.dart';
 
 class DownloadsScreen extends StatefulWidget {
@@ -123,15 +122,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                           value: 0,
                           child: ListTile(
                             leading: Icon(Icons.sort),
-                            title: Text(AppLocalizations.of(context)!.sortby),
-                          ),
-                        ),
-                        PopupMenuItem<int>(
-                          value: 1,
-                          child: ListTile(
-                            leading: Icon(Icons.sort_by_alpha),
-                            title:
-                                Text(AppLocalizations.of(context)!.sortorder),
+                            title: Text(AppLocalizations.of(context)!.sort),
                           ),
                         ),
                       ],
@@ -179,47 +170,34 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
   }
 
   void handleMenuButton(int item) {
-    switch (item) {
-      case 0:
-        showSortByDialog(
-          context: context,
-          initialSortBy: sortBy,
-          onSortByChanged: (int value) {
-            setState(() {
-              sortBy = value;
-              _downloadedArticles = _sortDownloads(_downloadedArticles);
-              _filterDownloads(_filterController.text); // Apply filter again
-            });
-          },
-          sortOptions: [
-            AppLocalizations.of(context)!.articletitle,
-            AppLocalizations.of(context)!.journaltitle,
-            AppLocalizations.of(context)!.datepublished,
-          ],
-        );
-        break;
-      case 1:
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return SortOrderDialog(
-              initialSortOrder: sortOrder,
-              sortOrderOptions: [
-                AppLocalizations.of(context)!.ascending,
-                AppLocalizations.of(context)!.descending,
-              ],
-              onSortOrderChanged: (int value) {
-                setState(() {
-                  sortOrder = value;
-                  _downloadedArticles = _sortDownloads(_downloadedArticles);
-                  _filterDownloads(_filterController.text);
-                });
-              },
-            );
-          },
-        );
-        break;
-    }
+    showSortDialog(
+      context: context,
+      initialSortBy: sortBy,
+      initialSortOrder: sortOrder,
+      sortByOptions: [
+        AppLocalizations.of(context)!.articletitle,
+        AppLocalizations.of(context)!.journaltitle,
+        AppLocalizations.of(context)!.datepublished,
+      ],
+      sortOrderOptions: [
+        AppLocalizations.of(context)!.ascending,
+        AppLocalizations.of(context)!.descending,
+      ],
+      onSortByChanged: (int value) {
+        setState(() {
+          sortBy = value;
+          _downloadedArticles = _sortDownloads(_downloadedArticles);
+          _filterDownloads(_filterController.text);
+        });
+      },
+      onSortOrderChanged: (int value) {
+        setState(() {
+          sortOrder = value;
+          _downloadedArticles = _sortDownloads(_downloadedArticles);
+          _filterDownloads(_filterController.text);
+        });
+      },
+    );
   }
 
   List<DownloadedCard> _sortDownloads(List<DownloadedCard> downloads) {

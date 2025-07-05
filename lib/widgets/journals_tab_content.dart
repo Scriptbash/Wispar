@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../generated_l10n/app_localizations.dart';
 import '../models/journal_entity.dart';
-import '../widgets/sortbydialog.dart';
-import '../widgets/sortorderdialog.dart';
+import '../widgets/sort_dialog.dart';
 import '../services/database_helper.dart';
 import '../widgets/journal_card.dart';
 
@@ -44,20 +43,20 @@ class _JournalsTabContentState extends State<JournalsTabContent> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextButton.icon(
-                onPressed: () => _showSortByDialog(context),
+                onPressed: () => _showSortDialog(context),
                 icon: Icon(Icons.sort),
-                label: Text(AppLocalizations.of(context)!.sortby),
+                label: Text(AppLocalizations.of(context)!.sort),
                 style:
                     TextButton.styleFrom(visualDensity: VisualDensity.compact),
               ),
               TextButton.icon(
-                onPressed: () => _showSortOrderDialog(context),
+                onPressed: () => _showSortDialog(context),
                 icon: Icon(
                   widget.initialSortOrder == 0
                       ? Icons.arrow_downward
                       : Icons.arrow_upward,
                 ),
-                label: Text(AppLocalizations.of(context)!.sortorder),
+                label: Text("Edit"),
                 style:
                     TextButton.styleFrom(visualDensity: VisualDensity.compact),
               ),
@@ -129,33 +128,23 @@ class _JournalsTabContentState extends State<JournalsTabContent> {
     );
   }
 
-  void _showSortByDialog(BuildContext context) {
-    showSortByDialog(
+  void _showSortDialog(BuildContext context) {
+    showSortDialog(
       context: context,
       initialSortBy: widget.initialSortBy,
-      onSortByChanged: widget.onSortByChanged,
-      sortOptions: [
+      initialSortOrder: widget.initialSortOrder,
+      sortByOptions: [
         AppLocalizations.of(context)!.journaltitle,
         AppLocalizations.of(context)!.publisher,
         AppLocalizations.of(context)!.followingdate,
         'ISSN',
       ],
-    );
-  }
-
-  void _showSortOrderDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return SortOrderDialog(
-          initialSortOrder: widget.initialSortOrder,
-          sortOrderOptions: [
-            AppLocalizations.of(context)!.ascending,
-            AppLocalizations.of(context)!.descending,
-          ],
-          onSortOrderChanged: widget.onSortOrderChanged,
-        );
-      },
+      sortOrderOptions: [
+        AppLocalizations.of(context)!.ascending,
+        AppLocalizations.of(context)!.descending,
+      ],
+      onSortByChanged: widget.onSortByChanged,
+      onSortOrderChanged: widget.onSortOrderChanged,
     );
   }
 

@@ -3,8 +3,7 @@ import '../generated_l10n/app_localizations.dart';
 import '../widgets/publication_card.dart';
 import '../services/database_helper.dart';
 import '../services/abstract_helper.dart';
-import '../widgets/sortbydialog.dart';
-import '../widgets/sortorderdialog.dart';
+import '../widgets/sort_dialog.dart';
 import '../services/logs_helper.dart';
 
 class FavoritesScreen extends StatefulWidget {
@@ -144,14 +143,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         value: 0,
                         child: ListTile(
                           leading: Icon(Icons.sort),
-                          title: Text(AppLocalizations.of(context)!.sortby),
-                        ),
-                      ),
-                      PopupMenuItem<int>(
-                        value: 1,
-                        child: ListTile(
-                          leading: Icon(Icons.sort_by_alpha),
-                          title: Text(AppLocalizations.of(context)!.sortorder),
+                          title: Text(AppLocalizations.of(context)!.sort),
                         ),
                       ),
                     ],
@@ -277,47 +269,34 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   void handleMenuButton(int item) {
-    switch (item) {
-      case 0:
-        showSortByDialog(
-          context: context,
-          initialSortBy: sortBy,
-          onSortByChanged: (int value) {
-            setState(() {
-              sortBy = value;
-            });
-            _filterFeed(_filterController.text);
-          },
-          sortOptions: [
-            AppLocalizations.of(context)!.articletitle,
-            AppLocalizations.of(context)!.journaltitle,
-            AppLocalizations.of(context)!.firstauthfamname,
-            AppLocalizations.of(context)!.datepublished,
-            AppLocalizations.of(context)!.dateaddedtofavorites,
-          ],
-        );
-        break;
-      case 1:
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return SortOrderDialog(
-              initialSortOrder: sortOrder,
-              sortOrderOptions: [
-                AppLocalizations.of(context)!.ascending,
-                AppLocalizations.of(context)!.descending,
-              ],
-              onSortOrderChanged: (int value) {
-                setState(() {
-                  sortOrder = value;
-                });
-                _filterFeed(_filterController.text);
-              },
-            );
-          },
-        );
-        break;
-    }
+    showSortDialog(
+      context: context,
+      initialSortBy: sortBy,
+      initialSortOrder: sortOrder,
+      sortByOptions: [
+        AppLocalizations.of(context)!.articletitle,
+        AppLocalizations.of(context)!.journaltitle,
+        AppLocalizations.of(context)!.firstauthfamname,
+        AppLocalizations.of(context)!.datepublished,
+        AppLocalizations.of(context)!.dateaddedtofavorites,
+      ],
+      sortOrderOptions: [
+        AppLocalizations.of(context)!.ascending,
+        AppLocalizations.of(context)!.descending,
+      ],
+      onSortByChanged: (int value) {
+        setState(() {
+          sortBy = value;
+        });
+        _filterFeed(_filterController.text);
+      },
+      onSortOrderChanged: (int value) {
+        setState(() {
+          sortOrder = value;
+        });
+        _filterFeed(_filterController.text);
+      },
+    );
   }
 
   List<PublicationCard> _sortFavorites(List<PublicationCard> favorites) {

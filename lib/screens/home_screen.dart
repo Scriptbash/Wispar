@@ -6,8 +6,7 @@ import '../services/database_helper.dart';
 import '../services/feed_service.dart';
 import '../services/abstract_helper.dart';
 import '../widgets/publication_card.dart';
-import '../widgets/sortbydialog.dart';
-import '../widgets/sortorderdialog.dart';
+import '../widgets/sort_dialog.dart';
 import './hidden_articles_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -261,41 +260,35 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         break;
       case 1:
-        showSortByDialog(
+        showSortDialog(
           context: context,
           initialSortBy: sortBy,
+          initialSortOrder: sortOrder,
           onSortByChanged: (int value) {
             setState(() {
               sortBy = value;
             });
             _sortFeed();
           },
-          sortOptions: [
+          onSortOrderChanged: (int value) {
+            setState(() {
+              sortOrder = value;
+            });
+            _sortFeed();
+          },
+          sortByOptions: [
             AppLocalizations.of(context)!.datepublished,
             AppLocalizations.of(context)!.articletitle,
             AppLocalizations.of(context)!.journaltitle,
             AppLocalizations.of(context)!.firstauthfamname,
           ],
+          sortOrderOptions: [
+            AppLocalizations.of(context)!.ascending,
+            AppLocalizations.of(context)!.descending,
+          ],
         );
         break;
-      case 2:
-        showDialog(
-          context: context,
-          builder: (context) => SortOrderDialog(
-            initialSortOrder: sortOrder,
-            sortOrderOptions: [
-              AppLocalizations.of(context)!.ascending,
-              AppLocalizations.of(context)!.descending,
-            ],
-            onSortOrderChanged: (int value) {
-              setState(() {
-                sortOrder = value;
-              });
-              _sortFeed();
-            },
-          ),
-        );
-        break;
+
       case 3:
         await Navigator.push(
           context,
@@ -357,15 +350,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       PopupMenuItem<int>(
                         value: 1,
                         child: ListTile(
-                          leading: Icon(Icons.sort),
-                          title: Text(AppLocalizations.of(context)!.sortby),
-                        ),
-                      ),
-                      PopupMenuItem<int>(
-                        value: 2,
-                        child: ListTile(
                           leading: Icon(Icons.sort_by_alpha),
-                          title: Text(AppLocalizations.of(context)!.sortorder),
+                          title: Text(AppLocalizations.of(context)!.sort),
                         ),
                       ),
                       PopupMenuItem<int>(

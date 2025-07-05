@@ -140,7 +140,7 @@ class _CrossRefSearchFormState extends State<CrossRefSearchForm> {
                         selectedSearchIndex = index;
                       });
                     },
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: BorderRadius.circular(15.0),
                   );
                 },
               ),
