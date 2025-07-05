@@ -87,7 +87,7 @@ class _JournalSearchFormState extends State<JournalSearchForm> {
                         child: Text(AppLocalizations.of(context)!.searchByISSN),
                       ),
                     ],
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: BorderRadius.circular(15.0),
                   );
                 },
               ),

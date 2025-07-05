@@ -33,7 +33,7 @@ class _SearchScreenState extends State<SearchScreen> {
             LayoutBuilder(
               builder: (context, constraints) {
                 return ToggleButtons(
-                  borderRadius: BorderRadius.circular(8.0),
+                  borderRadius: BorderRadius.circular(15.0),
                   isSelected: [
                     selectedSearchType == 1,
                     selectedSearchType == 2,

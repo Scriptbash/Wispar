@@ -316,7 +316,7 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                               part['value'] == 'NOT'
                             ],
                             onPressed: (int i) => _toggleOperator(index, i),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(15),
                             children: [Text('AND'), Text('OR'), Text('NOT')],
                           ),
                         ],

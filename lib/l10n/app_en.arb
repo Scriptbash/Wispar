@@ -274,6 +274,8 @@
   },
   "selectinstitution": "Select your institution",
   "@selectinstitution": {},
+  "sort": "Sort",
+  "@sort":{},
   "sortby": "Sort by",
   "@sortby": {},
   "sortorder": "Sort order",
