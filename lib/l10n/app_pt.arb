@@ -474,5 +474,9 @@
   "notificationSettingsMessage": "As notificações estão permanentemente desativadas. Para habilitar, vá para as configurações de notificação do APP.",
   "@notificationSettingsMessage": {},
   "fgNotificationContent": "Wispar está rodando em segundo plano para atualizar as suas revistas",
-  "@fgNotificationContent": {}
+  "@fgNotificationContent": {},
+  "sort": "Ordenar",
+  "@sort": {},
+  "zoteroApiKeyEmpty": "A chave da API do zotero ainda não foi configurada. Por favor, configure nas configurações do aplicativo",
+  "@zoteroApiKeyEmpty": {}
 }
