@@ -5,8 +5,10 @@ import 'settings_screen.dart';
 import '../services/database_helper.dart';
 import '../services/feed_service.dart';
 import '../services/abstract_helper.dart';
+import '../models/feed_filter_entity.dart';
 import '../widgets/publication_card.dart';
 import '../widgets/sort_dialog.dart';
+import '../widgets/custom_feed_bottom_sheet.dart';
 import './hidden_articles_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -25,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final StreamController<List<PublicationCard>> _feedStreamController =
       StreamController<List<PublicationCard>>();
 
+  String _currentFeedName = 'Home'; // Default feed (no filter)
   int sortBy = 0; // Set the default sort by to published date
   int sortOrder = 1; // Set the default sort order to descending
   int fetchIntervalInHours = 6; // Default to 6 hours for API fetch
@@ -65,6 +68,30 @@ class _HomeScreenState extends State<HomeScreen> {
       fetchIntervalInHours = prefs.getInt('fetchInterval') ?? 6;
       _concurrentFetches = prefs.getInt('concurrentFetches') ?? 3;
     });
+
+    final lastFeedName = prefs.getString('lastSelectedFeed');
+    if (lastFeedName != null && lastFeedName != 'Home') {
+      final filters = await dbHelper.getParsedFeedFilters();
+      final match = filters.firstWhere(
+        (f) => f.name == lastFeedName,
+        orElse: () => FeedFilter(
+          id: 0,
+          name: 'Home',
+          include: '',
+          exclude: '',
+          journals: <String>{},
+          dateCreated: '',
+        ),
+      );
+
+      if (match.name != 'Home') {
+        setState(() {
+          _currentFeedName = match.name;
+        });
+        _applyAdvancedFilters(
+            match.name, match.journals, match.include, match.exclude);
+      }
+    }
   }
 
   Future<void> checkAndSetNotificationPermissions() async {
@@ -94,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _buildAndStreamFeed() async {
     try {
-      final followedJournals = await dbHelper.getJournals();
+      final followedJournals = await dbHelper.getFollowedJournals();
       List<Map<String, dynamic>> savedQueries =
           await dbHelper.getSavedQueriesToUpdate();
       if (mounted && followedJournals.isNotEmpty) {
@@ -130,6 +157,10 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           _allFeed = List.from(cachedFeed);
           _filteredFeed = List.from(_allFeed);
+          if (_currentFeedName != 'Home') {
+            // Reapply the filter if a custom feed was last used
+            _applyStoredFilter();
+          }
           _sortFeed();
           _feedLoaded = true;
         });
@@ -288,6 +319,36 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         );
         break;
+      case 2:
+        final journals = await dbHelper.getAllJournals();
+        // Split journals into followed and not followed (coming from saved queries)
+        final followedJournals = journals
+            .where((j) => j.dateFollowed != null)
+            .map((j) => j.title)
+            .toList();
+        final unfollowedJournals = journals
+            .where((j) => j.dateFollowed == null)
+            .map((j) => j.title)
+            .toList();
+
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          builder: (context) {
+            return CustomizeFeedBottomSheet(
+              followedJournals: followedJournals,
+              moreJournals: unfollowedJournals,
+              onApply: (String feedName, Set<String> journals, String include,
+                  String exclude) {
+                _applyAdvancedFilters(feedName, journals, include, exclude);
+              },
+            );
+          },
+        );
+        break;
 
       case 3:
         await Navigator.push(
@@ -303,73 +364,59 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Container(
-          height: 50.0,
-          child: TextField(
-            controller: _filterController,
-            decoration: InputDecoration(
-              hintText: AppLocalizations.of(context)!.filter,
-              enabledBorder: OutlineInputBorder(
-                borderSide: const BorderSide(
-                    color: Color.fromARGB(31, 148, 147, 147), width: 0.0),
-                borderRadius: BorderRadius.circular(30.0),
-              ),
-              border: OutlineInputBorder(
-                borderSide: const BorderSide(
-                    color: Color.fromARGB(31, 148, 147, 147), width: 0.0),
-                borderRadius: BorderRadius.circular(30.0),
-              ),
-              prefixIcon: Icon(Icons.search),
-              filled: true,
-              fillColor: Color.fromARGB(31, 148, 147, 147),
-              suffixIcon: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _useAndFilter = !_useAndFilter;
-                        _filterFeed(_filterController.text);
-                      });
-                    },
-                    child: Text(
-                      _useAndFilter ? 'AND' : 'OR',
-                    ),
-                  ),
-                  PopupMenuButton<int>(
-                    icon: Icon(Icons.more_vert),
-                    onSelected: (item) => handleMenuButton(item),
-                    itemBuilder: (context) => [
-                      PopupMenuItem<int>(
-                        value: 0,
-                        child: ListTile(
-                          leading: Icon(Icons.settings_outlined),
-                          title: Text(AppLocalizations.of(context)!.settings),
-                        ),
-                      ),
-                      PopupMenuItem<int>(
-                        value: 1,
-                        child: ListTile(
-                          leading: Icon(Icons.sort_by_alpha),
-                          title: Text(AppLocalizations.of(context)!.sort),
-                        ),
-                      ),
-                      PopupMenuItem<int>(
-                        value: 3,
-                        child: ListTile(
-                          leading: Icon(Icons.layers_clear_outlined),
-                          title: Text(
-                              AppLocalizations.of(context)!.viewHiddenArticles),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+        title: GestureDetector(
+          onTap: _showFeedFiltersDialog,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(_currentFeedName),
+              const SizedBox(width: 4),
+              const Icon(Icons.arrow_drop_down),
+            ],
           ),
         ),
         centerTitle: false,
+        actions: [
+          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
+          PopupMenuButton<int>(
+            icon: Image.asset(
+              'assets/icon/icon.png',
+              width: 28,
+              height: 28,
+            ),
+            onSelected: (item) => handleMenuButton(item),
+            itemBuilder: (context) => [
+              PopupMenuItem<int>(
+                value: 0,
+                child: ListTile(
+                  leading: Icon(Icons.settings_outlined),
+                  title: Text(AppLocalizations.of(context)!.settings),
+                ),
+              ),
+              PopupMenuItem<int>(
+                value: 1,
+                child: ListTile(
+                  leading: Icon(Icons.sort_by_alpha),
+                  title: Text(AppLocalizations.of(context)!.sort),
+                ),
+              ),
+              PopupMenuItem<int>(
+                value: 2,
+                child: ListTile(
+                  leading: Icon(Icons.tune),
+                  title: Text(AppLocalizations.of(context)!.createCustomFeed),
+                ),
+              ),
+              PopupMenuItem<int>(
+                value: 3,
+                child: ListTile(
+                  leading: Icon(Icons.layers_clear_outlined),
+                  title: Text(AppLocalizations.of(context)!.viewHiddenArticles),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: StreamBuilder<List<PublicationCard>>(
         stream: _feedStreamController.stream,
@@ -448,10 +495,173 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _applyAdvancedFilters(
+      String feedName, Set<String> journals, String include, String exclude) {
+    if (journals.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Select at least one journal"),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _currentFeedName = feedName;
+      _filteredFeed = _allFeed.where((pub) {
+        final matchesJournal = journals.contains(pub.journalTitle);
+        if (!matchesJournal) return false;
+
+        final includeWords = include
+            .toLowerCase()
+            .split(RegExp(r'\s+'))
+            .where((w) => w.isNotEmpty)
+            .toList();
+        final excludeWords = exclude
+            .toLowerCase()
+            .split(RegExp(r'\s+'))
+            .where((w) => w.isNotEmpty)
+            .toList();
+
+        final content =
+            '${pub.title} ${pub.abstract} ${pub.journalTitle}'.toLowerCase();
+
+        final matchesInclude = includeWords.isEmpty
+            ? true
+            : includeWords.every((word) => content.contains(word));
+
+        final matchesExclude = excludeWords.isEmpty
+            ? true
+            : excludeWords.every((word) => !content.contains(word));
+
+        return matchesInclude && matchesExclude;
+      }).toList();
+
+      _sortFeed();
+    });
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setString('lastSelectedFeed', feedName);
+    });
+  }
+
+  Future<void> _applyStoredFilter() async {
+    final filters = await dbHelper.getParsedFeedFilters();
+    final match = filters.firstWhere(
+      (f) => f.name == _currentFeedName,
+      orElse: () => FeedFilter(
+        id: 0,
+        name: 'Home', // TODO Localize this probably
+        include: '',
+        exclude: '',
+        journals: <String>{},
+        dateCreated: '',
+      ),
+    );
+
+    if (match.name != 'Home') {
+      _applyAdvancedFilters(
+          match.name, match.journals, match.include, match.exclude);
+    }
+  }
+
   @override
   void dispose() {
     _feedStreamController.close();
     _filterController.dispose();
     super.dispose();
+  }
+
+  Future<void> _showFeedFiltersDialog() async {
+    final db = DatabaseHelper();
+    final List<FeedFilter> filters = await db.getParsedFeedFilters();
+
+    final allFilters = [
+      FeedFilter(
+        id: 0,
+        name: 'Home',
+        include: '',
+        exclude: '',
+        journals: <String>{},
+        dateCreated: '',
+      ),
+      ...filters,
+    ];
+
+    bool isEditing = false;
+
+    await showDialog<void>(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(AppLocalizations.of(context)!.selectFeed),
+                  TextButton(
+                    onPressed: () => setState(() => isEditing = !isEditing),
+                    child: Text(isEditing
+                        ? AppLocalizations.of(context)!.done
+                        : AppLocalizations.of(context)!.edit),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: allFilters.length,
+                  itemBuilder: (context, index) {
+                    final filter = allFilters[index];
+                    return ListTile(
+                      title: Text(filter.name),
+                      trailing: isEditing && filter.name != 'Home'
+                          ? IconButton(
+                              icon: Icon(Icons.delete,
+                                  color: Theme.of(context).primaryColor),
+                              onPressed: () async {
+                                await db.deleteFeedFilter(filter.id);
+                                Navigator.pop(context);
+                                _showFeedFiltersDialog();
+                              },
+                            )
+                          : null,
+                      onTap: !isEditing
+                          ? () async {
+                              Navigator.pop(context);
+                              if (filter.name == 'Home') {
+                                setState(() {
+                                  _currentFeedName = 'Home';
+                                  _filteredFeed = List.from(_allFeed);
+                                  _sortFeed();
+                                  _filterController.clear();
+                                });
+                                final prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.setString(
+                                    'lastSelectedFeed', filter.name);
+                              } else {
+                                setState(() {
+                                  _currentFeedName = filter.name;
+                                });
+                                _applyAdvancedFilters(
+                                    filter.name,
+                                    filter.journals,
+                                    filter.include,
+                                    filter.exclude);
+                              }
+                            }
+                          : null,
+                    );
+                  },
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }

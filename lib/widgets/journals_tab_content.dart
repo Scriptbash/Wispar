@@ -66,7 +66,7 @@ class _JournalsTabContentState extends State<JournalsTabContent> {
         // Journal list
         Expanded(
           child: FutureBuilder<List<Journal>>(
-            future: dbHelper.getJournals(),
+            future: dbHelper.getFollowedJournals(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return CircularProgressIndicator();

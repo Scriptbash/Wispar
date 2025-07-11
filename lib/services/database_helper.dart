@@ -4,6 +4,7 @@ import '../models/crossref_journals_works_models.dart';
 import '../widgets/publication_card.dart';
 import '../widgets/downloaded_card.dart';
 import '../models/journal_entity.dart';
+import '../models/feed_filter_entity.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,7 +25,7 @@ class DatabaseHelper {
     final path = await getDatabasesPath();
     final databasePath = join(path, 'wispar.db');
 
-    return openDatabase(databasePath, version: 5, onOpen: (db) async {
+    return openDatabase(databasePath, version: 6, onOpen: (db) async {
       await db.execute('PRAGMA foreign_keys = ON');
     }, onCreate: (db, version) async {
       await db.execute('PRAGMA foreign_keys = ON');
@@ -84,6 +85,18 @@ class DatabaseHelper {
           lastFetched TEXT,
           queryProvider TEXT
         )
+      ''');
+
+      // Create the feed filters table
+      await db.execute('''
+        CREATE TABLE feed_filters (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        includedKeywords TEXT,
+        excludedKeywords TEXT,
+        journals TEXT,
+        dateCreated TEXT DEFAULT CURRENT_TIMESTAMP
+      )
       ''');
     }, onUpgrade: (db, oldVersion, newVersion) async {
       logger.info("Upgrading DB from ${oldVersion} to ${newVersion}");
@@ -147,6 +160,18 @@ class DatabaseHelper {
       if (oldVersion < 5) {
         await db.execute('''
         ALTER TABLE articles ADD COLUMN isHidden INTEGER;
+      ''');
+      }
+      if (oldVersion < 6) {
+        await db.execute('''
+        CREATE TABLE feed_filters (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        includedKeywords TEXT,
+        excludedKeywords TEXT,
+        journals TEXT,
+        dateCreated TEXT DEFAULT CURRENT_TIMESTAMP
+      )
       ''');
       }
     });
@@ -216,7 +241,7 @@ class DatabaseHelper {
     }
   }
 
-  Future<List<Journal>> getJournals() async {
+  Future<List<Journal>> getFollowedJournals() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.rawQuery('''
       SELECT j.journal_id, j.title, j.publisher, j.dateFollowed, j.lastUpdated, 
@@ -224,6 +249,28 @@ class DatabaseHelper {
       FROM journals j
       JOIN journal_issns ji ON j.journal_id = ji.journal_id
       WHERE j.dateFollowed IS NOT NULL
+      GROUP BY j.journal_id
+    ''');
+
+    return List.generate(maps.length, (i) {
+      return Journal(
+        id: maps[i]['journal_id'],
+        issn: (maps[i]['issns'] as String).split(','),
+        title: maps[i]['title'],
+        publisher: maps[i]['publisher'],
+        dateFollowed: maps[i]['dateFollowed'],
+        lastUpdated: maps[i]['lastUpdated'],
+      );
+    });
+  }
+
+  Future<List<Journal>> getAllJournals() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+      SELECT j.journal_id, j.title, j.publisher, j.dateFollowed, j.lastUpdated, 
+            GROUP_CONCAT(ji.issn) as issns
+      FROM journals j
+      JOIN journal_issns ji ON j.journal_id = ji.journal_id
       GROUP BY j.journal_id
     ''');
 
@@ -908,5 +955,45 @@ class DatabaseHelper {
     } catch (e, stackTrace) {
       logger.severe('Error cleaning up the database', e, stackTrace);
     }
+  }
+
+  Future<void> insertFeedFilter({
+    required String name,
+    required String include,
+    required String exclude,
+    required Set<String> journals,
+  }) async {
+    final db = await database;
+
+    await db.insert('feed_filters', {
+      'name': name,
+      'includedKeywords': include,
+      'excludedKeywords': exclude,
+      'journals': journals.join(','),
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> getFeedFilters() async {
+    final db = await database;
+    return await db.query('feed_filters', orderBy: 'dateCreated DESC');
+  }
+
+  Future<List<FeedFilter>> getParsedFeedFilters() async {
+    final raw = await getFeedFilters();
+    return raw.map((row) {
+      return FeedFilter(
+        id: row['id'],
+        name: row['name'],
+        include: row['includedKeywords'] ?? '',
+        exclude: row['excludedKeywords'] ?? '',
+        journals: (row['journals'] ?? '').split(',').toSet(),
+        dateCreated: row['dateCreated'],
+      );
+    }).toList();
+  }
+
+  Future<void> deleteFeedFilter(int id) async {
+    final db = await database;
+    await db.delete('feed_filters', where: 'id = ?', whereArgs: [id]);
   }
 }

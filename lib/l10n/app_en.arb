@@ -49,6 +49,14 @@
   "@fgNotificationContent": {},
   "fgNotificationTitle": "Background updates service",
   "@fgNotificationTitle": {},
+  "selectFeed": "Select a feed",
+  "@selectFeed":{},
+  "createCustomFeed": "Create a custom feed",
+  "@createCustomFeed": {},
+  "done": "Done",
+  "@done": {},
+  "edit": "Edit",
+  "@edit": {},
   "home": "Home",
   "@home": {
     "description": "The home menu button and the app bar title when in the home screen."
