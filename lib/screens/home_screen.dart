@@ -390,8 +390,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ? TextField(
                 controller: _filterController,
                 autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'Search...',
+                decoration: InputDecoration(
+                  hintText: AppLocalizations.of(context)!.searchPlaceholder,
                   border: UnderlineInputBorder(),
                 ),
               )
@@ -400,7 +400,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(_currentFeedName),
+                    Text(
+                      _currentFeedName == 'Home'
+                          ? AppLocalizations.of(context)!.home
+                          : _currentFeedName,
+                    ),
                     const SizedBox(width: 4),
                     const Icon(Icons.arrow_drop_down),
                   ],
@@ -548,7 +552,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (journals.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Select at least one journal"),
+          content: Text(AppLocalizations.of(context)!.errorSelectOneJournal),
           duration: Duration(seconds: 3),
         ),
       );
@@ -666,7 +670,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (context, index) {
                     final filter = allFilters[index];
                     return ListTile(
-                      title: Text(filter.name),
+                      title: Text(
+                        filter.name == 'Home'
+                            ? AppLocalizations.of(context)!.home
+                            : filter.name,
+                      ),
                       trailing: isEditing && filter.name != 'Home'
                           ? Row(
                               mainAxisSize: MainAxisSize.min,
@@ -727,6 +735,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                   onPressed: () async {
                                     await db.deleteFeedFilter(filter.id);
                                     Navigator.pop(context);
+
+                                    // Reset to Home feed after deletion
+                                    setState(() {
+                                      _currentFeedName = 'Home';
+                                      _activeFeed = List.from(_allFeed);
+                                      _filteredFeed = List.from(_allFeed);
+                                      _sortFeed();
+                                      _filterController.clear();
+                                    });
+
+                                    final prefs =
+                                        await SharedPreferences.getInstance();
+                                    await prefs.setString(
+                                        'lastSelectedFeed', 'Home');
+
                                     _showFeedFiltersDialog();
                                   },
                                 ),

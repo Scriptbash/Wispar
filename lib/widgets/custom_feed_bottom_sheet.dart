@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
 import '../services/database_helper.dart';
 
 class CustomizeFeedBottomSheet extends StatefulWidget {
@@ -147,13 +148,13 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                           decoration: BoxDecoration(color: Colors.grey[400]),
                         ),
                       ),
-                      Text('Customize feed',
+                      Text(AppLocalizations.of(context)!.customizeFeed,
                           style: Theme.of(context).textTheme.titleLarge),
                       const SizedBox(height: 16),
                       TextField(
                         controller: _nameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Feed name',
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.feedName,
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -161,14 +162,14 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Followed journals',
+                          Text(AppLocalizations.of(context)!.followedJournals,
                               style: Theme.of(context).textTheme.labelLarge),
                           TextButton(
                             onPressed: _toggleSelectAllFollowed,
                             child: Text(_selectedJournals
                                     .containsAll(widget.followedJournals)
-                                ? 'Clear all'
-                                : 'Select all'),
+                                ? AppLocalizations.of(context)!.clearAll
+                                : AppLocalizations.of(context)!.selectAll),
                           ),
                         ],
                       ),
@@ -192,7 +193,7 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                       const SizedBox(height: 16),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text('More journals',
+                        title: Text(AppLocalizations.of(context)!.moreJournals,
                             style: Theme.of(context).textTheme.labelLarge),
                         trailing: Icon(
                           _showMoreJournals
@@ -210,8 +211,8 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                               onPressed: _toggleSelectAllMore,
                               child: Text(_selectedJournals
                                       .containsAll(widget.moreJournals)
-                                  ? 'Clear all'
-                                  : 'Select all'),
+                                  ? AppLocalizations.of(context)!.clearAll
+                                  : AppLocalizations.of(context)!.selectAll),
                             ),
                           ],
                         ),
@@ -236,7 +237,7 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                       ],
                       const SizedBox(height: 24),
                       // Include keywords
-                      Text('Include keywords',
+                      Text(AppLocalizations.of(context)!.includeKeywords,
                           style: Theme.of(context).textTheme.labelLarge),
                       Wrap(
                         spacing: 8,
@@ -253,12 +254,13 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                       ),
                       TextField(
                         controller: _includeKeywordsController,
-                        decoration: const InputDecoration(
-                            hintText: 'Type and press space...'),
+                        decoration: InputDecoration(
+                            hintText:
+                                AppLocalizations.of(context)!.typePressSpace),
                       ),
                       const SizedBox(height: 16),
                       // Exclude keywords
-                      Text('Exclude keywords',
+                      Text(AppLocalizations.of(context)!.excludeKeywords,
                           style: Theme.of(context).textTheme.labelLarge),
                       Wrap(
                         spacing: 8,
@@ -275,8 +277,9 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                       ),
                       TextField(
                         controller: _excludeKeywordsController,
-                        decoration: const InputDecoration(
-                            hintText: 'Type and press space...'),
+                        decoration: InputDecoration(
+                            hintText:
+                                AppLocalizations.of(context)!.typePressSpace),
                       ),
                       const SizedBox(height: 24),
                     ],
@@ -295,8 +298,9 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
 
                         if (feedName.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Please enter a feed name')),
+                            SnackBar(
+                                content: Text(AppLocalizations.of(context)!
+                                    .errorFeedNameEmpty)),
                           );
                           return;
                         }
@@ -312,9 +316,9 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                                 widget.initialName!.toLowerCase() !=
                                     feedName.toLowerCase())) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text(
-                                    'A feed with this name already exists')),
+                            SnackBar(
+                                content: Text(AppLocalizations.of(context)!
+                                    .errorFeedNameAlreadyExists)),
                           );
                           return;
                         }
@@ -340,7 +344,7 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                             feedName, _selectedJournals, include, exclude);
                         Navigator.pop(context);
                       },
-                      label: const Text('Save'),
+                      label: Text(AppLocalizations.of(context)!.save),
                       icon: const Icon(Icons.check),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(40),
