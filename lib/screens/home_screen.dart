@@ -34,10 +34,12 @@ class _HomeScreenState extends State<HomeScreen> {
   int _concurrentFetches = 3; // Default to 3 concurrent requests
   List<String> _currentJournalNames = [];
 
-  // Variables related to the filter bar in the appbar
+  // Variables related to the search bar in the appbar
+  bool _isSearching = false;
   final TextEditingController _filterController = TextEditingController();
   List<PublicationCard> _allFeed = [];
   List<PublicationCard> _filteredFeed = [];
+  List<PublicationCard> _activeFeed = [];
 
   final FeedService _feedService = FeedService();
 
@@ -91,6 +93,12 @@ class _HomeScreenState extends State<HomeScreen> {
         _applyAdvancedFilters(
             match.name, match.journals, match.include, match.exclude);
       }
+    } else {
+      setState(() {
+        _currentFeedName = 'Home';
+        _activeFeed = List.from(_allFeed);
+        _filteredFeed = List.from(_allFeed);
+      });
     }
   }
 
@@ -158,9 +166,14 @@ class _HomeScreenState extends State<HomeScreen> {
           _allFeed = List.from(cachedFeed);
           _filteredFeed = List.from(_allFeed);
           if (_currentFeedName != 'Home') {
-            // Reapply the filter if a custom feed was last used
             _applyStoredFilter();
+          } else {
+            setState(() {
+              _activeFeed = List.from(_allFeed);
+              _filteredFeed = List.from(_allFeed);
+            });
           }
+
           _sortFeed();
           _feedLoaded = true;
         });
@@ -217,13 +230,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Filters the feed using the filter bar
   void _filterFeed(String query) {
+    final sourceFeed = _activeFeed.isNotEmpty ? _activeFeed : _allFeed;
+
     setState(() {
       if (query.isEmpty) {
-        _filteredFeed = List.from(_allFeed);
+        _filteredFeed = List.from(sourceFeed);
       } else {
         List<String> keywords = query.toLowerCase().split(' ');
 
-        _filteredFeed = _allFeed.where((publication) {
+        _filteredFeed = sourceFeed.where((publication) {
           bool matchesAnyField(String word, PublicationCard pub) {
             return pub.title.toLowerCase().contains(word) ||
                 pub.journalTitle.toLowerCase().contains(word) ||
@@ -236,11 +251,9 @@ class _HomeScreenState extends State<HomeScreen> {
           }
 
           if (_useAndFilter) {
-            return keywords.every(
-                (word) => matchesAnyField(word, publication)); // AND logic
+            return keywords.every((word) => matchesAnyField(word, publication));
           } else {
-            return keywords
-                .any((word) => matchesAnyField(word, publication)); // OR logic
+            return keywords.any((word) => matchesAnyField(word, publication));
           }
         }).toList();
       }
@@ -276,10 +289,19 @@ class _HomeScreenState extends State<HomeScreen> {
         await _getCachedFeed(context, _onAbstractChanged);
     setState(() {
       _allFeed = List.from(cachedFeed);
-      _filterFeed(_filterController.text);
-      _sortFeed();
-      _feedStreamController.add(_filteredFeed);
     });
+
+    if (_currentFeedName == 'Home') {
+      setState(() {
+        _activeFeed = List.from(_allFeed);
+        _filterFeed(_filterController.text);
+      });
+    } else {
+      await _applyStoredFilter();
+    }
+
+    _sortFeed();
+    _feedStreamController.add(_filteredFeed);
   }
 
   void handleMenuButton(int item) async {
@@ -364,20 +386,46 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: GestureDetector(
-          onTap: _showFeedFiltersDialog,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(_currentFeedName),
-              const SizedBox(width: 4),
-              const Icon(Icons.arrow_drop_down),
-            ],
-          ),
-        ),
+        title: _isSearching
+            ? TextField(
+                controller: _filterController,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'Search...',
+                  border: UnderlineInputBorder(),
+                ),
+              )
+            : GestureDetector(
+                onTap: _showFeedFiltersDialog,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(_currentFeedName),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.arrow_drop_down),
+                  ],
+                ),
+              ),
         centerTitle: false,
         actions: [
-          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
+          _isSearching
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    setState(() {
+                      _isSearching = false;
+                      _filterController.clear(); // This restores the full feed
+                    });
+                  },
+                )
+              : IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () {
+                    setState(() {
+                      _isSearching = true;
+                    });
+                  },
+                ),
           PopupMenuButton<int>(
             icon: Image.asset(
               'assets/icon/icon.png',
@@ -509,7 +557,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     setState(() {
       _currentFeedName = feedName;
-      _filteredFeed = _allFeed.where((pub) {
+      _activeFeed = _allFeed.where((pub) {
         final matchesJournal = journals.contains(pub.journalTitle);
         if (!matchesJournal) return false;
 
@@ -538,8 +586,10 @@ class _HomeScreenState extends State<HomeScreen> {
         return matchesInclude && matchesExclude;
       }).toList();
 
+      _filterFeed(_filterController.text);
       _sortFeed();
     });
+
     SharedPreferences.getInstance().then((prefs) {
       prefs.setString('lastSelectedFeed', feedName);
     });
@@ -689,10 +739,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               if (filter.name == 'Home') {
                                 setState(() {
                                   _currentFeedName = 'Home';
+                                  _activeFeed = List.from(_allFeed);
                                   _filteredFeed = List.from(_allFeed);
                                   _sortFeed();
                                   _filterController.clear();
                                 });
+
                                 final prefs =
                                     await SharedPreferences.getInstance();
                                 await prefs.setString(
