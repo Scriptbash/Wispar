@@ -25,6 +25,7 @@ class JournalsTabContent extends StatefulWidget {
 
 class _JournalsTabContentState extends State<JournalsTabContent> {
   late DatabaseHelper dbHelper;
+  bool _isEditing = false;
 
   @override
   void initState() {
@@ -50,13 +51,15 @@ class _JournalsTabContentState extends State<JournalsTabContent> {
                     TextButton.styleFrom(visualDensity: VisualDensity.compact),
               ),
               TextButton.icon(
-                onPressed: () => _showSortDialog(context),
-                icon: Icon(
-                  widget.initialSortOrder == 0
-                      ? Icons.arrow_downward
-                      : Icons.arrow_upward,
-                ),
-                label: Text("Edit"),
+                onPressed: () {
+                  setState(() {
+                    _isEditing = !_isEditing;
+                  });
+                },
+                icon: Icon(_isEditing ? Icons.check : Icons.edit),
+                label: Text(_isEditing
+                    ? AppLocalizations.of(context)!.done
+                    : AppLocalizations.of(context)!.edit),
                 style:
                     TextButton.styleFrom(visualDensity: VisualDensity.compact),
               ),
@@ -115,6 +118,7 @@ class _JournalsTabContentState extends State<JournalsTabContent> {
                         JournalCard(
                           journal: currentJournal,
                           unfollowCallback: _unfollowJournal,
+                          showDeleteButton: _isEditing,
                         ),
                       ],
                     );

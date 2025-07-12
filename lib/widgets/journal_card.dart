@@ -7,8 +7,13 @@ import '../models/journal_entity.dart';
 class JournalCard extends StatelessWidget {
   final Journal journal;
   final Function(BuildContext, Journal) unfollowCallback;
+  final bool showDeleteButton;
 
-  const JournalCard({required this.journal, required this.unfollowCallback});
+  const JournalCard({
+    required this.journal,
+    required this.unfollowCallback,
+    this.showDeleteButton = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -61,13 +66,13 @@ class JournalCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            TextButton(
-              onPressed: () {
-                // Perform the unfollow action
-                unfollowCallback(context, journal);
-              },
-              child: Text(AppLocalizations.of(context)!.unfollow),
-            ),
+            if (showDeleteButton)
+              TextButton(
+                onPressed: () {
+                  unfollowCallback(context, journal);
+                },
+                child: Text(AppLocalizations.of(context)!.unfollow),
+              ),
           ],
         ),
         subtitle: Column(
