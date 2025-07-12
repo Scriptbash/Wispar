@@ -102,7 +102,7 @@ Future<void> runFeedJob(
 
   int journalArticleCountBefore = await dbHelper.getArticleCount();
 
-  List<Journal> followedJournals = await dbHelper.getJournals();
+  List<Journal> followedJournals = await dbHelper.getFollowedJournals();
   await feedService.updateFeed(
     followedJournals,
     (journalNames) {},
