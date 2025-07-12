@@ -24,6 +24,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
   final TextEditingController _filterController = TextEditingController();
   List<DownloadedCard> _filteredDownloads = [];
   bool _useAndFilter = true;
+  bool _showSearchBar = false;
 
   @override
   void initState() {
@@ -81,57 +82,41 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Container(
-          height: 50.0,
-          child: TextField(
-            controller: _filterController,
-            decoration: InputDecoration(
-                hintText: AppLocalizations.of(context)!.filterDownloads,
-                enabledBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(
-                      color: Color.fromARGB(31, 148, 147, 147), width: 0.0),
-                  borderRadius: BorderRadius.circular(30.0),
+        title: _showSearchBar
+            ? TextField(
+                controller: _filterController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: AppLocalizations.of(context)!.filterDownloads,
+                  border: UnderlineInputBorder(),
                 ),
-                border: OutlineInputBorder(
-                  borderSide: const BorderSide(
-                      color: Color.fromARGB(31, 148, 147, 147), width: 0.0),
-                  borderRadius: BorderRadius.circular(30.0),
-                ),
-                prefixIcon: Icon(Icons.search),
-                filled: true,
-                fillColor: Color.fromARGB(31, 148, 147, 147),
-                suffixIcon: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _useAndFilter = !_useAndFilter;
-                          _filterDownloads(_filterController.text);
-                        });
-                      },
-                      child: Text(
-                        _useAndFilter ? 'AND' : 'OR',
-                      ),
-                    ),
-                    PopupMenuButton<int>(
-                      icon: Icon(Icons.more_vert),
-                      onSelected: (item) => handleMenuButton(item),
-                      itemBuilder: (context) => [
-                        PopupMenuItem<int>(
-                          value: 0,
-                          child: ListTile(
-                            leading: Icon(Icons.sort),
-                            title: Text(AppLocalizations.of(context)!.sort),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                )),
+              )
+            : Text(AppLocalizations.of(context)!.downloads),
+        actions: [
+          if (_showSearchBar)
+            IconButton(
+              icon: Icon(Icons.close),
+              onPressed: () {
+                setState(() {
+                  _showSearchBar = false;
+                  _filterController.clear();
+                });
+              },
+            )
+          else
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                setState(() {
+                  _showSearchBar = true;
+                });
+              },
+            ),
+          IconButton(
+            icon: Icon(Icons.swap_vert),
+            onPressed: () => handleMenuButton(),
           ),
-        ),
-        centerTitle: false,
+        ],
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
@@ -169,7 +154,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     });
   }
 
-  void handleMenuButton(int item) {
+  void handleMenuButton() {
     showSortDialog(
       context: context,
       initialSortBy: sortBy,

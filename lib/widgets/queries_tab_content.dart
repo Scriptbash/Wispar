@@ -45,7 +45,7 @@ class _QueriesTabContentState extends State<QueriesTabContent> {
             children: [
               TextButton.icon(
                 onPressed: () => _showSortDialog(context),
-                icon: Icon(Icons.sort),
+                icon: Icon(Icons.swap_vert),
                 label: Text(AppLocalizations.of(context)!.sort),
                 style:
                     TextButton.styleFrom(visualDensity: VisualDensity.compact),
