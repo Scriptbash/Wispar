@@ -25,6 +25,7 @@ class QueriesTabContent extends StatefulWidget {
 class _QueriesTabContentState extends State<QueriesTabContent> {
   final dbHelper = DatabaseHelper();
   late Future<List<Map<String, dynamic>>> savedQueriesFuture;
+  bool _isEditing = false;
 
   @override
   void initState() {
@@ -50,13 +51,15 @@ class _QueriesTabContentState extends State<QueriesTabContent> {
                     TextButton.styleFrom(visualDensity: VisualDensity.compact),
               ),
               TextButton.icon(
-                onPressed: () => _showSortDialog(context),
-                icon: Icon(
-                  widget.initialSortOrder == 0
-                      ? Icons.arrow_downward
-                      : Icons.arrow_upward,
-                ),
-                label: Text("Edit"),
+                onPressed: () {
+                  setState(() {
+                    _isEditing = !_isEditing;
+                  });
+                },
+                icon: Icon(_isEditing ? Icons.check : Icons.edit),
+                label: Text(_isEditing
+                    ? AppLocalizations.of(context)!.done
+                    : AppLocalizations.of(context)!.edit),
                 style:
                     TextButton.styleFrom(visualDensity: VisualDensity.compact),
               ),
@@ -113,6 +116,7 @@ class _QueriesTabContentState extends State<QueriesTabContent> {
                       queryParams: query['queryParams'],
                       queryProvider: query['queryProvider'],
                       dateSaved: query['dateSaved'],
+                      showDeleteButton: _isEditing,
                       onDelete: () async {
                         await dbHelper.deleteQuery(query['query_id']);
                         setState(() {

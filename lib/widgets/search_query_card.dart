@@ -13,6 +13,7 @@ class SearchQueryCard extends StatefulWidget {
   final String queryParams;
   final String queryProvider;
   final String dateSaved;
+  final bool showDeleteButton;
   final VoidCallback? onDelete;
 
   const SearchQueryCard({
@@ -21,6 +22,7 @@ class SearchQueryCard extends StatefulWidget {
     required this.queryName,
     required this.queryParams,
     required this.queryProvider,
+    this.showDeleteButton = false,
     required this.dateSaved,
     this.onDelete,
   }) : super(key: key);
@@ -198,7 +200,7 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  if (widget.onDelete != null)
+                  if (widget.showDeleteButton && widget.onDelete != null)
                     IconButton(
                       icon: const Icon(Icons.delete_outline),
                       onPressed: widget.onDelete,
