@@ -448,7 +448,7 @@ class _HomeScreenState extends State<HomeScreen> {
               PopupMenuItem<int>(
                 value: 1,
                 child: ListTile(
-                  leading: Icon(Icons.sort_by_alpha),
+                  leading: Icon(Icons.swap_vert),
                   title: Text(AppLocalizations.of(context)!.sort),
                 ),
               ),
