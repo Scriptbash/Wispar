@@ -618,14 +618,69 @@ class _HomeScreenState extends State<HomeScreen> {
                     return ListTile(
                       title: Text(filter.name),
                       trailing: isEditing && filter.name != 'Home'
-                          ? IconButton(
-                              icon: Icon(Icons.delete,
-                                  color: Theme.of(context).primaryColor),
-                              onPressed: () async {
-                                await db.deleteFeedFilter(filter.id);
-                                Navigator.pop(context);
-                                _showFeedFiltersDialog();
-                              },
+                          ? Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.edit,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    final journals = dbHelper.getAllJournals();
+                                    journals.then((allJournals) {
+                                      final followedJournals = allJournals
+                                          .where((j) => j.dateFollowed != null)
+                                          .map((j) => j.title)
+                                          .toList();
+                                      final unfollowedJournals = allJournals
+                                          .where((j) => j.dateFollowed == null)
+                                          .map((j) => j.title)
+                                          .toList();
+
+                                      showModalBottomSheet(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(20)),
+                                        ),
+                                        builder: (context) {
+                                          return CustomizeFeedBottomSheet(
+                                            followedJournals: followedJournals,
+                                            moreJournals: unfollowedJournals,
+                                            initialName: filter.name,
+                                            initialInclude: filter.include,
+                                            initialExclude: filter.exclude,
+                                            initialSelectedJournals:
+                                                filter.journals,
+                                            feedId: filter.id,
+                                            onApply: (String feedName,
+                                                Set<String> journals,
+                                                String include,
+                                                String exclude) {
+                                              _applyAdvancedFilters(feedName,
+                                                  journals, include, exclude);
+                                            },
+                                          );
+                                        },
+                                      );
+                                    });
+                                  },
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.delete,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                  onPressed: () async {
+                                    await db.deleteFeedFilter(filter.id);
+                                    Navigator.pop(context);
+                                    _showFeedFiltersDialog();
+                                  },
+                                ),
+                              ],
                             )
                           : null,
                       onTap: !isEditing

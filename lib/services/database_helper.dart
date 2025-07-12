@@ -992,6 +992,28 @@ class DatabaseHelper {
     }).toList();
   }
 
+  Future<void> updateFeedFilter({
+    required int id,
+    required String name,
+    required String include,
+    required String exclude,
+    required Set<String> journals,
+  }) async {
+    final db = await database;
+
+    await db.update(
+      'feed_filters',
+      {
+        'name': name,
+        'includedKeywords': include,
+        'excludedKeywords': exclude,
+        'journals': journals.join(','),
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
   Future<void> deleteFeedFilter(int id) async {
     final db = await database;
     await db.delete('feed_filters', where: 'id = ?', whereArgs: [id]);

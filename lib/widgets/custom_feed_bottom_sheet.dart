@@ -11,12 +11,22 @@ class CustomizeFeedBottomSheet extends StatefulWidget {
     String exclude,
   ) onApply;
 
-  const CustomizeFeedBottomSheet({
-    super.key,
-    required this.followedJournals,
-    required this.moreJournals,
-    required this.onApply,
-  });
+  final String? initialName;
+  final String? initialInclude;
+  final String? initialExclude;
+  final Set<String>? initialSelectedJournals;
+  final int? feedId;
+
+  const CustomizeFeedBottomSheet(
+      {super.key,
+      required this.followedJournals,
+      required this.moreJournals,
+      required this.onApply,
+      this.initialName,
+      this.initialInclude,
+      this.initialExclude,
+      this.initialSelectedJournals,
+      this.feedId});
 
   @override
   _CustomizeFeedBottomSheetState createState() =>
@@ -24,8 +34,9 @@ class CustomizeFeedBottomSheet extends StatefulWidget {
 }
 
 class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
-  final TextEditingController _feedNameController = TextEditingController();
-
+  late TextEditingController _nameController;
+  late TextEditingController _includeController;
+  late TextEditingController _excludeController;
   final TextEditingController _includeKeywordsController =
       TextEditingController();
   final TextEditingController _excludeKeywordsController =
@@ -33,14 +44,29 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
 
   final List<String> _includeChips = [];
   final List<String> _excludeChips = [];
-
-  final Set<String> _selectedJournals = {};
+  Set<String> _selectedJournals = {};
   bool _showMoreJournals = false;
 
   @override
   void initState() {
     super.initState();
-    _selectedJournals.addAll(widget.followedJournals);
+
+    _nameController = TextEditingController(text: widget.initialName ?? '');
+    _includeController =
+        TextEditingController(text: widget.initialInclude ?? '');
+    _excludeController =
+        TextEditingController(text: widget.initialExclude ?? '');
+
+    _selectedJournals = widget.initialSelectedJournals != null
+        ? Set<String>.from(widget.initialSelectedJournals!)
+        : Set<String>.from(widget.followedJournals);
+
+    if (_includeController.text.isNotEmpty) {
+      _includeChips.addAll(_includeController.text.split(RegExp(r'\\s+')));
+    }
+    if (_excludeController.text.isNotEmpty) {
+      _excludeChips.addAll(_excludeController.text.split(RegExp(r'\\s+')));
+    }
 
     _includeKeywordsController.addListener(() {
       final text = _includeKeywordsController.text;
@@ -101,9 +127,8 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
           return Container(
             decoration: BoxDecoration(
               color: Theme.of(context).canvasColor,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(16),
-              ),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(16)),
             ),
             padding: MediaQuery.of(context).viewInsets,
             child: Stack(
@@ -119,18 +144,14 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                           width: 40,
                           height: 4,
                           margin: const EdgeInsets.only(bottom: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[400],
-                          ),
+                          decoration: BoxDecoration(color: Colors.grey[400]),
                         ),
                       ),
-                      Text(
-                        'Customize feed',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
+                      Text('Customize feed',
+                          style: Theme.of(context).textTheme.titleLarge),
                       const SizedBox(height: 16),
                       TextField(
-                        controller: _feedNameController,
+                        controller: _nameController,
                         decoration: const InputDecoration(
                           labelText: 'Feed name',
                           border: OutlineInputBorder(),
@@ -140,18 +161,14 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            'Followed journals',
-                            style: Theme.of(context).textTheme.labelLarge,
-                          ),
+                          Text('Followed journals',
+                              style: Theme.of(context).textTheme.labelLarge),
                           TextButton(
                             onPressed: _toggleSelectAllFollowed,
-                            child: Text(
-                              _selectedJournals
-                                      .containsAll(widget.followedJournals)
-                                  ? 'Clear all'
-                                  : 'Select all',
-                            ),
+                            child: Text(_selectedJournals
+                                    .containsAll(widget.followedJournals)
+                                ? 'Clear all'
+                                : 'Select all'),
                           ),
                         ],
                       ),
@@ -162,13 +179,11 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                           return FilterChip(
                             label: Text(name),
                             selected: _selectedJournals.contains(name),
-                            onSelected: (bool selected) {
+                            onSelected: (selected) {
                               setState(() {
-                                if (selected) {
-                                  _selectedJournals.add(name);
-                                } else {
-                                  _selectedJournals.remove(name);
-                                }
+                                selected
+                                    ? _selectedJournals.add(name)
+                                    : _selectedJournals.remove(name);
                               });
                             },
                           );
@@ -177,20 +192,15 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                       const SizedBox(height: 16),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          'More journals',
-                          style: Theme.of(context).textTheme.labelLarge,
-                        ),
+                        title: Text('More journals',
+                            style: Theme.of(context).textTheme.labelLarge),
                         trailing: Icon(
                           _showMoreJournals
                               ? Icons.expand_less
                               : Icons.expand_more,
                         ),
-                        onTap: () {
-                          setState(() {
-                            _showMoreJournals = !_showMoreJournals;
-                          });
-                        },
+                        onTap: () => setState(
+                            () => _showMoreJournals = !_showMoreJournals),
                       ),
                       if (_showMoreJournals) ...[
                         Row(
@@ -198,12 +208,10 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                           children: [
                             TextButton(
                               onPressed: _toggleSelectAllMore,
-                              child: Text(
-                                _selectedJournals
-                                        .containsAll(widget.moreJournals)
-                                    ? 'Clear all'
-                                    : 'Select all',
-                              ),
+                              child: Text(_selectedJournals
+                                      .containsAll(widget.moreJournals)
+                                  ? 'Clear all'
+                                  : 'Select all'),
                             ),
                           ],
                         ),
@@ -214,13 +222,11 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                             return FilterChip(
                               label: Text(name),
                               selected: _selectedJournals.contains(name),
-                              onSelected: (bool selected) {
+                              onSelected: (selected) {
                                 setState(() {
-                                  if (selected) {
-                                    _selectedJournals.add(name);
-                                  } else {
-                                    _selectedJournals.remove(name);
-                                  }
+                                  selected
+                                      ? _selectedJournals.add(name)
+                                      : _selectedJournals.remove(name);
                                 });
                               },
                             );
@@ -234,58 +240,44 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                           style: Theme.of(context).textTheme.labelLarge),
                       Wrap(
                         spacing: 8,
-                        children: _includeChips
-                            .map((chip) => FilterChip(
-                                  label: Text(chip),
-                                  selected: true,
-                                  onSelected: (_) {},
-                                  onDeleted: () {
-                                    setState(() {
-                                      _includeChips.remove(chip);
-                                    });
-                                  },
-                                  selectedColor:
-                                      Theme.of(context).chipTheme.selectedColor,
-                                  showCheckmark: false,
-                                ))
-                            .toList(),
+                        children: _includeChips.map((chip) {
+                          return FilterChip(
+                            label: Text(chip),
+                            selected: true,
+                            onSelected: (_) {},
+                            onDeleted: () =>
+                                setState(() => _includeChips.remove(chip)),
+                            showCheckmark: false,
+                          );
+                        }).toList(),
                       ),
                       TextField(
                         controller: _includeKeywordsController,
                         decoration: const InputDecoration(
-                          hintText: 'Type and press space...',
-                        ),
+                            hintText: 'Type and press space...'),
                       ),
                       const SizedBox(height: 16),
-
                       // Exclude keywords
                       Text('Exclude keywords',
                           style: Theme.of(context).textTheme.labelLarge),
                       Wrap(
                         spacing: 8,
-                        children: _excludeChips
-                            .map((chip) => FilterChip(
-                                  label: Text(chip),
-                                  selected: true,
-                                  onSelected: (_) {},
-                                  onDeleted: () {
-                                    setState(() {
-                                      _excludeChips.remove(chip);
-                                    });
-                                  },
-                                  selectedColor:
-                                      Theme.of(context).chipTheme.selectedColor,
-                                  showCheckmark: false,
-                                ))
-                            .toList(),
+                        children: _excludeChips.map((chip) {
+                          return FilterChip(
+                            label: Text(chip),
+                            selected: true,
+                            onSelected: (_) {},
+                            onDeleted: () =>
+                                setState(() => _excludeChips.remove(chip)),
+                            showCheckmark: false,
+                          );
+                        }).toList(),
                       ),
                       TextField(
                         controller: _excludeKeywordsController,
                         decoration: const InputDecoration(
-                          hintText: 'Type and press space...',
-                        ),
+                            hintText: 'Type and press space...'),
                       ),
-
                       const SizedBox(height: 24),
                     ],
                   ),
@@ -297,13 +289,14 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                     child: FloatingActionButton.extended(
                       onPressed: () async {
                         final db = DatabaseHelper();
-                        final feedName = _feedNameController.text.trim();
+                        final feedName = _nameController.text.trim();
                         final include = _includeChips.join(' ');
                         final exclude = _excludeChips.join(' ');
 
                         if (feedName.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Please enter a feed name')),
+                            const SnackBar(
+                                content: Text('Please enter a feed name')),
                           );
                           return;
                         }
@@ -314,32 +307,40 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                             (f['name'] as String).toLowerCase() ==
                             feedName.toLowerCase());
 
-                        if (nameExists) {
+                        if (nameExists &&
+                            (widget.initialName == null ||
+                                widget.initialName!.toLowerCase() !=
+                                    feedName.toLowerCase())) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
+                            const SnackBar(
                                 content: Text(
                                     'A feed with this name already exists')),
                           );
                           return;
                         }
 
-                        await db.insertFeedFilter(
-                          name: feedName,
-                          include: include,
-                          exclude: exclude,
-                          journals: _selectedJournals,
-                        );
+                        if (widget.initialName != null) {
+                          await db.updateFeedFilter(
+                            id: widget.feedId!,
+                            name: feedName,
+                            include: include,
+                            exclude: exclude,
+                            journals: _selectedJournals,
+                          );
+                        } else {
+                          await db.insertFeedFilter(
+                            name: feedName,
+                            include: include,
+                            exclude: exclude,
+                            journals: _selectedJournals,
+                          );
+                        }
 
                         widget.onApply(
-                          feedName,
-                          _selectedJournals,
-                          include,
-                          exclude,
-                        );
-
+                            feedName, _selectedJournals, include, exclude);
                         Navigator.pop(context);
                       },
-                      label: const Text('Create'),
+                      label: const Text('Save'),
                       icon: const Icon(Icons.check),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(40),
@@ -357,7 +358,9 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
 
   @override
   void dispose() {
-    _feedNameController.dispose();
+    _nameController.dispose();
+    _includeController.dispose();
+    _excludeController.dispose();
     _includeKeywordsController.dispose();
     _excludeKeywordsController.dispose();
     super.dispose();
