@@ -62,10 +62,10 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
         : Set<String>.from(widget.followedJournals);
 
     if (_includeController.text.isNotEmpty) {
-      _includeChips.addAll(_includeController.text.split(RegExp(r'\\s+')));
+      _includeChips.addAll(_includeController.text.split(RegExp(r'\s+')));
     }
     if (_excludeController.text.isNotEmpty) {
-      _excludeChips.addAll(_excludeController.text.split(RegExp(r'\\s+')));
+      _excludeChips.addAll(_excludeController.text.split(RegExp(r'\s+')));
     }
 
     _includeKeywordsController.addListener(() {
