@@ -200,11 +200,16 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  if (widget.showDeleteButton && widget.onDelete != null)
-                    IconButton(
+                  Visibility(
+                    visible: widget.showDeleteButton && widget.onDelete != null,
+                    maintainSize: true,
+                    maintainAnimation: true,
+                    maintainState: true,
+                    child: IconButton(
                       icon: const Icon(Icons.delete_outline),
                       onPressed: widget.onDelete,
                     ),
+                  ),
                 ],
               ),
               const SizedBox(height: 8.0),
