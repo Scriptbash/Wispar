@@ -189,15 +189,7 @@ class _PublicationCardState extends State<PublicationCard> {
                                     widget.issn);
                               }
                             } else if (result == SampleItem.itemTwo) {
-                              Clipboard.setData(
-                                  ClipboardData(text: widget.doi));
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                      AppLocalizations.of(context)!.doicopied),
-                                  duration: const Duration(seconds: 1),
-                                ),
-                              );
+                              _showCopyOptions();
                             } else if (result == SampleItem.itemThree) {
                               final box =
                                   context.findRenderObject() as RenderBox?;
@@ -234,8 +226,7 @@ class _PublicationCardState extends State<PublicationCard> {
                               value: SampleItem.itemTwo,
                               child: ListTile(
                                 leading: Icon(Icons.copy),
-                                title:
-                                    Text(AppLocalizations.of(context)!.copydoi),
+                                title: Text(AppLocalizations.of(context)!.copy),
                               ),
                             ),
                             PopupMenuItem<SampleItem>(
@@ -377,6 +368,69 @@ class _PublicationCardState extends State<PublicationCard> {
         ),
       ),
     );
+  }
+
+  void _showCopyOptions() async {
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.short_text),
+                title: Text(AppLocalizations.of(context)!.copyTitle),
+                onTap: () => Navigator.pop(context, 'title'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.article),
+                title: Text(AppLocalizations.of(context)!.copyAbstract),
+                onTap: () => Navigator.pop(context, 'abstract'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.numbers),
+                title: Text(AppLocalizations.of(context)!.copydoi),
+                onTap: () => Navigator.pop(context, 'doi'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.link),
+                title: Text(AppLocalizations.of(context)!.copyUrl),
+                onTap: () => Navigator.pop(context, 'url'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (choice != null) {
+      String contentToCopy = '';
+      switch (choice) {
+        case 'title':
+          contentToCopy = widget.title;
+          break;
+        case 'abstract':
+          contentToCopy = widget.abstract;
+          break;
+        case 'doi':
+          contentToCopy = widget.doi;
+          break;
+        case 'url':
+          contentToCopy = widget.url;
+          break;
+      }
+
+      await Clipboard.setData(ClipboardData(text: contentToCopy));
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(AppLocalizations.of(context)!.copiedToClipboard),
+        duration: const Duration(seconds: 1),
+      ));
+    }
   }
 
   void checkIfLiked() async {
