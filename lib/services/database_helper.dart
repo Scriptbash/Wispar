@@ -5,6 +5,7 @@ import '../widgets/publication_card.dart';
 import '../widgets/downloaded_card.dart';
 import '../models/journal_entity.dart';
 import '../models/feed_filter_entity.dart';
+import './string_format_helper.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -173,6 +174,29 @@ class DatabaseHelper {
         dateCreated TEXT DEFAULT CURRENT_TIMESTAMP
       )
       ''');
+
+        final List<Map<String, dynamic>> articles =
+            await db.query('articles', columns: ['doi', 'title', 'abstract']);
+
+        for (final article in articles) {
+          final String doi = article['doi'];
+          final String? rawTitle = article['title'];
+          final String? rawAbstract = article['abstract'];
+
+          String? cleanedTitle = rawTitle != null ? cleanTitle(rawTitle) : null;
+          String? cleanedAbstract =
+              rawAbstract != null ? cleanAbstract(rawAbstract) : null;
+
+          await db.update(
+            'articles',
+            {
+              if (cleanedTitle != null) 'title': cleanedTitle,
+              if (cleanedAbstract != null) 'abstract': cleanedAbstract,
+            },
+            where: 'doi = ?',
+            whereArgs: [doi],
+          );
+        }
       }
     });
   }
