@@ -397,6 +397,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               )
             : Material(
+                color: Colors.transparent,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(4),
                   onTap: _showFeedFiltersDialog,
