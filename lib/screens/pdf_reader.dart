@@ -116,7 +116,7 @@ class _PdfReaderState extends State<PdfReader> {
               PdfViewer.file(resolvedPdfPath,
                   controller: controller,
                   params: PdfViewerParams(
-                    enableTextSelection: false,
+                    enableTextSelection: true,
                     maxScale: 8,
                     loadingBannerBuilder:
                         (context, bytesDownloaded, totalBytes) {
