@@ -279,7 +279,7 @@ class DatabaseHelper {
         id: maps[i]['journal_id'],
         issn: (maps[i]['issns'] as String).split(','),
         title: maps[i]['title'],
-        publisher: maps[i]['publisher'],
+        publisher: maps[i]['publisher'] ?? '',
         dateFollowed: maps[i]['dateFollowed'],
         lastUpdated: maps[i]['lastUpdated'],
       );

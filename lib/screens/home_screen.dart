@@ -13,6 +13,7 @@ import './hidden_articles_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../services/logs_helper.dart';
+import '../widgets/appbar_dropdown_menu.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -395,19 +396,40 @@ class _HomeScreenState extends State<HomeScreen> {
                   border: UnderlineInputBorder(),
                 ),
               )
-            : GestureDetector(
-                onTap: _showFeedFiltersDialog,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _currentFeedName == 'Home'
-                          ? AppLocalizations.of(context)!.home
-                          : _currentFeedName,
+            : Material(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(4),
+                  onTap: _showFeedFiltersDialog,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        DefaultTextStyle(
+                          style: Theme.of(context).appBarTheme.titleTextStyle ??
+                              Theme.of(context).textTheme.headlineSmall!,
+                          child: Flexible(
+                            child: Text(
+                              _currentFeedName == 'Home'
+                                  ? AppLocalizations.of(context)!.home
+                                  : _currentFeedName,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              softWrap: false,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.arrow_drop_down,
+                          color:
+                              Theme.of(context).appBarTheme.iconTheme?.color ??
+                                  Theme.of(context).iconTheme.color,
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.arrow_drop_down),
-                  ],
+                  ),
                 ),
               ),
         centerTitle: false,
@@ -430,43 +452,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     });
                   },
                 ),
-          PopupMenuButton<int>(
+          IconButton(
             icon: Image.asset(
               'assets/icon/icon.png',
               width: 28,
               height: 28,
             ),
-            onSelected: (item) => handleMenuButton(item),
-            itemBuilder: (context) => [
-              PopupMenuItem<int>(
-                value: 0,
-                child: ListTile(
-                  leading: Icon(Icons.settings_outlined),
-                  title: Text(AppLocalizations.of(context)!.settings),
-                ),
-              ),
-              PopupMenuItem<int>(
-                value: 1,
-                child: ListTile(
-                  leading: Icon(Icons.swap_vert),
-                  title: Text(AppLocalizations.of(context)!.sort),
-                ),
-              ),
-              PopupMenuItem<int>(
-                value: 2,
-                child: ListTile(
-                  leading: Icon(Icons.tune),
-                  title: Text(AppLocalizations.of(context)!.createCustomFeed),
-                ),
-              ),
-              PopupMenuItem<int>(
-                value: 3,
-                child: ListTile(
-                  leading: Icon(Icons.layers_clear_outlined),
-                  title: Text(AppLocalizations.of(context)!.viewHiddenArticles),
-                ),
-              ),
-            ],
+            onPressed: () {
+              AppBarDropdownMenu.show(
+                context: context,
+                onSelected: (item) => handleMenuButton(item),
+              );
+            },
           ),
         ],
       ),
