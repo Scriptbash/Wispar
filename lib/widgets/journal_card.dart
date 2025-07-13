@@ -34,6 +34,7 @@ class JournalCard extends StatelessWidget {
             }
           }()
         : AppLocalizations.of(context)!.pendingUpdate;
+
     return Card(
       margin: EdgeInsets.all(8.0),
       child: ListTile(
@@ -66,13 +67,18 @@ class JournalCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            if (showDeleteButton)
-              TextButton(
+            Visibility(
+              visible: showDeleteButton,
+              maintainSize: true,
+              maintainAnimation: true,
+              maintainState: true,
+              child: TextButton(
                 onPressed: () {
                   unfollowCallback(context, journal);
                 },
                 child: Text(AppLocalizations.of(context)!.unfollow),
               ),
+            ),
           ],
         ),
         subtitle: Column(
