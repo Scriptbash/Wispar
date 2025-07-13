@@ -15,7 +15,7 @@
   <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play" height="50"/>
 </a>
 <a href="https://apps.apple.com/us/app/wispar/id6741366984" target="_blank">
-  <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store"height="50">
+  <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store"width="150">
 </a>
 </br>
 <a href="https://f-droid.org/packages/app.wispar.wispar">
