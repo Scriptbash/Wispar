@@ -226,8 +226,18 @@
   }},
   "abstract": "Abstract",
   "@abstract": {},
+  "copy": "Copy",
+  "@copy":{},
   "copydoi": "Copy DOI",
   "@copydoi": {},
+  "copyAbstract": "Copy abstract",
+  "@copyAbstract":{},
+  "copyTitle": "Copy title",
+  "@copyTitle":{},
+  "copyUrl":"Copy URL",
+  "@copyUrl":{},
+  "copiedToClipboard": "Copied to clipboard!",
+  "@copiedToClipboard":{},
   "doicopied": "DOI copied to clipboard",
   "@doicopied": {
     "description": "Snackbar shown when the Copy DOI button is pressed."
