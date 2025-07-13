@@ -75,8 +75,8 @@ class FeedService {
     } catch (e, stackTrace) {
       logger.severe('Error retrieving saved queries to update.', e, stackTrace);
     }
-    if (savedQueries.isNotEmpty) {
-      logger.info('Found saved queries to update ${savedQueries}');
+    if (queriesToUpdate.isNotEmpty) {
+      logger.info('Found saved queries to update ${queriesToUpdate}');
     }
     return queriesToUpdate;
   }

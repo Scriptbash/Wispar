@@ -46,22 +46,21 @@ class OpenAlexWorks {
     }
 
     return OpenAlexWorks(
-      title: cleanTitle(json['title']),
-      doi: extractedDoi ?? json['doi'],
-      url: primaryLocation?['landing_page_url'],
+      title: cleanTitle(json['title'] ?? 'Untitled'),
+      doi: extractedDoi ?? json['doi'] ?? '',
+      url: primaryLocation?['landing_page_url'] ?? '',
       authors: (json['authorships'] as List?)
               ?.map((a) => a['author']?['display_name'] as String?)
               .whereType<String>()
               .toList() ??
           [],
       abstract: reconstructAbstract(json['abstract_inverted_index']),
-      journalTitle: cleanText(
-        primaryLocation?['source']?['display_name'],
-      ),
-      publishedDate: json['publication_date'],
+      journalTitle:
+          cleanText(primaryLocation?['source']?['display_name'] ?? ''),
+      publishedDate: json['publication_date'] ?? '',
       issn:
           (primaryLocation?['source']?['issn'] as List?)?.cast<String>() ?? [],
-      publisher: primaryLocation?['source']?['host_organization_name'],
+      publisher: primaryLocation?['source']?['host_organization_name'] ?? '',
       license: license,
     );
   }
