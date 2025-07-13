@@ -461,7 +461,7 @@
   "@selectFeed": {},
   "createCustomFeed": "Créer un flux personnalisé",
   "@createCustomFeed": {},
-  "done": "Terminé",
+  "done": "Terminer",
   "@done": {},
   "edit": "Éditer",
   "@edit": {},
@@ -499,6 +499,6 @@
   "@copyTitle": {},
   "copyUrl": "Copier l'URL",
   "@copyUrl": {},
-  "copiedToClipboard": "Copié dans le presse-papier!",
+  "copiedToClipboard": "Copié dans le presse-papier !",
   "@copiedToClipboard": {}
 }
