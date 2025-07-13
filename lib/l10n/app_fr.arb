@@ -490,5 +490,15 @@
   "errorSelectOneJournal": "Sélectionnez au moins une revue",
   "@errorSelectOneJournal": {},
   "sort": "Trier",
-  "@sort": {}
+  "@sort": {},
+  "copy": "Copier",
+  "@copy": {},
+  "copyAbstract": "Copier le résumé",
+  "@copyAbstract": {},
+  "copyTitle": "Copier le titre",
+  "@copyTitle": {},
+  "copyUrl": "Copier l'URL",
+  "@copyUrl": {},
+  "copiedToClipboard": "Copié dans le presse-papier!",
+  "@copiedToClipboard": {}
 }
