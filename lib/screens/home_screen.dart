@@ -649,14 +649,22 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (context, setState) {
             return AlertDialog(
               title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(AppLocalizations.of(context)!.selectFeed),
+                  Expanded(
+                    child: Text(
+                      AppLocalizations.of(context)!.selectFeed,
+                      style: Theme.of(context).textTheme.titleLarge,
+                      softWrap: true,
+                      overflow: TextOverflow.visible,
+                    ),
+                  ),
                   TextButton(
                     onPressed: () => setState(() => isEditing = !isEditing),
-                    child: Text(isEditing
-                        ? AppLocalizations.of(context)!.done
-                        : AppLocalizations.of(context)!.edit),
+                    child: Text(
+                      isEditing
+                          ? AppLocalizations.of(context)!.done
+                          : AppLocalizations.of(context)!.edit,
+                    ),
                   ),
                 ],
               ),
@@ -668,92 +676,92 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (context, index) {
                     final filter = allFilters[index];
                     return ListTile(
-                      title: Text(
-                        filter.name == 'Home'
-                            ? AppLocalizations.of(context)!.home
-                            : filter.name,
-                      ),
-                      trailing: isEditing && filter.name != 'Home'
-                          ? Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: Icon(Icons.edit,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    final journals = dbHelper.getAllJournals();
-                                    journals.then((allJournals) {
-                                      final followedJournals = allJournals
-                                          .where((j) => j.dateFollowed != null)
-                                          .map((j) => j.title)
-                                          .toList();
-                                      final unfollowedJournals = allJournals
-                                          .where((j) => j.dateFollowed == null)
-                                          .map((j) => j.title)
-                                          .toList();
+                      title: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              filter.name == 'Home'
+                                  ? AppLocalizations.of(context)!.home
+                                  : filter.name,
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
+                            ),
+                          ),
+                          if (isEditing && filter.name != 'Home') ...[
+                            IconButton(
+                              icon: Icon(Icons.edit,
+                                  color: Theme.of(context).colorScheme.primary),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                final journals = db.getAllJournals();
+                                journals.then((allJournals) {
+                                  final followedJournals = allJournals
+                                      .where((j) => j.dateFollowed != null)
+                                      .map((j) => j.title)
+                                      .toList();
+                                  final unfollowedJournals = allJournals
+                                      .where((j) => j.dateFollowed == null)
+                                      .map((j) => j.title)
+                                      .toList();
 
-                                      showModalBottomSheet(
-                                        context: context,
-                                        isScrollControlled: true,
-                                        shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.vertical(
-                                              top: Radius.circular(20)),
-                                        ),
-                                        builder: (context) {
-                                          return CustomizeFeedBottomSheet(
-                                            followedJournals: followedJournals,
-                                            moreJournals: unfollowedJournals,
-                                            initialName: filter.name,
-                                            initialInclude: filter.include,
-                                            initialExclude: filter.exclude,
-                                            initialSelectedJournals:
-                                                filter.journals,
-                                            feedId: filter.id,
-                                            onApply: (String feedName,
-                                                Set<String> journals,
-                                                String include,
-                                                String exclude) {
-                                              _applyAdvancedFilters(feedName,
-                                                  journals, include, exclude);
-                                            },
-                                          );
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(20)),
+                                    ),
+                                    builder: (context) {
+                                      return CustomizeFeedBottomSheet(
+                                        followedJournals: followedJournals,
+                                        moreJournals: unfollowedJournals,
+                                        initialName: filter.name,
+                                        initialInclude: filter.include,
+                                        initialExclude: filter.exclude,
+                                        initialSelectedJournals:
+                                            filter.journals,
+                                        feedId: filter.id,
+                                        onApply: (String feedName,
+                                            Set<String> journals,
+                                            String include,
+                                            String exclude) {
+                                          _applyAdvancedFilters(feedName,
+                                              journals, include, exclude);
                                         },
                                       );
-                                    });
-                                  },
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.delete,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary),
-                                  onPressed: () async {
-                                    await db.deleteFeedFilter(filter.id);
-                                    Navigator.pop(context);
+                                    },
+                                  );
+                                });
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete,
+                                  color: Theme.of(context).colorScheme.primary),
+                              onPressed: () async {
+                                await db.deleteFeedFilter(filter.id);
+                                Navigator.pop(context);
 
-                                    // Reset to Home feed after deletion
-                                    setState(() {
-                                      _currentFeedName = 'Home';
-                                      _activeFeed = List.from(_allFeed);
-                                      _filteredFeed = List.from(_allFeed);
-                                      _sortFeed();
-                                      _filterController.clear();
-                                    });
+                                // Reset to Home feed after deletion
+                                setState(() {
+                                  _currentFeedName = 'Home';
+                                  _activeFeed = List.from(_allFeed);
+                                  _filteredFeed = List.from(_allFeed);
+                                  _sortFeed();
+                                  _filterController.clear();
+                                });
 
-                                    final prefs =
-                                        await SharedPreferences.getInstance();
-                                    await prefs.setString(
-                                        'lastSelectedFeed', 'Home');
+                                final prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.setString(
+                                    'lastSelectedFeed', 'Home');
 
-                                    _showFeedFiltersDialog();
-                                  },
-                                ),
-                              ],
-                            )
-                          : null,
+                                _showFeedFiltersDialog();
+                              },
+                            ),
+                          ],
+                        ],
+                      ),
                       onTap: !isEditing
                           ? () async {
                               Navigator.pop(context);
