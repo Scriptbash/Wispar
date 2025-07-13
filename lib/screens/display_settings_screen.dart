@@ -28,6 +28,7 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
     'ja': '日本語',
     'id': 'Bahasa Indonesia',
     'pt': 'Português',
+    'de': 'Deutsch',
     'zh': '中文',
   };
 
@@ -44,6 +45,7 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
     Locale('ja'),
     Locale('id'),
     Locale('pt'),
+    Locale('de'),
     Locale('zh'),
   ];
 
