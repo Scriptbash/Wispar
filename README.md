@@ -45,6 +45,7 @@ Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly s
     <li> [x] Scrape missing abstracts</li>
     <li> [x] Export/Import the database</li>
     <li> [x] Notifications and background journals updates</li>
+    <li> [x] Create custom feeds</li>
     <li> [x] Filters</li>
 </ul>
 * The download feature is currently limited to some publishers. Flutter tools and publishers like Elsevier and Wiley make it hard to get the PDF file.
