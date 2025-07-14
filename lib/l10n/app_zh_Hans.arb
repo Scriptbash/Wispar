@@ -538,5 +538,15 @@
   "errorSelectOneJournal": "请至少选择一个期刊",
   "@errorSelectOneJournal": {},
   "sort": "排序",
-  "@sort": {}
+  "@sort": {},
+  "copy": "拷贝",
+  "@copy": {},
+  "copyAbstract": "拷贝摘要",
+  "@copyAbstract": {},
+  "copyTitle": "拷贝标题",
+  "@copyTitle": {},
+  "copyUrl": "拷贝URL",
+  "@copyUrl": {},
+  "copiedToClipboard": "复制到剪贴板!",
+  "@copiedToClipboard": {}
 }
