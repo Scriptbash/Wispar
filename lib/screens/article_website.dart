@@ -50,6 +50,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
   bool _isPdfInAppWebView = false;
 
   String? _currentWebViewCookies;
+  WebUri? _currentWebViewUrl;
 
   @override
   void initState() {
@@ -103,6 +104,9 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
     setState(() {
       isReadyToLoad =
           pdfUrl.isNotEmpty; // Ensure WebView only loads when URL is ready
+      if (isReadyToLoad) {
+        _currentWebViewUrl = WebUri(pdfUrl);
+      }
     });
   }
 
@@ -132,14 +136,13 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
         title: Text(widget.publicationCard.title),
         actions: [
           // Show 'Download PDF' button if an extracted URL exists
-          if (_extractedPdfUrl != null)
+          if (_currentWebViewUrl != null)
             IconButton(
               icon: const Icon(Icons.open_in_browser),
               onPressed: () async {
-                Uri? currentWebUri = await webViewController?.getUrl();
-                if (currentWebUri != null &&
-                    await canLaunchUrl(currentWebUri)) {
-                  await launchUrl(currentWebUri,
+                if (_currentWebViewUrl != null &&
+                    await canLaunchUrl(_currentWebViewUrl!)) {
+                  await launchUrl(_currentWebViewUrl!,
                       mode: LaunchMode.externalApplication);
                 } else {
                   _showSnackBar(
@@ -148,13 +151,15 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
               },
               tooltip: AppLocalizations.of(context)!.openExternalBrowser,
             ),
-          IconButton(
-            icon: const Icon(Icons.download),
-            tooltip: AppLocalizations.of(context)!.downloadFoundPdf,
-            onPressed: () {
-              _showDownloadOptions(context, Uri.parse(_extractedPdfUrl!), null);
-            },
-          ),
+          if (_extractedPdfUrl != null)
+            IconButton(
+              icon: const Icon(Icons.download),
+              tooltip: AppLocalizations.of(context)!.downloadFoundPdf,
+              onPressed: () {
+                _showDownloadOptions(
+                    context, Uri.parse(_extractedPdfUrl!), null);
+              },
+            ),
         ],
       ),
       body: SafeArea(
@@ -177,6 +182,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                           urlController.text = this.url;
                           _extractedPdfUrl = null;
                           _isPdfInAppWebView = false;
+                          _currentWebViewUrl = url;
                         });
                       },
                       onCreateWindow: (controller, createWindowRequest) async {
@@ -185,7 +191,6 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                         logger.info(
                             'Intercepted new window: ${newWindowUri.toString()}');
 
-                        // Check if the new window URL is a PDF
                         bool isPdfWindow = newWindowUri.path
                                 .toLowerCase()
                                 .endsWith('.pdf') ||
@@ -193,8 +198,12 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                             (newWindowUri.toString().contains('/pdf/') &&
                                 !newWindowUri.toString().contains('/epdf/')) ||
                             (newWindowUri.toString().contains('/pdfft') &&
-                                newWindowUri.toString().contains(
-                                    '.pdf')); // Specifically for Elsevier's /pdfft
+                                newWindowUri.toString().contains('.pdf')) ||
+                            (newWindowUri.toString().contains('/pdfdirect/') &&
+                                newWindowUri.queryParameters
+                                    .containsKey('download') &&
+                                newWindowUri.queryParameters['download'] ==
+                                    'true');
 
                         if (isPdfWindow) {
                           logger.info(
@@ -204,6 +213,10 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                           await controller.loadUrl(
                               urlRequest: URLRequest(
                                   url: WebUri(newWindowUri.toString())));
+                          setState(() {
+                            _currentWebViewUrl =
+                                WebUri(newWindowUri.toString());
+                          });
                           return true;
                         } else {
                           logger.info(
@@ -236,7 +249,12 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                             downloadUri.path.toLowerCase().endsWith('.pdf') ||
                             (downloadUri.queryParameters.containsKey('pdf') &&
                                 !downloadUri.queryParameters
-                                    .containsKey('needAccess'))) {
+                                    .containsKey('needAccess')) ||
+                            (downloadUri.toString().contains('/pdfdirect/') &&
+                                downloadUri.queryParameters
+                                    .containsKey('download') &&
+                                downloadUri.queryParameters['download'] ==
+                                    'true')) {
                           logger.info(
                               'PDF download request detected. Offering options to user.');
                           _showDownloadOptions(
@@ -261,6 +279,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                         setState(() {
                           this.url = url.toString();
                           urlController.text = this.url;
+                          _currentWebViewUrl = url;
                         });
 
                         await _extractCookiesFromWebView(url);
@@ -273,7 +292,10 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                                 !url!.queryParameters
                                     .containsKey('needAccess')) ||
                             (url?.toString().contains('/pdf/') == true &&
-                                !url!.toString().contains('/epdf/'))) {
+                                !url!.toString().contains('/epdf/')) ||
+                            (url?.toString().contains('/pdfdirect/') == true &&
+                                url!.queryParameters.containsKey('download') &&
+                                url.queryParameters['download'] == 'true')) {
                           logger.info(
                               'Current URL ends with .pdf or strongly indicates a PDF. Marking as in-app PDF.');
                           setState(() {
@@ -314,6 +336,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                             AppLocalizations.of(context)!.webViewError);
                         setState(() {
                           _isPdfInAppWebView = false;
+                          _currentWebViewUrl = null;
                         });
                       },
                       onProgressChanged: (controller, progress) {
@@ -330,6 +353,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                         setState(() {
                           this.url = url.toString();
                           urlController.text = this.url;
+                          _currentWebViewUrl = url;
                         });
                       },
                       onConsoleMessage: (controller, consoleMessage) {
@@ -383,10 +407,29 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
         .info('Starting _extractPdfLink for URL: ${await controller.getUrl()}');
 
     try {
-      pdfLink = await controller.evaluateJavascript(
-              source:
-                  "document.querySelector('meta[name=\"citation_pdf_url\"]')?.getAttribute('content');")
-          as String?;
+      pdfLink = await controller.evaluateJavascript(source: r"""
+                  var directPdfLink = document.querySelector('a[href*="/doi/pdfdirect/"][href*="?download=true"]');
+                  if (directPdfLink) {
+                      return directPdfLink.href;
+                  }
+
+                  var link = document.querySelector('a.read-link[data-track-action="Download PDF"], a[data-track-label="PdfLink"], a.pdf-link, a[href*="/doi/pdf/"]');
+                  if (link) {
+                      return link.href;
+                  }
+                  link = document.querySelector('a[aria-label*="Download PDF"]');
+                  if (link) {
+                      return link.href;
+                  }
+                  return null;
+                  """) as String?;
+
+      if (pdfLink == null || pdfLink.isEmpty) {
+        pdfLink = await controller.evaluateJavascript(
+                source:
+                    "document.querySelector('meta[name=\"citation_pdf_url\"]')?.getAttribute('content');")
+            as String?;
+      }
 
       if (pdfLink == null || pdfLink.isEmpty) {
         pdfLink = await controller.evaluateJavascript(
