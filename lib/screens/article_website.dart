@@ -48,6 +48,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
 
   String? _extractedPdfUrl;
   bool _isPdfInAppWebView = false;
+  bool _isShowingDownloadOptions = false;
 
   String? _currentWebViewCookies;
   WebUri? _currentWebViewUrl;
@@ -175,6 +176,27 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                       pullToRefreshController: pullToRefreshController,
                       onWebViewCreated: (controller) {
                         webViewController = controller;
+                        controller.addJavaScriptHandler(
+                          handlerName:
+                              'downloadPdfUrl', // This matches the JS callHandler name
+                          callback: (args) async {
+                            final String pdfDirectUrl =
+                                args[0]; // Get the URL from the JS arguments
+                            logger.info(
+                                "Received direct PDF URL from JavaScript: $pdfDirectUrl");
+                            await controller.loadUrl(
+                                urlRequest:
+                                    URLRequest(url: WebUri(pdfDirectUrl)));
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(AppLocalizations.of(context)!
+                                    .downloadStarting),
+                                duration: const Duration(seconds: 3),
+                              ),
+                            );
+                          },
+                        );
                       },
                       onLoadStart: (controller, url) {
                         setState(() {
@@ -186,8 +208,16 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                         });
                       },
                       onCreateWindow: (controller, createWindowRequest) async {
-                        final Uri newWindowUri =
-                            createWindowRequest.request.url!;
+                        final WebUri? newWindowUri =
+                            createWindowRequest.request.url;
+
+                        if (newWindowUri == null ||
+                            newWindowUri.toString().isEmpty) {
+                          logger.warning(
+                              'onCreateWindow: Incoming request URL is null or empty. Preventing popup.');
+                          return false;
+                        }
+
                         logger.info(
                             'Intercepted new window: ${newWindowUri.toString()}');
 
@@ -211,11 +241,9 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                           // Load the PDF URL into the current webViewController
                           // This will replace the current content with the PDF
                           await controller.loadUrl(
-                              urlRequest: URLRequest(
-                                  url: WebUri(newWindowUri.toString())));
+                              urlRequest: URLRequest(url: newWindowUri));
                           setState(() {
-                            _currentWebViewUrl =
-                                WebUri(newWindowUri.toString());
+                            _currentWebViewUrl = newWindowUri;
                           });
                           return true;
                         } else {
@@ -228,7 +256,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                           }
                         }
                         logger.warning(
-                            'onCreateWindow: No handler for ${newWindowUri.toString()}, letting WebView create new window.');
+                            'onCreateWindow: No specific handler for ${newWindowUri.toString()}, preventing WebView from creating new window.');
                         return false;
                       },
                       onReceivedServerTrustAuthRequest:
@@ -306,6 +334,56 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                             _isPdfInAppWebView = false;
                           });
                         }
+
+                        // --- Wiley-specific JavaScript injection for download ---
+                        if (url
+                                .toString()
+                                .contains('onlinelibrary.wiley.com') &&
+                            (url.toString().contains('/doi/pdfviewer/') ||
+                                url.toString().contains('/doi/epdf/'))) {
+                          logger.info(
+                              'Wiley PDF viewer (or epdf) detected. Initiating delayed click attempt with polling for dropdown and download link.');
+
+                          await controller.evaluateJavascript(source: """
+                            (function() {
+                                var checkAttempts = 0;
+                                var maxAttempts = 40;
+                                var intervalTime = 500;
+                                var pdfUrlFound = false;
+                                var checkInterval;
+
+                                console.log('WEBVIEW_DEBUG: Initializing Wiley PDF URL extraction.');
+
+                                function performExtraction() {
+                                    if (pdfUrlFound) {
+                                        clearInterval(checkInterval);
+                                        return;
+                                    }
+
+                                    var downloadLinkSelector = 'a.download.drawerMenu--trigger.list-button[href*="/doi/pdfdirect/"][href*="?download=true"]';
+                                    var downloadLink = document.querySelector(downloadLinkSelector);
+
+                                    if (downloadLink && downloadLink.href) {
+                                        console.log('WEBVIEW_DEBUG: Wiley Download link href found: ' + downloadLink.href);
+                                        window.flutter_inappwebview.callHandler('downloadPdfUrl', downloadLink.href);
+                                        pdfUrlFound = true;
+                                        clearInterval(checkInterval);
+                                    } else {
+                                        checkAttempts++;
+                                        console.log('WEBVIEW_DEBUG: Wiley Download link href NOT found yet. Attempt ' + checkAttempts + '.');
+                                        if (checkAttempts >= maxAttempts) {
+                                            console.log('WEBVIEW_DEBUG: Max attempts reached for PDF URL extraction. Stopping.');
+                                            clearInterval(checkInterval);
+                                        }
+                                    }
+                                }
+
+                                checkInterval = setInterval(performExtraction, intervalTime);
+
+                            })();
+                          """);
+                        }
+                        // --- End Wiley-specific JavaScript injection ---
 
                         if (url.toString().contains('/epdf/')) {
                           logger.info(
@@ -480,6 +558,14 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
 
   Future<void> _showDownloadOptions(
       BuildContext context, Uri downloadUri, String? suggestedFilename) async {
+    if (_isShowingDownloadOptions) {
+      logger.info(
+          'Download options already showing or recently shown. Debouncing.');
+      return;
+    }
+
+    _isShowingDownloadOptions = true;
+
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -635,6 +721,8 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
           ),
         );
       },
-    );
+    ).whenComplete(() {
+      _isShowingDownloadOptions = false;
+    });
   }
 }
