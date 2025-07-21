@@ -225,8 +225,8 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                                 .toLowerCase()
                                 .endsWith('.pdf') ||
                             newWindowUri.queryParameters.containsKey('pdf') ||
-                            (newWindowUri.toString().contains('/pdf/') &&
-                                !newWindowUri.toString().contains('/epdf/')) ||
+                            (newWindowUri.toString().contains('/pdf/') ||
+                                newWindowUri.toString().contains('/epdf/')) ||
                             (newWindowUri.toString().contains('/pdfft') &&
                                 newWindowUri.toString().contains('.pdf')) ||
                             (newWindowUri.toString().contains('/pdfdirect/') &&
@@ -319,8 +319,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                             (url?.queryParameters.containsKey('pdf') == true &&
                                 !url!.queryParameters
                                     .containsKey('needAccess')) ||
-                            (url?.toString().contains('/pdf/') == true &&
-                                !url!.toString().contains('/epdf/')) ||
+                            url?.toString().contains('/pdf/') == true ||
                             (url?.toString().contains('/pdfdirect/') == true &&
                                 url!.queryParameters.containsKey('download') &&
                                 url.queryParameters['download'] == 'true')) {
@@ -410,8 +409,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                         pullToRefreshController?.endRefreshing();
                         logger.severe(
                             'WebView Error: ${error.description}', error);
-                        _showSnackBar(
-                            AppLocalizations.of(context)!.webViewError);
+
                         setState(() {
                           _isPdfInAppWebView = false;
                           _currentWebViewUrl = null;
@@ -684,13 +682,15 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                         ));
                       }
                     } else {
+                      _showSnackBar(AppLocalizations.of(this.context)!
+                          .downloadFailedInAppViewer);
                       logger.warning(
                           'HTTP download failed (status: ${response.statusCode}). Content was not a valid PDF header or server rejected.');
 
-                      if (await canLaunchUrl(downloadUri)) {
+                      /*if (await canLaunchUrl(downloadUri)) {
                         launchUrl(downloadUri,
                             mode: LaunchMode.externalApplication);
-                      }
+                      }*/
                     }
                   } catch (e, st) {
                     logger.severe('Error during HTTP PDF download: $e', e, st);

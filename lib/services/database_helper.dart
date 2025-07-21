@@ -467,10 +467,14 @@ class DatabaseHelper {
 
         // Insert the ISSNs into the journal_issns table
         for (final issn in publicationCard.issn) {
-          await db.insert('journal_issns', {
-            'issn': issn,
-            'journal_id': journalId,
-          });
+          await db.insert(
+            'journal_issns',
+            {
+              'issn': issn,
+              'journal_id': journalId,
+            },
+            conflictAlgorithm: ConflictAlgorithm.ignore,
+          );
         }
       }
 

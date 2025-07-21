@@ -550,15 +550,13 @@
   "@downloadFailedInAppViewer":{},
   "errorOpeningFile": "Could not open file.",
   "@errorOpeningFile":{},
-  "webViewError": "The WebView encountered an error",
-  "@webViewError":{},
   "downloadStarting": "Download starting.",
   "@downloadStarting":{},
   "downloadFoundPdf": "Download found pdf",
   "@downloadFoundPdf":{},
   "downloadToApp": "Download in app",
   "@downloadToApp":{},
-  "downloadToAppSubtitle": "Attempt to download and view PDF directly in the Wispar for better integration.",
+  "downloadToAppSubtitle": "Attempt to download and view PDF directly in Wispar for better integration.",
   "@downloadToAppSubtitle":{}
 
 }
