@@ -32,9 +32,9 @@
   "notifications": "Notifications",
   "@notifications": {},
   "notifPermsGranted": "Permission granted",
-  "@notifPermsNotGranted": {},
-  "notifPermsNotGranted": "Permission not granted",
   "@notifPermsGranted": {},
+  "notifPermsNotGranted": "Permission not granted",
+  "@notifPermsNotGranted": {},
   "openAppSettings": "Open settings",
   "@openAppSettings": {},
   "notificationSettingsMessage": "Notifications are permanently disabled. To enable them, go to the app's notification settings.",
@@ -50,7 +50,7 @@
   "fgNotificationTitle": "Background updates service",
   "@fgNotificationTitle": {},
   "selectFeed": "Select a feed",
-  "@selectFeed":{},
+  "@selectFeed": {},
   "createCustomFeed": "Create a custom feed",
   "@createCustomFeed": {},
   "done": "Done",
@@ -58,29 +58,29 @@
   "edit": "Edit",
   "@edit": {},
   "clearAll": "Clear all",
-  "@clearAll":{},
+  "@clearAll": {},
   "selectAll": "Select all",
-  "@selectAll":{},
+  "@selectAll": {},
   "customizeFeed": "Customize feed",
-  "@customizeFeed":{},
+  "@customizeFeed": {},
   "feedName": "Feed name",
-  "@feedName":{},
-  "followedJournals":"Followed journals",
-  "@followedJournals":{},
+  "@feedName": {},
+  "followedJournals": "Followed journals",
+  "@followedJournals": {},
   "moreJournals": "More journals",
-  "@moreJournals":{},
+  "@moreJournals": {},
   "includeKeywords": "Include keywords",
-  "@includeKeywords":{},
+  "@includeKeywords": {},
   "excludeKeywords": "Exclude keywords",
-  "@excludeKeywords":{},
-  "typePressSpace": "Type and press space...",
-  "@typePressSpace":{},
+  "@excludeKeywords": {},
+  "typePressSpace": "Type and press space…",
+  "@typePressSpace": {},
   "errorFeedNameEmpty": "Please enter a name for the feed",
-  "@errorFeedNameEmpty":{},
+  "@errorFeedNameEmpty": {},
   "errorFeedNameAlreadyExists": "A feed with this name already exists",
-  "@errorFeedNameAlreadyExists":{},
+  "@errorFeedNameAlreadyExists": {},
   "errorSelectOneJournal": "Select at least one journal",
-  "@errorSelectOneJournal":{},
+  "@errorSelectOneJournal": {},
   "home": "Home",
   "@home": {
     "description": "The home menu button and the app bar title when in the home screen."
@@ -144,41 +144,41 @@
   "filter": "Filter publication cards",
   "@filter": {},
   "filterResultsEmpty": "No publication matches your filter",
+  "@filterResultsEmpty": {},
   "filterDownloads": "Filter downloads",
   "@filterDownloads": {},
   "filterFavorites": "Filter favorites",
   "@filterFavorites": {},
-  "@filterResultsEmpty": {},
   "emptyDOIError": "Please enter a DOI",
   "@emptyDOIError": {},
   "searchByQuery": "Search by query",
   "@searchByQuery": {},
   "searchOpenAlex": "OpenAlex (recommended)",
-  "@searchOpenAlex":{},
+  "@searchOpenAlex": {},
   "source": "Source: {search_provider}",
+  "@source": {},
   "everything": "Everything",
-  "@everything":{},
+  "@everything": {},
   "titleAndAbstract": "Title and abstract",
   "@titleAndAbstract": {},
   "title": "Title",
   "@title": {},
   "searchIn": "Search in",
-  "@searchIn":{},
-  "addKeyword":"Add keyword",
-  "@addKeyword":{},
-  "enterKeyword":"Enter a keyword",
-  "@enterKeyword":{},
+  "@searchIn": {},
+  "addKeyword": "Add keyword",
+  "@addKeyword": {},
+  "enterKeyword": "Enter a keyword",
+  "@enterKeyword": {},
   "displayName": "Display name",
-  "@displayName":{},
+  "@displayName": {},
   "citedByCount": "Cited by count",
-  "@citedByCount":{},
-  "worksCount":"Works count",
-  "@worksCount":{},
-  "publicationDate":"Publication date",
-  "@publicationDate":{},
+  "@citedByCount": {},
+  "worksCount": "Works count",
+  "@worksCount": {},
+  "publicationDate": "Publication date",
+  "@publicationDate": {},
   "queryPreview": "Query preview:",
-  "@queryPreview":{},
-  "@source":{},
+  "@queryPreview": {},
   "searchByDOI": "Search by DOI",
   "@searchByDOI": {},
   "searchByTitle": "Search by title",
@@ -218,26 +218,28 @@
   "authors": "Authors",
   "@authors": {},
   "publishedon": "Published on {date}",
-  "@publishedon": {"placeholders": {
-    "date": {
-      "type": "DateTime",
-      "format": "yMMMMd"
+  "@publishedon": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMMd"
+      }
     }
-  }},
+  },
   "abstract": "Abstract",
   "@abstract": {},
   "copy": "Copy",
-  "@copy":{},
+  "@copy": {},
   "copydoi": "Copy DOI",
   "@copydoi": {},
   "copyAbstract": "Copy abstract",
-  "@copyAbstract":{},
+  "@copyAbstract": {},
   "copyTitle": "Copy title",
-  "@copyTitle":{},
-  "copyUrl":"Copy URL",
-  "@copyUrl":{},
+  "@copyTitle": {},
+  "copyUrl": "Copy URL",
+  "@copyUrl": {},
   "copiedToClipboard": "Copied to clipboard!",
-  "@copiedToClipboard":{},
+  "@copiedToClipboard": {},
   "doicopied": "DOI copied to clipboard",
   "@doicopied": {
     "description": "Snackbar shown when the Copy DOI button is pressed."
@@ -297,7 +299,7 @@
   "systemtheme": "System theme",
   "@systemtheme": {},
   "system": "System",
-  "@system":{},
+  "@system": {},
   "publicationCard": "Publication card",
   "@publicationCard": {},
   "showAllAbstracts": "Show all abstracts",
@@ -317,33 +319,44 @@
   "selectinstitution": "Select your institution",
   "@selectinstitution": {},
   "sort": "Sort",
-  "@sort":{},
+  "@sort": {},
   "sortby": "Sort by",
   "@sortby": {},
   "sortorder": "Sort order",
   "@sortorder": {},
   "followingsince": "Following since {date}",
-  "@followingsince": {"placeholders": {
-    "date": {
-      "type": "DateTime",
-      "format": "yMMMMd"
+  "@followingsince": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMMd"
+      }
     }
-  }},
+  },
   "lastUpdatedMinutes": "{minutes, plural, one{Last updated 1 minute ago} other{Last updated {minutes} minutes ago}}",
   "@lastUpdatedMinutes": {
-  "placeholders": {
-    "minutes": {
-      "type": "int"}}},
-"lastUpdatedHours": "{hours, plural, one{Last updated 1 hour ago} other{Last updated {hours} hours ago}}",
-"@lastUpdatedHours": {
-  "placeholders": {
-    "hours": {
-      "type": "int"}}},
-"lastUpdatedDays": "{days, plural, one{Last updated 1 day ago} other{Last updated {days} days ago}}",
-"@lastUpdatedDays": {
-  "placeholders": {
-    "days": {
-      "type": "int"}}},
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "lastUpdatedHours": "{hours, plural, one{Last updated 1 hour ago} other{Last updated {hours} hours ago}}",
+  "@lastUpdatedHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "lastUpdatedDays": "{days, plural, one{Last updated 1 day ago} other{Last updated {days} days ago}}",
+  "@lastUpdatedDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "pendingUpdate": "Pending update",
   "@pendingUpdate": {},
   "journaltitle": "Journal title",
@@ -363,12 +376,14 @@
   "dateaddedtofavorites": "Date added to favorites",
   "@dateaddedtofavorites": {},
   "addedtoyourfav": "Added to your favorites on {date}",
-  "@addedtoyourfav": {"placeholders": {
-    "date": {
-      "type": "DateTime",
-      "format": "yMMMMd"
+  "@addedtoyourfav": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMMd"
+      }
     }
-  }},
+  },
   "noinstitution": "No institution",
   "@noinstitution": {},
   "buildingfeed": "Building your feed. Please wait…",
@@ -424,18 +439,20 @@
     "description": "Snackbar shown when an attempt to save an invalid Zotero API key is made."
   },
   "zoteroApiKeyEmpty": "The Zotero API key has not been set yet. Please configure the API key in the app settings.",
-  "@zoteroApiKeyEmpty":{},
+  "@zoteroApiKeyEmpty": {},
   "zoteroArticleSent": "The article was sent to Zotero.",
-  "@zoteroArticleSent":{},
+  "@zoteroArticleSent": {},
   "save": "Save",
   "@save": {},
   "savedOn": "Saved on {date}",
-  "@savedOn": {"placeholders": {
-    "date": {
-      "type": "DateTime",
-      "format": "yMMMMd"
+  "@savedOn": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMMd"
+      }
     }
-  }},
+  },
   "sourceCode": "Source code",
   "@sourceCode": {},
   "reportIssue": "Report an issue",
@@ -451,7 +468,7 @@
   "concurrentFetches": "Concurrent API requests: {number}",
   "@concurrentFetches": {},
   "scrapeAbstracts": "Scrape missing abstracts",
-  "@scrapeAbstracts":{},
+  "@scrapeAbstracts": {},
   "cleanupInterval": "Cleanup interval (days)",
   "@cleanupInterval": {},
   "cleanupIntervalHint": "Enter number of days (1 to 365)",
@@ -469,21 +486,21 @@
   "storagePermissionDenied": "Permission denied.",
   "@storagePermissionDenied": {},
   "databaseExported": "Database exported successfully!",
-  "@databaseExported":{},
+  "@databaseExported": {},
   "databaseExportFailed": "Failed to export database.",
-  "@databaseExportFailed":{},
+  "@databaseExportFailed": {},
   "selectDBExportLocation": "Select a location where to export the database.",
-  "@selectDBExportLocation":{},
+  "@selectDBExportLocation": {},
   "exportDatabase": "Export database",
-  "@exportDatabase":{},
+  "@exportDatabase": {},
   "importDatabase": "Import database",
-  "@importDatabase":{},
-  "databaseImportFailed":"Failed to import database.",
-  "@databaseImportFailed":{},
+  "@importDatabase": {},
+  "databaseImportFailed": "Failed to import database.",
+  "@databaseImportFailed": {},
   "databaseImported": "Database imported successfully!",
-  "@databaseImported":{},
+  "@databaseImported": {},
   "language": "Language",
-  "@language":{},
+  "@language": {},
   "saveSettings": "Save settings",
   "@saveSettings": {},
   "settingsSaved": "Settings saved successfully!",
@@ -507,56 +524,55 @@
   "hours": "hours",
   "@hours": {},
   "failedLoadMoreResults": "Failed to load more results. Please check the logs and consider reporting the issue on GitHub.",
-  "@failedLoadMoreResults":{},
+  "@failedLoadMoreResults": {},
   "errorOccured": "An error occured. Please check the logs and consider reporting the issue on GitHub.",
-  "@errorOccured":{},
+  "@errorOccured": {},
   "logs": "Logs",
-  "@logs":{},
+  "@logs": {},
   "viewLogs": "View logs",
-  "@viewLogs":{},
+  "@viewLogs": {},
   "deleteLogs": "Delete logs",
-  "@deleteLogs":{},
+  "@deleteLogs": {},
   "logsDeleted": "Logs deleted!",
-  "@logsDeleted":{},
+  "@logsDeleted": {},
   "logsUnavailable": "No logs available.",
-  "@logsUnavailable":{},
+  "@logsUnavailable": {},
   "logCopied": "Log copied to clipboard!",
-  "@logCopied":{},
+  "@logCopied": {},
   "saveLogs": "Save logs",
-  "@saveLogs":{},
+  "@saveLogs": {},
   "selectLogsLocation": "Select a location where to save the logs.",
-  "@selectLogsLocation":{},
+  "@selectLogsLocation": {},
   "logsExportedSuccessfully": "Successfully saved the logs!",
-  "@logsExportedSuccessfully":{},
+  "@logsExportedSuccessfully": {},
   "logsExportedError": "Unable to save the logs.",
-  "@logsExportedError":{},
+  "@logsExportedError": {},
   "shareLogs": "Share logs",
-  "@shareLogs":{},
+  "@shareLogs": {},
   "translate": "Translate",
-  "@translate":{},
+  "@translate": {},
   "swapLanguages": "Swap languages",
-  "@swapLanguages":{},
-  "cancel":"Cancel",
-  "@cancel":{},
+  "@swapLanguages": {},
+  "cancel": "Cancel",
+  "@cancel": {},
   "pdfDownloadOptionsTitle": "PDF download options",
-  "@pdfDownloadOptionsTitle":{},
-  "openInExternalPdfViewer": "Open in External PDF Viewer",
-  "@openInExternalPdfViewer":{},
+  "@pdfDownloadOptionsTitle": {},
+  "openInExternalPdfViewer": "Open in external PDF viewer",
+  "@openInExternalPdfViewer": {},
   "openInExternalPdfViewerSubtitle": "Open the PDF in your device's default browser or PDF app.",
-  "@openInExternalPdfViewerSubtitle":{},
-  "downloadingFile": "Downloading file...",
-  "@downloadingFile":{},
+  "@openInExternalPdfViewerSubtitle": {},
+  "downloadingFile": "Downloading file…",
+  "@downloadingFile": {},
   "downloadFailedInAppViewer": "Failed to open in-app. Trying external viewer.",
-  "@downloadFailedInAppViewer":{},
+  "@downloadFailedInAppViewer": {},
   "errorOpeningFile": "Could not open file.",
-  "@errorOpeningFile":{},
+  "@errorOpeningFile": {},
   "downloadStarting": "Download starting.",
-  "@downloadStarting":{},
+  "@downloadStarting": {},
   "downloadFoundPdf": "Download found pdf",
-  "@downloadFoundPdf":{},
+  "@downloadFoundPdf": {},
   "downloadToApp": "Download in app",
-  "@downloadToApp":{},
+  "@downloadToApp": {},
   "downloadToAppSubtitle": "Attempt to download and view PDF directly in Wispar for better integration.",
-  "@downloadToAppSubtitle":{}
-
+  "@downloadToAppSubtitle": {}
 }
