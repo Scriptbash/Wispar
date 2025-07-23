@@ -27,6 +27,7 @@ enum TranslateLanguage {
   turkish('tr', 'Turkish'),
   vietnamese('vi', 'Vietnamese'),
   polish('pl', 'Polish'),
+  pirate('pirate', 'Pirate'),
   ukrainian('uk', 'Ukrainian'),
   greek('el', 'Greek'),
   hebrew('he', 'Hebrew'),
@@ -41,7 +42,49 @@ enum TranslateLanguage {
   hungarian('hu', 'Hungarian'),
   romanian('ro', 'Romanian'),
   slovak('sk', 'Slovak'),
-  ;
+  afrikaans('af', 'Afrikaans'),
+  albanian('sq', 'Albanian'),
+  amharic('am', 'Amharic'),
+  azerbaijani('az', 'Azerbaijani'),
+  basque('eu', 'Basque'),
+  belarusian('be', 'Belarusian'),
+  bulgarian('bg', 'Bulgarian'),
+  catalan('ca', 'Catalan'),
+  croatian('hr', 'Croatian'),
+  estonian('et', 'Estonian'),
+  filipino('fil', 'Filipino'),
+  georgian('ka', 'Georgian'),
+  gujarati('gu', 'Gujarati'),
+  haitianCreole('ht', 'Haitian Creole'),
+  icelandic('is', 'Icelandic'),
+  irish('ga', 'Irish'),
+  kannada('kn', 'Kannada'),
+  kazakh('kk', 'Kazakh'),
+  khmer('km', 'Khmer'),
+  lao('lo', 'Lao'),
+  latvian('lv', 'Latvian'),
+  lithuanian('lt', 'Lithuanian'),
+  macedonian('mk', 'Macedonian'),
+  malagasy('mg', 'Malagasy'),
+  malayalam('ml', 'Malayalam'),
+  maltese('mt', 'Maltese'),
+  maori('mi', 'Maori'),
+  marathi('mr', 'Marathi'),
+  mongolian('mn', 'Mongolian'),
+  nepali('ne', 'Nepali'),
+  persian('fa', 'Persian'),
+  serbian('sr', 'Serbian'),
+  sinhala('si', 'Sinhala'),
+  slovenian('sl', 'Slovenian'),
+  somali('so', 'Somali'),
+  swahili('sw', 'Swahili'),
+  tamil('ta', 'Tamil'),
+  telugu('te', 'Telugu'),
+  urdu('ur', 'Urdu'),
+  welsh('cy', 'Welsh'),
+  xhosa('xh', 'Xhosa'),
+  yiddish('yi', 'Yiddish'),
+  zulu('zu', 'Zulu');
 
   final String bcpCode;
   final String name;
@@ -336,9 +379,17 @@ class _LanguagePickerScreenState extends State<LanguagePickerScreen> {
   Widget build(BuildContext context) {
     final localizedNames = LocaleNames.of(context);
 
-    final filtered = TranslateLanguage.values.where((lang) {
+    // Get all languages, filter, and then sort
+    final List<TranslateLanguage> sortedFilteredLanguages =
+        TranslateLanguage.values.where((lang) {
       final localized = localizedNames?.nameOf(lang.bcpCode) ?? lang.name;
       return localized.toLowerCase().contains(_search.toLowerCase());
+    }).toList();
+
+    sortedFilteredLanguages.sort((a, b) {
+      final aName = localizedNames?.nameOf(a.bcpCode) ?? a.name;
+      final bName = localizedNames?.nameOf(b.bcpCode) ?? b.name;
+      return aName.toLowerCase().compareTo(bName.toLowerCase());
     });
 
     return Scaffold(
@@ -353,7 +404,7 @@ class _LanguagePickerScreenState extends State<LanguagePickerScreen> {
         ),
       ),
       body: ListView(
-        children: filtered.map((lang) {
+        children: sortedFilteredLanguages.map((lang) {
           return ListTile(
             title: Text(localizedNames?.nameOf(lang.bcpCode) ?? lang.name),
             trailing: widget.current == lang ? const Icon(Icons.check) : null,

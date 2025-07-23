@@ -205,6 +205,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       builder: (context) => TranslateOptionsSheet(
         title: widget.title,
         abstractText:
