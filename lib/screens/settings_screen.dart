@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../generated_l10n/app_localizations.dart';
 import './institutions_screen.dart';
 import './zotero_settings_screen.dart';
+import './ai_settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -207,10 +208,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Text('Zotero'),
                       ],
                     ),
-                    /*subtitle: Row(children: [
-                SizedBox(width: 32),
-                Text('Manage Zotero'),
-              ]),*/
+                  ),
+                  ListTile(
+                    onTap: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AISettingsScreen()),
+                      );
+                      setState(() {});
+                    },
+                    title: Row(
+                      children: [
+                        Icon(Icons.smart_toy_outlined),
+                        SizedBox(width: 8),
+                        Text(AppLocalizations.of(context)!.aiSettings),
+                      ],
+                    ),
                   ),
                   ListTile(
                     onTap: () {
