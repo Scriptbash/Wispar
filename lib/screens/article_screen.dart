@@ -166,6 +166,9 @@ class _ArticleScreenState extends State<ArticleScreen> {
       if (!_isAbstractTranslated && !_showTranslatedAbstract) {
         _accumulatedTranslatedAbstract = finalAbstract;
       }
+      if (!_showTranslatedAbstract) {
+        _translatedAbstractController!.add(abstract ?? widget.abstract);
+      }
     });
   }
 
@@ -181,23 +184,21 @@ class _ArticleScreenState extends State<ArticleScreen> {
 
     setState(() {
       _isTitleTranslated = hasTranslatedTitle;
-      _showTranslatedTitle = hasTranslatedTitle;
       _accumulatedTranslatedTitle = hasTranslatedTitle
           ? translatedContent['translatedTitle']!
           : widget.title;
 
       _isAbstractTranslated = hasTranslatedAbstract;
-      _showTranslatedAbstract = hasTranslatedAbstract;
       _accumulatedTranslatedAbstract = hasTranslatedAbstract
           ? translatedContent['translatedAbstract']!
           : (abstract ?? widget.abstract);
     });
 
     if (!_translatedTitleController!.isClosed) {
-      _translatedTitleController!.add(_accumulatedTranslatedTitle);
+      _translatedTitleController!.add(widget.title);
     }
     if (!_translatedAbstractController!.isClosed) {
-      _translatedAbstractController!.add(_accumulatedTranslatedAbstract);
+      _translatedAbstractController!.add(abstract ?? widget.abstract);
     }
   }
 
@@ -236,6 +237,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
               if (!mounted) return;
               setState(() {
                 _accumulatedTranslatedTitle += data;
+                _translatedTitleController!.add(_accumulatedTranslatedTitle);
               });
             },
             onError: (error) {
@@ -246,6 +248,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                 doi: widget.doi,
                 translatedTitle: _accumulatedTranslatedTitle,
               );
+              if (!mounted) return;
               setState(() {
                 _isTitleTranslated = true;
               });
@@ -257,6 +260,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
               if (!mounted) return;
               setState(() {
                 _accumulatedTranslatedAbstract += data;
+                _translatedAbstractController!
+                    .add(_accumulatedTranslatedAbstract);
               });
             },
             onError: (error) {
@@ -267,6 +272,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                 doi: widget.doi,
                 translatedAbstract: _accumulatedTranslatedAbstract,
               );
+              if (!mounted) return;
               setState(() {
                 _isAbstractTranslated = true;
               });
@@ -317,10 +323,13 @@ class _ArticleScreenState extends State<ArticleScreen> {
       String contentToCopy = '';
       switch (choice) {
         case 'title':
-          contentToCopy = _accumulatedTranslatedTitle;
+          contentToCopy =
+              _showTranslatedTitle ? _accumulatedTranslatedTitle : widget.title;
           break;
         case 'abstract':
-          contentToCopy = _accumulatedTranslatedAbstract;
+          contentToCopy = _showTranslatedAbstract
+              ? _accumulatedTranslatedAbstract
+              : (abstract ?? widget.abstract);
           break;
         case 'doi':
           contentToCopy = widget.doi;
@@ -351,7 +360,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                   return LaTexT(
                     breakDelimiter: r'\nl',
                     laTeXCode: Text(
-                      _accumulatedTranslatedTitle,
+                      snapshot.data!,
                     ),
                   );
                 },
@@ -436,7 +445,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                         return LaTexT(
                           breakDelimiter: r'\nl',
                           laTeXCode: Text(
-                            _accumulatedTranslatedTitle,
+                            snapshot.data!,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
@@ -469,7 +478,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                             return LaTexT(
                               breakDelimiter: r'\nl',
                               laTeXCode: Text(
-                                _accumulatedTranslatedAbstract,
+                                snapshot.data!,
                                 textAlign: TextAlign.justify,
                                 style: TextStyle(fontSize: 16),
                               ),
