@@ -8,8 +8,13 @@ class GeminiTranslationProvider {
   String? _apiKey;
   final _logger = LogsService().logger;
 
-  static const String _baseUrl =
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent';
+  static const String _defaultBaseUrl =
+      'https://generativelanguage.googleapis.com/v1beta/models';
+  static const String _streamGenerateContentPath = ':streamGenerateContent';
+
+  String _currentBaseUrl = _defaultBaseUrl;
+  bool _useCustomBaseUrl = false;
+  String _modelName = 'gemini-2.5-flash';
 
   GeminiTranslationProvider._privateConstructor();
 
@@ -17,15 +22,29 @@ class GeminiTranslationProvider {
       GeminiTranslationProvider._privateConstructor();
 
   static GeminiTranslationProvider get instance {
-    if (_instance._apiKey == null) {
-      _instance._loadApiKeyOnDemand();
+    if (_instance._apiKey == null ||
+        (_instance._currentBaseUrl == _defaultBaseUrl &&
+            !_instance._useCustomBaseUrl) ||
+        _instance._modelName == 'gemini-2.5-flash') {
+      _instance._loadSettingsOnDemand();
     }
     return _instance;
   }
 
-  Future<void> _loadApiKeyOnDemand() async {
+  Future<void> _loadSettingsOnDemand() async {
     final prefs = await SharedPreferences.getInstance();
     _apiKey = prefs.getString('gemini_api_key');
+    _useCustomBaseUrl = prefs.getBool('use_custom_gemini_base_url') ?? false;
+    final storedBaseUrl = prefs.getString('gemini_base_url');
+    _modelName = prefs.getString('gemini_model_name') ?? 'gemini-2.5-flash';
+
+    if (_useCustomBaseUrl &&
+        storedBaseUrl != null &&
+        storedBaseUrl.isNotEmpty) {
+      _currentBaseUrl = storedBaseUrl;
+    } else {
+      _currentBaseUrl = _defaultBaseUrl;
+    }
   }
 
   void setApiKey(String? newKey) async {
@@ -36,6 +55,26 @@ class GeminiTranslationProvider {
     } else {
       await prefs.remove('gemini_api_key');
     }
+  }
+
+  void setBaseUrl(String baseUrl, bool useCustom) async {
+    _useCustomBaseUrl = useCustom;
+    if (useCustom && baseUrl.isNotEmpty) {
+      _currentBaseUrl = baseUrl.endsWith('/')
+          ? baseUrl.substring(0, baseUrl.length - 1)
+          : baseUrl;
+    } else {
+      _currentBaseUrl = _defaultBaseUrl;
+    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('use_custom_gemini_base_url', _useCustomBaseUrl);
+    await prefs.setString('gemini_base_url', baseUrl);
+  }
+
+  void setModelName(String newModelName) async {
+    _modelName = newModelName;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('gemini_model_name', newModelName);
   }
 
   Future<Stream<String>> translateStream({
@@ -53,12 +92,10 @@ class GeminiTranslationProvider {
     final prompt =
         'Translate the following text from $sourceLangName to $targetLangName. Do not enclosed the translation with quotes or other extra punctuation. Respond only with the translated text, no conversational filler:\n\n"$text"';
 
-    //_logger.info(
-    //    'Gemini Translation Request: Prompt Length=${prompt.length}, Text length=${text.length}');
-
     try {
-      final uri = Uri.parse('$_baseUrl?alt=sse&key=$_apiKey');
-      // _logger.info('Gemini API Request URL: $uri');
+      final uri = Uri.parse(
+          '$_currentBaseUrl/$_modelName$_streamGenerateContentPath?alt=sse&key=$_apiKey');
+      _logger.info('Gemini API Request URL: $uri');
 
       final requestBody = jsonEncode({
         "contents": [
@@ -79,7 +116,6 @@ class GeminiTranslationProvider {
           "temperature": 0.7,
           "topK": 1,
           "topP": 1,
-          //"maxOutputTokens": 2000,
         },
         "safetySettings": [
           {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
@@ -110,12 +146,10 @@ class GeminiTranslationProvider {
             .transform(const LineSplitter())
             .listen(
           (line) {
-            // _logger.fine('Gemini Stream Raw Line: "$line"');
             if (line.startsWith('data: ')) {
               final jsonString = line.substring(6);
               try {
                 final Map<String, dynamic> data = jsonDecode(jsonString);
-                //_logger.fine('Gemini Stream JSON Data: $data');
 
                 String translatedChunk = '';
                 if (data.containsKey('candidates') &&
@@ -135,11 +169,6 @@ class GeminiTranslationProvider {
 
                 if (translatedChunk.isNotEmpty) {
                   controller.add(translatedChunk);
-                  //_logger.info(
-                  //    'Gemini Stream: Added chunk to controller: "$translatedChunk"');
-                } else {
-                  //_logger.warning(
-                  //   'Gemini Stream: Received empty chunk or no text in candidate for line: "$line"');
                 }
               } catch (e, stackTrace) {
                 _logger.severe(

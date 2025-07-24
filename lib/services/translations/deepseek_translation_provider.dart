@@ -8,7 +8,12 @@ class DeepSeekTranslationProvider {
   String? _apiKey;
   final _logger = LogsService().logger;
 
-  static const String _baseUrl = 'https://api.deepseek.com/chat/completions';
+  static const String _defaultBaseUrl = 'https://api.deepseek.com';
+  static const String _chatCompletionsPath = '/chat/completions';
+
+  String _currentBaseUrl = _defaultBaseUrl;
+  bool _useCustomBaseUrl = false;
+  String _modelName = 'deepseek-chat';
 
   DeepSeekTranslationProvider._privateConstructor();
 
@@ -16,15 +21,29 @@ class DeepSeekTranslationProvider {
       DeepSeekTranslationProvider._privateConstructor();
 
   static DeepSeekTranslationProvider get instance {
-    if (_instance._apiKey == null) {
-      _instance._loadApiKey();
+    if (_instance._apiKey == null ||
+        (_instance._currentBaseUrl == _defaultBaseUrl &&
+            !_instance._useCustomBaseUrl) ||
+        _instance._modelName == 'deepseek-chat') {
+      _instance._loadSettingsOnDemand();
     }
     return _instance;
   }
 
-  Future<void> _loadApiKey() async {
+  Future<void> _loadSettingsOnDemand() async {
     final prefs = await SharedPreferences.getInstance();
     _apiKey = prefs.getString('deepseek_api_key');
+    _useCustomBaseUrl = prefs.getBool('use_custom_deepseek_base_url') ?? false;
+    final storedBaseUrl = prefs.getString('deepseek_base_url');
+    _modelName = prefs.getString('deepseek_model_name') ?? 'deepseek-chat';
+
+    if (_useCustomBaseUrl &&
+        storedBaseUrl != null &&
+        storedBaseUrl.isNotEmpty) {
+      _currentBaseUrl = storedBaseUrl;
+    } else {
+      _currentBaseUrl = _defaultBaseUrl;
+    }
   }
 
   void setApiKey(String? newKey) async {
@@ -35,6 +54,26 @@ class DeepSeekTranslationProvider {
     } else {
       await prefs.remove('deepseek_api_key');
     }
+  }
+
+  void setBaseUrl(String baseUrl, bool useCustom) async {
+    _useCustomBaseUrl = useCustom;
+    if (useCustom && baseUrl.isNotEmpty) {
+      _currentBaseUrl = baseUrl.endsWith('/')
+          ? baseUrl.substring(0, baseUrl.length - 1)
+          : baseUrl;
+    } else {
+      _currentBaseUrl = _defaultBaseUrl;
+    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('use_custom_deepseek_base_url', _useCustomBaseUrl);
+    await prefs.setString('deepseek_base_url', baseUrl);
+  }
+
+  void setModelName(String newModelName) async {
+    _modelName = newModelName;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('deepseek_model_name', newModelName);
   }
 
   Future<Stream<String>> translateStream({
@@ -52,12 +91,9 @@ class DeepSeekTranslationProvider {
     final prompt =
         'Translate the following text from $sourceLangName to $targetLangName. Do not enclosed the translation with quotes or other extra punctuation. Respond only with the translated text, no conversational filler:\n\n"$text"';
 
-    // _logger.info(
-    //     'DeepSeek Translation Request: Prompt Length=${prompt.length}, Text length=${text.length}');
-
     try {
-      final uri = Uri.parse(_baseUrl);
-      //_logger.info('DeepSeek API Request URL: $uri');
+      final uri = Uri.parse('$_currentBaseUrl$_chatCompletionsPath');
+      _logger.info('DeepSeek API Request URL: $uri');
 
       final requestBody = jsonEncode({
         "messages": [
@@ -67,10 +103,9 @@ class DeepSeekTranslationProvider {
           },
           {"role": "user", "content": prompt}
         ],
-        "model": "deepseek-chat",
+        "model": _modelName,
         "stream": true,
         "temperature": 0.7,
-        //"max_tokens": 4000,
       });
 
       final client = http.Client();
@@ -89,16 +124,13 @@ class DeepSeekTranslationProvider {
             .transform(const LineSplitter())
             .listen(
           (line) {
-            //_logger.fine('DeepSeek Stream Raw Line: "$line"');
             if (line.startsWith('data: ')) {
               final jsonString = line.substring(6);
               if (jsonString.trim() == '[DONE]') {
-                //_logger.info('DeepSeek Stream: [DONE] received.');
                 return;
               }
               try {
                 final Map<String, dynamic> data = jsonDecode(jsonString);
-                //_logger.fine('DeepSeek Stream JSON Data: $data');
 
                 String translatedChunk = '';
                 if (data.containsKey('choices') &&
@@ -109,18 +141,10 @@ class DeepSeekTranslationProvider {
                       choice['delta'].containsKey('content')) {
                     translatedChunk = choice['delta']['content'].toString();
                   }
-                  if (choice.containsKey('delta') &&
-                      choice['delta'].containsKey('reasoning_content') &&
-                      data["model"] == "deepseek-reasoner") {}
                 }
 
                 if (translatedChunk.isNotEmpty) {
                   controller.add(translatedChunk);
-                  //_logger.info(
-                  //    'DeepSeek Stream: Added chunk to controller: "$translatedChunk"');
-                } else {
-                  //_logger.warning(
-                  //   'DeepSeek Stream: Received empty chunk or no text in delta for line: "$line"');
                 }
               } catch (e, stackTrace) {
                 _logger.severe(
