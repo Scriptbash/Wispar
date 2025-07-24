@@ -571,153 +571,160 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (BuildContext context) {
-        return Padding(
-          padding:
-              MediaQuery.of(context).viewInsets.add(const EdgeInsets.all(16)),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(AppLocalizations.of(context)!.pdfDownloadOptionsTitle,
-                  style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 16),
-              ListTile(
-                leading: const Icon(Icons.download_for_offline),
-                title: Text(AppLocalizations.of(context)!.downloadToApp),
-                subtitle:
-                    Text(AppLocalizations.of(context)!.downloadToAppSubtitle),
-                onTap: () async {
-                  Navigator.pop(context);
-
-                  if (!mounted) {
-                    logger.warning(
-                        'ArticleWebsiteState is not mounted, cannot proceed with download results.');
-                    return;
-                  }
-
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          AppLocalizations.of(this.context)!.downloadingFile),
-                      duration: const Duration(seconds: 3),
-                    ),
-                  );
-
-                  try {
-                    final currentWebViewUrl = await webViewController?.getUrl();
-
-                    Map<String, String> headers = {
-                      'Host': downloadUri.host,
-                      'User-Agent': settings.userAgent!,
-                      'Accept':
-                          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                      'Accept-Language':
-                          'en-CA,fr;q=0.8,fr-FR;q=0.6,en-US;q=0.4,en;q=0.2',
-                      'Accept-Encoding': 'gzip, deflate, br, zstd',
-                      'DNT': '1',
-                      'Sec-GPC': '1',
-                      'Connection': 'keep-alive',
-                      'Upgrade-Insecure-Requests': '1',
-                      'Sec-Fetch-Dest': 'document',
-                      'Sec-Fetch-Mode': 'navigate',
-                      'Sec-Fetch-Site': 'none',
-                      'Sec-Fetch-User': '?1',
-                      'Priority': 'u=0, i',
-                    };
-
-                    if (currentWebViewUrl != null) {
-                      headers['Referer'] = currentWebViewUrl.toString();
-                      logger.info(
-                          'Setting Referer header to: ${headers['Referer']}');
-                    } else {
-                      headers['Referer'] = downloadUri.origin;
-                      logger.warning(
-                          'currentWebViewUrl is null, using origin as Referer: ${headers['Referer']}');
-                    }
-
-                    if (_currentWebViewCookies != null &&
-                        _currentWebViewCookies!.isNotEmpty) {
-                      headers['Cookie'] = _currentWebViewCookies!;
-                      logger
-                          .info('Attaching cookies to HTTP download request.');
-                      logger.info('Cookie Header: ${_currentWebViewCookies!}');
-                    } else {
-                      logger.warning(
-                          'No cookies available for HTTP download. This might fail for authenticated content.');
-                    }
-
-                    logger.info('HTTP Request URL: $downloadUri');
-                    logger
-                        .info('Full HTTP Request Headers being sent: $headers');
-
-                    final response =
-                        await http.get(downloadUri, headers: headers);
+        return SafeArea(
+          child: Padding(
+            padding:
+                MediaQuery.of(context).viewInsets.add(const EdgeInsets.all(16)),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(AppLocalizations.of(context)!.pdfDownloadOptionsTitle,
+                    style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: const Icon(Icons.download_for_offline),
+                  title: Text(AppLocalizations.of(context)!.downloadToApp),
+                  subtitle:
+                      Text(AppLocalizations.of(context)!.downloadToAppSubtitle),
+                  onTap: () async {
+                    Navigator.pop(context);
 
                     if (!mounted) {
                       logger.warning(
-                          'ArticleWebsiteState unmounted after HTTP request, cannot show results.');
+                          'ArticleWebsiteState is not mounted, cannot proceed with download results.');
                       return;
                     }
 
-                    logger.info('HTTP Response Status: ${response.statusCode}');
-                    logger.info('HTTP Response Headers: ${response.headers}');
+                    ScaffoldMessenger.of(this.context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            AppLocalizations.of(this.context)!.downloadingFile),
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
 
-                    if (response.statusCode == 200 &&
-                        response.bodyBytes.isNotEmpty &&
-                        response.bodyBytes[0] == 0x25 && // '%PDF' header check
-                        response.bodyBytes[1] == 0x50 &&
-                        response.bodyBytes[2] == 0x44 &&
-                        response.bodyBytes[3] == 0x46) {
-                      final appDir = await getApplicationDocumentsDirectory();
-                      final fileName = suggestedFilename ??
-                          'downloaded_pdf_${DateTime.now().millisecondsSinceEpoch}.pdf';
-                      final pdfFile = File('${appDir.path}/$fileName');
-                      await pdfFile.writeAsBytes(response.bodyBytes);
-                      if (mounted) {
-                        Navigator.of(this.context).push(MaterialPageRoute(
-                          builder: (context) => PdfReader(
-                            pdfUrl: pdfFile.path,
-                            publicationCard: widget.publicationCard,
-                          ),
-                        ));
+                    try {
+                      final currentWebViewUrl =
+                          await webViewController?.getUrl();
+
+                      Map<String, String> headers = {
+                        'Host': downloadUri.host,
+                        'User-Agent': settings.userAgent!,
+                        'Accept':
+                            'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                        'Accept-Language':
+                            'en-CA,fr;q=0.8,fr-FR;q=0.6,en-US;q=0.4,en;q=0.2',
+                        'Accept-Encoding': 'gzip, deflate, br, zstd',
+                        'DNT': '1',
+                        'Sec-GPC': '1',
+                        'Connection': 'keep-alive',
+                        'Upgrade-Insecure-Requests': '1',
+                        'Sec-Fetch-Dest': 'document',
+                        'Sec-Fetch-Mode': 'navigate',
+                        'Sec-Fetch-Site': 'none',
+                        'Sec-Fetch-User': '?1',
+                        'Priority': 'u=0, i',
+                      };
+
+                      if (currentWebViewUrl != null) {
+                        headers['Referer'] = currentWebViewUrl.toString();
+                        logger.info(
+                            'Setting Referer header to: ${headers['Referer']}');
+                      } else {
+                        headers['Referer'] = downloadUri.origin;
+                        logger.warning(
+                            'currentWebViewUrl is null, using origin as Referer: ${headers['Referer']}');
                       }
-                    } else {
+
+                      if (_currentWebViewCookies != null &&
+                          _currentWebViewCookies!.isNotEmpty) {
+                        headers['Cookie'] = _currentWebViewCookies!;
+                        logger.info(
+                            'Attaching cookies to HTTP download request.');
+                        logger
+                            .info('Cookie Header: ${_currentWebViewCookies!}');
+                      } else {
+                        logger.warning(
+                            'No cookies available for HTTP download. This might fail for authenticated content.');
+                      }
+
+                      logger.info('HTTP Request URL: $downloadUri');
+                      logger.info(
+                          'Full HTTP Request Headers being sent: $headers');
+
+                      final response =
+                          await http.get(downloadUri, headers: headers);
+
+                      if (!mounted) {
+                        logger.warning(
+                            'ArticleWebsiteState unmounted after HTTP request, cannot show results.');
+                        return;
+                      }
+
+                      logger
+                          .info('HTTP Response Status: ${response.statusCode}');
+                      logger.info('HTTP Response Headers: ${response.headers}');
+
+                      if (response.statusCode == 200 &&
+                          response.bodyBytes.isNotEmpty &&
+                          response.bodyBytes[0] ==
+                              0x25 && // '%PDF' header check
+                          response.bodyBytes[1] == 0x50 &&
+                          response.bodyBytes[2] == 0x44 &&
+                          response.bodyBytes[3] == 0x46) {
+                        final appDir = await getApplicationDocumentsDirectory();
+                        final fileName = suggestedFilename ??
+                            'downloaded_pdf_${DateTime.now().millisecondsSinceEpoch}.pdf';
+                        final pdfFile = File('${appDir.path}/$fileName');
+                        await pdfFile.writeAsBytes(response.bodyBytes);
+                        if (mounted) {
+                          Navigator.of(this.context).push(MaterialPageRoute(
+                            builder: (context) => PdfReader(
+                              pdfUrl: pdfFile.path,
+                              publicationCard: widget.publicationCard,
+                            ),
+                          ));
+                        }
+                      } else {
+                        _showSnackBar(AppLocalizations.of(this.context)!
+                            .downloadFailedInAppViewer);
+                        logger.warning(
+                            'HTTP download failed (status: ${response.statusCode}). Content was not a valid PDF header or server rejected.');
+
+                        /*if (await canLaunchUrl(downloadUri)) {
+                          launchUrl(downloadUri,
+                              mode: LaunchMode.externalApplication);
+                        }*/
+                      }
+                    } catch (e, st) {
+                      logger.severe(
+                          'Error during HTTP PDF download: $e', e, st);
                       _showSnackBar(AppLocalizations.of(this.context)!
                           .downloadFailedInAppViewer);
-                      logger.warning(
-                          'HTTP download failed (status: ${response.statusCode}). Content was not a valid PDF header or server rejected.');
-
-                      /*if (await canLaunchUrl(downloadUri)) {
+                      if (await canLaunchUrl(downloadUri)) {
                         launchUrl(downloadUri,
                             mode: LaunchMode.externalApplication);
-                      }*/
+                      }
                     }
-                  } catch (e, st) {
-                    logger.severe('Error during HTTP PDF download: $e', e, st);
-                    _showSnackBar(AppLocalizations.of(this.context)!
-                        .downloadFailedInAppViewer);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.open_in_browser),
+                  title: Text(
+                      AppLocalizations.of(context)!.openInExternalPdfViewer),
+                  subtitle: Text(AppLocalizations.of(context)!
+                      .openInExternalPdfViewerSubtitle),
+                  onTap: () async {
+                    Navigator.pop(context);
                     if (await canLaunchUrl(downloadUri)) {
                       launchUrl(downloadUri,
                           mode: LaunchMode.externalApplication);
-                    }
-                  }
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.open_in_browser),
-                title:
-                    Text(AppLocalizations.of(context)!.openInExternalPdfViewer),
-                subtitle: Text(AppLocalizations.of(context)!
-                    .openInExternalPdfViewerSubtitle),
-                onTap: () async {
-                  Navigator.pop(context);
-                  if (await canLaunchUrl(downloadUri)) {
-                    launchUrl(downloadUri,
-                        mode: LaunchMode.externalApplication);
-                  } else {}
-                },
-              ),
-            ],
+                    } else {}
+                  },
+                ),
+              ],
+            ),
           ),
         );
       },
