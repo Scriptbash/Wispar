@@ -20,7 +20,6 @@ jobs:
       with:
         channel: 'stable'
     - run: flutter pub get
-    - run: dart run pdfrx:remove_wasm_modules
     - name: Patch pdfrx
       run: |
         PDFRX_PATH=$(find $HOME/.pub-cache -type d -name "pdfrx*" | head -n 1)
@@ -32,6 +31,7 @@ jobs:
           echo "CMakeLists.txt not found in expected location"
           exit 1
         fi
+    - run: dart run pdfrx:remove_wasm_modules
     - run: flutter build apk --debug
     - uses: actions/upload-artifact@v4
       with:
