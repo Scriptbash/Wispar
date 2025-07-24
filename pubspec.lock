@@ -617,10 +617,18 @@ packages:
     dependency: "direct main"
     description:
       name: pdfrx
-      sha256: "132e07fed4c5bdeeece43be607c914a985bc4234fde71d49d1aa45fb28a7e1c6"
+      sha256: "0b4d3231a38967ce5b27f480076a336e74db30293926218c6a0aa96d29de0082"
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.2"
+    version: "2.0.4"
+  pdfrx_engine:
+    dependency: transitive
+    description:
+      name: pdfrx_engine
+      sha256: "4cdba7df1ee83e32c572c7721838e67341742be4b597cc1325549bf90f03511f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.9"
   permission_handler:
     dependency: "direct main"
     description:
@@ -1075,5 +1083,5 @@ packages:
     source: hosted
     version: "3.1.3"
 sdks:
-  dart: ">=3.8.0 <4.0.0"
+  dart: ">=3.8.1 <4.0.0"
   flutter: ">=3.32.7"
