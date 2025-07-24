@@ -217,113 +217,117 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
         title: Text(AppLocalizations.of(context)!.aiSettings),
         centerTitle: false,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.aiProvider,
-                  border: OutlineInputBorder(),
-                ),
-                value: _selectedProvider,
-                items: _providers
-                    .map((provider) => DropdownMenuItem(
-                          value: provider,
-                          child: Text(provider),
-                        ))
-                    .toList(),
-                onChanged: (val) {
-                  setState(() => _selectedProvider = val);
-                },
-                validator: (val) => val == null || val.isEmpty
-                    ? AppLocalizations.of(context)!.pleaseSelectProvider
-                    : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _getCurrentApiKeyController(),
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!
-                      .apiKeyLabel(_selectedProvider ?? ''),
-                  border: const OutlineInputBorder(),
-                ),
-                onSaved: (val) {},
-                validator: (val) => (val == null || val.isEmpty)
-                    ? AppLocalizations.of(context)!
-                        .pleaseEnterAiAPIKey(_selectedProvider ?? '')
-                    : null,
-                obscureText: true,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _getCurrentModelNameController(),
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!
-                      .modelNameLabel(_selectedProvider ?? ''),
-                  hintText: _selectedProvider == 'Gemini'
-                      ? 'e.g., gemini-2.5-flash'
-                      : _selectedProvider == 'DeepSeek'
-                          ? 'e.g., deepseek-chat'
-                          : _selectedProvider == 'ChatGPT'
-                              ? 'e.g., gpt-4o'
-                              : '',
-                  border: const OutlineInputBorder(),
-                ),
-                validator: (val) {
-                  if (val == null || val.isEmpty) {
-                    return AppLocalizations.of(context)!
-                        .pleaseEnterModelName(_selectedProvider ?? '');
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              SwitchListTile(
-                title: Text(AppLocalizations.of(context)!.overrideBaseUrl),
-                value: _getCurrentUseCustomBaseUrl(),
-                onChanged: _setCurrentUseCustomBaseUrl,
-              ),
-              if (_getCurrentUseCustomBaseUrl())
-                TextFormField(
-                  controller: _getCurrentBaseUrlController(),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                SizedBox(height: 8),
+                DropdownButtonFormField<String>(
                   decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.customBaseUrl,
-                    hintText: "https://api.example.com/v1",
+                    labelText: AppLocalizations.of(context)!.aiProvider,
+                    border: OutlineInputBorder(),
+                  ),
+                  value: _selectedProvider,
+                  items: _providers
+                      .map((provider) => DropdownMenuItem(
+                            value: provider,
+                            child: Text(provider),
+                          ))
+                      .toList(),
+                  onChanged: (val) {
+                    setState(() => _selectedProvider = val);
+                  },
+                  validator: (val) => val == null || val.isEmpty
+                      ? AppLocalizations.of(context)!.pleaseSelectProvider
+                      : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _getCurrentApiKeyController(),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!
+                        .apiKeyLabel(_selectedProvider ?? ''),
                     border: const OutlineInputBorder(),
                   ),
-                  keyboardType: TextInputType.url,
+                  onSaved: (val) {},
+                  validator: (val) => (val == null || val.isEmpty)
+                      ? AppLocalizations.of(context)!
+                          .pleaseEnterAiAPIKey(_selectedProvider ?? '')
+                      : null,
+                  obscureText: true,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _getCurrentModelNameController(),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!
+                        .modelNameLabel(_selectedProvider ?? ''),
+                    hintText: _selectedProvider == 'Gemini'
+                        ? 'e.g., gemini-2.5-flash'
+                        : _selectedProvider == 'DeepSeek'
+                            ? 'e.g., deepseek-chat'
+                            : _selectedProvider == 'ChatGPT'
+                                ? 'e.g., gpt-4o'
+                                : '',
+                    border: const OutlineInputBorder(),
+                  ),
                   validator: (val) {
-                    if (_getCurrentUseCustomBaseUrl() &&
-                        (val == null || val.isEmpty)) {
-                      return AppLocalizations.of(context)!.pleaseEnterBaseUrl;
-                    }
-                    if (_getCurrentUseCustomBaseUrl() &&
-                        !Uri.tryParse(val!)!.isAbsolute) {
-                      return AppLocalizations.of(context)!.invalidUrl;
+                    if (val == null || val.isEmpty) {
+                      return AppLocalizations.of(context)!
+                          .pleaseEnterModelName(_selectedProvider ?? '');
                     }
                     return null;
                   },
                 ),
-              const SizedBox(height: 24),
-              FilledButton.icon(
-                icon: const Icon(Icons.save),
-                label: Text(AppLocalizations.of(context)!.save),
-                onPressed: () async {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    _formKey.currentState?.save();
-                    await _saveSettings();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text(
-                              AppLocalizations.of(context)!.settingsSaved)),
-                    );
-                  }
-                },
-              ),
-            ],
+                const SizedBox(height: 16),
+                SwitchListTile(
+                  title: Text(AppLocalizations.of(context)!.overrideBaseUrl),
+                  value: _getCurrentUseCustomBaseUrl(),
+                  onChanged: _setCurrentUseCustomBaseUrl,
+                ),
+                if (_getCurrentUseCustomBaseUrl())
+                  TextFormField(
+                    controller: _getCurrentBaseUrlController(),
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.customBaseUrl,
+                      hintText: "https://api.example.com/v1",
+                      border: const OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.url,
+                    validator: (val) {
+                      if (_getCurrentUseCustomBaseUrl() &&
+                          (val == null || val.isEmpty)) {
+                        return AppLocalizations.of(context)!.pleaseEnterBaseUrl;
+                      }
+                      if (_getCurrentUseCustomBaseUrl() &&
+                          !Uri.tryParse(val!)!.isAbsolute) {
+                        return AppLocalizations.of(context)!.invalidUrl;
+                      }
+                      return null;
+                    },
+                  ),
+                const SizedBox(height: 24),
+                FilledButton.icon(
+                  icon: const Icon(Icons.save),
+                  label: Text(AppLocalizations.of(context)!.save),
+                  onPressed: () async {
+                    if (_formKey.currentState?.validate() ?? false) {
+                      _formKey.currentState?.save();
+                      await _saveSettings();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text(
+                                AppLocalizations.of(context)!.settingsSaved)),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
       ),

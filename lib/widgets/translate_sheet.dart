@@ -168,87 +168,91 @@ class _TranslateOptionsSheetState extends State<TranslateOptionsSheet> {
   Widget build(BuildContext context) {
     final localizedNames = LocaleNames.of(context);
 
-    return Padding(
-      padding: MediaQuery.of(context).viewInsets.add(const EdgeInsets.all(16)),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (_availableAiProviders.isNotEmpty) ...[
-            DropdownButtonFormField<String>(
-              decoration: InputDecoration(
-                labelText: AppLocalizations.of(context)!.aiProvider,
-                border: OutlineInputBorder(),
+    return SafeArea(
+      minimum: const EdgeInsets.only(bottom: 16.0),
+      child: Padding(
+        padding:
+            MediaQuery.of(context).viewInsets.add(const EdgeInsets.all(16)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_availableAiProviders.isNotEmpty) ...[
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.aiProvider,
+                  border: OutlineInputBorder(),
+                ),
+                value: _selectedAiProvider,
+                items: _availableAiProviders
+                    .map((provider) => DropdownMenuItem(
+                          value: provider,
+                          child: Text(provider),
+                        ))
+                    .toList(),
+                onChanged: (val) {
+                  setState(() {
+                    _selectedAiProvider = val;
+                  });
+                  _saveSelectedAiProvider(val);
+                },
+                validator: (val) => val == null || val.isEmpty
+                    ? AppLocalizations.of(context)!.pleaseSelectProvider
+                    : null,
               ),
-              value: _selectedAiProvider,
-              items: _availableAiProviders
-                  .map((provider) => DropdownMenuItem(
-                        value: provider,
-                        child: Text(provider),
-                      ))
-                  .toList(),
-              onChanged: (val) {
-                setState(() {
-                  _selectedAiProvider = val;
-                });
-                _saveSelectedAiProvider(val);
-              },
-              validator: (val) => val == null || val.isEmpty
-                  ? AppLocalizations.of(context)!.pleaseSelectProvider
-                  : null,
-            ),
-            const SizedBox(height: 16),
-          ] else ...[
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                AppLocalizations.of(context)!.noAiApiKeySetError,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              const SizedBox(height: 16),
+            ] else ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  AppLocalizations.of(context)!.noAiApiKeySetError,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
               ),
+              const SizedBox(height: 8),
+            ],
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => _pickLanguage(isSource: true),
+                    child: Text(localizedNames?.nameOf(_sourceLang!.bcpCode) ??
+                        _sourceLang!.name),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.swap_horiz),
+                  tooltip: AppLocalizations.of(context)!.swapLanguages,
+                  onPressed: () {
+                    setState(() {
+                      final temp = _sourceLang;
+                      _sourceLang = _targetLang;
+                      _targetLang = temp;
+                    });
+                  },
+                ),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => _pickLanguage(isSource: false),
+                    child: Text(localizedNames?.nameOf(_targetLang!.bcpCode) ??
+                        _targetLang!.name),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
+            FilledButton(
+              onPressed: (_isTranslating ||
+                      _selectedAiProvider == null ||
+                      _availableAiProviders.isEmpty)
+                  ? null
+                  : _translate,
+              child: _isTranslating
+                  ? const CircularProgressIndicator()
+                  : Text(AppLocalizations.of(context)!.translate),
+            ),
           ],
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => _pickLanguage(isSource: true),
-                  child: Text(localizedNames?.nameOf(_sourceLang!.bcpCode) ??
-                      _sourceLang!.name),
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.swap_horiz),
-                tooltip: AppLocalizations.of(context)!.swapLanguages,
-                onPressed: () {
-                  setState(() {
-                    final temp = _sourceLang;
-                    _sourceLang = _targetLang;
-                    _targetLang = temp;
-                  });
-                },
-              ),
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => _pickLanguage(isSource: false),
-                  child: Text(localizedNames?.nameOf(_targetLang!.bcpCode) ??
-                      _targetLang!.name),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          FilledButton(
-            onPressed: (_isTranslating ||
-                    _selectedAiProvider == null ||
-                    _availableAiProviders.isEmpty)
-                ? null
-                : _translate,
-            child: _isTranslating
-                ? const CircularProgressIndicator()
-                : Text(AppLocalizations.of(context)!.translate),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -297,11 +301,11 @@ class _TranslateOptionsSheetState extends State<TranslateOptionsSheet> {
       Stream<String> abstractStream;
 
       final GeminiTranslationProvider geminiProvider =
-          await GeminiTranslationProvider.instance;
+          GeminiTranslationProvider.instance;
       final DeepSeekTranslationProvider deepseekProvider =
-          await DeepSeekTranslationProvider.instance;
+          DeepSeekTranslationProvider.instance;
       final ChatgptTranslationProvider chatgptProvider =
-          await ChatgptTranslationProvider.instance;
+          ChatgptTranslationProvider.instance;
 
       switch (_selectedAiProvider) {
         case 'Gemini':
@@ -403,14 +407,16 @@ class _LanguagePickerScreenState extends State<LanguagePickerScreen> {
           onChanged: (val) => setState(() => _search = val),
         ),
       ),
-      body: ListView(
-        children: sortedFilteredLanguages.map((lang) {
-          return ListTile(
-            title: Text(localizedNames?.nameOf(lang.bcpCode) ?? lang.name),
-            trailing: widget.current == lang ? const Icon(Icons.check) : null,
-            onTap: () => Navigator.pop(context, lang),
-          );
-        }).toList(),
+      body: SafeArea(
+        child: ListView(
+          children: sortedFilteredLanguages.map((lang) {
+            return ListTile(
+              title: Text(localizedNames?.nameOf(lang.bcpCode) ?? lang.name),
+              trailing: widget.current == lang ? const Icon(Icons.check) : null,
+              onTap: () => Navigator.pop(context, lang),
+            );
+          }).toList(),
+        ),
       ),
     );
   }
