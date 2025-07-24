@@ -1,0 +1,17 @@
+Wispar est votre compagnon de recherche personnel — une application respectueuse de la vie privée pour explorer les revues académiques et les articles scientifiques.
+
+Grâce aux API de Crossref et OpenAlex, Wispar vous aide à rester informé des dernières publications de vos revues préférées. Suivez des revues pour recevoir les derniers résumés de recherche dans votre fil principal — aucun compte requis.
+
+- Recherchez des articles et des revues scientifiques
+- Suivez des revues pour rester à jour
+- Ajoutez des mots-clés et requêtes personnalisés à votre fil principal
+- Accédez aux articles en libre accès via Unpaywall
+- Utilisez EZproxy pour débloquer les publications payantes
+- Envoyez des articles vers votre bibliothèque Zotero
+- Conçu pour les chercheurs, les étudiants et les curieux du savoir
+
+Wispar est facile à utiliser, open source, et conçu pour respecter votre vie privée.
+
+En tant que projet communautaire, les contributions sont toujours les bienvenues ! Si vous souhaitez contribuer, rendez-vous sur notre dépôt GitHub : https://github.com/Scriptbash/Wispar
+
+Si l'application n'est pas disponible dans votre langue, vous pouvez nous aider à la traduire en visitant notre instance Weblate hébergée : https://hosted.weblate.org/engage/wispar
