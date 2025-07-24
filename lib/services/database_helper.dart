@@ -26,7 +26,7 @@ class DatabaseHelper {
     final path = await getDatabasesPath();
     final databasePath = join(path, 'wispar.db');
 
-    return openDatabase(databasePath, version: 6, onOpen: (db) async {
+    return openDatabase(databasePath, version: 7, onOpen: (db) async {
       await db.execute('PRAGMA foreign_keys = ON');
     }, onCreate: (db, version) async {
       await db.execute('PRAGMA foreign_keys = ON');
@@ -57,7 +57,9 @@ class DatabaseHelper {
           article_id INTEGER PRIMARY KEY AUTOINCREMENT,
           doi TEXT,
           title TEXT,
+          translatedTitle TEXT,
           abstract TEXT,
+          translatedAbstract TEXT,
           publishedDate TEXT,  
           authors TEXT,
           url TEXT,
@@ -197,6 +199,14 @@ class DatabaseHelper {
             whereArgs: [doi],
           );
         }
+      }
+      if (oldVersion < 7) {
+        await db.execute('''
+         ALTER TABLE articles ADD COLUMN translatedTitle TEXT;
+        ''');
+        await db.execute('''
+        ALTER TABLE articles ADD COLUMN translatedAbstract TEXT;
+      ''');
       }
     });
   }
@@ -714,6 +724,55 @@ class DatabaseHelper {
       where: 'doi = ?',
       whereArgs: [doi],
     );
+  }
+
+  Future<void> updateTranslatedContent({
+    required String doi,
+    String? translatedTitle,
+    String? translatedAbstract,
+  }) async {
+    final db = await database;
+    final Map<String, dynamic> updateData = {};
+
+    if (translatedTitle != null) {
+      updateData['translatedTitle'] = translatedTitle;
+    }
+    if (translatedAbstract != null) {
+      updateData['translatedAbstract'] = translatedAbstract;
+    }
+
+    if (updateData.isNotEmpty) {
+      final rowsAffected = await db.update(
+        'articles',
+        updateData,
+        where: 'doi = ?',
+        whereArgs: [doi],
+      );
+      if (rowsAffected > 0) {
+        logger.info('Updated translated content for DOI: $doi');
+      } else {
+        logger.warning(
+            'No article found with DOI: $doi to update translated content.');
+      }
+    }
+  }
+
+  Future<Map<String, String?>> getTranslatedContent(String doi) async {
+    final db = await database;
+    final result = await db.query(
+      'articles',
+      columns: ['translatedTitle', 'translatedAbstract'],
+      where: 'doi = ?',
+      whereArgs: [doi],
+    );
+
+    if (result.isNotEmpty) {
+      return {
+        'translatedTitle': result.first['translatedTitle'] as String?,
+        'translatedAbstract': result.first['translatedAbstract'] as String?,
+      };
+    }
+    return {'translatedTitle': null, 'translatedAbstract': null};
   }
 
   Future<bool> checkIfDoiExists(String doi) async {

@@ -13,6 +13,8 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:latext/latext.dart';
 import '../services/logs_helper.dart';
+import 'dart:async';
+import 'package:wispar/widgets/translate_sheet.dart';
 
 class ArticleScreen extends StatefulWidget {
   final String doi;
@@ -56,6 +58,19 @@ class _ArticleScreenState extends State<ArticleScreen> {
   bool isLoadingAbstract = false;
   bool _scrapeAbstracts = true;
 
+  StreamController<String>? _translatedTitleController;
+  StreamController<String>? _translatedAbstractController;
+
+  // If a translation was ever done, this will be true
+  bool _isTitleTranslated = false;
+  bool _isAbstractTranslated = false;
+
+  bool _showTranslatedTitle = false;
+  bool _showTranslatedAbstract = false;
+
+  String _accumulatedTranslatedTitle = '';
+  String _accumulatedTranslatedAbstract = '';
+
   @override
   void initState() {
     super.initState();
@@ -63,6 +78,21 @@ class _ArticleScreenState extends State<ArticleScreen> {
     _loadScrapingSettings();
     checkIfLiked();
     abstract = widget.abstract;
+
+    _accumulatedTranslatedTitle = widget.title;
+    _accumulatedTranslatedAbstract = abstract ?? widget.abstract;
+
+    _translatedTitleController = StreamController<String>.broadcast();
+    _translatedAbstractController = StreamController<String>.broadcast();
+
+    _loadTranslatedContent();
+  }
+
+  @override
+  void dispose() {
+    _translatedTitleController?.close();
+    _translatedAbstractController?.close();
+    super.dispose();
   }
 
   void _onShare(BuildContext context) async {
@@ -70,7 +100,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
     try {
       await SharePlus.instance.share(ShareParams(
         text:
-            '${widget.title}\n\n${widget.url}\n\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage} 👻',
+            '${_showTranslatedTitle ? _accumulatedTranslatedTitle : widget.title}\n\n${widget.url}\n\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage} 👻',
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
       ));
     } catch (e, stackTrace) {
@@ -101,13 +131,12 @@ class _ArticleScreenState extends State<ArticleScreen> {
       isLoadingAbstract = true;
     });
 
-    //debugPrint("Calling scraper for: ${widget.url}");
-
     AbstractScraper scraper = AbstractScraper();
     String? scraped;
     try {
       scraped = await scraper.scrapeAbstract(widget.url);
     } catch (e) {
+      logger.warning('Failed to scrape abstract from ${widget.url}: $e');
       scraped = '';
     }
     String finalAbstract = '';
@@ -124,7 +153,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
         }
       } catch (e, stackTrace) {
         logger.severe(
-            'An error occured while updating the abstract for DOI ${widget.doi}.',
+            'An error occurred while updating the abstract for DOI ${widget.doi}.',
             e,
             stackTrace);
       }
@@ -135,100 +164,388 @@ class _ArticleScreenState extends State<ArticleScreen> {
     setState(() {
       abstract = finalAbstract;
       isLoadingAbstract = false;
+      _translatedAbstractController!.add(abstract ?? widget.abstract);
     });
+  }
+
+  Future<void> _loadTranslatedContent() async {
+    final translatedContent =
+        await databaseHelper.getTranslatedContent(widget.doi);
+
+    bool hasTranslatedTitle = translatedContent['translatedTitle'] != null &&
+        translatedContent['translatedTitle']!.isNotEmpty;
+    bool hasTranslatedAbstract =
+        translatedContent['translatedAbstract'] != null &&
+            translatedContent['translatedAbstract']!.isNotEmpty;
+
+    setState(() {
+      _isTitleTranslated = hasTranslatedTitle;
+      _accumulatedTranslatedTitle = hasTranslatedTitle
+          ? translatedContent['translatedTitle']!
+          : widget.title;
+
+      _isAbstractTranslated = hasTranslatedAbstract;
+      _accumulatedTranslatedAbstract = hasTranslatedAbstract
+          ? translatedContent['translatedAbstract']!
+          : (abstract ?? widget.abstract);
+      _showTranslatedTitle = false;
+      _showTranslatedAbstract = false;
+    });
+
+    if (!_translatedTitleController!.isClosed) {
+      _translatedTitleController!.add(widget.title);
+    }
+    if (!_translatedAbstractController!.isClosed) {
+      _translatedAbstractController!.add(abstract ?? widget.abstract);
+    }
+  }
+
+  void _showTranslateSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => TranslateOptionsSheet(
+        title: widget.title,
+        abstractText:
+            abstract ?? AppLocalizations.of(context)!.abstractunavailable,
+        onTranslateStart: (Stream<String> titleStreamFromProvider,
+            Stream<String> abstractStreamFromProvider) {
+          _translatedTitleController?.close();
+          _translatedAbstractController?.close();
+          _translatedTitleController = StreamController<String>.broadcast();
+          _translatedAbstractController = StreamController<String>.broadcast();
+
+          setState(() {
+            _accumulatedTranslatedTitle = '';
+            _accumulatedTranslatedAbstract = '';
+            _showTranslatedTitle = true;
+            _showTranslatedAbstract = true;
+          });
+
+          titleStreamFromProvider.listen(
+            (data) {
+              if (!mounted) return;
+              setState(() {
+                _accumulatedTranslatedTitle += data;
+                _translatedTitleController!.add(_accumulatedTranslatedTitle);
+              });
+            },
+            onError: (error) {
+              logger.severe('Title Translation Error', error);
+              if (mounted) {
+                setState(() {
+                  _showTranslatedTitle = false;
+                  _translatedTitleController!.add(widget.title);
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content: Text(
+                          AppLocalizations.of(context)!.translationFailed)),
+                );
+              }
+            },
+            onDone: () {
+              databaseHelper.updateTranslatedContent(
+                doi: widget.doi,
+                translatedTitle: _accumulatedTranslatedTitle,
+              );
+              if (!mounted) return;
+              setState(() {
+                _isTitleTranslated = true;
+              });
+            },
+          );
+
+          abstractStreamFromProvider.listen(
+            (data) {
+              if (!mounted) return;
+              setState(() {
+                _accumulatedTranslatedAbstract += data;
+                _translatedAbstractController!
+                    .add(_accumulatedTranslatedAbstract);
+              });
+            },
+            onError: (error) {
+              logger.severe('Abstract Translation Error', error);
+              if (mounted) {
+                setState(() {
+                  _showTranslatedAbstract = false;
+                  _translatedAbstractController!
+                      .add(abstract ?? widget.abstract);
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content: Text(
+                          AppLocalizations.of(context)!.translationFailed)),
+                );
+              }
+            },
+            onDone: () {
+              databaseHelper.updateTranslatedContent(
+                doi: widget.doi,
+                translatedAbstract: _accumulatedTranslatedAbstract,
+              );
+              if (!mounted) return;
+              setState(() {
+                _isAbstractTranslated = true;
+              });
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  void _onCopy(BuildContext context) async {
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.short_text),
+                title: Text(AppLocalizations.of(context)!.copyTitle),
+                onTap: () => Navigator.pop(context, 'title'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.article),
+                title: Text(AppLocalizations.of(context)!.copyAbstract),
+                onTap: () => Navigator.pop(context, 'abstract'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.numbers),
+                title: Text(AppLocalizations.of(context)!.copydoi),
+                onTap: () => Navigator.pop(context, 'doi'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.link),
+                title: Text(AppLocalizations.of(context)!.copyUrl),
+                onTap: () => Navigator.pop(context, 'url'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (choice != null) {
+      String contentToCopy = '';
+      switch (choice) {
+        case 'title':
+          contentToCopy =
+              _showTranslatedTitle ? _accumulatedTranslatedTitle : widget.title;
+          break;
+        case 'abstract':
+          contentToCopy = _showTranslatedAbstract
+              ? _accumulatedTranslatedAbstract
+              : (abstract ?? widget.abstract);
+          break;
+        case 'doi':
+          contentToCopy = widget.doi;
+          break;
+        case 'url':
+          contentToCopy = widget.url;
+          break;
+      }
+
+      await Clipboard.setData(ClipboardData(text: contentToCopy));
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(AppLocalizations.of(context)!.copiedToClipboard),
+        duration: const Duration(seconds: 1),
+      ));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: LaTexT(breakDelimiter: r'\nl', laTeXCode: (Text(widget.title))),
+        title: _showTranslatedTitle
+            ? StreamBuilder<String>(
+                stream: _translatedTitleController?.stream,
+                initialData: _accumulatedTranslatedTitle,
+                builder: (context, snapshot) {
+                  return LaTexT(
+                    breakDelimiter: r'\nl',
+                    laTeXCode: Text(
+                      snapshot.data!,
+                    ),
+                  );
+                },
+              )
+            : LaTexT(breakDelimiter: r'\nl', laTeXCode: Text(widget.title)),
         actions: [
+          IconButton(
+            onPressed: () => _onCopy(context),
+            icon: const Icon(Icons.copy_outlined),
+            tooltip: AppLocalizations.of(context)!.copy,
+          ),
           Builder(
             builder: (BuildContext context) {
               return IconButton(
-                  onPressed: () => _onShare(context),
-                  icon: Icon(Icons.share_outlined));
+                onPressed: () => _onShare(context),
+                icon: const Icon(Icons.share_outlined),
+                tooltip: AppLocalizations.of(context)!.shareArticle,
+              );
             },
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppLocalizations.of(context)!
-                    .publishedon(widget.publishedDate!),
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 13,
-                ),
-              ),
-              SizedBox(height: 5),
-              LaTexT(
-                  breakDelimiter: r'\nl',
-                  laTeXCode: Text(
-                    widget.title,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                  )),
-              SizedBox(height: 5),
-              SelectableText(getAuthorsNames(widget.authors),
-                  style: TextStyle(color: Colors.grey, fontSize: 15)),
-              SizedBox(height: 15),
-              isLoadingAbstract
-                  ? Center(child: CircularProgressIndicator())
-                  : abstract != null && abstract!.isNotEmpty
-                      ? LaTexT(
-                          breakDelimiter: r'\nl',
-                          laTeXCode: Text(
-                            abstract!,
-                            textAlign: TextAlign.justify,
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        )
-                      : Text(
-                          AppLocalizations.of(context)!.abstractunavailable,
-                          textAlign: TextAlign.justify,
-                          style: TextStyle(fontSize: 16),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (_isTitleTranslated || _isAbstractTranslated)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 0.0),
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
-              SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'DOI: ${widget.doi}',
-                            style: TextStyle(
-                              color: Colors.grey,
+                        onPressed: () {
+                          setState(() {
+                            _showTranslatedTitle = !_showTranslatedTitle;
+                            _showTranslatedAbstract = !_showTranslatedAbstract;
+                            if (_showTranslatedTitle) {
+                              _translatedTitleController!
+                                  .add(_accumulatedTranslatedTitle);
+                            } else {
+                              _translatedTitleController!.add(widget.title);
+                            }
+
+                            if (_showTranslatedAbstract) {
+                              _translatedAbstractController!
+                                  .add(_accumulatedTranslatedAbstract);
+                            } else {
+                              _translatedAbstractController!
+                                  .add(abstract ?? widget.abstract);
+                            }
+                          });
+                        },
+                        child: Text(
+                          _showTranslatedTitle || _showTranslatedAbstract
+                              ? AppLocalizations.of(context)!.showOriginal
+                              : AppLocalizations.of(context)!.showTranslation,
+                        ),
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 16),
+                Text(
+                  AppLocalizations.of(context)!
+                      .publishedon(widget.publishedDate!),
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                _showTranslatedTitle
+                    ? StreamBuilder<String>(
+                        stream: _translatedTitleController?.stream,
+                        initialData: _accumulatedTranslatedTitle,
+                        builder: (context, snapshot) {
+                          return LaTexT(
+                            breakDelimiter: r'\nl',
+                            laTeXCode: Text(
+                              snapshot.data!,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : LaTexT(
+                        breakDelimiter: r'\nl',
+                        laTeXCode: Text(
+                          widget.title,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ),
+                const SizedBox(height: 5),
+                SelectableText(getAuthorsNames(widget.authors),
+                    style: TextStyle(color: Colors.grey, fontSize: 15)),
+                const SizedBox(height: 15),
+                isLoadingAbstract
+                    ? const Center(child: CircularProgressIndicator())
+                    : _showTranslatedAbstract
+                        ? StreamBuilder<String>(
+                            stream: _translatedAbstractController?.stream,
+                            initialData: _accumulatedTranslatedAbstract,
+                            builder: (context, snapshot) {
+                              return LaTexT(
+                                breakDelimiter: r'\nl',
+                                laTeXCode: Text(
+                                  snapshot.data!,
+                                  textAlign: TextAlign.justify,
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              );
+                            },
+                          )
+                        : LaTexT(
+                            breakDelimiter: r'\nl',
+                            laTeXCode: Text(
+                              abstract ??
+                                  AppLocalizations.of(context)!
+                                      .abstractunavailable,
+                              textAlign: TextAlign.justify,
+                              style: TextStyle(fontSize: 16),
                             ),
                           ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: TextButton(
-                            onPressed: () async {
-                              String journalPublisher = "";
-                              Map<String, dynamic>? journalInfo;
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'DOI: ${widget.doi}',
+                              style: TextStyle(
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: TextButton(
+                              onPressed: () async {
+                                String journalPublisher = "";
+                                Map<String, dynamic>? journalInfo;
 
-                              journalInfo =
-                                  await getJournalDetails(widget.issn);
+                                journalInfo =
+                                    await getJournalDetails(widget.issn);
 
-                              if (widget.publisher == null) {
-                                debugPrint("publisher is null");
-                                if (journalInfo != null &&
-                                    journalInfo['publisher'] != null) {
-                                  journalPublisher = journalInfo['publisher'];
+                                if (widget.publisher == null ||
+                                    widget.publisher!.isEmpty) {
+                                  if (journalInfo != null &&
+                                      journalInfo['publisher'] != null) {
+                                    journalPublisher = journalInfo['publisher'];
+                                  } else {
+                                    journalPublisher = widget.publisher ?? "";
+                                  }
                                 } else {
-                                  journalPublisher = widget.publisher ?? "";
+                                  journalPublisher = widget.publisher!;
                                 }
 
                                 Navigator.push(
@@ -241,67 +558,68 @@ class _ArticleScreenState extends State<ArticleScreen> {
                                     ),
                                   ),
                                 );
-                              }
-                            },
-                            child: widget.journalTitle.isNotEmpty
-                                ? Text(
-                                    '${AppLocalizations.of(context)!.publishedin} ${widget.journalTitle}',
-                                    style: TextStyle(color: Colors.grey),
-                                  )
-                                : SizedBox(),
-                            style: TextButton.styleFrom(
-                              minimumSize: Size.zero,
-                              padding: EdgeInsets.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              },
+                              child: widget.journalTitle.isNotEmpty
+                                  ? Text(
+                                      '${AppLocalizations.of(context)!.publishedin} ${widget.journalTitle}',
+                                      style: TextStyle(color: Colors.grey),
+                                    )
+                                  : SizedBox(),
+                              style: TextButton.styleFrom(
+                                minimumSize: Size.zero,
+                                padding: EdgeInsets.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      isLiked ? Icons.favorite : Icons.favorite_border,
-                      color: isLiked
-                          ? Theme.of(context).colorScheme.primary
-                          : null,
+                    IconButton(
+                      icon: Icon(
+                        isLiked ? Icons.favorite : Icons.favorite_border,
+                        color: isLiked
+                            ? Theme.of(context).colorScheme.primary
+                            : null,
+                      ),
+                      onPressed: () async {
+                        setState(() {
+                          isLiked = !isLiked;
+                        });
+
+                        if (isLiked) {
+                          await databaseHelper.insertArticle(
+                            PublicationCard(
+                              title: widget.title,
+                              abstract: widget.abstract,
+                              journalTitle: widget.journalTitle,
+                              issn: widget.issn,
+                              publishedDate: widget.publishedDate,
+                              doi: widget.doi,
+                              authors: widget.authors,
+                              url: widget.url,
+                              license: widget.license,
+                              licenseName: widget.licenseName,
+                              publisher: widget.publisher,
+                            ),
+                            isLiked: true,
+                          );
+                        } else {
+                          await databaseHelper.removeFavorite(widget.doi);
+                        }
+
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(isLiked
+                              ? '${widget.title} ${AppLocalizations.of(context)!.favoriteadded}'
+                              : '${widget.title} ${AppLocalizations.of(context)!.favoriteremoved}'),
+                        ));
+                      },
                     ),
-                    onPressed: () async {
-                      setState(() {
-                        isLiked = !isLiked;
-                      });
-
-                      if (isLiked) {
-                        await databaseHelper.insertArticle(
-                          PublicationCard(
-                            title: widget.title,
-                            abstract: widget.abstract,
-                            journalTitle: widget.journalTitle,
-                            issn: widget.issn,
-                            publishedDate: widget.publishedDate,
-                            doi: widget.doi,
-                            authors: widget.authors,
-                            url: widget.url,
-                            license: widget.license,
-                            licenseName: widget.licenseName,
-                            publisher: widget.publisher,
-                          ),
-                          isLiked: true,
-                        );
-                      } else {
-                        await databaseHelper.removeFavorite(widget.doi);
-                      }
-
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(isLiked
-                            ? '${widget.title} ${AppLocalizations.of(context)!.favoriteadded}'
-                            : '${widget.title} ${AppLocalizations.of(context)!.favoriteremoved}'),
-                      ));
-                    },
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
           ),
         ),
       ),
@@ -316,75 +634,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () async {
-                      final choice = await showModalBottomSheet<String>(
-                        context: context,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(16)),
-                        ),
-                        builder: (BuildContext context) {
-                          return SafeArea(
-                            child: Wrap(
-                              children: [
-                                ListTile(
-                                  leading: const Icon(Icons.short_text),
-                                  title: Text(
-                                      AppLocalizations.of(context)!.copyTitle),
-                                  onTap: () => Navigator.pop(context, 'title'),
-                                ),
-                                ListTile(
-                                  leading: const Icon(Icons.article),
-                                  title: Text(AppLocalizations.of(context)!
-                                      .copyAbstract),
-                                  onTap: () =>
-                                      Navigator.pop(context, 'abstract'),
-                                ),
-                                ListTile(
-                                  leading: const Icon(Icons.numbers),
-                                  title: Text(
-                                      AppLocalizations.of(context)!.copydoi),
-                                  onTap: () => Navigator.pop(context, 'doi'),
-                                ),
-                                ListTile(
-                                  leading: const Icon(Icons.link),
-                                  title: Text(
-                                      AppLocalizations.of(context)!.copyUrl),
-                                  onTap: () => Navigator.pop(context, 'url'),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-
-                      if (choice != null) {
-                        String contentToCopy = '';
-                        switch (choice) {
-                          case 'title':
-                            contentToCopy = widget.title;
-                            break;
-                          case 'abstract':
-                            contentToCopy = abstract ?? '';
-                            break;
-                          case 'doi':
-                            contentToCopy = widget.doi;
-                            break;
-                          case 'url':
-                            contentToCopy = widget.url;
-                            break;
-                        }
-
-                        await Clipboard.setData(
-                            ClipboardData(text: contentToCopy));
-
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(
-                              AppLocalizations.of(context)!.copiedToClipboard),
-                          duration: const Duration(seconds: 1),
-                        ));
-                      }
-                    },
+                    onTap: _showTranslateSheet,
                     borderRadius: BorderRadius.circular(8),
                     splashColor: Theme.of(context)
                         .colorScheme
@@ -395,10 +645,10 @@ class _ArticleScreenState extends State<ArticleScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.copy_outlined, size: 30),
+                          Icon(Icons.translate_outlined, size: 30),
                           const SizedBox(height: 4),
                           Text(
-                            AppLocalizations.of(context)!.copy,
+                            AppLocalizations.of(context)!.translate,
                             style: const TextStyle(fontSize: 10),
                           ),
                         ],
@@ -472,7 +722,9 @@ class _ArticleScreenState extends State<ArticleScreen> {
                         context,
                         authorsData,
                         widget.title,
-                        widget.abstract,
+                        _showTranslatedAbstract
+                            ? _accumulatedTranslatedAbstract
+                            : (abstract ?? widget.abstract),
                         widget.journalTitle,
                         widget.publishedDate,
                         widget.doi,
@@ -510,19 +762,24 @@ class _ArticleScreenState extends State<ArticleScreen> {
 
   void checkIfLiked() async {
     bool liked = await databaseHelper.isArticleFavorite(widget.doi);
-    setState(() {
-      isLiked = liked;
-    });
+    if (mounted) {
+      setState(() {
+        isLiked = liked;
+      });
+    }
   }
 
   Future<Map<String, dynamic>?> getJournalDetails(List<String> issn) async {
-    if (widget.publisher != null) {
+    if (widget.publisher != null && widget.publisher!.isNotEmpty) {
       return {'publisher': widget.publisher};
     }
 
     // If publisher is not passed, fetch from the database
     final db = await databaseHelper.database;
     final id = await databaseHelper.getJournalIdByIssns(issn);
+    if (id == null) {
+      return null;
+    }
     final List<Map<String, dynamic>> rows = await db.query(
       'journals',
       columns: ['publisher'],
