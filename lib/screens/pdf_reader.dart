@@ -111,37 +111,38 @@ class _PdfReaderState extends State<PdfReader> {
                     },
                   ),
           ]),
-      body: isPathResolved
-          ? Stack(children: [
-              PdfViewer.file(resolvedPdfPath,
-                  controller: controller,
-                  params: PdfViewerParams(
-                    enableTextSelection: true,
-                    maxScale: 8,
-                    loadingBannerBuilder:
-                        (context, bytesDownloaded, totalBytes) {
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: totalBytes != null
-                              ? bytesDownloaded / totalBytes
-                              : null,
-                          backgroundColor: Colors.grey,
-                        ),
-                      );
-                    },
-                    linkHandlerParams: PdfLinkHandlerParams(
-                      linkColor: const Color.fromARGB(20, 255, 235, 59),
-                      onLinkTap: (link) {
-                        if (link.url != null) {
-                          launchUrl(link.url!);
-                        } else if (link.dest != null) {
-                          controller.goToDest(link.dest);
-                        }
+      body: SafeArea(
+        child: isPathResolved
+            ? Stack(children: [
+                PdfViewer.file(resolvedPdfPath,
+                    controller: controller,
+                    params: PdfViewerParams(
+                      maxScale: 8,
+                      loadingBannerBuilder:
+                          (context, bytesDownloaded, totalBytes) {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: totalBytes != null
+                                ? bytesDownloaded / totalBytes
+                                : null,
+                            backgroundColor: Colors.grey,
+                          ),
+                        );
                       },
-                    ),
-                  ))
-            ])
-          : const Center(child: CircularProgressIndicator()),
+                      linkHandlerParams: PdfLinkHandlerParams(
+                        linkColor: const Color.fromARGB(20, 255, 235, 59),
+                        onLinkTap: (link) {
+                          if (link.url != null) {
+                            launchUrl(link.url!);
+                          } else if (link.dest != null) {
+                            controller.goToDest(link.dest);
+                          }
+                        },
+                      ),
+                    ))
+              ])
+            : const Center(child: CircularProgressIndicator()),
+      ),
     );
   }
 

@@ -46,7 +46,7 @@ dependencies:
   flutter_inappwebview: ^6.1.5
   url_launcher: ^6.3.1
   http: ^1.2.2
-  pdfrx: ^1.0.88
+  pdfrx: ^2.0.4
   package_info_plus: ^8.1.1
   share_plus: ^11.0.0
   introduction_screen: ^3.1.14
