@@ -157,8 +157,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
               icon: const Icon(Icons.download),
               tooltip: AppLocalizations.of(context)!.downloadFoundPdf,
               onPressed: () {
-                _showDownloadOptions(
-                    context, Uri.parse(_extractedPdfUrl!), null);
+                _showDownloadOptions(context, Uri.parse(_extractedPdfUrl!));
               },
             ),
         ],
@@ -285,8 +284,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                                     'true')) {
                           logger.info(
                               'PDF download request detected. Offering options to user.');
-                          _showDownloadOptions(
-                              context, downloadUri, suggestedFilename);
+                          _showDownloadOptions(context, downloadUri);
                           return;
                         } else {
                           logger.info(
@@ -555,7 +553,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
   }
 
   Future<void> _showDownloadOptions(
-      BuildContext context, Uri downloadUri, String? suggestedFilename) async {
+      BuildContext context, Uri downloadUri) async {
     if (_isShowingDownloadOptions) {
       logger.info(
           'Download options already showing or recently shown. Debouncing.');
@@ -674,8 +672,16 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                           response.bodyBytes[2] == 0x44 &&
                           response.bodyBytes[3] == 0x46) {
                         final appDir = await getApplicationDocumentsDirectory();
-                        final fileName = suggestedFilename ??
-                            'downloaded_pdf_${DateTime.now().millisecondsSinceEpoch}.pdf';
+                        String cleanedDoi = widget.publicationCard.doi
+                            .replaceAll(RegExp(r'[^\w\s.-]'), '_')
+                            .replaceAll(' ', '_');
+
+                        if (cleanedDoi.isEmpty) {
+                          cleanedDoi =
+                              'article_${DateTime.now().millisecondsSinceEpoch}';
+                        }
+
+                        final fileName = '$cleanedDoi.pdf';
                         final pdfFile = File('${appDir.path}/$fileName');
                         await pdfFile.writeAsBytes(response.bodyBytes);
                         if (mounted) {
