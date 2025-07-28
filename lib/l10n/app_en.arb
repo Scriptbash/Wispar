@@ -585,6 +585,42 @@
   "@modelNameLabel":{},
     "pleaseEnterModelName": "Please enter the {provider} model name.",
     "@pleaseEnterModelName": {},
+  "chatWithAi": "Chat with AI",
+  "pdfNotReadyForChat": "PDF not ready for chat. Please wait or try again.",
+  "chatWithPdf": "Chat with PDF",
+  "typeYourMessage": "Type your message...",
+  "aiModel": "AI Model",
+  "askAboutPdf": "Hello! I'm ready to chat about this PDF. What would you like to know or summarize?",
+  "pdfNotFound": "PDF file could not be found.",
+  "errorLoadingPdf": "Error loading or encoding PDF for chat.",
+  "pdfNotLoadedYet": "PDF not fully loaded or encoded yet. Please wait a moment.",
+  "apiTokenMissing": "API key for {aiModel} is missing in settings. Please configure it.",
+  "@apiTokenMissing": {
+    "placeholders": {
+      "aiModel": {
+        "type": "String"
+      }
+    }
+  },
+  "apiUrlMissing": "API URL for {aiModel} is missing. This is an internal configuration error.",
+  "@apiUrlMissing": {
+    "placeholders": {
+      "aiModel": {
+        "type": "String"
+      }
+    }
+  },
+  "noResponseFromAI": "No clear response from AI.",
+  "errorConnectingToAI": "Error connecting to AI ({statusCode}). Please check your internet or API settings.",
+  "@errorConnectingToAI": {
+    "placeholders": {
+      "statusCode": {
+        "type": "int"
+      }
+    }
+  },
+  "networkError": "Network error or problem communicating with AI service.",
+
   "pdfDownloadOptionsTitle": "PDF download options",
   "@pdfDownloadOptionsTitle": {},
   "openInExternalPdfViewer": "Open in external PDF viewer",
