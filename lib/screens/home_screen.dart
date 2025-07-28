@@ -308,12 +308,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void handleMenuButton(int item) async {
     switch (item) {
       case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute<void>(builder: (context) => const SettingsScreen()),
-        );
-        break;
-      case 1:
         showSortDialog(
           context: context,
           initialSortBy: sortBy,
@@ -342,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         );
         break;
-      case 2:
+      case 1:
         final journals = await dbHelper.getAllJournals();
         // Split journals into followed and not followed (coming from saved queries)
         final followedJournals = journals
@@ -373,12 +367,18 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         break;
 
-      case 3:
+      case 2:
         await Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const HiddenArticlesScreen()),
         );
         _onAbstractChanged();
+        break;
+      case 3:
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(builder: (context) => const SettingsScreen()),
+        );
         break;
     }
   }
