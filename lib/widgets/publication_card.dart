@@ -375,25 +375,29 @@ class _PublicationCardState extends State<PublicationCard> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          if (widget.license.isNotEmpty) {
-                            launchUrl(Uri.parse(widget.license));
-                          }
-                        },
-                        child: Text(
-                          widget.licenseName.isNotEmpty
-                              ? widget.licenseName
-                              : (widget.license.isNotEmpty
-                                  ? AppLocalizations.of(context)!.otherLicense
-                                  : AppLocalizations.of(context)!
-                                      .unknownLicense),
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                        style: TextButton.styleFrom(
-                          minimumSize: Size.zero,
-                          padding: EdgeInsets.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton(
+                          onPressed: () {
+                            if (widget.license.isNotEmpty) {
+                              launchUrl(Uri.parse(widget.license));
+                            }
+                          },
+                          child: Text(
+                            widget.licenseName.isNotEmpty
+                                ? widget.licenseName
+                                : (widget.license.isNotEmpty
+                                    ? AppLocalizations.of(context)!.otherLicense
+                                    : AppLocalizations.of(context)!
+                                        .unknownLicense),
+                            style: const TextStyle(color: Colors.grey),
+                            textAlign: TextAlign.left,
+                          ),
+                          style: TextButton.styleFrom(
+                            minimumSize: Size.zero,
+                            padding: EdgeInsets.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
                         ),
                       ),
                     ),

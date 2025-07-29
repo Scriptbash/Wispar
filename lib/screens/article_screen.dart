@@ -100,7 +100,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
     try {
       await SharePlus.instance.share(ShareParams(
         text:
-            '${_showTranslatedTitle ? _accumulatedTranslatedTitle : widget.title}\n\n${widget.url}\n\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage} 👻',
+            '${_showTranslatedTitle ? _accumulatedTranslatedTitle : widget.title}\n\n${widget.url}\n\nDOI: ${widget.doi}\n${AppLocalizations.of(context)!.sharedMessage} 👻',
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
       ));
     } catch (e, stackTrace) {

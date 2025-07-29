@@ -20,12 +20,12 @@ class DeepSeekTranslationProvider {
   static final DeepSeekTranslationProvider _instance =
       DeepSeekTranslationProvider._privateConstructor();
 
-  static DeepSeekTranslationProvider get instance {
+  static Future<DeepSeekTranslationProvider> get instance async {
     if (_instance._apiKey == null ||
         (_instance._currentBaseUrl == _defaultBaseUrl &&
             !_instance._useCustomBaseUrl) ||
         _instance._modelName == 'deepseek-chat') {
-      _instance._loadSettingsOnDemand();
+      await _instance._loadSettingsOnDemand();
     }
     return _instance;
   }

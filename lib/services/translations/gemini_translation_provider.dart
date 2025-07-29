@@ -21,12 +21,12 @@ class GeminiTranslationProvider {
   static final GeminiTranslationProvider _instance =
       GeminiTranslationProvider._privateConstructor();
 
-  static GeminiTranslationProvider get instance {
+  static Future<GeminiTranslationProvider> get instance async {
     if (_instance._apiKey == null ||
         (_instance._currentBaseUrl == _defaultBaseUrl &&
             !_instance._useCustomBaseUrl) ||
         _instance._modelName == 'gemini-2.5-flash') {
-      _instance._loadSettingsOnDemand();
+      await _instance._loadSettingsOnDemand();
     }
     return _instance;
   }
