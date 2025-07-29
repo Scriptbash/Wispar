@@ -20,12 +20,12 @@ class ChatgptTranslationProvider {
   static final ChatgptTranslationProvider _instance =
       ChatgptTranslationProvider._privateConstructor();
 
-  static ChatgptTranslationProvider get instance {
+  static Future<ChatgptTranslationProvider> get instance async {
     if (_instance._apiKey == null ||
         (_instance._currentBaseUrl == _defaultBaseUrl &&
             !_instance._useCustomBaseUrl) ||
         _instance._modelName == 'gpt-4o') {
-      _instance._loadSettingsOnDemand();
+      await _instance._loadSettingsOnDemand();
     }
     return _instance;
   }

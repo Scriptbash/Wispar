@@ -126,17 +126,17 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
     await prefs.setBool(
         'use_custom_chatgpt_base_url', _useCustomChatgptBaseUrl);
 
-    final geminiProvider = GeminiTranslationProvider.instance;
+    final geminiProvider = await GeminiTranslationProvider.instance;
     geminiProvider.setApiKey(geminiKey);
     geminiProvider.setBaseUrl(geminiBaseUrl, _useCustomGeminiBaseUrl);
     geminiProvider.setModelName(geminiModelName);
 
-    final deepseekProvider = DeepSeekTranslationProvider.instance;
+    final deepseekProvider = await DeepSeekTranslationProvider.instance;
     deepseekProvider.setApiKey(deepseekKey);
     deepseekProvider.setBaseUrl(deepseekBaseUrl, _useCustomDeepseekBaseUrl);
     deepseekProvider.setModelName(deepseekModelName);
 
-    final chatgptProvider = ChatgptTranslationProvider.instance;
+    final chatgptProvider = await ChatgptTranslationProvider.instance;
     chatgptProvider.setApiKey(chatgptKey);
     chatgptProvider.setBaseUrl(chatgptBaseUrl, _useCustomChatgptBaseUrl);
     chatgptProvider.setModelName(chatgptModelName);

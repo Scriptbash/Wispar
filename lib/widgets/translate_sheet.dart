@@ -301,11 +301,11 @@ class _TranslateOptionsSheetState extends State<TranslateOptionsSheet> {
       Stream<String> abstractStream;
 
       final GeminiTranslationProvider geminiProvider =
-          GeminiTranslationProvider.instance;
+          await GeminiTranslationProvider.instance;
       final DeepSeekTranslationProvider deepseekProvider =
-          DeepSeekTranslationProvider.instance;
+          await DeepSeekTranslationProvider.instance;
       final ChatgptTranslationProvider chatgptProvider =
-          ChatgptTranslationProvider.instance;
+          await ChatgptTranslationProvider.instance;
 
       switch (_selectedAiProvider) {
         case 'Gemini':
