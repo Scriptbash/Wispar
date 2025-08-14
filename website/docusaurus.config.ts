@@ -25,6 +25,7 @@ const config: Config = {
   organizationName: 'Scriptbash', // Usually your GitHub org/user name.
   projectName: 'Wispar', // Usually your repo name.
   trailingSlash: false,
+  deploymentBranch: 'gh-pages',
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
