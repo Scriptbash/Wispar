@@ -1,0 +1,42 @@
+.heroSection {
+  padding: 2rem 1rem;
+  margin-bottom: 2rem;
+  overflow-x: hidden;
+}
+
+.heroContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap; 
+}
+
+.heroTextWrapper {
+  flex: 1 1 400px; 
+  max-width: 600px;
+  text-align: left;
+}
+
+.heroText {
+  font-size: 1.25rem;
+  line-height: 1.8;
+  color: var(--ifm-font-color-base);
+}
+
+.heroCarouselWrapper {
+  flex: 1 1 300px;
+  max-width: 500px;
+}
+
+@media (max-width: 768px) {
+  .heroTextWrapper, .heroCarouselWrapper {
+    flex: 1 1 100%;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .heroText {
+    font-size: 1.15rem;
+  }
+}
