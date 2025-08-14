@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: website
-        run: npm ci
+        run: npm install
 
       - name: Build Docusaurus
         working-directory: website
