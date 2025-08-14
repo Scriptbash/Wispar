@@ -15,18 +15,16 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: latest
+          node-version: 18
           cache: npm
 
       - name: Install dependencies
-        run: |
-          cd website
-          npm ci
+        working-directory: website
+        run: npm install
 
       - name: Build Docusaurus
-        run: |
-          cd website
-          npm run build
+        working-directory: website
+        run: npm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
