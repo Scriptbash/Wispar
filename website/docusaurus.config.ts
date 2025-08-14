@@ -76,7 +76,7 @@ const config: Config = {
       title: 'Wispar',
       logo: {
         alt: 'Wispar logo showing a purple ghost wearing glasses and a graduation hat.',
-        src: 'img/logo.svg',
+        src: 'img/wispar.png',
       },
       items: [
         {
@@ -106,19 +106,19 @@ const config: Config = {
           ],
         },
         {
-          title: 'Community',
+          title: 'App stores',
           items: [
             {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
+              label: 'Google Play',
+              href: 'https://play.google.com/store/apps/details?id=app.wispar.wispar',
             },
             {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
+              label: 'App Store',
+              href: 'https://apps.apple.com/us/app/wispar/id6741366984',
             },
             {
-              label: 'X',
-              href: 'https://x.com/docusaurus',
+              label: 'F-Droid',
+              href: 'https://f-droid.org/packages/app.wispar.wispar',
             },
           ],
         },
@@ -131,7 +131,7 @@ const config: Config = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/Scriptbash/Wispar',
             },
           ],
         },
