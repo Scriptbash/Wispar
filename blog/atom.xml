@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="atom.xsl"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://wispar.app/blog</id>
+    <title>Wispar Blog</title>
+    <updated>2025-08-14T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://wispar.app/blog"/>
+    <subtitle>Wispar Blog</subtitle>
+    <icon>https://wispar.app/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Welcome to Wispar's site!]]></title>
+        <id>https://wispar.app/blog/welcome-blog-post</id>
+        <link href="https://wispar.app/blog/welcome-blog-post"/>
+        <updated>2025-08-14T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[This is the official home for Wispar’s documentation.]]></summary>
+        <content type="html"><![CDATA[<p>This is the official home for <strong>Wispar</strong>’s documentation.<br>
+<!-- -->Here, you'll find guides, tips, and reference materials to help you get the most out of the app.</p>
+<p>From time to time, I'll also publish <strong>blog posts</strong> to share:</p>
+<ul>
+<li>New features</li>
+<li>Important updates</li>
+<li>Behind-the-scenes improvements</li>
+</ul>
+<p>Stay tuned!</p>]]></content>
+        <author>
+            <name>Francis Lapointe</name>
+            <email>wispar-app@protonmail.com</email>
+            <uri>https://github.com/Scriptbash/Wispar</uri>
+        </author>
+        <category label="welcome" term="welcome"/>
+        <category label="wispar" term="wispar"/>
+    </entry>
+</feed>

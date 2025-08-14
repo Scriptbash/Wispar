@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="rss.xsl"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+    <channel>
+        <title>Wispar Blog</title>
+        <link>https://wispar.app/blog</link>
+        <description>Wispar Blog</description>
+        <lastBuildDate>Thu, 14 Aug 2025 00:00:00 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <language>en</language>
+        <item>
+            <title><![CDATA[Welcome to Wispar's site!]]></title>
+            <link>https://wispar.app/blog/welcome-blog-post</link>
+            <guid>https://wispar.app/blog/welcome-blog-post</guid>
+            <pubDate>Thu, 14 Aug 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[This is the official home for Wispar’s documentation.]]></description>
+            <content:encoded><![CDATA[<p>This is the official home for <strong>Wispar</strong>’s documentation.<br>
+<!-- -->Here, you'll find guides, tips, and reference materials to help you get the most out of the app.</p>
+<p>From time to time, I'll also publish <strong>blog posts</strong> to share:</p>
+<ul>
+<li>New features</li>
+<li>Important updates</li>
+<li>Behind-the-scenes improvements</li>
+</ul>
+<p>Stay tuned!</p>]]></content:encoded>
+            <author>wispar-app@protonmail.com (Francis Lapointe)</author>
+            <category>welcome</category>
+            <category>wispar</category>
+        </item>
+    </channel>
+</rss>
