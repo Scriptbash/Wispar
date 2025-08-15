@@ -2,7 +2,7 @@ import type {ReactNode} from 'react';
 import clsx from 'clsx';
 import Heading from '@theme/Heading';
 import styles from './styles.module.css';
-import { BookOpen, Send, Lock, Globe2, Download, Shield } from 'lucide-react';
+import { BookOpen, Send, Globe2, Download, Shield, Unlock } from 'lucide-react';
 
 
 type FeatureItem = {
@@ -24,7 +24,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Unpaywall & EZproxy',
-    Svg: <Lock size={48} />,
+    Svg: <Unlock size={48} />,
     description: <>Get open-access papers or bypass paywalls via EZproxy.</>,
   },
   {

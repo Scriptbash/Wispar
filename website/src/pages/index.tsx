@@ -78,7 +78,7 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title={`${siteConfig.title} - Research companion`}
-      description="Description will go into a meta tag in <head />">
+      description="Wispar is a privacy-friendly research companion for exploring academic journals and scientific articles. Powered by Crossref and OpenAlex APIs, it lets you follow journals and get the latest research abstracts in your feed — all without creating an account.">
       <HomepageHeader />
       <main>
         <HeroText />
