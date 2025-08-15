@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkwispar=self.webpackChunkwispar||[]).push([[762],{4963:a=>{a.exports=JSON.parse('{"tag":{"label":"wispar","permalink":"/blog/tags/wispar","allTagsPath":"/blog/tags","count":1,"unlisted":false},"listMetadata":{"permalink":"/blog/tags/wispar","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
