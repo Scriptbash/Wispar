@@ -47,7 +47,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/Scriptbash/Wispar/edit/main/website/',
         },
         blog: {
           showReadingTime: true,
@@ -58,7 +58,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/Scriptbash/Wispar/edit/main/website/',
           // Useful options to enforce blogging best practices
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
@@ -73,7 +73,7 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: 'img/docusaurus-social-card.jpg',
+    image: 'img/wispar_social_card.png',
     navbar: {
       title: 'Wispar',
       logo: {
@@ -93,7 +93,7 @@ const config: Config = {
           label: 'GitHub',
           position: 'right',
         },
-         {
+        {
           type: 'localeDropdown', position:'right'
         },
       ],
@@ -133,6 +133,10 @@ const config: Config = {
             {
               label: 'Blog',
               to: '/blog',
+            },
+            {
+              label: 'Weblate',
+              href: 'https://hosted.weblate.org/engage/wispar'
             },
             {
               label: 'GitHub',
