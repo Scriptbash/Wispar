@@ -1,0 +1,8 @@
+{
+  "label": "Search Articles",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "1 minute to learn the installation methods."
+  }
+}

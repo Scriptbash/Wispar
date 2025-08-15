@@ -1,0 +1,8 @@
+{
+  "label": "Initial Setup",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "When you first open Wispar, you will be greeted with an introduction screen. The introduction will guide you through some basic settings of the app."
+  }
+}
