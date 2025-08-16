@@ -37,6 +37,16 @@ const config: Config = {
     defaultLocale: 'en',
     locales: ['en'],
   },
+  
+  themes: [
+    [
+      require.resolve('@easyops-cn/docusaurus-search-local'),
+      {
+        hashed: true,
+        language: ['en'],
+      },
+    ],
+  ],
 
   presets: [
     [

@@ -2,5 +2,69 @@
 sidebar_position: 1
 ---
 
-# Search articles with OpenAlex
+# Search Articles With OpenAlex
 
+The OpenAlex API allows searches similar to a search engine, making boolean queries possible.
+
+:::tip Tip
+OpenAlex supports the use of **parentheses** in queries.  
+You can group keywords by wrapping them in parentheses across different keyword fields.  
+
+Use the **query preview** to confirm that your search is structured correctly.  
+
+<img src="/img/docs/search/parentheses.png" alt="Screenshot showing a query using parentheses" width="200"/>
+:::
+
+
+## Creating a basic query
+
+1. To search using OpenAlex, first go to the <b>Search</b> screen.
+
+<img src="/img/docs/search_bottom_menu.png" alt="Screenshot showing the search screen selected on the navigation bar" width="300"/>
+
+2. Tap the <b>Articles</b> toggle button.
+
+<img src="/img/docs/search/articles_toggle_button.png" alt="Screenshot showing the article search toggle button active" width="300"/>
+
+3. Tap the <b>OpenAlex</b> toggle button.
+
+<img src="/img/docs/search/openalex_toggle_button.png" alt="Screenshot showing the OpenAlex toggle button active" width="150"/>
+
+4. To add a keyword, tap the <b>Add keyword</b> button. If more than one keyword is added, <b>boolean operators</b> will appear.
+
+<img src="/img/docs/search/add_keyword.png" alt="Screenshot showing the add keyword button" width="100"/>
+
+5. In the keyword text field, type in a keyword. To delete a keyword, tap the <b>trash can</b> icon.
+
+<img src="/img/docs/search/openalex_keyword.png" alt="Screenshot showing the keyword text field" width="200"/>
+
+:::tip Tip
+If multiple words are entered in a single keyword text field, the words will be "ANDed" by OpenAlex.
+:::
+
+6. Tap the search <img src="/img/docs/search/search_button.png" alt="Screenshot showing the search button" width="30"/> button to send your query.
+
+
+## Search options
+
+### Search in
+
+- Everything &rarr; Searches across titles, abstracts and fulltext
+- Title and abstract &rarr; Searches across titles and abstracts
+- Title &rarr; Searches using titles only
+- Abstract &rarr; Searches using abstracts only
+
+### Sort by
+
+- Display name &rarr; The title of the paper
+- Cited by count &rarr; The number of times a paper was cited by another
+- Publication date &rarr; The date of publication
+
+### Sort order
+
+- Ascending
+- Descending
+
+### Save this query
+
+Toggling this option reveals a text field. If a name is entered, the query will be saved and reusable in the library screen. The saved queries can also have their results included the main feed.
