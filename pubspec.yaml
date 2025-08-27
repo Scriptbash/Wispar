@@ -49,7 +49,7 @@ dependencies:
   pdfrx: ^2.0.4
   package_info_plus: ^8.1.1
   share_plus: ^11.0.0
-  introduction_screen: ^3.1.14
+  introduction_screen: ^4.0.0
   open_filex: ^4.7.0
   google_nav_bar: ^5.0.7
   file_picker: ^10.0.0
