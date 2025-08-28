@@ -79,7 +79,7 @@ If you run into any issue while using Wispar, have a question or want to share y
 
 ## Credits
 <ul>
-    <li>Thank you<a href="https://github.com/reds2401" target='_blank'> Sergio </a>for the app icon!</li>
+    <li>Thank you<a href="https://github.com/reds2401" target='_blank'> Sergio </a>for the original app icon and <a href="https://github.com/Meigane" target='_blank'> Lingling </a>for the updated app icon!</li>
     <li><a href="https://libproxy-db.org/" target='_blank'>Library Proxy URL Database</a></li>
     <li><a href="https://unpaywall.org/" target='_blank'>Unpaywall</a></li>
     <li><a href="https://www.crossref.org/" target='_blank'>Crossref</a></li>
