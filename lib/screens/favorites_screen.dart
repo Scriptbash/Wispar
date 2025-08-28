@@ -143,7 +143,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         future: _favoriteArticles,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -153,35 +153,77 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 child: Text(
                   AppLocalizations.of(context)!.noFavorites,
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16.0),
+                  style: const TextStyle(fontSize: 16.0),
+                ),
+              ),
+            );
+          } else if (_filteredFavorites.isEmpty) {
+            return Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  AppLocalizations.of(context)!.filterResultsEmpty,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16.0),
                 ),
               ),
             );
           } else {
-            return _filteredFavorites.isEmpty
-                ? Center(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Text(
-                        AppLocalizations.of(context)!.filterResultsEmpty,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16.0),
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    controller: _scrollController,
-                    itemCount: _filteredFavorites.length,
-                    itemBuilder: (context, index) {
-                      final publicationCard = _filteredFavorites[index];
+            return GridView.builder(
+              controller: _scrollController,
+              padding: const EdgeInsets.all(8),
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 600,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                childAspectRatio: 0.7,
+              ),
+              itemCount: _filteredFavorites.length,
+              itemBuilder: (context, index) {
+                final publicationCard = _filteredFavorites[index];
 
-                      // Check if the abstract is cached, if not fetch it
-                      String? cachedAbstract =
-                          abstractCache[publicationCard.doi];
-                      if (cachedAbstract != null) {
+                // Check if the abstract is cached, if not fetch it
+                String? cachedAbstract = abstractCache[publicationCard.doi];
+                if (cachedAbstract != null) {
+                  return PublicationCard(
+                    title: publicationCard.title,
+                    abstract: cachedAbstract,
+                    journalTitle: publicationCard.journalTitle,
+                    issn: publicationCard.issn,
+                    publishedDate: publicationCard.publishedDate,
+                    doi: publicationCard.doi,
+                    authors: publicationCard.authors,
+                    url: publicationCard.url,
+                    license: publicationCard.license,
+                    licenseName: publicationCard.licenseName,
+                    dateLiked: publicationCard.dateLiked,
+                    onFavoriteChanged: () {
+                      _removeFavorite(context, publicationCard);
+                    },
+                    onAbstractChanged: _updateAbstract,
+                  );
+                } else {
+                  // Use the AbstractHelper to get the formatted abstract
+                  return FutureBuilder<String>(
+                    future: AbstractHelper.buildAbstract(
+                        context, publicationCard.abstract),
+                    builder: (context, abstractSnapshot) {
+                      if (abstractSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (abstractSnapshot.hasError) {
+                        return Center(
+                            child: Text('Error: ${abstractSnapshot.error}'));
+                      } else if (!abstractSnapshot.hasData) {
+                        return const Center(
+                            child: Text('No abstract available'));
+                      } else {
+                        String formattedAbstract = abstractSnapshot.data!;
+                        abstractCache[publicationCard.doi] = formattedAbstract;
+
                         return PublicationCard(
                           title: publicationCard.title,
-                          abstract: cachedAbstract,
+                          abstract: formattedAbstract,
                           journalTitle: publicationCard.journalTitle,
                           issn: publicationCard.issn,
                           publishedDate: publicationCard.publishedDate,
@@ -194,58 +236,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           onFavoriteChanged: () {
                             _removeFavorite(context, publicationCard);
                           },
-                          onAbstractChanged: () {
-                            _updateAbstract();
-                          },
-                        );
-                      } else {
-                        // Use the AbstractHelper to get the formatted abstract
-                        return FutureBuilder<String>(
-                          future: AbstractHelper.buildAbstract(
-                              context, publicationCard.abstract),
-                          builder: (context, abstractSnapshot) {
-                            if (abstractSnapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (abstractSnapshot.hasError) {
-                              return Center(
-                                  child:
-                                      Text('Error: ${abstractSnapshot.error}'));
-                            } else if (!abstractSnapshot.hasData) {
-                              return Center(
-                                  child: Text('No abstract available'));
-                            } else {
-                              String formattedAbstract = abstractSnapshot.data!;
-
-                              // Cache the abstract for future use
-                              abstractCache[publicationCard.doi] =
-                                  formattedAbstract;
-
-                              return PublicationCard(
-                                title: publicationCard.title,
-                                abstract: formattedAbstract,
-                                journalTitle: publicationCard.journalTitle,
-                                issn: publicationCard.issn,
-                                publishedDate: publicationCard.publishedDate,
-                                doi: publicationCard.doi,
-                                authors: publicationCard.authors,
-                                url: publicationCard.url,
-                                license: publicationCard.license,
-                                licenseName: publicationCard.licenseName,
-                                dateLiked: publicationCard.dateLiked,
-                                onFavoriteChanged: () {
-                                  _removeFavorite(context, publicationCard);
-                                },
-                                onAbstractChanged: () {
-                                  _updateAbstract();
-                                },
-                              );
-                            }
-                          },
+                          onAbstractChanged: _updateAbstract,
                         );
                       }
                     },
                   );
+                }
+              },
+            );
           }
         },
       ),
