@@ -49,7 +49,7 @@ dependencies:
   pdfrx: ^2.0.4
   package_info_plus: ^8.1.1
   share_plus: ^11.0.0
-  introduction_screen: ^3.1.14
+  introduction_screen: ^4.0.0
   open_filex: ^4.7.0
   google_nav_bar: ^5.0.7
   file_picker: ^10.0.0
@@ -73,6 +73,7 @@ flutter_launcher_icons:
   android: true
   ios: true
   remove_alpha_ios: true
+  background_color_ios: c0a6f4
   image_path: "assets/icon/icon.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
 
