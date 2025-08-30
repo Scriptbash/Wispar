@@ -3,6 +3,8 @@
   "@welcomeWispar": {},
   "appDescription": "Your open-source app to stay up-to-date with scientific literature. Let's get you set up quickly!",
   "@appDescription": {},
+  "institutionalAccess": "Institutional access",
+  "@institutionalAccess":{},
   "setupInstitutionalAccess": "Setup Institutional Access",
   "@setupInstitutionalAccess": {},
   "setupInstitutionalAccessLong": "Select your institution's EZproxy to gain access to their journal subscriptions. This will eliminate the need for a VPN or on-premises access.",
