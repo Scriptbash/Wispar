@@ -26,6 +26,9 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
   int _concurrentFetches = 3; // Default to 3 concurrent fetches
   TextEditingController _cleanupIntervalController = TextEditingController();
 
+  bool _overrideUserAgent = false;
+  TextEditingController _userAgentController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +44,8 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       _fetchInterval = prefs.getInt('fetchInterval') ?? 6;
       _scrapeAbstracts = prefs.getBool('scrapeAbstracts') ?? true;
       _concurrentFetches = prefs.getInt('concurrentFetches') ?? 3;
+      _overrideUserAgent = prefs.getBool('overrideUserAgent') ?? false;
+      _userAgentController.text = prefs.getString('customUserAgent') ?? '';
     });
     _cleanupIntervalController.text = _cleanupInterval.toString();
   }
@@ -53,6 +58,10 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       await prefs.setInt('fetchInterval', _fetchInterval);
       await prefs.setBool('scrapeAbstracts', _scrapeAbstracts);
       await prefs.setInt('concurrentFetches', _concurrentFetches);
+      await prefs.setBool('overrideUserAgent', _overrideUserAgent);
+      if (_overrideUserAgent) {
+        await prefs.setString('customUserAgent', _userAgentController.text);
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.settingsSaved)),
@@ -284,6 +293,31 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(AppLocalizations.of(context)!.overrideUserAgent),
+                        Switch(
+                          value: _overrideUserAgent,
+                          onChanged: (bool value) {
+                            setState(() {
+                              _overrideUserAgent = value;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    if (_overrideUserAgent)
+                      TextFormField(
+                        controller: _userAgentController,
+                        decoration: InputDecoration(
+                          labelText:
+                              AppLocalizations.of(context)!.customUserAgent,
+                          hintText:
+                              "Mozilla/5.0 (Android 16; Mobile; LG-M255; rv:140.0) Gecko/140.0 Firefox/140.0",
+                        ),
+                      ),
                     const SizedBox(height: 16),
                     FilledButton(
                       onPressed: _saveSettings,
