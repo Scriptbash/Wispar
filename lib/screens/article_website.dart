@@ -25,17 +25,6 @@ class ArticleWebsite extends StatefulWidget {
 class _ArticleWebsiteState extends State<ArticleWebsite> {
   final GlobalKey webViewKey = GlobalKey();
   InAppWebViewController? webViewController;
-  InAppWebViewSettings settings = InAppWebViewSettings(
-    isInspectable: kDebugMode,
-    mediaPlaybackRequiresUserGesture: true,
-    javaScriptEnabled: true,
-    javaScriptCanOpenWindowsAutomatically: true,
-    useOnDownloadStart: true,
-    iframeAllowFullscreen: true,
-    userAgent:
-        "Mozilla/5.0 (Android 16; Mobile; LG-M255; rv:140.0) Gecko/140.0 Firefox/140.0",
-    supportMultipleWindows: true,
-  );
 
   PullToRefreshController? pullToRefreshController;
   String url = "";
@@ -53,9 +42,13 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
   String? _currentWebViewCookies;
   WebUri? _currentWebViewUrl;
 
+  late InAppWebViewSettings settings;
+  late final String _platformUserAgent;
+
   @override
   void initState() {
     super.initState();
+    _initWebViewSettings();
     checkUnpaywallAvailability();
     pullToRefreshController = kIsWeb
         ? null
@@ -73,6 +66,43 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
               }
             },
           );
+  }
+
+  Future<void> _initWebViewSettings() async {
+    _platformUserAgent = _getPlatformUserAgent();
+
+    final prefs = await SharedPreferences.getInstance();
+    bool overrideUA = prefs.getBool('overrideUserAgent') ?? false;
+    String? customUA = prefs.getString('customUserAgent');
+
+    settings = InAppWebViewSettings(
+      isInspectable: kDebugMode,
+      mediaPlaybackRequiresUserGesture: true,
+      javaScriptEnabled: true,
+      javaScriptCanOpenWindowsAutomatically: true,
+      useOnDownloadStart: true,
+      iframeAllowFullscreen: true,
+      userAgent: (overrideUA && customUA != null && customUA.isNotEmpty)
+          ? customUA
+          : _platformUserAgent,
+      supportMultipleWindows: true,
+    );
+  }
+
+  String _getPlatformUserAgent() {
+    if (Platform.isAndroid) {
+      return "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.3";
+    } else if (Platform.isIOS) {
+      return "Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Mobile/15E148 Safari/604";
+    } else if (Platform.isMacOS) {
+      return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.3";
+    } else if (Platform.isWindows) {
+      return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.3";
+    } else if (Platform.isLinux) {
+      return "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.3";
+    } else {
+      return "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0 Mobile Safari/537.36";
+    }
   }
 
   Future<void> checkUnpaywallAvailability() async {
@@ -608,7 +638,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
 
                       Map<String, String> headers = {
                         'Host': downloadUri.host,
-                        'User-Agent': settings.userAgent!,
+                        'User-Agent': _platformUserAgent,
                         'Accept':
                             'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                         'Accept-Language':
