@@ -181,6 +181,14 @@ class _HomeScreenNavigatorState extends State<HomeScreenNavigator> {
                 setState(() => _currentIndex = index);
               },
               labelType: NavigationRailLabelType.selected,
+              selectedIconTheme: IconThemeData(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              unselectedIconTheme:
+                  IconThemeData(color: Theme.of(context).colorScheme.primary),
+              selectedLabelTextStyle: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
               destinations: [
                 NavigationRailDestination(
                   icon: Icon(Icons.home_outlined),
@@ -242,20 +250,35 @@ class _HomeScreenNavigatorState extends State<HomeScreenNavigator> {
                     },
                     tabs: [
                       GButton(
-                          icon: Icons.home_outlined,
-                          text: AppLocalizations.of(context)!.home),
+                        icon: _currentIndex == 0
+                            ? Icons.home
+                            : Icons.home_outlined,
+                        text: AppLocalizations.of(context)!.home,
+                      ),
                       GButton(
-                          icon: Icons.search_outlined,
-                          text: AppLocalizations.of(context)!.search),
+                        icon: _currentIndex == 1
+                            ? Icons.search
+                            : Icons.search_outlined,
+                        text: AppLocalizations.of(context)!.search,
+                      ),
                       GButton(
-                          icon: Icons.my_library_books_outlined,
-                          text: AppLocalizations.of(context)!.library),
+                        icon: _currentIndex == 2
+                            ? Icons.library_books
+                            : Icons.my_library_books_outlined,
+                        text: AppLocalizations.of(context)!.library,
+                      ),
                       GButton(
-                          icon: Icons.favorite_border,
-                          text: AppLocalizations.of(context)!.favorites),
+                        icon: _currentIndex == 3
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        text: AppLocalizations.of(context)!.favorites,
+                      ),
                       GButton(
-                          icon: Icons.download_outlined,
-                          text: AppLocalizations.of(context)!.downloads),
+                        icon: _currentIndex == 4
+                            ? Icons.download
+                            : Icons.download_outlined,
+                        text: AppLocalizations.of(context)!.downloads,
+                      ),
                     ],
                   ),
                 ),

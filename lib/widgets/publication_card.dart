@@ -86,25 +86,35 @@ class _PublicationCardState extends State<PublicationCard> {
               children: _buildSlidableActions(context),
             ),
             child: GestureDetector(
-              onTap: () => _openArticleScreen(
-                context,
-                ArticleScreen(
-                  doi: widget.doi,
-                  title: widget.title,
-                  issn: widget.issn,
-                  abstract: widget.abstract,
-                  journalTitle: widget.journalTitle,
-                  publishedDate: widget.publishedDate,
-                  authors: widget.authors,
-                  url: widget.url,
-                  license: widget.license,
-                  licenseName: widget.licenseName,
-                  publisher: widget.publisher,
-                  onAbstractChanged: () {
-                    widget.onAbstractChanged?.call();
-                  },
-                ),
-              ),
+              onTap: () async {
+                String finalAbstract = widget.abstract;
+                if (widget.abstract.trim().isEmpty) {
+                  final dbAbstract =
+                      await databaseHelper.getAbstract(widget.doi);
+                  if (dbAbstract != null && dbAbstract.isNotEmpty) {
+                    finalAbstract = dbAbstract;
+                  }
+                }
+                _openArticleScreen(
+                  context,
+                  ArticleScreen(
+                    doi: widget.doi,
+                    title: widget.title,
+                    issn: widget.issn,
+                    abstract: finalAbstract,
+                    journalTitle: widget.journalTitle,
+                    publishedDate: widget.publishedDate,
+                    authors: widget.authors,
+                    url: widget.url,
+                    license: widget.license,
+                    licenseName: widget.licenseName,
+                    publisher: widget.publisher,
+                    onAbstractChanged: () {
+                      widget.onAbstractChanged?.call();
+                    },
+                  ),
+                );
+              },
               child: Card(
                 elevation: 2.0,
                 margin:

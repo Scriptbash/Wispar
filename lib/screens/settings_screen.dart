@@ -85,15 +85,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _buildTile(
         icon: Icons.lock_open_outlined,
         label: 'Unpaywall',
-        subtitleFuture: getUnpaywallStatus(),
-        subtitleBuilder: (status) => status == '1'
-            ? AppLocalizations.of(context)!.enabled
-            : AppLocalizations.of(context)!.disabled,
-        onTap: () => _showUnpaywallDialog(context),
+        isToggle: true,
+        toggleFuture: getUnpaywallStatus(),
+        onToggle: _toggleUnpaywall,
       ),
       _buildTile(
         icon: Icons.school_outlined,
-        label: 'EZproxy',
+        label: AppLocalizations.of(context)!.institutionalAccess,
         subtitleFuture: getInstitutionName(),
         subtitleBuilder: (name) =>
             name ?? AppLocalizations.of(context)!.noinstitution,
@@ -230,55 +228,90 @@ class _SettingsScreenState extends State<SettingsScreen> {
     String? subtitle,
     Future<String?>? subtitleFuture,
     String Function(String?)? subtitleBuilder,
-    required VoidCallback onTap,
+    VoidCallback? onTap,
+    bool isToggle = false,
+    Future<String?>? toggleFuture,
+    Function(String)? onToggle,
   }) {
     return Card(
       elevation: 2,
       child: InkWell(
-        onTap: onTap,
+        onTap: isToggle
+            ? () async {
+                final prefs = await SharedPreferences.getInstance();
+                String current = await toggleFuture! ?? '1';
+                String newStatus = current == '1' ? '0' : '1';
+                await prefs.setString('unpaywall', newStatus);
+                if (onToggle != null) onToggle(newStatus);
+                setState(() {});
+              }
+            : onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                children: [
-                  Icon(icon),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text(label)),
-                ],
-              ),
-              if (subtitle != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Text(subtitle,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Icon(icon),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(label)),
+                    if (isToggle && toggleFuture != null)
+                      FutureBuilder<String?>(
+                        future: toggleFuture,
+                        builder: (context, snapshot) {
+                          final enabled = snapshot.data ?? '1';
+                          return Switch(
+                            value: enabled == '1',
+                            onChanged: (value) async {
+                              final prefs =
+                                  await SharedPreferences.getInstance();
+                              await prefs.setString(
+                                  'unpaywall', value ? '1' : '0');
+                              if (onToggle != null) onToggle(value ? '1' : '0');
+                              setState(() {});
+                            },
+                          );
+                        },
+                      ),
+                  ],
+                ),
+                if (!isToggle && subtitle != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 32, top: 8),
+                    child: Text(
+                      subtitle,
                       style: const TextStyle(
                         fontSize: 13,
                         color: Colors.grey,
-                      )),
-                ),
-              if (subtitleFuture != null && subtitleBuilder != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: FutureBuilder<String?>(
-                    future: subtitleFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return Text(subtitleBuilder(snapshot.data),
+                      ),
+                    ),
+                  ),
+                if (!isToggle &&
+                    subtitleFuture != null &&
+                    subtitleBuilder != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 32, top: 8),
+                    child: FutureBuilder<String?>(
+                      future: subtitleFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Text(
+                            subtitleBuilder(snapshot.data),
                             style: const TextStyle(
                               fontSize: 13,
                               color: Colors.grey,
-                            ));
-                      } else {
-                        return const SizedBox.shrink();
-                      }
-                    },
+                            ),
+                          );
+                        } else {
+                          return const SizedBox.shrink();
+                        }
+                      },
+                    ),
                   ),
-                ),
-            ],
-          ),
-        ),
+              ],
+            )),
       ),
     );
   }
@@ -313,42 +346,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return prefs.getString('unpaywall') ?? '1';
   }
 
-  void _showUnpaywallDialog(BuildContext context) async {
-    String? currentStatus = await getUnpaywallStatus();
-    currentStatus ??= '1';
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Unpaywall'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            RadioListTile<String>(
-              title: Text(AppLocalizations.of(context)!.enabled),
-              value: "1",
-              groupValue: currentStatus,
-              onChanged: (value) {
-                if (value != null) {
-                  saveUnpaywallPreference(value);
-                  Navigator.of(context).pop();
-                }
-              },
-            ),
-            RadioListTile<String>(
-              title: Text(AppLocalizations.of(context)!.disabled),
-              value: "0",
-              groupValue: currentStatus,
-              onChanged: (value) {
-                if (value != null) {
-                  saveUnpaywallPreference(value);
-                  Navigator.of(context).pop();
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-    );
+  Future<void> _toggleUnpaywall(String newStatus) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('unpaywall', newStatus);
+    setState(() {});
   }
 
   void _showPermissionSettingsDialog() {
