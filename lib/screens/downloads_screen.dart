@@ -30,7 +30,6 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
   void initState() {
     super.initState();
     _fetchDownloadedArticles();
-
     _filterController.addListener(() {
       _filterDownloads(_filterController.text);
     });
@@ -133,14 +132,34 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                     ),
                   ),
                 )
-              : ListView.builder(
-                  itemCount: _filteredDownloads.length,
-                  itemBuilder: (context, index) {
-                    final article = _filteredDownloads[index];
-                    return DownloadedCard(
-                      publicationCard: article.publicationCard,
-                      pdfPath: article.pdfPath,
-                      onDelete: () => _handleDelete(index),
+              : LayoutBuilder(
+                  builder: (context, constraints) {
+                    final spacing = 8.0;
+                    final minCardWidth = 300.0;
+                    int columns = (constraints.maxWidth / minCardWidth).floor();
+                    columns = columns > 0 ? columns : 1;
+
+                    final totalSpacing = (columns + 1) * spacing;
+                    final cardWidth =
+                        (constraints.maxWidth - totalSpacing) / columns;
+
+                    return SingleChildScrollView(
+                      padding: EdgeInsets.all(spacing),
+                      child: Wrap(
+                        spacing: spacing,
+                        runSpacing: spacing,
+                        children: _filteredDownloads.map((article) {
+                          return SizedBox(
+                            width: cardWidth,
+                            child: DownloadedCard(
+                              publicationCard: article.publicationCard,
+                              pdfPath: article.pdfPath,
+                              onDelete: () => _handleDelete(
+                                  _filteredDownloads.indexOf(article)),
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     );
                   },
                 ),

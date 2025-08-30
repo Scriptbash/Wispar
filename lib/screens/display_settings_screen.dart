@@ -65,71 +65,83 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final items = [
+      {
+        "icon": Icons.brightness_4_outlined,
+        "label": AppLocalizations.of(context)!.appearance,
+        "subtitle": _getThemeSubtitle(
+          context,
+          Provider.of<ThemeProvider>(context).themeMode,
+        ),
+        "onTap": () => _showThemeDialog(context),
+      },
+      {
+        "icon": Icons.article_outlined,
+        "label": AppLocalizations.of(context)!.publicationCard,
+        "subtitle":
+            _getPublicationCardSubtitle(context, _publicationCardOption),
+        "onTap": () => _showPublicationCardsDialog(context),
+      },
+      {
+        "icon": Icons.language,
+        "label": AppLocalizations.of(context)!.language,
+        "subtitle": _getLocaleLabel(context),
+        "onTap": () => _showLanguageDialog(context),
+      },
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.displaySettings),
       ),
-      body: ListView(
-        children: <Widget>[
-          ListTile(
-            onTap: () {
-              _showThemeDialog(context);
-            },
-            title: Row(
-              children: [
-                Icon(Icons.brightness_4_outlined),
-                SizedBox(width: 8),
-                Text(AppLocalizations.of(context)!.appearance),
-              ],
-            ),
-            subtitle: Row(
-              children: [
-                SizedBox(width: 32),
-                Text(
-                  _getThemeSubtitle(
-                    context,
-                    Provider.of<ThemeProvider>(context).themeMode,
-                  ),
+      body: GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 400,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          childAspectRatio: 3.5,
+        ),
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          final item = items[index];
+          return Card(
+            elevation: 2,
+            child: InkWell(
+              onTap: item["onTap"] as VoidCallback,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(item["icon"] as IconData),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(item["label"] as String),
+                        ),
+                      ],
+                    ),
+                    if (item["subtitle"] != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8, left: 32),
+                        child: Text(
+                          item["subtitle"] as String,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-          ListTile(
-            onTap: () {
-              _showPublicationCardsDialog(context);
-            },
-            title: Row(
-              children: [
-                Icon(Icons.article_outlined),
-                SizedBox(width: 8),
-                Text(AppLocalizations.of(context)!.publicationCard),
-              ],
-            ),
-            subtitle: Row(
-              children: [
-                SizedBox(width: 32),
-                Text(_getPublicationCardSubtitle(
-                    context, _publicationCardOption)),
-              ],
-            ),
-          ),
-          ListTile(
-            onTap: () => _showLanguageDialog(context),
-            title: Row(
-              children: [
-                const Icon(Icons.language),
-                const SizedBox(width: 8),
-                Text(AppLocalizations.of(context)!.language),
-              ],
-            ),
-            subtitle: Row(
-              children: [
-                const SizedBox(width: 32),
-                Text(_getLocaleLabel(context)),
-              ],
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
