@@ -25,7 +25,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadNotificationPermissionStatus();
+    if (Platform.isAndroid || Platform.isIOS) {
+      _loadNotificationPermissionStatus();
+    }
   }
 
   Future<void> _loadNotificationPermissionStatus() async {
@@ -137,14 +139,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             MaterialPageRoute(
                 builder: (context) => const DatabaseSettingsScreen())),
       ),
-      _buildTile(
-        icon: Icons.notifications_outlined,
-        label: AppLocalizations.of(context)!.notifications,
-        subtitle: isNotificationEnabled
-            ? AppLocalizations.of(context)!.notifPermsGranted
-            : AppLocalizations.of(context)!.notifPermsNotGranted,
-        onTap: _checkNotificationPermission,
-      ),
+      if (Platform.isAndroid || Platform.isIOS)
+        _buildTile(
+          icon: Icons.notifications_outlined,
+          label: AppLocalizations.of(context)!.notifications,
+          subtitle: isNotificationEnabled
+              ? AppLocalizations.of(context)!.notifPermsGranted
+              : AppLocalizations.of(context)!.notifPermsNotGranted,
+          onTap: _checkNotificationPermission,
+        ),
       _buildTile(
         icon: Icons.privacy_tip_outlined,
         label: AppLocalizations.of(context)!.privacyPolicy,

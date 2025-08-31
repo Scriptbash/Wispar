@@ -152,6 +152,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                           return SizedBox(
                             width: cardWidth,
                             child: DownloadedCard(
+                              key: ValueKey(article.key),
                               publicationCard: article.publicationCard,
                               pdfPath: article.pdfPath,
                               onDelete: () => _handleDelete(

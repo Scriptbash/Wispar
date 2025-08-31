@@ -50,7 +50,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
     super.initState();
     _initWebViewSettings();
     checkUnpaywallAvailability();
-    pullToRefreshController = kIsWeb
+    pullToRefreshController = kIsWeb || Platform.isMacOS
         ? null
         : PullToRefreshController(
             settings: PullToRefreshSettings(
@@ -91,11 +91,11 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
 
   String _getPlatformUserAgent() {
     if (Platform.isAndroid) {
-      return "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.3";
+      return "Mozilla/5.0 (Android 16; Mobile; LG-M255; rv:142.0) Gecko/142.0 Firefox/142.0";
     } else if (Platform.isIOS) {
       return "Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Mobile/15E148 Safari/604";
     } else if (Platform.isMacOS) {
-      return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.3";
+      return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:142.0) Gecko/20100101 Firefox/142.0";
     } else if (Platform.isWindows) {
       return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.3";
     } else if (Platform.isLinux) {
