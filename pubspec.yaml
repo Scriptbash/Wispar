@@ -63,6 +63,7 @@ dependencies:
   flutter_localized_locales: ^2.0.5
   flutter_slidable: ^4.0.0
   path: ^1.9.1
+  sqflite_common_ffi: ^2.3.6
 
 dev_dependencies:
   flutter_test:
