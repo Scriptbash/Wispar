@@ -44,12 +44,17 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
 
   late InAppWebViewSettings settings;
   late final String _platformUserAgent;
+  bool _overrideUA = false;
+  String? _customUA;
+
+  String? _webViewUserAgent;
 
   @override
   void initState() {
     super.initState();
     _initWebViewSettings();
     checkUnpaywallAvailability();
+
     pullToRefreshController = kIsWeb || Platform.isMacOS
         ? null
         : PullToRefreshController(
@@ -70,10 +75,9 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
 
   Future<void> _initWebViewSettings() async {
     _platformUserAgent = _getPlatformUserAgent();
-
     final prefs = await SharedPreferences.getInstance();
-    bool overrideUA = prefs.getBool('overrideUserAgent') ?? false;
-    String? customUA = prefs.getString('customUserAgent');
+    _overrideUA = prefs.getBool('overrideUserAgent') ?? false;
+    _customUA = prefs.getString('customUserAgent');
 
     settings = InAppWebViewSettings(
       isInspectable: kDebugMode,
@@ -82,9 +86,8 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
       javaScriptCanOpenWindowsAutomatically: true,
       useOnDownloadStart: true,
       iframeAllowFullscreen: true,
-      userAgent: (overrideUA && customUA != null && customUA.isNotEmpty)
-          ? customUA
-          : _platformUserAgent,
+      userAgent:
+          (_overrideUA && (_customUA?.isNotEmpty ?? false)) ? _customUA : null,
       supportMultipleWindows: true,
     );
   }
@@ -95,7 +98,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
     } else if (Platform.isIOS) {
       return "Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Mobile/15E148 Safari/604";
     } else if (Platform.isMacOS) {
-      return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:142.0) Gecko/20100101 Firefox/142.0";
+      return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)";
     } else if (Platform.isWindows) {
       return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.3";
     } else if (Platform.isLinux) {
@@ -332,6 +335,13 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                       },
                       onLoadStop: (controller, url) async {
                         pullToRefreshController?.endRefreshing();
+                        String? userAgent = await controller.evaluateJavascript(
+                            source: "navigator.userAgent;");
+                        if (userAgent != null) {
+                          _webViewUserAgent = userAgent;
+                          logger.info(
+                              'InAppWebView User-Agent: $_webViewUserAgent');
+                        }
                         setState(() {
                           this.url = url.toString();
                           urlController.text = this.url;
@@ -638,7 +648,6 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
 
                       Map<String, String> headers = {
                         'Host': downloadUri.host,
-                        'User-Agent': _platformUserAgent,
                         'Accept':
                             'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                         'Accept-Language':
@@ -654,15 +663,24 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                         'Sec-Fetch-User': '?1',
                         'Priority': 'u=0, i',
                       };
+                      if (_webViewUserAgent != null) {
+                        headers['User-Agent'] = _webViewUserAgent!;
+                      } else if (_overrideUA &&
+                          _customUA != null &&
+                          _customUA!.isNotEmpty) {
+                        headers['User-Agent'] = _customUA!;
+                      } else {
+                        headers['User-Agent'] = _getPlatformUserAgent();
+                      }
 
                       if (currentWebViewUrl != null) {
-                        headers['Referer'] = currentWebViewUrl.toString();
+                        headers['Referer'] = currentWebViewUrl.origin;
                         logger.info(
-                            'Setting Referer header to: ${headers['Referer']}');
+                            'Setting Referer header to: ${headers['Referer']} (from current page origin)');
                       } else {
                         headers['Referer'] = downloadUri.origin;
                         logger.warning(
-                            'currentWebViewUrl is null, using origin as Referer: ${headers['Referer']}');
+                            'currentWebViewUrl is null, using origin of downloadUri as Referer: ${headers['Referer']}');
                       }
 
                       if (_currentWebViewCookies != null &&
