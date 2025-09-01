@@ -94,9 +94,9 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
 
   String _getPlatformUserAgent() {
     if (Platform.isAndroid) {
-      return "Mozilla/5.0 (Android 16; Mobile; LG-M255; rv:142.0) Gecko/142.0 Firefox/142.0";
+      return "Mozilla/5.0 (Android 16; Mobile; LG-M255; rv:140.0) Gecko/140.0 Firefox/140.0";
     } else if (Platform.isIOS) {
-      return "Mozilla/5.0 (iPhone; CPU iPhone OS 18_3_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Mobile/15E148 Safari/604";
+      return "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile Safari/604.1";
     } else if (Platform.isMacOS) {
       return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)";
     } else if (Platform.isWindows) {
@@ -663,13 +663,14 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                         'Sec-Fetch-User': '?1',
                         'Priority': 'u=0, i',
                       };
-                      if (_webViewUserAgent != null) {
-                        headers['User-Agent'] = _webViewUserAgent!;
-                      } else if (_overrideUA &&
+                      if (_overrideUA &&
                           _customUA != null &&
                           _customUA!.isNotEmpty) {
                         headers['User-Agent'] = _customUA!;
-                      } else {
+                      } /*else if (_webViewUserAgent != null) {
+                        headers['User-Agent'] = _webViewUserAgent!;
+                      } */
+                      else {
                         headers['User-Agent'] = _getPlatformUserAgent();
                       }
 
