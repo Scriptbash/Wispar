@@ -210,16 +210,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: Text(AppLocalizations.of(context)!.settings),
       ),
       body: SafeArea(
-        child: GridView.builder(
-          padding: const EdgeInsets.all(16),
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 400,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 3.5,
-          ),
-          itemCount: settingsItems.length,
-          itemBuilder: (context, index) => settingsItems[index],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final double maxTileWidth = 400;
+            final int crossAxisCount =
+                (constraints.maxWidth / maxTileWidth).floor().clamp(1, 4);
+
+            final double tileWidth =
+                (constraints.maxWidth - (crossAxisCount - 1) * 16) /
+                    crossAxisCount;
+
+            return GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: tileWidth / 120,
+              ),
+              itemCount: settingsItems.length,
+              itemBuilder: (context, index) => settingsItems[index],
+            );
+          },
         ),
       ),
     );
