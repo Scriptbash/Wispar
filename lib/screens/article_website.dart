@@ -55,9 +55,8 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
     _initWebViewSettings();
     checkUnpaywallAvailability();
 
-    pullToRefreshController = kIsWeb || Platform.isMacOS
-        ? null
-        : PullToRefreshController(
+    pullToRefreshController = Platform.isAndroid || Platform.isIOS
+        ? PullToRefreshController(
             settings: PullToRefreshSettings(
               color: Colors.deepPurple,
             ),
@@ -70,7 +69,8 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                         URLRequest(url: await webViewController?.getUrl()));
               }
             },
-          );
+          )
+        : null;
   }
 
   Future<void> _initWebViewSettings() async {
@@ -100,7 +100,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
     } else if (Platform.isMacOS) {
       return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)";
     } else if (Platform.isWindows) {
-      return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.3";
+      return "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0";
     } else if (Platform.isLinux) {
       return "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.3";
     } else {
