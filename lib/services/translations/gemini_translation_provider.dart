@@ -15,7 +15,7 @@ class GeminiTranslationProvider {
   String _currentBaseUrl = _defaultBaseUrl;
   bool _useCustomBaseUrl = false;
   String _modelName = 'gemini-2.5-flash';
-  double _temperature = 1.0;
+  double _temperature = 0.7;
 
   GeminiTranslationProvider._privateConstructor();
 
@@ -38,7 +38,7 @@ class GeminiTranslationProvider {
     _useCustomBaseUrl = prefs.getBool('use_custom_gemini_base_url') ?? false;
     final storedBaseUrl = prefs.getString('gemini_base_url');
     _modelName = prefs.getString('gemini_model_name') ?? 'gemini-2.5-flash';
-    _temperature = prefs.getDouble('gemini_temperature') ?? 1.0;
+    _temperature = prefs.getDouble('gemini_temperature') ?? 0.7;
 
     if (_useCustomBaseUrl &&
         storedBaseUrl != null &&

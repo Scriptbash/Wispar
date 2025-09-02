@@ -14,7 +14,7 @@ class DeepSeekTranslationProvider {
   String _currentBaseUrl = _defaultBaseUrl;
   bool _useCustomBaseUrl = false;
   String _modelName = 'deepseek-chat';
-  double _temperature = 1.0;
+  double _temperature = 0.7;
 
   DeepSeekTranslationProvider._privateConstructor();
 
@@ -37,7 +37,7 @@ class DeepSeekTranslationProvider {
     _useCustomBaseUrl = prefs.getBool('use_custom_deepseek_base_url') ?? false;
     final storedBaseUrl = prefs.getString('deepseek_base_url');
     _modelName = prefs.getString('deepseek_model_name') ?? 'deepseek-chat';
-    _temperature = prefs.getDouble('deepseek_temperature') ?? 1.0;
+    _temperature = prefs.getDouble('deepseek_temperature') ?? 0.7;
 
     if (_useCustomBaseUrl &&
         storedBaseUrl != null &&

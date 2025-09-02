@@ -18,8 +18,8 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
   final List<String> _providers = ['Gemini', 'DeepSeek', 'ChatGPT'];
   String? _selectedProvider;
 
-  double _geminiTemperature = 1.0;
-  double _deepseekTemperature = 1.0;
+  double _geminiTemperature = 0.7;
+  double _deepseekTemperature = 0.7;
   double _chatgptTemperature = 1.0;
 
   final TextEditingController _geminiApiKeyController = TextEditingController();
@@ -95,8 +95,8 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
       _useCustomChatgptBaseUrl =
           prefs.getBool('use_custom_chatgpt_base_url') ?? false;
 
-      _geminiTemperature = prefs.getDouble('gemini_temperature') ?? 1.0;
-      _deepseekTemperature = prefs.getDouble('deepseek_temperature') ?? 1.0;
+      _geminiTemperature = prefs.getDouble('gemini_temperature') ?? 0.7;
+      _deepseekTemperature = prefs.getDouble('deepseek_temperature') ?? 0.7;
       _chatgptTemperature = prefs.getDouble('chatgpt_temperature') ?? 1.0;
     });
   }
