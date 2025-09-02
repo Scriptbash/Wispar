@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../services/logs_helper.dart';
 import '../widgets/appbar_dropdown_menu.dart';
+import 'dart:io' show Platform;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -54,9 +55,11 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadPreferences();
     _buildAndStreamFeed();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await checkAndSetNotificationPermissions();
-      if (_feedLoaded) {
-        _onAbstractChanged();
+      if (Platform.isAndroid || Platform.isIOS) {
+        await checkAndSetNotificationPermissions();
+        if (_feedLoaded) {
+          _onAbstractChanged();
+        }
       }
     });
 
@@ -268,6 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Future.wait(cachedPublications.map((item) async {
       return PublicationCard(
+        key: ValueKey(item.doi),
         title: item.title,
         abstract: await AbstractHelper.buildAbstract(context, item.abstract),
         journalTitle: item.journalTitle,

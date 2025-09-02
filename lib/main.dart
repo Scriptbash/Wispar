@@ -15,9 +15,15 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import './services/background_service.dart';
 import './services/logs_helper.dart';
 import 'package:background_fetch/background_fetch.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'dart:io' show Platform;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isLinux || Platform.isWindows) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
   LogsService();
   runApp(
     MultiProvider(
@@ -28,8 +34,10 @@ void main() async {
       child: const Wispar(),
     ),
   );
-  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
-  await initBackgroundFetch();
+  if (Platform.isAndroid || Platform.isIOS) {
+    BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
+    await initBackgroundFetch();
+  }
 }
 
 class Wispar extends StatefulWidget {
@@ -62,8 +70,8 @@ class _WisparState extends State<Wispar> {
   Widget build(BuildContext context) {
     final localeProvider = Provider.of<LocaleProvider>(context);
     return MaterialApp(
-      debugShowCheckedModeBanner:
-          false, // remove debug watermark for screenshots
+      debugShowCheckedModeBanner: false,
+      // remove debug watermark for screenshots
       title: Wispar.title,
       locale: localeProvider.locale,
       localizationsDelegates: [
@@ -129,6 +137,7 @@ class _WisparState extends State<Wispar> {
 
 class HomeScreenNavigator extends StatefulWidget {
   final bool skipToSearch;
+
   const HomeScreenNavigator({Key? key, this.skipToSearch = false})
       : super(key: key);
 

@@ -94,54 +94,68 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.displaySettings),
       ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 400,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          childAspectRatio: 3.5,
-        ),
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final item = items[index];
-          return Card(
-            elevation: 2,
-            child: InkWell(
-              onTap: item["onTap"] as VoidCallback,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(item["icon"] as IconData),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(item["label"] as String),
-                        ),
-                      ],
-                    ),
-                    if (item["subtitle"] != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8, left: 32),
-                        child: Text(
-                          item["subtitle"] as String,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final double maxTileWidth = 400;
+            final int crossAxisCount =
+                (constraints.maxWidth / maxTileWidth).floor().clamp(1, 4);
+
+            final double tileWidth =
+                (constraints.maxWidth - (crossAxisCount - 1) * 16) /
+                    crossAxisCount;
+
+            final double minTileHeight = 100;
+
+            return GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: tileWidth / minTileHeight,
               ),
-            ),
-          );
-        },
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return Card(
+                  elevation: 2,
+                  child: InkWell(
+                    onTap: item["onTap"] as VoidCallback,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(item["icon"] as IconData),
+                              const SizedBox(width: 8),
+                              Expanded(child: Text(item["label"] as String)),
+                            ],
+                          ),
+                          if (item["subtitle"] != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8, left: 32),
+                              child: Text(
+                                item["subtitle"] as String,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

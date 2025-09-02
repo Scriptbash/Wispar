@@ -243,7 +243,8 @@ class _PublicationCardState extends State<PublicationCard> {
                         breakDelimiter: r'\nl',
                         laTeXCode: Text(
                           widget.title,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                           softWrap: true,
                         ),
                       ),

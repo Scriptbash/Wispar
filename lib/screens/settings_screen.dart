@@ -25,7 +25,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadNotificationPermissionStatus();
+    if (Platform.isAndroid || Platform.isIOS) {
+      _loadNotificationPermissionStatus();
+    }
   }
 
   Future<void> _loadNotificationPermissionStatus() async {
@@ -137,14 +139,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             MaterialPageRoute(
                 builder: (context) => const DatabaseSettingsScreen())),
       ),
-      _buildTile(
-        icon: Icons.notifications_outlined,
-        label: AppLocalizations.of(context)!.notifications,
-        subtitle: isNotificationEnabled
-            ? AppLocalizations.of(context)!.notifPermsGranted
-            : AppLocalizations.of(context)!.notifPermsNotGranted,
-        onTap: _checkNotificationPermission,
-      ),
+      if (Platform.isAndroid || Platform.isIOS)
+        _buildTile(
+          icon: Icons.notifications_outlined,
+          label: AppLocalizations.of(context)!.notifications,
+          subtitle: isNotificationEnabled
+              ? AppLocalizations.of(context)!.notifPermsGranted
+              : AppLocalizations.of(context)!.notifPermsNotGranted,
+          onTap: _checkNotificationPermission,
+        ),
       _buildTile(
         icon: Icons.privacy_tip_outlined,
         label: AppLocalizations.of(context)!.privacyPolicy,
@@ -207,16 +210,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: Text(AppLocalizations.of(context)!.settings),
       ),
       body: SafeArea(
-        child: GridView.builder(
-          padding: const EdgeInsets.all(16),
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 400,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 3.5,
-          ),
-          itemCount: settingsItems.length,
-          itemBuilder: (context, index) => settingsItems[index],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final double maxTileWidth = 400;
+            final int crossAxisCount =
+                (constraints.maxWidth / maxTileWidth).floor().clamp(1, 4);
+
+            final double tileWidth =
+                (constraints.maxWidth - (crossAxisCount - 1) * 16) /
+                    crossAxisCount;
+
+            return GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: tileWidth / 120,
+              ),
+              itemCount: settingsItems.length,
+              itemBuilder: (context, index) => settingsItems[index],
+            );
+          },
         ),
       ),
     );

@@ -259,6 +259,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           abstractCache[publicationCard.doi];
                       if (cachedAbstract != null) {
                         cardWidget = PublicationCard(
+                          key: ValueKey(publicationCard.doi),
                           title: publicationCard.title,
                           abstract: cachedAbstract,
                           journalTitle: publicationCard.journalTitle,
@@ -296,6 +297,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                   formattedAbstract;
 
                               return PublicationCard(
+                                key: ValueKey(publicationCard.doi),
                                 title: publicationCard.title,
                                 abstract: formattedAbstract,
                                 journalTitle: publicationCard.journalTitle,
