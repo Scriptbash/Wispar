@@ -79,6 +79,21 @@ class AbstractScraper {
                   return extractFullText(elsevierAbstract);
                 }
 
+                // Special case: Intitute of Mathematical Statistics 
+                let imsHeader = document.querySelector('h2.main-title');
+                if (imsHeader && /abstract/i.test(imsHeader.innerText)) {
+                  let parent = imsHeader.parentElement; // <text>
+                  if (parent) {
+                    let imsAbstractDiv = parent.querySelector('div');
+                    if (imsAbstractDiv) {
+                      return Array.from(imsAbstractDiv.querySelectorAll('p'))
+                        .map(p => p.innerText.trim())
+                        .filter(t => t.length > 0)
+                        .join("\\n\\n");
+                    }
+                  }
+                }
+
                 // General case: Look for any div/section with 'abstract' in class or id
                 let abstractDiv = [...document.querySelectorAll('div, section')]
                   .find(el => /abstract/i.test(el.className) || /abstract/i.test(el.id));
