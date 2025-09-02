@@ -14,6 +14,7 @@ class ChatgptTranslationProvider {
   String _currentBaseUrl = _defaultBaseUrl;
   bool _useCustomBaseUrl = false;
   String _modelName = 'gpt-4o';
+  double _temperature = 1.0;
 
   ChatgptTranslationProvider._privateConstructor();
 
@@ -36,7 +37,7 @@ class ChatgptTranslationProvider {
     _useCustomBaseUrl = prefs.getBool('use_custom_chatgpt_base_url') ?? false;
     final storedBaseUrl = prefs.getString('chatgpt_base_url');
     _modelName = prefs.getString('chatgpt_model_name') ?? 'gpt-4o';
-
+    _temperature = prefs.getDouble('chatgpt_temperature') ?? 1.0;
     if (_useCustomBaseUrl &&
         storedBaseUrl != null &&
         storedBaseUrl.isNotEmpty) {
@@ -76,6 +77,12 @@ class ChatgptTranslationProvider {
     await prefs.setString('chatgpt_model_name', newModelName);
   }
 
+  void setTemperature(double newTemperature) async {
+    _temperature = newTemperature;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('chatgpt_temperature', newTemperature);
+  }
+
   Future<Stream<String>> translateStream({
     required String text,
     required String sourceLangName,
@@ -104,7 +111,7 @@ class ChatgptTranslationProvider {
           {"role": "user", "content": prompt}
         ],
         "stream": true,
-        "temperature": 0.7,
+        "temperature": _temperature,
       });
 
       final client = http.Client();
