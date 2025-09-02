@@ -14,6 +14,7 @@ class DeepSeekTranslationProvider {
   String _currentBaseUrl = _defaultBaseUrl;
   bool _useCustomBaseUrl = false;
   String _modelName = 'deepseek-chat';
+  double _temperature = 1.0;
 
   DeepSeekTranslationProvider._privateConstructor();
 
@@ -36,6 +37,7 @@ class DeepSeekTranslationProvider {
     _useCustomBaseUrl = prefs.getBool('use_custom_deepseek_base_url') ?? false;
     final storedBaseUrl = prefs.getString('deepseek_base_url');
     _modelName = prefs.getString('deepseek_model_name') ?? 'deepseek-chat';
+    _temperature = prefs.getDouble('deepseek_temperature') ?? 1.0;
 
     if (_useCustomBaseUrl &&
         storedBaseUrl != null &&
@@ -76,6 +78,12 @@ class DeepSeekTranslationProvider {
     await prefs.setString('deepseek_model_name', newModelName);
   }
 
+  void setTemperature(double newTemperature) async {
+    _temperature = newTemperature;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('deepseek_temperature', newTemperature);
+  }
+
   Future<Stream<String>> translateStream({
     required String text,
     required String sourceLangName,
@@ -105,7 +113,7 @@ class DeepSeekTranslationProvider {
         ],
         "model": _modelName,
         "stream": true,
-        "temperature": 0.7,
+        "temperature": _temperature,
       });
 
       final client = http.Client();

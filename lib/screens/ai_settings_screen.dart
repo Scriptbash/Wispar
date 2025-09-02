@@ -18,6 +18,10 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
   final List<String> _providers = ['Gemini', 'DeepSeek', 'ChatGPT'];
   String? _selectedProvider;
 
+  double _geminiTemperature = 1.0;
+  double _deepseekTemperature = 1.0;
+  double _chatgptTemperature = 1.0;
+
   final TextEditingController _geminiApiKeyController = TextEditingController();
   final TextEditingController _deepseekApiKeyController =
       TextEditingController();
@@ -90,6 +94,10 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
           prefs.getBool('use_custom_deepseek_base_url') ?? false;
       _useCustomChatgptBaseUrl =
           prefs.getBool('use_custom_chatgpt_base_url') ?? false;
+
+      _geminiTemperature = prefs.getDouble('gemini_temperature') ?? 1.0;
+      _deepseekTemperature = prefs.getDouble('deepseek_temperature') ?? 1.0;
+      _chatgptTemperature = prefs.getDouble('chatgpt_temperature') ?? 1.0;
     });
   }
 
@@ -125,21 +133,27 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
         'use_custom_deepseek_base_url', _useCustomDeepseekBaseUrl);
     await prefs.setBool(
         'use_custom_chatgpt_base_url', _useCustomChatgptBaseUrl);
+    await prefs.setDouble('gemini_temperature', _geminiTemperature);
+    await prefs.setDouble('deepseek_temperature', _deepseekTemperature);
+    await prefs.setDouble('chatgpt_temperature', _chatgptTemperature);
 
     final geminiProvider = await GeminiTranslationProvider.instance;
     geminiProvider.setApiKey(geminiKey);
     geminiProvider.setBaseUrl(geminiBaseUrl, _useCustomGeminiBaseUrl);
     geminiProvider.setModelName(geminiModelName);
+    geminiProvider.setTemperature(_geminiTemperature);
 
     final deepseekProvider = await DeepSeekTranslationProvider.instance;
     deepseekProvider.setApiKey(deepseekKey);
     deepseekProvider.setBaseUrl(deepseekBaseUrl, _useCustomDeepseekBaseUrl);
     deepseekProvider.setModelName(deepseekModelName);
+    deepseekProvider.setTemperature(_deepseekTemperature);
 
     final chatgptProvider = await ChatgptTranslationProvider.instance;
     chatgptProvider.setApiKey(chatgptKey);
     chatgptProvider.setBaseUrl(chatgptBaseUrl, _useCustomChatgptBaseUrl);
     chatgptProvider.setModelName(chatgptModelName);
+    chatgptProvider.setTemperature(_chatgptTemperature);
   }
 
   TextEditingController _getCurrentApiKeyController() {
@@ -205,6 +219,35 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
           break;
         case 'ChatGPT':
           _useCustomChatgptBaseUrl = value;
+          break;
+      }
+    });
+  }
+
+  double _getCurrentTemperature() {
+    switch (_selectedProvider) {
+      case 'Gemini':
+        return _geminiTemperature;
+      case 'DeepSeek':
+        return _deepseekTemperature;
+      case 'ChatGPT':
+        return _chatgptTemperature;
+      default:
+        return 1.0;
+    }
+  }
+
+  void _setCurrentTemperature(double value) {
+    setState(() {
+      switch (_selectedProvider) {
+        case 'Gemini':
+          _geminiTemperature = value;
+          break;
+        case 'DeepSeek':
+          _deepseekTemperature = value;
+          break;
+        case 'ChatGPT':
+          _chatgptTemperature = value;
           break;
       }
     });
@@ -281,6 +324,16 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
                     }
                     return null;
                   },
+                ),
+                const SizedBox(height: 16),
+                Text(AppLocalizations.of(context)!.aiTemperature),
+                Slider(
+                  min: 0.0,
+                  max: 2.0,
+                  divisions: 20,
+                  label: _getCurrentTemperature().toStringAsFixed(2),
+                  value: _getCurrentTemperature(),
+                  onChanged: _setCurrentTemperature,
                 ),
                 const SizedBox(height: 16),
                 SwitchListTile(

@@ -15,6 +15,7 @@ class GeminiTranslationProvider {
   String _currentBaseUrl = _defaultBaseUrl;
   bool _useCustomBaseUrl = false;
   String _modelName = 'gemini-2.5-flash';
+  double _temperature = 1.0;
 
   GeminiTranslationProvider._privateConstructor();
 
@@ -37,6 +38,7 @@ class GeminiTranslationProvider {
     _useCustomBaseUrl = prefs.getBool('use_custom_gemini_base_url') ?? false;
     final storedBaseUrl = prefs.getString('gemini_base_url');
     _modelName = prefs.getString('gemini_model_name') ?? 'gemini-2.5-flash';
+    _temperature = prefs.getDouble('gemini_temperature') ?? 1.0;
 
     if (_useCustomBaseUrl &&
         storedBaseUrl != null &&
@@ -77,6 +79,12 @@ class GeminiTranslationProvider {
     await prefs.setString('gemini_model_name', newModelName);
   }
 
+  void setTemperature(double newTemperature) async {
+    _temperature = newTemperature;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('gemini_temperature', newTemperature);
+  }
+
   Future<Stream<String>> translateStream({
     required String text,
     required String sourceLangName,
@@ -113,7 +121,7 @@ class GeminiTranslationProvider {
           }
         ],
         "generationConfig": {
-          "temperature": 0.7,
+          "temperature": _temperature,
           "topK": 1,
           "topP": 1,
         },

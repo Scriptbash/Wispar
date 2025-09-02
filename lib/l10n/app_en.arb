@@ -591,6 +591,8 @@
   "@modelNameLabel":{},
     "pleaseEnterModelName": "Please enter the {provider} model name.",
     "@pleaseEnterModelName": {},
+  "aiTemperature": "Temperature",
+  "@aiTemperature":{},
   "pdfDownloadOptionsTitle": "PDF download options",
   "@pdfDownloadOptionsTitle": {},
   "openInExternalPdfViewer": "Open in external PDF viewer",
