@@ -42,6 +42,14 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
   final TextEditingController _chatgptModelNameController =
       TextEditingController();
 
+  final TextEditingController _customPrompt1Controller =
+      TextEditingController();
+  final TextEditingController _customPrompt2Controller =
+      TextEditingController();
+  final TextEditingController _customPrompt3Controller =
+      TextEditingController();
+  int _selectedPrompt = 1;
+
   bool _useCustomGeminiBaseUrl = false;
   bool _useCustomDeepseekBaseUrl = false;
   bool _useCustomChatgptBaseUrl = false;
@@ -63,6 +71,10 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
     _geminiModelNameController.dispose();
     _deepseekModelNameController.dispose();
     _chatgptModelNameController.dispose();
+    _customPrompt1Controller.dispose();
+    _customPrompt2Controller.dispose();
+    _customPrompt3Controller.dispose();
+
     super.dispose();
   }
 
@@ -98,6 +110,12 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
       _geminiTemperature = prefs.getDouble('gemini_temperature') ?? 0.7;
       _deepseekTemperature = prefs.getDouble('deepseek_temperature') ?? 0.7;
       _chatgptTemperature = prefs.getDouble('chatgpt_temperature') ?? 1.0;
+
+      final prompts =
+          prefs.getStringList('custom_translation_prompts') ?? ['', '', ''];
+      _customPrompt1Controller.text = prompts.length > 0 ? prompts[0] : '';
+      _customPrompt2Controller.text = prompts.length > 1 ? prompts[1] : '';
+      _customPrompt3Controller.text = prompts.length > 2 ? prompts[2] : '';
     });
   }
 
@@ -136,6 +154,13 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
     await prefs.setDouble('gemini_temperature', _geminiTemperature);
     await prefs.setDouble('deepseek_temperature', _deepseekTemperature);
     await prefs.setDouble('chatgpt_temperature', _chatgptTemperature);
+    await prefs.setStringList('custom_translation_prompts', [
+      _customPrompt1Controller.text,
+      _customPrompt2Controller.text,
+      _customPrompt3Controller.text,
+    ]);
+
+    await prefs.setInt('selected_translation_prompt', _selectedPrompt);
 
     final geminiProvider = await GeminiTranslationProvider.instance;
     geminiProvider.setApiKey(geminiKey);
@@ -253,6 +278,21 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
     });
   }
 
+  String? _validateCustomPrompt(String? prompt) {
+    if (prompt == null || prompt.isEmpty) return null;
+    final missing = <String>[];
+    if (!prompt.contains('\$src')) missing.add('\$src');
+    if (!prompt.contains('\$dst')) missing.add('\$dst');
+    if (!prompt.contains('\$text')) missing.add('\$text');
+
+    if (missing.isNotEmpty) {
+      return AppLocalizations.of(context)!.missingPlaceholders(
+        missing.join(', '),
+      );
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -334,6 +374,43 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
                   label: _getCurrentTemperature().toStringAsFixed(2),
                   value: _getCurrentTemperature(),
                   onChanged: _setCurrentTemperature,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  AppLocalizations.of(context)!.aiCustomPrompts,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Text(AppLocalizations.of(context)!.aiCustomPromptsDescription,
+                    style: TextStyle(fontSize: 12, color: Colors.grey)),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _customPrompt1Controller,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: '1',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: _validateCustomPrompt,
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _customPrompt2Controller,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: '2',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: _validateCustomPrompt,
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _customPrompt3Controller,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: '3',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: _validateCustomPrompt,
                 ),
                 const SizedBox(height: 16),
                 SwitchListTile(

@@ -87,6 +87,7 @@ class ChatgptTranslationProvider {
     required String text,
     required String sourceLangName,
     required String targetLangName,
+    String? customPrompt,
   }) async {
     if (_apiKey == null || _apiKey!.isEmpty) {
       _logger.warning('ChatGPT API key is not set. Cannot translate.');
@@ -94,13 +95,21 @@ class ChatgptTranslationProvider {
     }
 
     final controller = StreamController<String>();
-    final prompt =
-        'Translate the following text from $sourceLangName to $targetLangName. Do not enclosed the translation with quotes or other extra punctuation. Respond only with the translated text, no conversational filler:\n\n"$text"';
+    final prompt = (customPrompt != null &&
+            customPrompt.isNotEmpty &&
+            customPrompt != 'Default')
+        ? customPrompt
+            .replaceAll('\$src', sourceLangName)
+            .replaceAll('\$dst', targetLangName)
+            .replaceAll('\$text', text)
+        : 'Translate the following text from $sourceLangName to $targetLangName. '
+            'Do not enclose the translation with quotes or other extra punctuation. '
+            'Respond only with the translated text, no conversational filler:\n\n"$text"';
 
     try {
       final uri = Uri.parse('$_currentBaseUrl$_chatCompletionsPath');
       _logger.info('ChatGPT API Request URL: $uri');
-
+      _logger.info('Prompting using: $prompt');
       final requestBody = jsonEncode({
         "model": _modelName,
         "messages": [
