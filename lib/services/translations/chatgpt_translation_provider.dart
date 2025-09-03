@@ -14,18 +14,19 @@ class ChatgptTranslationProvider {
   String _currentBaseUrl = _defaultBaseUrl;
   bool _useCustomBaseUrl = false;
   String _modelName = 'gpt-4o';
+  double _temperature = 1.0;
 
   ChatgptTranslationProvider._privateConstructor();
 
   static final ChatgptTranslationProvider _instance =
       ChatgptTranslationProvider._privateConstructor();
 
-  static ChatgptTranslationProvider get instance {
+  static Future<ChatgptTranslationProvider> get instance async {
     if (_instance._apiKey == null ||
         (_instance._currentBaseUrl == _defaultBaseUrl &&
             !_instance._useCustomBaseUrl) ||
         _instance._modelName == 'gpt-4o') {
-      _instance._loadSettingsOnDemand();
+      await _instance._loadSettingsOnDemand();
     }
     return _instance;
   }
@@ -36,7 +37,7 @@ class ChatgptTranslationProvider {
     _useCustomBaseUrl = prefs.getBool('use_custom_chatgpt_base_url') ?? false;
     final storedBaseUrl = prefs.getString('chatgpt_base_url');
     _modelName = prefs.getString('chatgpt_model_name') ?? 'gpt-4o';
-
+    _temperature = prefs.getDouble('chatgpt_temperature') ?? 1.0;
     if (_useCustomBaseUrl &&
         storedBaseUrl != null &&
         storedBaseUrl.isNotEmpty) {
@@ -76,10 +77,17 @@ class ChatgptTranslationProvider {
     await prefs.setString('chatgpt_model_name', newModelName);
   }
 
+  void setTemperature(double newTemperature) async {
+    _temperature = newTemperature;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('chatgpt_temperature', newTemperature);
+  }
+
   Future<Stream<String>> translateStream({
     required String text,
     required String sourceLangName,
     required String targetLangName,
+    String? customPrompt,
   }) async {
     if (_apiKey == null || _apiKey!.isEmpty) {
       _logger.warning('ChatGPT API key is not set. Cannot translate.');
@@ -87,13 +95,20 @@ class ChatgptTranslationProvider {
     }
 
     final controller = StreamController<String>();
-    final prompt =
-        'Translate the following text from $sourceLangName to $targetLangName. Do not enclosed the translation with quotes or other extra punctuation. Respond only with the translated text, no conversational filler:\n\n"$text"';
+    final prompt = (customPrompt != null &&
+            customPrompt.isNotEmpty &&
+            customPrompt != 'Default')
+        ? customPrompt
+            .replaceAll('\$src', sourceLangName)
+            .replaceAll('\$dst', targetLangName)
+            .replaceAll('\$text', text)
+        : 'Translate the following text from $sourceLangName to $targetLangName. '
+            'Do not enclose the translation with quotes or other extra punctuation. '
+            'Respond only with the translated text, no conversational filler:\n\n"$text"';
 
     try {
       final uri = Uri.parse('$_currentBaseUrl$_chatCompletionsPath');
       _logger.info('ChatGPT API Request URL: $uri');
-
       final requestBody = jsonEncode({
         "model": _modelName,
         "messages": [
@@ -104,7 +119,7 @@ class ChatgptTranslationProvider {
           {"role": "user", "content": prompt}
         ],
         "stream": true,
-        "temperature": 0.7,
+        "temperature": _temperature,
       });
 
       final client = http.Client();

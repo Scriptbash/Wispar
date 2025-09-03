@@ -15,9 +15,15 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import './services/background_service.dart';
 import './services/logs_helper.dart';
 import 'package:background_fetch/background_fetch.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'dart:io' show Platform;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isLinux || Platform.isWindows) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
   LogsService();
   runApp(
     MultiProvider(
@@ -28,8 +34,10 @@ void main() async {
       child: const Wispar(),
     ),
   );
-  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
-  await initBackgroundFetch();
+  if (Platform.isAndroid || Platform.isIOS) {
+    BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
+    await initBackgroundFetch();
+  }
 }
 
 class Wispar extends StatefulWidget {
@@ -62,8 +70,8 @@ class _WisparState extends State<Wispar> {
   Widget build(BuildContext context) {
     final localeProvider = Provider.of<LocaleProvider>(context);
     return MaterialApp(
-      debugShowCheckedModeBanner:
-          false, // remove debug watermark for screenshots
+      debugShowCheckedModeBanner: false,
+      // remove debug watermark for screenshots
       title: Wispar.title,
       locale: localeProvider.locale,
       localizationsDelegates: [
@@ -129,6 +137,7 @@ class _WisparState extends State<Wispar> {
 
 class HomeScreenNavigator extends StatefulWidget {
   final bool skipToSearch;
+
   const HomeScreenNavigator({Key? key, this.skipToSearch = false})
       : super(key: key);
 
@@ -169,73 +178,121 @@ class _HomeScreenNavigatorState extends State<HomeScreenNavigator> {
 
   @override
   Widget build(BuildContext context) {
+    final isWide = MediaQuery.of(context).size.width >= 600;
+
     return Scaffold(
-      body: _pages[_currentIndex],
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          /*boxShadow: [
-            BoxShadow(
-              blurRadius: 10,
-              color: const Color.fromARGB(43, 0, 0, 0),
-            )
-          ],*/
-        ),
-        child: SafeArea(
-          child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6),
-              child: GNav(
-                rippleColor: Theme.of(context)
-                    .colorScheme
-                    .primary
-                    .withValues(alpha: 0.1),
-                haptic: true,
-                hoverColor: Theme.of(context)
-                    .colorScheme
-                    .primary
-                    .withValues(alpha: 0.1),
-                gap: 4,
-                activeColor: Theme.of(context).colorScheme.primary,
-                iconSize: 24,
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                duration: const Duration(milliseconds: 400),
-                tabBackgroundColor: Theme.of(context)
-                    .colorScheme
-                    .primary
-                    .withValues(alpha: 0.1),
+      body: Row(
+        children: [
+          if (isWide)
+            NavigationRail(
+              selectedIndex: _currentIndex,
+              onDestinationSelected: (index) {
+                setState(() => _currentIndex = index);
+              },
+              labelType: NavigationRailLabelType.selected,
+              selectedIconTheme: IconThemeData(
                 color: Theme.of(context).colorScheme.primary,
-                selectedIndex: _currentIndex,
-                onTabChange: (index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
-                },
-                tabs: [
-                  GButton(
-                    icon: Icons.home_outlined,
-                    text: AppLocalizations.of(context)!.home,
-                  ),
-                  GButton(
-                    icon: Icons.search_outlined,
-                    text: AppLocalizations.of(context)!.search,
-                  ),
-                  GButton(
-                    icon: Icons.my_library_books_outlined,
-                    text: AppLocalizations.of(context)!.library,
-                  ),
-                  GButton(
-                    icon: Icons.favorite_border,
-                    text: AppLocalizations.of(context)!.favorites,
-                  ),
-                  GButton(
-                    icon: Icons.download_outlined,
-                    text: AppLocalizations.of(context)!.downloads,
-                  ),
-                ],
-              )),
-        ),
+              ),
+              unselectedIconTheme:
+                  IconThemeData(color: Theme.of(context).colorScheme.primary),
+              selectedLabelTextStyle: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              destinations: [
+                NavigationRailDestination(
+                  icon: Icon(Icons.home_outlined),
+                  selectedIcon: Icon(Icons.home),
+                  label: Text(AppLocalizations.of(context)!.home),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.search_outlined),
+                  selectedIcon: Icon(Icons.search),
+                  label: Text(AppLocalizations.of(context)!.search),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.my_library_books_outlined),
+                  selectedIcon: Icon(Icons.library_books),
+                  label: Text(AppLocalizations.of(context)!.library),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.favorite_border),
+                  selectedIcon: Icon(Icons.favorite),
+                  label: Text(AppLocalizations.of(context)!.favorites),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.download_outlined),
+                  selectedIcon: Icon(Icons.download),
+                  label: Text(AppLocalizations.of(context)!.downloads),
+                ),
+              ],
+            ),
+          Expanded(child: _pages[_currentIndex]),
+        ],
       ),
+      bottomNavigationBar: isWide
+          ? null
+          : Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+              ),
+              child: SafeArea(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  child: GNav(
+                    rippleColor:
+                        Theme.of(context).colorScheme.primary.withAlpha(25),
+                    hoverColor:
+                        Theme.of(context).colorScheme.primary.withAlpha(25),
+                    gap: 4,
+                    activeColor: Theme.of(context).colorScheme.primary,
+                    iconSize: 24,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    duration: const Duration(milliseconds: 400),
+                    tabBackgroundColor:
+                        Theme.of(context).colorScheme.primary.withAlpha(25),
+                    color: Theme.of(context).colorScheme.primary,
+                    selectedIndex: _currentIndex,
+                    onTabChange: (index) {
+                      setState(() => _currentIndex = index);
+                    },
+                    tabs: [
+                      GButton(
+                        icon: _currentIndex == 0
+                            ? Icons.home
+                            : Icons.home_outlined,
+                        text: AppLocalizations.of(context)!.home,
+                      ),
+                      GButton(
+                        icon: _currentIndex == 1
+                            ? Icons.search
+                            : Icons.search_outlined,
+                        text: AppLocalizations.of(context)!.search,
+                      ),
+                      GButton(
+                        icon: _currentIndex == 2
+                            ? Icons.library_books
+                            : Icons.my_library_books_outlined,
+                        text: AppLocalizations.of(context)!.library,
+                      ),
+                      GButton(
+                        icon: _currentIndex == 3
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        text: AppLocalizations.of(context)!.favorites,
+                      ),
+                      GButton(
+                        icon: _currentIndex == 4
+                            ? Icons.download
+                            : Icons.download_outlined,
+                        text: AppLocalizations.of(context)!.downloads,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
     );
   }
 }

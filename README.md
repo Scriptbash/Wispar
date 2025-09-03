@@ -38,23 +38,15 @@ Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly s
 <ul>
     <li> [x] Search and follow journals</li>
     <li> [x] Search for articles and save the queries for easy access later. You can even include them in your feed!</li>
-    <li> [x] Download articles for offline access *</li>
+    <li> [x] Download articles for offline reading</li>
     <li> [x] EZproxy and Unpaywall integration</li>
     <li> [x] Send articles to Zotero</li>
     <li> [x] Share articles</li>
     <li> [x] Scrape missing abstracts</li>
-    <li> [x] Export/Import the database</li>
+    <li> [x] Export/Import the local database</li>
     <li> [x] Notifications and background journals updates</li>
     <li> [x] Create custom feeds</li>
-    <li> [x] Filters</li>
-</ul>
-* The download feature is currently limited to some publishers. Flutter tools and publishers like Elsevier and Wiley make it hard to get the PDF file.
-
-### Planned features
-<ul>
-    <li> [ ] Deep links</li>
-    <li> [ ] Get downloads working for more publishers</li>
-</ul>
+    <li> [x] Translate title and abstracts (requires an AI API key)</li>
 </ul>
 
 ## Translations
@@ -80,7 +72,6 @@ Translation status:
     <b>If you contribute to the project, feel free to add yourself to the .zenodo.json file to be credited!</b>
 </p>
 
-
 ## Help
 <p align ="justify">
 If you run into any issue while using Wispar, have a question or want to share your feedback, please open an issue here : https://github.com/Scriptbash/Wispar/issues
@@ -88,7 +79,7 @@ If you run into any issue while using Wispar, have a question or want to share y
 
 ## Credits
 <ul>
-    <li>Thank you<a href="https://github.com/reds2401" target='_blank'> Sergio </a>for the app icon!</li>
+    <li>Thank you<a href="https://github.com/reds2401" target='_blank'> Sergio </a>for the original app icon and <a href="https://github.com/Meigane" target='_blank'> Lingling </a>for the updated app icon!</li>
     <li><a href="https://libproxy-db.org/" target='_blank'>Library Proxy URL Database</a></li>
     <li><a href="https://unpaywall.org/" target='_blank'>Unpaywall</a></li>
     <li><a href="https://www.crossref.org/" target='_blank'>Crossref</a></li>

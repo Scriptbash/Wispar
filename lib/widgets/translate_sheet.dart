@@ -118,6 +118,9 @@ class _TranslateOptionsSheetState extends State<TranslateOptionsSheet> {
   List<String> _availableAiProviders = [];
   bool _isTranslating = false;
 
+  List<String> _availableCustomPrompts = [];
+  String? _selectedCustomPrompt;
+
   @override
   void initState() {
     super.initState();
@@ -140,6 +143,14 @@ class _TranslateOptionsSheetState extends State<TranslateOptionsSheet> {
       available.add('ChatGPT');
     }
 
+    final customPrompts =
+        prefs.getStringList('custom_translation_prompts') ?? [];
+    _availableCustomPrompts = ['Default', ...customPrompts];
+
+    final savedPrompt = prefs.getString('selected_custom_prompt');
+    _selectedCustomPrompt =
+        _availableCustomPrompts.contains(savedPrompt) ? savedPrompt : 'Default';
+
     setState(() {
       _sourceLang = TranslateLanguage.values.firstWhere(
         (lang) => lang.bcpCode == sourceCode,
@@ -161,6 +172,15 @@ class _TranslateOptionsSheetState extends State<TranslateOptionsSheet> {
       await prefs.setString('selected_ai_provider', provider);
     } else {
       await prefs.remove('selected_ai_provider');
+    }
+  }
+
+  Future<void> _saveSelectedCustomPrompt(String? prompt) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prompt != null) {
+      await prefs.setString('selected_custom_prompt', prompt);
+    } else {
+      await prefs.remove('selected_custom_prompt');
     }
   }
 
@@ -211,6 +231,33 @@ class _TranslateOptionsSheetState extends State<TranslateOptionsSheet> {
               ),
               const SizedBox(height: 8),
             ],
+            DropdownButtonFormField<String>(
+              isExpanded: true,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.prompt,
+                border: OutlineInputBorder(),
+              ),
+              value: _selectedCustomPrompt,
+              items: _availableCustomPrompts.map((prompt) {
+                return DropdownMenuItem<String>(
+                  value: prompt,
+                  child: Tooltip(
+                    message: prompt,
+                    child: Text(
+                      prompt,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                );
+              }).toList(),
+              onChanged: (val) {
+                setState(() {
+                  _selectedCustomPrompt = val;
+                });
+                _saveSelectedCustomPrompt(val);
+              },
+            ),
+            const SizedBox(height: 8),
             Row(
               children: [
                 Expanded(
@@ -301,48 +348,48 @@ class _TranslateOptionsSheetState extends State<TranslateOptionsSheet> {
       Stream<String> abstractStream;
 
       final GeminiTranslationProvider geminiProvider =
-          GeminiTranslationProvider.instance;
+          await GeminiTranslationProvider.instance;
       final DeepSeekTranslationProvider deepseekProvider =
-          DeepSeekTranslationProvider.instance;
+          await DeepSeekTranslationProvider.instance;
       final ChatgptTranslationProvider chatgptProvider =
-          ChatgptTranslationProvider.instance;
+          await ChatgptTranslationProvider.instance;
 
       switch (_selectedAiProvider) {
         case 'Gemini':
           titleStream = await geminiProvider.translateStream(
-            text: widget.title,
-            sourceLangName: _sourceLang!.name,
-            targetLangName: _targetLang!.name,
-          );
+              text: widget.title,
+              sourceLangName: _sourceLang!.name,
+              targetLangName: _targetLang!.name,
+              customPrompt: _selectedCustomPrompt);
           abstractStream = await geminiProvider.translateStream(
-            text: widget.abstractText,
-            sourceLangName: _sourceLang!.name,
-            targetLangName: _targetLang!.name,
-          );
+              text: widget.abstractText,
+              sourceLangName: _sourceLang!.name,
+              targetLangName: _targetLang!.name,
+              customPrompt: _selectedCustomPrompt);
           break;
         case 'DeepSeek':
           titleStream = await deepseekProvider.translateStream(
-            text: widget.title,
-            sourceLangName: _sourceLang!.name,
-            targetLangName: _targetLang!.name,
-          );
+              text: widget.title,
+              sourceLangName: _sourceLang!.name,
+              targetLangName: _targetLang!.name,
+              customPrompt: _selectedCustomPrompt);
           abstractStream = await deepseekProvider.translateStream(
-            text: widget.abstractText,
-            sourceLangName: _sourceLang!.name,
-            targetLangName: _targetLang!.name,
-          );
+              text: widget.abstractText,
+              sourceLangName: _sourceLang!.name,
+              targetLangName: _targetLang!.name,
+              customPrompt: _selectedCustomPrompt);
           break;
         case 'ChatGPT':
           titleStream = await chatgptProvider.translateStream(
-            text: widget.title,
-            sourceLangName: _sourceLang!.name,
-            targetLangName: _targetLang!.name,
-          );
+              text: widget.title,
+              sourceLangName: _sourceLang!.name,
+              targetLangName: _targetLang!.name,
+              customPrompt: _selectedCustomPrompt);
           abstractStream = await chatgptProvider.translateStream(
-            text: widget.abstractText,
-            sourceLangName: _sourceLang!.name,
-            targetLangName: _targetLang!.name,
-          );
+              text: widget.abstractText,
+              sourceLangName: _sourceLang!.name,
+              targetLangName: _targetLang!.name,
+              customPrompt: _selectedCustomPrompt);
           break;
         default:
           throw Exception('No valid AI provider selected or configured.');

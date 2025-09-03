@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../services/logs_helper.dart';
 import '../widgets/appbar_dropdown_menu.dart';
+import 'dart:io' show Platform;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -54,9 +55,11 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadPreferences();
     _buildAndStreamFeed();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await checkAndSetNotificationPermissions();
-      if (_feedLoaded) {
-        _onAbstractChanged();
+      if (Platform.isAndroid || Platform.isIOS) {
+        await checkAndSetNotificationPermissions();
+        if (_feedLoaded) {
+          _onAbstractChanged();
+        }
       }
     });
 
@@ -268,6 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Future.wait(cachedPublications.map((item) async {
       return PublicationCard(
+        key: ValueKey(item.doi),
         title: item.title,
         abstract: await AbstractHelper.buildAbstract(context, item.abstract),
         journalTitle: item.journalTitle,
@@ -308,12 +312,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void handleMenuButton(int item) async {
     switch (item) {
       case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute<void>(builder: (context) => const SettingsScreen()),
-        );
-        break;
-      case 1:
         showSortDialog(
           context: context,
           initialSortBy: sortBy,
@@ -342,7 +340,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         );
         break;
-      case 2:
+      case 1:
         final journals = await dbHelper.getAllJournals();
         // Split journals into followed and not followed (coming from saved queries)
         final followedJournals = journals
@@ -373,12 +371,18 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         break;
 
-      case 3:
+      case 2:
         await Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const HiddenArticlesScreen()),
         );
         _onAbstractChanged();
+        break;
+      case 3:
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(builder: (context) => const SettingsScreen()),
+        );
         break;
     }
   }
@@ -647,151 +651,165 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
-            return AlertDialog(
-              title: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      AppLocalizations.of(context)!.selectFeed,
-                      style: Theme.of(context).textTheme.titleLarge,
-                      softWrap: true,
-                      overflow: TextOverflow.visible,
-                    ),
+            return Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: 500,
+                  minWidth: MediaQuery.of(context).size.width < 500
+                      ? MediaQuery.of(context).size.width * 0.95
+                      : 0,
+                ),
+                child: AlertDialog(
+                  title: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          AppLocalizations.of(context)!.selectFeed,
+                          style: Theme.of(context).textTheme.titleLarge,
+                          softWrap: true,
+                          overflow: TextOverflow.visible,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => setState(() => isEditing = !isEditing),
+                        child: Text(
+                          isEditing
+                              ? AppLocalizations.of(context)!.done
+                              : AppLocalizations.of(context)!.edit,
+                        ),
+                      ),
+                    ],
                   ),
-                  TextButton(
-                    onPressed: () => setState(() => isEditing = !isEditing),
-                    child: Text(
-                      isEditing
-                          ? AppLocalizations.of(context)!.done
-                          : AppLocalizations.of(context)!.edit,
-                    ),
-                  ),
-                ],
-              ),
-              content: SizedBox(
-                width: double.maxFinite,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: allFilters.length,
-                  itemBuilder: (context, index) {
-                    final filter = allFilters[index];
-                    return ListTile(
-                      title: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              filter.name == 'Home'
-                                  ? AppLocalizations.of(context)!.home
-                                  : filter.name,
-                              softWrap: true,
-                              overflow: TextOverflow.visible,
-                            ),
-                          ),
-                          if (isEditing && filter.name != 'Home') ...[
-                            IconButton(
-                              icon: Icon(Icons.edit,
-                                  color: Theme.of(context).colorScheme.primary),
-                              onPressed: () {
-                                Navigator.pop(context);
-                                final journals = db.getAllJournals();
-                                journals.then((allJournals) {
-                                  final followedJournals = allJournals
-                                      .where((j) => j.dateFollowed != null)
-                                      .map((j) => j.title)
-                                      .toList();
-                                  final unfollowedJournals = allJournals
-                                      .where((j) => j.dateFollowed == null)
-                                      .map((j) => j.title)
-                                      .toList();
+                  content: SizedBox(
+                    width: double.maxFinite,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: allFilters.length,
+                      itemBuilder: (context, index) {
+                        final filter = allFilters[index];
+                        return ListTile(
+                          title: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  filter.name == 'Home'
+                                      ? AppLocalizations.of(context)!.home
+                                      : filter.name,
+                                  softWrap: true,
+                                  overflow: TextOverflow.visible,
+                                ),
+                              ),
+                              if (isEditing && filter.name != 'Home') ...[
+                                IconButton(
+                                  icon: Icon(Icons.edit,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    final journals = db.getAllJournals();
+                                    journals.then((allJournals) {
+                                      final followedJournals = allJournals
+                                          .where((j) => j.dateFollowed != null)
+                                          .map((j) => j.title)
+                                          .toList();
+                                      final unfollowedJournals = allJournals
+                                          .where((j) => j.dateFollowed == null)
+                                          .map((j) => j.title)
+                                          .toList();
 
-                                  showModalBottomSheet(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(
-                                          top: Radius.circular(20)),
-                                    ),
-                                    builder: (context) {
-                                      return CustomizeFeedBottomSheet(
-                                        followedJournals: followedJournals,
-                                        moreJournals: unfollowedJournals,
-                                        initialName: filter.name,
-                                        initialInclude: filter.include,
-                                        initialExclude: filter.exclude,
-                                        initialSelectedJournals:
-                                            filter.journals,
-                                        feedId: filter.id,
-                                        onApply: (String feedName,
-                                            Set<String> journals,
-                                            String include,
-                                            String exclude) {
-                                          _applyAdvancedFilters(feedName,
-                                              journals, include, exclude);
+                                      showModalBottomSheet(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(20)),
+                                        ),
+                                        builder: (context) {
+                                          return CustomizeFeedBottomSheet(
+                                            followedJournals: followedJournals,
+                                            moreJournals: unfollowedJournals,
+                                            initialName: filter.name,
+                                            initialInclude: filter.include,
+                                            initialExclude: filter.exclude,
+                                            initialSelectedJournals:
+                                                filter.journals,
+                                            feedId: filter.id,
+                                            onApply: (String feedName,
+                                                Set<String> journals,
+                                                String include,
+                                                String exclude) {
+                                              _applyAdvancedFilters(feedName,
+                                                  journals, include, exclude);
+                                            },
+                                          );
                                         },
                                       );
-                                    },
-                                  );
-                                });
-                              },
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.delete,
-                                  color: Theme.of(context).colorScheme.primary),
-                              onPressed: () async {
-                                await db.deleteFeedFilter(filter.id);
-                                Navigator.pop(context);
+                                    });
+                                  },
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.delete,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                  onPressed: () async {
+                                    await db.deleteFeedFilter(filter.id);
+                                    Navigator.pop(context);
 
-                                // Reset to Home feed after deletion
-                                setState(() {
-                                  _currentFeedName = 'Home';
-                                  _activeFeed = List.from(_allFeed);
-                                  _filteredFeed = List.from(_allFeed);
-                                  _sortFeed();
-                                  _filterController.clear();
-                                });
+                                    // Reset to Home feed after deletion
+                                    setState(() {
+                                      _currentFeedName = 'Home';
+                                      _activeFeed = List.from(_allFeed);
+                                      _filteredFeed = List.from(_allFeed);
+                                      _sortFeed();
+                                      _filterController.clear();
+                                    });
 
-                                final prefs =
-                                    await SharedPreferences.getInstance();
-                                await prefs.setString(
-                                    'lastSelectedFeed', 'Home');
+                                    final prefs =
+                                        await SharedPreferences.getInstance();
+                                    await prefs.setString(
+                                        'lastSelectedFeed', 'Home');
 
-                                _showFeedFiltersDialog();
-                              },
-                            ),
-                          ],
-                        ],
-                      ),
-                      onTap: !isEditing
-                          ? () async {
-                              Navigator.pop(context);
-                              if (filter.name == 'Home') {
-                                setState(() {
-                                  _currentFeedName = 'Home';
-                                  _activeFeed = List.from(_allFeed);
-                                  _filteredFeed = List.from(_allFeed);
-                                  _sortFeed();
-                                  _filterController.clear();
-                                });
+                                    _showFeedFiltersDialog();
+                                  },
+                                ),
+                              ],
+                            ],
+                          ),
+                          onTap: !isEditing
+                              ? () async {
+                                  Navigator.pop(context);
+                                  if (filter.name == 'Home') {
+                                    setState(() {
+                                      _currentFeedName = 'Home';
+                                      _activeFeed = List.from(_allFeed);
+                                      _filteredFeed = List.from(_allFeed);
+                                      _sortFeed();
+                                      _filterController.clear();
+                                    });
 
-                                final prefs =
-                                    await SharedPreferences.getInstance();
-                                await prefs.setString(
-                                    'lastSelectedFeed', filter.name);
-                              } else {
-                                setState(() {
-                                  _currentFeedName = filter.name;
-                                });
-                                _applyAdvancedFilters(
-                                    filter.name,
-                                    filter.journals,
-                                    filter.include,
-                                    filter.exclude);
-                              }
-                            }
-                          : null,
-                    );
-                  },
+                                    final prefs =
+                                        await SharedPreferences.getInstance();
+                                    await prefs.setString(
+                                        'lastSelectedFeed', filter.name);
+                                  } else {
+                                    setState(() {
+                                      _currentFeedName = filter.name;
+                                    });
+                                    _applyAdvancedFilters(
+                                        filter.name,
+                                        filter.journals,
+                                        filter.include,
+                                        filter.exclude);
+                                  }
+                                }
+                              : null,
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ),
             );

@@ -1,0 +1,8 @@
+{
+  "label": "Search Articles",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "Wispar supports two APIs for article searches: OpenAlex and Crossref, each with its own search approach."
+  }
+}

@@ -4,12 +4,12 @@ import '../generated_l10n/app_localizations.dart';
 import './institutions_screen.dart';
 import './zotero_settings_screen.dart';
 import './ai_settings_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 import './database_settings_screen.dart';
 import './display_settings_screen.dart';
 import './logs_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -20,13 +20,14 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  late Future<List<String>> appInfo;
   bool isNotificationEnabled = false;
 
   @override
   void initState() {
     super.initState();
-    _loadNotificationPermissionStatus();
+    if (Platform.isAndroid || Platform.isIOS) {
+      _loadNotificationPermissionStatus();
+    }
   }
 
   Future<void> _loadNotificationPermissionStatus() async {
@@ -47,9 +48,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     final bool deniedBefore = prefs.getBool('notification_perms') ?? false;
 
-    if (deniedBefore) {
-      await prefs.remove('notification_perms');
-    }
+    if (deniedBefore) await prefs.remove('notification_perms');
 
     final permissionGranted = await _requestNotificationPermission();
 
@@ -76,301 +75,260 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          centerTitle: false,
-          title: Text(AppLocalizations.of(context)!.settings),
+    final List<Widget> settingsItems = [
+      _buildTile(
+        icon: Icons.palette_outlined,
+        label: AppLocalizations.of(context)!.display,
+        onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const DisplaySettingsScreen())),
+      ),
+      _buildTile(
+        icon: Icons.lock_open_outlined,
+        label: 'Unpaywall',
+        isToggle: true,
+        toggleFuture: getUnpaywallStatus(),
+        onToggle: _toggleUnpaywall,
+      ),
+      _buildTile(
+        icon: Icons.school_outlined,
+        label: AppLocalizations.of(context)!.institutionalAccess,
+        subtitleFuture: getInstitutionName(),
+        subtitleBuilder: (name) =>
+            name ?? AppLocalizations.of(context)!.noinstitution,
+        onTap: () async {
+          Map<String, dynamic>? result = await Navigator.push(context,
+              MaterialPageRoute(builder: (context) => InstitutionScreen()));
+          if (result != null &&
+              result.containsKey('name') &&
+              result.containsKey('url')) {
+            String institutionName = result['name'] as String;
+            String institutionUrl = result['url'] as String;
+
+            if (institutionName == 'None') {
+              await unsetInstitution();
+            } else {
+              await saveInstitutionPreference(institutionName, institutionUrl);
+            }
+          }
+        },
+      ),
+      _buildTile(
+        icon: Icons.book_outlined,
+        label: 'Zotero',
+        onTap: () => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const ZoteroSettings())),
+      ),
+      _buildTile(
+        icon: Icons.smart_toy_outlined,
+        label: AppLocalizations.of(context)!.aiSettings,
+        onTap: () async {
+          await Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const AISettingsScreen()));
+          setState(() {});
+        },
+      ),
+      _buildTile(
+        icon: Icons.dns_outlined,
+        label: AppLocalizations.of(context)!.database,
+        onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const DatabaseSettingsScreen())),
+      ),
+      if (Platform.isAndroid || Platform.isIOS)
+        _buildTile(
+          icon: Icons.notifications_outlined,
+          label: AppLocalizations.of(context)!.notifications,
+          subtitle: isNotificationEnabled
+              ? AppLocalizations.of(context)!.notifPermsGranted
+              : AppLocalizations.of(context)!.notifPermsNotGranted,
+          onTap: _checkNotificationPermission,
         ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  ListTile(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const DisplaySettingsScreen(),
-                        ),
-                      );
-                    },
-                    title: Row(
-                      children: [
-                        Icon(Icons.palette_outlined),
-                        SizedBox(width: 8),
-                        Text(AppLocalizations.of(context)!.display),
-                      ],
-                    ),
-                  ),
-                  ListTile(
-                      onTap: () {
-                        _showUnpaywallDialog(context);
-                      },
-                      title: Row(
-                        children: [
-                          Icon(Icons.lock_open_outlined),
-                          SizedBox(width: 8),
-                          Text('Unpaywall'),
-                        ],
-                      ),
-                      subtitle: Row(children: [
-                        SizedBox(width: 32),
-                        FutureBuilder<String?>(
-                          future: getUnpaywallStatus(),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              String status = snapshot.data ??
-                                  '1'; // Default to '1' (Enabled)
-                              String statusText = status == '1'
-                                  ? AppLocalizations.of(context)!.enabled
-                                  : AppLocalizations.of(context)!.disabled;
-
-                              return Center(
-                                child: Text(statusText),
-                              );
-                            } else {
-                              return Center(
-                                child: Text(AppLocalizations.of(context)!
-                                    .enabled), // Default text
-                              );
-                            }
-                          },
-                        ),
-                      ])),
-                  ListTile(
-                    onTap: () async {
-                      Map<String, dynamic>? result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => InstitutionScreen(),
-                        ),
-                      );
-                      if (result != null &&
-                          result.containsKey('name') &&
-                          result.containsKey('url')) {
-                        String institutionName = result['name'] as String;
-                        String institutionUrl = result['url'] as String;
-
-                        if (institutionName == 'None') {
-                          // Remove the institution if no institution is selected
-                          await unsetInstitution();
-                        } else {
-                          // Otherwise, save the selected institution
-                          await saveInstitutionPreference(
-                              institutionName, institutionUrl);
-                        }
-                      }
-                    },
-                    title: Row(children: [
-                      Icon(Icons.school_outlined),
-                      SizedBox(width: 8),
-                      Text('EZproxy'),
-                    ]),
-                    subtitle: Row(
-                      children: [
-                        SizedBox(width: 32),
-                        Expanded(
-                          child: FutureBuilder<String?>(
-                            future: getInstitutionName(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                return Text(
-                                  snapshot.data ??
-                                      AppLocalizations.of(context)!
-                                          .noinstitution,
-                                );
-                              } else {
-                                return Text(
-                                  AppLocalizations.of(context)!.noinstitution,
-                                );
-                              }
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ListTile(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ZoteroSettings(),
-                        ),
-                      );
-                    },
-                    title: Row(
-                      children: [
-                        Icon(Icons.book_outlined),
-                        SizedBox(width: 8),
-                        Text('Zotero'),
-                      ],
-                    ),
-                  ),
-                  ListTile(
-                    onTap: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const AISettingsScreen()),
-                      );
-                      setState(() {});
-                    },
-                    title: Row(
-                      children: [
-                        Icon(Icons.smart_toy_outlined),
-                        SizedBox(width: 8),
-                        Text(AppLocalizations.of(context)!.aiSettings),
-                      ],
-                    ),
-                  ),
-                  ListTile(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DatabaseSettingsScreen(),
-                        ),
-                      );
-                    },
-                    title: Row(
-                      children: [
-                        Icon(Icons.dns_outlined),
-                        SizedBox(width: 8),
-                        Text(AppLocalizations.of(context)!.database),
-                      ],
-                    ),
-                  ),
-                  ListTile(
-                      onTap: () async {
-                        _checkNotificationPermission();
-                      },
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.notifications_outlined),
-                              SizedBox(width: 8),
-                              Text(AppLocalizations.of(context)!.notifications),
-                            ],
-                          ),
-                        ],
-                      ),
-                      subtitle: Row(
-                        children: [
-                          SizedBox(width: 32),
-                          Text(
-                            isNotificationEnabled
-                                ? AppLocalizations.of(context)!
-                                    .notifPermsGranted
-                                : AppLocalizations.of(context)!
-                                    .notifPermsNotGranted,
-                          ),
-                        ],
-                      )),
-                  ListTile(
-                    onTap: () {
-                      launchUrl(
-                          Uri.parse(
-                              'https://github.com/Scriptbash/Wispar/blob/main/PRIVACY.md'),
-                          mode: LaunchMode.platformDefault);
-                    },
-                    title: Row(
-                      children: [
-                        Icon(Icons.privacy_tip_outlined),
-                        SizedBox(width: 8),
-                        Text(AppLocalizations.of(context)!.privacyPolicy),
-                      ],
-                    ),
-                  ),
-                  ListTile(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const LogsScreen()),
-                        );
-                      },
-                      title: Row(
-                        children: [
-                          Icon(Icons.warning_amber),
-                          SizedBox(width: 8),
-                          Text(AppLocalizations.of(context)!.viewLogs),
-                        ],
-                      )),
-                  ListTile(
-                    onTap: () async {
-                      List<String> appInfo = await getAppVersion();
-                      final version = appInfo[0];
-                      final build = appInfo[1];
-                      showAboutDialog(
-                          context: context,
-                          applicationName: "Wispar",
-                          applicationIcon: Image.asset(
-                            'assets/icon/icon.png',
-                            width: 50,
-                          ),
-                          applicationVersion: "Version $version (Build $build)",
-                          children: [
-                            TextButton.icon(
-                                onPressed: () {
-                                  launchUrl(
-                                      Uri.parse(
-                                          'https://github.com/Scriptbash/Wispar'),
-                                      mode: LaunchMode.platformDefault);
-                                },
-                                icon: Icon(Icons.code),
-                                label: Text(
-                                    AppLocalizations.of(context)!.sourceCode)),
-                            TextButton.icon(
-                                onPressed: () {
-                                  launchUrl(
-                                      Uri.parse(
-                                          'https://github.com/Scriptbash/Wispar/issues'),
-                                      mode: LaunchMode.platformDefault);
-                                },
-                                icon: Icon(Icons.bug_report_outlined),
-                                label: Text(
-                                    AppLocalizations.of(context)!.reportIssue)),
-                          ],
-                          applicationLegalese: AppLocalizations.of(context)!
-                              .madeBy("Francis Lapointe"));
-                      //applicationLegalese: "");
-                    },
-                    title: Row(
-                      children: [
-                        Icon(Icons.info_outline),
-                        SizedBox(width: 8),
-                        Text(AppLocalizations.of(context)!.about),
-                      ],
-                    ),
-                  ),
-                  if (!Platform.isIOS)
-                    ListTile(
-                      onTap: () {
-                        launchUrl(Uri.parse('https://ko-fi.com/scriptbash'),
-                            mode: LaunchMode.platformDefault);
-                      },
-                      title: Row(
-                        children: [
-                          Icon(Icons.favorite_border),
-                          SizedBox(width: 8),
-                          Text(AppLocalizations.of(context)!.donate),
-                        ],
-                      ),
-                      subtitle: Row(children: [
-                        SizedBox(width: 32),
-                        Text(AppLocalizations.of(context)!.donateMessage)
-                      ]),
-                    ),
-                ],
+      _buildTile(
+        icon: Icons.privacy_tip_outlined,
+        label: AppLocalizations.of(context)!.privacyPolicy,
+        onTap: () => launchUrl(
+            Uri.parse(
+                'https://github.com/Scriptbash/Wispar/blob/main/PRIVACY.md'),
+            mode: LaunchMode.platformDefault),
+      ),
+      _buildTile(
+        icon: Icons.warning_amber,
+        label: AppLocalizations.of(context)!.viewLogs,
+        onTap: () => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const LogsScreen())),
+      ),
+      _buildTile(
+        icon: Icons.info_outline,
+        label: AppLocalizations.of(context)!.about,
+        onTap: () async {
+          List<String> appInfo = await getAppVersion();
+          final version = appInfo[0];
+          final build = appInfo[1];
+          showAboutDialog(
+            context: context,
+            applicationName: "Wispar",
+            applicationIcon: Image.asset('assets/icon/icon.png', width: 50),
+            applicationVersion: "Version $version (Build $build)",
+            children: [
+              TextButton.icon(
+                onPressed: () => launchUrl(
+                    Uri.parse('https://github.com/Scriptbash/Wispar'),
+                    mode: LaunchMode.platformDefault),
+                icon: const Icon(Icons.code),
+                label: Text(AppLocalizations.of(context)!.sourceCode),
               ),
-            ),
-          ),
-        ));
+              TextButton.icon(
+                onPressed: () => launchUrl(
+                    Uri.parse('https://github.com/Scriptbash/Wispar/issues'),
+                    mode: LaunchMode.platformDefault),
+                icon: const Icon(Icons.bug_report_outlined),
+                label: Text(AppLocalizations.of(context)!.reportIssue),
+              ),
+            ],
+            applicationLegalese:
+                AppLocalizations.of(context)!.madeBy("Francis Lapointe"),
+          );
+        },
+      ),
+      if (!Platform.isIOS)
+        _buildTile(
+          icon: Icons.favorite_border,
+          label: AppLocalizations.of(context)!.donate,
+          subtitle: AppLocalizations.of(context)!.donateMessage,
+          onTap: () => launchUrl(Uri.parse('https://ko-fi.com/scriptbash'),
+              mode: LaunchMode.platformDefault),
+        ),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.settings),
+      ),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final double maxTileWidth = 400;
+            final int crossAxisCount =
+                (constraints.maxWidth / maxTileWidth).floor().clamp(1, 4);
+
+            final double tileWidth =
+                (constraints.maxWidth - (crossAxisCount - 1) * 16) /
+                    crossAxisCount;
+
+            return GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: tileWidth / 120,
+              ),
+              itemCount: settingsItems.length,
+              itemBuilder: (context, index) => settingsItems[index],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTile({
+    required IconData icon,
+    required String label,
+    String? subtitle,
+    Future<String?>? subtitleFuture,
+    String Function(String?)? subtitleBuilder,
+    VoidCallback? onTap,
+    bool isToggle = false,
+    Future<String?>? toggleFuture,
+    Function(String)? onToggle,
+  }) {
+    return Card(
+      elevation: 2,
+      child: InkWell(
+        onTap: isToggle
+            ? () async {
+                final prefs = await SharedPreferences.getInstance();
+                String current = await toggleFuture! ?? '1';
+                String newStatus = current == '1' ? '0' : '1';
+                await prefs.setString('unpaywall', newStatus);
+                if (onToggle != null) onToggle(newStatus);
+                setState(() {});
+              }
+            : onTap,
+        child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Icon(icon),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(label)),
+                    if (isToggle && toggleFuture != null)
+                      FutureBuilder<String?>(
+                        future: toggleFuture,
+                        builder: (context, snapshot) {
+                          final enabled = snapshot.data ?? '1';
+                          return Switch(
+                            value: enabled == '1',
+                            onChanged: (value) async {
+                              final prefs =
+                                  await SharedPreferences.getInstance();
+                              await prefs.setString(
+                                  'unpaywall', value ? '1' : '0');
+                              if (onToggle != null) onToggle(value ? '1' : '0');
+                              setState(() {});
+                            },
+                          );
+                        },
+                      ),
+                  ],
+                ),
+                if (!isToggle && subtitle != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 32, top: 8),
+                    child: Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                if (!isToggle &&
+                    subtitleFuture != null &&
+                    subtitleBuilder != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 32, top: 8),
+                    child: FutureBuilder<String?>(
+                      future: subtitleFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Text(
+                            subtitleBuilder(snapshot.data),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey,
+                            ),
+                          );
+                        } else {
+                          return const SizedBox.shrink();
+                        }
+                      },
+                    ),
+                  ),
+              ],
+            )),
+      ),
+    );
   }
 
   Future<void> saveInstitutionPreference(String name, String url) async {
@@ -403,70 +361,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return prefs.getString('unpaywall') ?? '1';
   }
 
-  void _showUnpaywallDialog(BuildContext context) async {
-    // Fetch the current status of Unpaywall before opening the dialog
-    String? currentStatus = await getUnpaywallStatus();
-    currentStatus ??= '1';
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Unpaywall'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              RadioListTile<String>(
-                title: Text(AppLocalizations.of(context)!.enabled),
-                value: "1",
-                groupValue: currentStatus,
-                onChanged: (value) {
-                  if (value != null) {
-                    saveUnpaywallPreference(value);
-                    Navigator.of(context).pop();
-                  }
-                },
-              ),
-              RadioListTile<String>(
-                title: Text(AppLocalizations.of(context)!.disabled),
-                value: "0",
-                groupValue: currentStatus,
-                onChanged: (value) {
-                  if (value != null) {
-                    saveUnpaywallPreference(value);
-                    Navigator.of(context).pop();
-                  }
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  Future<void> _toggleUnpaywall(String newStatus) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('unpaywall', newStatus);
+    setState(() {});
   }
 
   void _showPermissionSettingsDialog() {
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.notifications),
-          content:
-              Text(AppLocalizations.of(context)!.notificationSettingsMessage),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                await openAppSettings();
-                Navigator.of(context).pop();
-              },
-              child: Text(AppLocalizations.of(context)!.openAppSettings),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-            ),
-          ],
-        );
-      },
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.notifications),
+        content:
+            Text(AppLocalizations.of(context)!.notificationSettingsMessage),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await openAppSettings();
+              Navigator.of(context).pop();
+            },
+            child: Text(AppLocalizations.of(context)!.openAppSettings),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+          ),
+        ],
+      ),
     );
   }
 }

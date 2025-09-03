@@ -14,18 +14,19 @@ class DeepSeekTranslationProvider {
   String _currentBaseUrl = _defaultBaseUrl;
   bool _useCustomBaseUrl = false;
   String _modelName = 'deepseek-chat';
+  double _temperature = 0.7;
 
   DeepSeekTranslationProvider._privateConstructor();
 
   static final DeepSeekTranslationProvider _instance =
       DeepSeekTranslationProvider._privateConstructor();
 
-  static DeepSeekTranslationProvider get instance {
+  static Future<DeepSeekTranslationProvider> get instance async {
     if (_instance._apiKey == null ||
         (_instance._currentBaseUrl == _defaultBaseUrl &&
             !_instance._useCustomBaseUrl) ||
         _instance._modelName == 'deepseek-chat') {
-      _instance._loadSettingsOnDemand();
+      await _instance._loadSettingsOnDemand();
     }
     return _instance;
   }
@@ -36,6 +37,7 @@ class DeepSeekTranslationProvider {
     _useCustomBaseUrl = prefs.getBool('use_custom_deepseek_base_url') ?? false;
     final storedBaseUrl = prefs.getString('deepseek_base_url');
     _modelName = prefs.getString('deepseek_model_name') ?? 'deepseek-chat';
+    _temperature = prefs.getDouble('deepseek_temperature') ?? 0.7;
 
     if (_useCustomBaseUrl &&
         storedBaseUrl != null &&
@@ -76,10 +78,17 @@ class DeepSeekTranslationProvider {
     await prefs.setString('deepseek_model_name', newModelName);
   }
 
+  void setTemperature(double newTemperature) async {
+    _temperature = newTemperature;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('deepseek_temperature', newTemperature);
+  }
+
   Future<Stream<String>> translateStream({
     required String text,
     required String sourceLangName,
     required String targetLangName,
+    String? customPrompt,
   }) async {
     if (_apiKey == null || _apiKey!.isEmpty) {
       _logger.warning('DeepSeek API key is not set. Cannot translate.');
@@ -87,9 +96,16 @@ class DeepSeekTranslationProvider {
     }
 
     final controller = StreamController<String>();
-
-    final prompt =
-        'Translate the following text from $sourceLangName to $targetLangName. Do not enclosed the translation with quotes or other extra punctuation. Respond only with the translated text, no conversational filler:\n\n"$text"';
+    final prompt = (customPrompt != null &&
+            customPrompt.isNotEmpty &&
+            customPrompt != 'Default')
+        ? customPrompt
+            .replaceAll('\$src', sourceLangName)
+            .replaceAll('\$dst', targetLangName)
+            .replaceAll('\$text', text)
+        : 'Translate the following text from $sourceLangName to $targetLangName. '
+            'Do not enclose the translation with quotes or other extra punctuation. '
+            'Respond only with the translated text, no conversational filler:\n\n"$text"';
 
     try {
       final uri = Uri.parse('$_currentBaseUrl$_chatCompletionsPath');
@@ -105,7 +121,7 @@ class DeepSeekTranslationProvider {
         ],
         "model": _modelName,
         "stream": true,
-        "temperature": 0.7,
+        "temperature": _temperature,
       });
 
       final client = http.Client();

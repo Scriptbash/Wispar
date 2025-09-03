@@ -25,17 +25,6 @@ class ArticleWebsite extends StatefulWidget {
 class _ArticleWebsiteState extends State<ArticleWebsite> {
   final GlobalKey webViewKey = GlobalKey();
   InAppWebViewController? webViewController;
-  InAppWebViewSettings settings = InAppWebViewSettings(
-    isInspectable: kDebugMode,
-    mediaPlaybackRequiresUserGesture: true,
-    javaScriptEnabled: true,
-    javaScriptCanOpenWindowsAutomatically: true,
-    useOnDownloadStart: true,
-    iframeAllowFullscreen: true,
-    userAgent:
-        "Mozilla/5.0 (Android 16; Mobile; LG-M255; rv:140.0) Gecko/140.0 Firefox/140.0",
-    supportMultipleWindows: true,
-  );
 
   PullToRefreshController? pullToRefreshController;
   String url = "";
@@ -53,13 +42,21 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
   String? _currentWebViewCookies;
   WebUri? _currentWebViewUrl;
 
+  late InAppWebViewSettings settings;
+  late final String _platformUserAgent;
+  bool _overrideUA = false;
+  String? _customUA;
+
+  String? _webViewUserAgent;
+
   @override
   void initState() {
     super.initState();
+    _initWebViewSettings();
     checkUnpaywallAvailability();
-    pullToRefreshController = kIsWeb
-        ? null
-        : PullToRefreshController(
+
+    pullToRefreshController = Platform.isAndroid || Platform.isIOS
+        ? PullToRefreshController(
             settings: PullToRefreshSettings(
               color: Colors.deepPurple,
             ),
@@ -72,7 +69,43 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                         URLRequest(url: await webViewController?.getUrl()));
               }
             },
-          );
+          )
+        : null;
+  }
+
+  Future<void> _initWebViewSettings() async {
+    _platformUserAgent = _getPlatformUserAgent();
+    final prefs = await SharedPreferences.getInstance();
+    _overrideUA = prefs.getBool('overrideUserAgent') ?? false;
+    _customUA = prefs.getString('customUserAgent');
+
+    settings = InAppWebViewSettings(
+      isInspectable: kDebugMode,
+      mediaPlaybackRequiresUserGesture: true,
+      javaScriptEnabled: true,
+      javaScriptCanOpenWindowsAutomatically: true,
+      useOnDownloadStart: true,
+      iframeAllowFullscreen: true,
+      userAgent:
+          (_overrideUA && (_customUA?.isNotEmpty ?? false)) ? _customUA : null,
+      supportMultipleWindows: true,
+    );
+  }
+
+  String _getPlatformUserAgent() {
+    if (Platform.isAndroid) {
+      return "Mozilla/5.0 (Android 16; Mobile; LG-M255; rv:140.0) Gecko/140.0 Firefox/140.0";
+    } else if (Platform.isIOS) {
+      return "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile Safari/604.1";
+    } else if (Platform.isMacOS) {
+      return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)";
+    } else if (Platform.isWindows) {
+      return "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0";
+    } else if (Platform.isLinux) {
+      return "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.3";
+    } else {
+      return "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0 Mobile Safari/537.36";
+    }
   }
 
   Future<void> checkUnpaywallAvailability() async {
@@ -157,8 +190,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
               icon: const Icon(Icons.download),
               tooltip: AppLocalizations.of(context)!.downloadFoundPdf,
               onPressed: () {
-                _showDownloadOptions(
-                    context, Uri.parse(_extractedPdfUrl!), null);
+                _showDownloadOptions(context, Uri.parse(_extractedPdfUrl!));
               },
             ),
         ],
@@ -285,8 +317,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                                     'true')) {
                           logger.info(
                               'PDF download request detected. Offering options to user.');
-                          _showDownloadOptions(
-                              context, downloadUri, suggestedFilename);
+                          _showDownloadOptions(context, downloadUri);
                           return;
                         } else {
                           logger.info(
@@ -304,6 +335,13 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                       },
                       onLoadStop: (controller, url) async {
                         pullToRefreshController?.endRefreshing();
+                        String? userAgent = await controller.evaluateJavascript(
+                            source: "navigator.userAgent;");
+                        if (userAgent != null) {
+                          _webViewUserAgent = userAgent;
+                          logger.info(
+                              'InAppWebView User-Agent: $_webViewUserAgent');
+                        }
                         setState(() {
                           this.url = url.toString();
                           urlController.text = this.url;
@@ -555,7 +593,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
   }
 
   Future<void> _showDownloadOptions(
-      BuildContext context, Uri downloadUri, String? suggestedFilename) async {
+      BuildContext context, Uri downloadUri) async {
     if (_isShowingDownloadOptions) {
       logger.info(
           'Download options already showing or recently shown. Debouncing.');
@@ -610,7 +648,6 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
 
                       Map<String, String> headers = {
                         'Host': downloadUri.host,
-                        'User-Agent': settings.userAgent!,
                         'Accept':
                             'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                         'Accept-Language':
@@ -626,15 +663,25 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                         'Sec-Fetch-User': '?1',
                         'Priority': 'u=0, i',
                       };
+                      if (_overrideUA &&
+                          _customUA != null &&
+                          _customUA!.isNotEmpty) {
+                        headers['User-Agent'] = _customUA!;
+                      } /*else if (_webViewUserAgent != null) {
+                        headers['User-Agent'] = _webViewUserAgent!;
+                      } */
+                      else {
+                        headers['User-Agent'] = _getPlatformUserAgent();
+                      }
 
                       if (currentWebViewUrl != null) {
-                        headers['Referer'] = currentWebViewUrl.toString();
+                        headers['Referer'] = currentWebViewUrl.origin;
                         logger.info(
-                            'Setting Referer header to: ${headers['Referer']}');
+                            'Setting Referer header to: ${headers['Referer']} (from current page origin)');
                       } else {
                         headers['Referer'] = downloadUri.origin;
                         logger.warning(
-                            'currentWebViewUrl is null, using origin as Referer: ${headers['Referer']}');
+                            'currentWebViewUrl is null, using origin of downloadUri as Referer: ${headers['Referer']}');
                       }
 
                       if (_currentWebViewCookies != null &&
@@ -674,8 +721,16 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                           response.bodyBytes[2] == 0x44 &&
                           response.bodyBytes[3] == 0x46) {
                         final appDir = await getApplicationDocumentsDirectory();
-                        final fileName = suggestedFilename ??
-                            'downloaded_pdf_${DateTime.now().millisecondsSinceEpoch}.pdf';
+                        String cleanedDoi = widget.publicationCard.doi
+                            .replaceAll(RegExp(r'[^\w\s.-]'), '_')
+                            .replaceAll(' ', '_');
+
+                        if (cleanedDoi.isEmpty) {
+                          cleanedDoi =
+                              'article_${DateTime.now().millisecondsSinceEpoch}';
+                        }
+
+                        final fileName = '$cleanedDoi.pdf';
                         final pdfFile = File('${appDir.path}/$fileName');
                         await pdfFile.writeAsBytes(response.bodyBytes);
                         if (mounted) {

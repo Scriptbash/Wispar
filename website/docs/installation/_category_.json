@@ -1,0 +1,8 @@
+{
+  "label": "Install the app",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "Wispar can currently be installed on both Android and iOS devices."
+  }
+}

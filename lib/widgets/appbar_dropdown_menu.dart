@@ -20,29 +20,29 @@ class AppBarDropdownMenu {
     final List<Widget> items = [
       _buildItem(
         context,
-        Icons.settings_outlined,
-        AppLocalizations.of(context)!.settings,
-        0,
-        onSelected,
-      ),
-      _buildItem(
-        context,
         Icons.swap_vert,
         AppLocalizations.of(context)!.sort,
-        1,
+        0,
         onSelected,
       ),
       _buildItem(
         context,
         Icons.tune,
         AppLocalizations.of(context)!.createCustomFeed,
-        2,
+        1,
         onSelected,
       ),
       _buildItem(
         context,
         Icons.layers_clear_outlined,
         AppLocalizations.of(context)!.viewHiddenArticles,
+        2,
+        onSelected,
+      ),
+      _buildItem(
+        context,
+        Icons.settings_outlined,
+        AppLocalizations.of(context)!.settings,
         3,
         onSelected,
       ),
@@ -140,7 +140,7 @@ class AppBarDropdownMenu {
           hide();
         },
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Row(
             children: [
               Icon(icon),

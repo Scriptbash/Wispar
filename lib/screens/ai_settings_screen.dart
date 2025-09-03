@@ -18,6 +18,10 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
   final List<String> _providers = ['Gemini', 'DeepSeek', 'ChatGPT'];
   String? _selectedProvider;
 
+  double _geminiTemperature = 0.7;
+  double _deepseekTemperature = 0.7;
+  double _chatgptTemperature = 1.0;
+
   final TextEditingController _geminiApiKeyController = TextEditingController();
   final TextEditingController _deepseekApiKeyController =
       TextEditingController();
@@ -37,6 +41,14 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
       TextEditingController();
   final TextEditingController _chatgptModelNameController =
       TextEditingController();
+
+  final TextEditingController _customPrompt1Controller =
+      TextEditingController();
+  final TextEditingController _customPrompt2Controller =
+      TextEditingController();
+  final TextEditingController _customPrompt3Controller =
+      TextEditingController();
+  int _selectedPrompt = 1;
 
   bool _useCustomGeminiBaseUrl = false;
   bool _useCustomDeepseekBaseUrl = false;
@@ -59,6 +71,10 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
     _geminiModelNameController.dispose();
     _deepseekModelNameController.dispose();
     _chatgptModelNameController.dispose();
+    _customPrompt1Controller.dispose();
+    _customPrompt2Controller.dispose();
+    _customPrompt3Controller.dispose();
+
     super.dispose();
   }
 
@@ -90,6 +106,16 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
           prefs.getBool('use_custom_deepseek_base_url') ?? false;
       _useCustomChatgptBaseUrl =
           prefs.getBool('use_custom_chatgpt_base_url') ?? false;
+
+      _geminiTemperature = prefs.getDouble('gemini_temperature') ?? 0.7;
+      _deepseekTemperature = prefs.getDouble('deepseek_temperature') ?? 0.7;
+      _chatgptTemperature = prefs.getDouble('chatgpt_temperature') ?? 1.0;
+
+      final prompts =
+          prefs.getStringList('custom_translation_prompts') ?? ['', '', ''];
+      _customPrompt1Controller.text = prompts.length > 0 ? prompts[0] : '';
+      _customPrompt2Controller.text = prompts.length > 1 ? prompts[1] : '';
+      _customPrompt3Controller.text = prompts.length > 2 ? prompts[2] : '';
     });
   }
 
@@ -125,21 +151,34 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
         'use_custom_deepseek_base_url', _useCustomDeepseekBaseUrl);
     await prefs.setBool(
         'use_custom_chatgpt_base_url', _useCustomChatgptBaseUrl);
+    await prefs.setDouble('gemini_temperature', _geminiTemperature);
+    await prefs.setDouble('deepseek_temperature', _deepseekTemperature);
+    await prefs.setDouble('chatgpt_temperature', _chatgptTemperature);
+    await prefs.setStringList('custom_translation_prompts', [
+      _customPrompt1Controller.text,
+      _customPrompt2Controller.text,
+      _customPrompt3Controller.text,
+    ]);
 
-    final geminiProvider = GeminiTranslationProvider.instance;
+    await prefs.setInt('selected_translation_prompt', _selectedPrompt);
+
+    final geminiProvider = await GeminiTranslationProvider.instance;
     geminiProvider.setApiKey(geminiKey);
     geminiProvider.setBaseUrl(geminiBaseUrl, _useCustomGeminiBaseUrl);
     geminiProvider.setModelName(geminiModelName);
+    geminiProvider.setTemperature(_geminiTemperature);
 
-    final deepseekProvider = DeepSeekTranslationProvider.instance;
+    final deepseekProvider = await DeepSeekTranslationProvider.instance;
     deepseekProvider.setApiKey(deepseekKey);
     deepseekProvider.setBaseUrl(deepseekBaseUrl, _useCustomDeepseekBaseUrl);
     deepseekProvider.setModelName(deepseekModelName);
+    deepseekProvider.setTemperature(_deepseekTemperature);
 
-    final chatgptProvider = ChatgptTranslationProvider.instance;
+    final chatgptProvider = await ChatgptTranslationProvider.instance;
     chatgptProvider.setApiKey(chatgptKey);
     chatgptProvider.setBaseUrl(chatgptBaseUrl, _useCustomChatgptBaseUrl);
     chatgptProvider.setModelName(chatgptModelName);
+    chatgptProvider.setTemperature(_chatgptTemperature);
   }
 
   TextEditingController _getCurrentApiKeyController() {
@@ -208,6 +247,50 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
           break;
       }
     });
+  }
+
+  double _getCurrentTemperature() {
+    switch (_selectedProvider) {
+      case 'Gemini':
+        return _geminiTemperature;
+      case 'DeepSeek':
+        return _deepseekTemperature;
+      case 'ChatGPT':
+        return _chatgptTemperature;
+      default:
+        return 1.0;
+    }
+  }
+
+  void _setCurrentTemperature(double value) {
+    setState(() {
+      switch (_selectedProvider) {
+        case 'Gemini':
+          _geminiTemperature = value;
+          break;
+        case 'DeepSeek':
+          _deepseekTemperature = value;
+          break;
+        case 'ChatGPT':
+          _chatgptTemperature = value;
+          break;
+      }
+    });
+  }
+
+  String? _validateCustomPrompt(String? prompt) {
+    if (prompt == null || prompt.isEmpty) return null;
+    final missing = <String>[];
+    if (!prompt.contains('\$src')) missing.add('\$src');
+    if (!prompt.contains('\$dst')) missing.add('\$dst');
+    if (!prompt.contains('\$text')) missing.add('\$text');
+
+    if (missing.isNotEmpty) {
+      return AppLocalizations.of(context)!.missingPlaceholders(
+        missing.join(', '),
+      );
+    }
+    return null;
   }
 
   @override
@@ -281,6 +364,53 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
                     }
                     return null;
                   },
+                ),
+                const SizedBox(height: 16),
+                Text(AppLocalizations.of(context)!.aiTemperature),
+                Slider(
+                  min: 0.0,
+                  max: 2.0,
+                  divisions: 20,
+                  label: _getCurrentTemperature().toStringAsFixed(2),
+                  value: _getCurrentTemperature(),
+                  onChanged: _setCurrentTemperature,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  AppLocalizations.of(context)!.aiCustomPrompts,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Text(AppLocalizations.of(context)!.aiCustomPromptsDescription,
+                    style: TextStyle(fontSize: 12, color: Colors.grey)),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _customPrompt1Controller,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: '1',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: _validateCustomPrompt,
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _customPrompt2Controller,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: '2',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: _validateCustomPrompt,
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _customPrompt3Controller,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: '3',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: _validateCustomPrompt,
                 ),
                 const SizedBox(height: 16),
                 SwitchListTile(

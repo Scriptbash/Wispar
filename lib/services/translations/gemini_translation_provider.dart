@@ -15,18 +15,19 @@ class GeminiTranslationProvider {
   String _currentBaseUrl = _defaultBaseUrl;
   bool _useCustomBaseUrl = false;
   String _modelName = 'gemini-2.5-flash';
+  double _temperature = 0.7;
 
   GeminiTranslationProvider._privateConstructor();
 
   static final GeminiTranslationProvider _instance =
       GeminiTranslationProvider._privateConstructor();
 
-  static GeminiTranslationProvider get instance {
+  static Future<GeminiTranslationProvider> get instance async {
     if (_instance._apiKey == null ||
         (_instance._currentBaseUrl == _defaultBaseUrl &&
             !_instance._useCustomBaseUrl) ||
         _instance._modelName == 'gemini-2.5-flash') {
-      _instance._loadSettingsOnDemand();
+      await _instance._loadSettingsOnDemand();
     }
     return _instance;
   }
@@ -37,6 +38,7 @@ class GeminiTranslationProvider {
     _useCustomBaseUrl = prefs.getBool('use_custom_gemini_base_url') ?? false;
     final storedBaseUrl = prefs.getString('gemini_base_url');
     _modelName = prefs.getString('gemini_model_name') ?? 'gemini-2.5-flash';
+    _temperature = prefs.getDouble('gemini_temperature') ?? 0.7;
 
     if (_useCustomBaseUrl &&
         storedBaseUrl != null &&
@@ -77,10 +79,17 @@ class GeminiTranslationProvider {
     await prefs.setString('gemini_model_name', newModelName);
   }
 
+  void setTemperature(double newTemperature) async {
+    _temperature = newTemperature;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('gemini_temperature', newTemperature);
+  }
+
   Future<Stream<String>> translateStream({
     required String text,
     required String sourceLangName,
     required String targetLangName,
+    String? customPrompt,
   }) async {
     if (_apiKey == null || _apiKey!.isEmpty) {
       _logger.warning('Gemini API key is not set. Cannot translate.');
@@ -88,9 +97,16 @@ class GeminiTranslationProvider {
     }
 
     final controller = StreamController<String>();
-
-    final prompt =
-        'Translate the following text from $sourceLangName to $targetLangName. Do not enclosed the translation with quotes or other extra punctuation. Respond only with the translated text, no conversational filler:\n\n"$text"';
+    final prompt = (customPrompt != null &&
+            customPrompt.isNotEmpty &&
+            customPrompt != 'Default')
+        ? customPrompt
+            .replaceAll('\$src', sourceLangName)
+            .replaceAll('\$dst', targetLangName)
+            .replaceAll('\$text', text)
+        : 'Translate the following text from $sourceLangName to $targetLangName. '
+            'Do not enclose the translation with quotes or other extra punctuation. '
+            'Respond only with the translated text, no conversational filler:\n\n"$text"';
 
     try {
       final uri = Uri.parse(
@@ -113,7 +129,7 @@ class GeminiTranslationProvider {
           }
         ],
         "generationConfig": {
-          "temperature": 0.7,
+          "temperature": _temperature,
           "topK": 1,
           "topP": 1,
         },

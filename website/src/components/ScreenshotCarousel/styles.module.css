@@ -1,0 +1,21 @@
+.carouselContainer {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.carouselImage {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  max-height: 600px;
+  object-fit: contain;
+  margin: 0 auto;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+@media (max-width: 768px) {
+  .carouselImage {
+    max-height: 400px;
+  }
+}

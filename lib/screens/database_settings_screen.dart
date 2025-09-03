@@ -1,12 +1,12 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../generated_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:archive/archive.dart';
+import 'package:archive/archive_io.dart';
+import 'package:path/path.dart' as p;
 import '../services/logs_helper.dart';
 
 class DatabaseSettingsScreen extends StatefulWidget {
@@ -26,6 +26,9 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
   int _concurrentFetches = 3; // Default to 3 concurrent fetches
   TextEditingController _cleanupIntervalController = TextEditingController();
 
+  bool _overrideUserAgent = false;
+  TextEditingController _userAgentController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +44,8 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       _fetchInterval = prefs.getInt('fetchInterval') ?? 6;
       _scrapeAbstracts = prefs.getBool('scrapeAbstracts') ?? true;
       _concurrentFetches = prefs.getInt('concurrentFetches') ?? 3;
+      _overrideUserAgent = prefs.getBool('overrideUserAgent') ?? false;
+      _userAgentController.text = prefs.getString('customUserAgent') ?? '';
     });
     _cleanupIntervalController.text = _cleanupInterval.toString();
   }
@@ -53,6 +58,10 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       await prefs.setInt('fetchInterval', _fetchInterval);
       await prefs.setBool('scrapeAbstracts', _scrapeAbstracts);
       await prefs.setInt('concurrentFetches', _concurrentFetches);
+      await prefs.setBool('overrideUserAgent', _overrideUserAgent);
+      if (_overrideUserAgent) {
+        await prefs.setString('customUserAgent', _userAgentController.text);
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.settingsSaved)),
@@ -62,12 +71,18 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
 
   Future<void> _exportDatabase() async {
     try {
+      String? outputDirectory = await FilePicker.platform.getDirectoryPath(
+        dialogTitle: AppLocalizations.of(context)!.selectDBExportLocation,
+      );
+
+      if (outputDirectory == null) return;
+
+      final String outputFile = p.join(outputDirectory, 'wispar_backup.zip');
+
       final appDir = await getApplicationDocumentsDirectory();
       final databasePath = await getDatabasesPath();
       String dbPath = '$databasePath/wispar.db';
       File dbFile = File(dbPath);
-
-      final archive = Archive();
 
       if (!await dbFile.exists()) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -77,30 +92,23 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
         return;
       }
 
-      archive.addFile(ArchiveFile(
-          'wispar.db', dbFile.lengthSync(), await dbFile.readAsBytes()));
+      final encoder = ZipFileEncoder();
+      encoder.create(outputFile);
 
-      for (var file in appDir.listSync()) {
-        if (file is File && file.path.endsWith('.pdf')) {
-          archive.addFile(ArchiveFile(file.uri.pathSegments.last,
-              file.lengthSync(), await file.readAsBytes()));
+      await encoder.addFile(dbFile, 'wispar.db');
+
+      for (var entity in appDir.listSync()) {
+        if (entity is File && entity.path.endsWith('.pdf')) {
+          await encoder.addFile(entity, p.basename(entity.path));
         }
       }
 
-      final zipData = ZipEncoder().encode(archive);
-
-      String? outputFile = await FilePicker.platform.saveFile(
-        dialogTitle: AppLocalizations.of(context)!.selectDBExportLocation,
-        fileName: 'wispar_backup.zip',
-        bytes: Uint8List.fromList(zipData),
-      );
-
-      if (outputFile == null) return;
+      encoder.close();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.databaseExported)),
       );
-      logger.info('The database was successfully exported to ${outputFile}');
+      logger.info('The database was successfully exported to $outputFile');
     } catch (e, stackTrace) {
       logger.severe('Database export error.', e, stackTrace);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -123,8 +131,8 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       final appDir = await getApplicationDocumentsDirectory();
       final databasePath = await getDatabasesPath();
 
-      final zipBytes = await selectedFile.readAsBytes();
-      final archive = ZipDecoder().decodeBytes(zipBytes);
+      final inputStream = InputFileStream(selectedFile.path!);
+      final archive = ZipDecoder().decodeStream(inputStream);
 
       for (final file in archive) {
         final filePath = file.name == 'wispar.db'
@@ -132,11 +140,16 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
             : '${appDir.path}/${file.name}';
         final outFile = File(filePath);
         await outFile.create(recursive: true);
-        await outFile.writeAsBytes(file.content as List<int>);
+
+        if (file.isFile) {
+          final outputStream = OutputFileStream(outFile.path);
+          file.writeContent(outputStream);
+          await outputStream.close();
+        }
       }
 
-      logger
-          .info('The database was successfully imported from ${selectedFile}');
+      logger.info(
+          'The database was successfully imported from ${selectedFile.path}');
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.databaseImported)),
@@ -147,7 +160,8 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       logger.severe('Database import error.', e, stackTrace);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(AppLocalizations.of(context)!.databaseImportFailed)),
+          content: Text(AppLocalizations.of(context)!.databaseImportFailed),
+        ),
       );
     }
   }
@@ -279,6 +293,31 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(AppLocalizations.of(context)!.overrideUserAgent),
+                        Switch(
+                          value: _overrideUserAgent,
+                          onChanged: (bool value) {
+                            setState(() {
+                              _overrideUserAgent = value;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    if (_overrideUserAgent)
+                      TextFormField(
+                        controller: _userAgentController,
+                        decoration: InputDecoration(
+                          labelText:
+                              AppLocalizations.of(context)!.customUserAgent,
+                          hintText:
+                              "Mozilla/5.0 (Android 16; Mobile; LG-M255; rv:140.0) Gecko/140.0 Firefox/140.0",
+                        ),
+                      ),
                     const SizedBox(height: 16),
                     FilledButton(
                       onPressed: _saveSettings,
