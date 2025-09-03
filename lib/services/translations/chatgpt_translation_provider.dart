@@ -109,7 +109,6 @@ class ChatgptTranslationProvider {
     try {
       final uri = Uri.parse('$_currentBaseUrl$_chatCompletionsPath');
       _logger.info('ChatGPT API Request URL: $uri');
-      _logger.info('Prompting using: $prompt');
       final requestBody = jsonEncode({
         "model": _modelName,
         "messages": [
