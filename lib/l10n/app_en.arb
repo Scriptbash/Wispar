@@ -606,7 +606,7 @@
   "chatWithPdf": "Chat with PDF",
   "typeYourMessage": "Type your message...",
   "aiModel": "AI Model",
-  "askAboutPdf": "Hello! I'm ready to chat about this PDF. What would you like to know or summarize?",
+  "askAboutPdf": "Hello! I'm ready to chat about this PDF. What would you like to know or summarize? Keep in mind that chatting with a PDF consumes a lot of tokens!",
   "pdfNotFound": "PDF file could not be found.",
   "errorLoadingPdf": "Error loading or encoding PDF for chat.",
   "pdfNotLoadedYet": "PDF not fully loaded or encoded yet. Please wait a moment.",

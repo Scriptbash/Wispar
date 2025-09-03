@@ -33,6 +33,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   bool _didInitDependencies = false;
 
+  List<Map<String, dynamic>> _conversationHistory = [];
+
   String _selectedAiProvider = '';
   List<String> _availableProviders = [];
 
@@ -43,7 +45,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   String _geminiBaseUrl =
       'https://generativelanguage.googleapis.com/v1beta/models/';
-  String _chatgptBaseUrl = 'https://api.openai.com/v1/chat/responses/';
+  String _chatgptBaseUrl = 'https://api.openai.com/v1/responses/';
   String _deepseekBaseUrl = 'https://api.deepseek.com/v1/chat/responses';
 
   String _geminiModelName = 'gemini-2.5-flash';
@@ -204,12 +206,6 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     try {
-      if (_base64Pdf == null) {
-        _addMessage('ai', AppLocalizations.of(context)!.pdfNotLoadedYet);
-        _isLoadingResponse = false;
-        return;
-      }
-
       String? apiKey;
       String? apiUrl;
       String? modelName;
@@ -225,7 +221,7 @@ class _ChatScreenState extends State<ChatScreen> {
         modelName = _chatgptModelName;
         apiUrl = _useCustomChatgptBaseUrl
             ? _chatgptBaseUrl
-            : 'https://api.openai.com/v1/chat/responses';
+            : 'https://api.openai.com/v1/responses';
       } else {
         logger.warning(
             'Selected AI provider $_selectedAiProvider is not supported for PDF chat or has no API key.');
@@ -235,71 +231,83 @@ class _ChatScreenState extends State<ChatScreen> {
       if (apiKey.isEmpty) {
         _addMessage('ai',
             AppLocalizations.of(context)!.apiTokenMissing(_selectedAiProvider));
-        logger.warning(
-            'API key for $_selectedAiProvider is missing during send attempt.');
-        return;
-      }
-      if (apiUrl.isEmpty) {
-        _addMessage('ai',
-            AppLocalizations.of(context)!.apiUrlMissing(_selectedAiProvider));
-        logger.warning(
-            'API URL for $_selectedAiProvider is missing during send attempt.');
         return;
       }
 
-      http.Response response;
+      dynamic body;
+
       if (_selectedAiProvider == "Gemini") {
-        final body = jsonEncode({
-          "contents": [
-            {
-              "parts": [
-                {
-                  "inline_data": {
-                    "mime_type": "application/pdf",
-                    "data": _base64Pdf
-                  }
-                },
-                {"text": userMessage}
-              ]
-            }
-          ]
-        });
-
-        logger.info(
-            'Sending request to Gemini API. Body size: ${body.length} bytes. Model: $modelName');
-        response = await http.post(
-          Uri.parse(apiUrl),
-          headers: {'Content-Type': 'application/json'},
-          body: body,
-        );
-      } else {
-        final body = jsonEncode({
-          "model": modelName,
-          "input": [
-            {
-              "role": "user",
-              "content": [
-                {
-                  "type": "input_file",
-                  "filename": p.basename(widget.pdfPath),
-                  "file_data": _base64Pdf
-                },
-                {"type": "input_text", "text": userMessage}
-              ]
-            }
-          ]
-        });
-        logger.info(
-            'Sending request to ChatGPT API. Body size: ${body.length} bytes. Model: $modelName');
-        response = await http.post(
-          Uri.parse(apiUrl),
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $apiKey',
-          },
-          body: body,
-        );
+        // Include PDF in the first request
+        if (_conversationHistory.isEmpty && _base64Pdf != null) {
+          body = jsonEncode({
+            "contents": [
+              {
+                "parts": [
+                  {
+                    "inline_data": {
+                      "mime_type": "application/pdf",
+                      "data": _base64Pdf
+                    }
+                  },
+                  {"text": userMessage}
+                ]
+              }
+            ]
+          });
+        } else {
+          // Only send the user message, without the PDF
+          body = jsonEncode({
+            "contents": [
+              {
+                "parts": [
+                  {"text": userMessage}
+                ]
+              }
+            ]
+          });
+        }
+      } else if (_selectedAiProvider == "ChatGPT") {
+        if (_conversationHistory.isEmpty && _base64Pdf != null) {
+          body = jsonEncode({
+            "model": modelName,
+            "input": [
+              {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "input_file",
+                    "filename": p.basename(widget.pdfPath),
+                    "file_data": "data:application/pdf;base64,$_base64Pdf"
+                  },
+                  {"type": "input_text", "text": userMessage}
+                ]
+              }
+            ]
+          });
+        } else {
+          body = jsonEncode({
+            "model": modelName,
+            "input": [
+              {
+                "role": "user",
+                "content": [
+                  {"type": "input_text", "text": userMessage}
+                ]
+              }
+            ]
+          });
+        }
       }
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          if (_selectedAiProvider == "ChatGPT")
+            'Authorization': 'Bearer $apiKey',
+        },
+        body: body,
+      );
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
@@ -310,11 +318,18 @@ class _ChatScreenState extends State<ChatScreen> {
                   ?[0]?['text'] ??
               AppLocalizations.of(context)!.noResponseFromAI;
         } else {
-          // ChatGPT
-          aiResponseText = jsonResponse['choices']?[0]?['message']
-                  ?['content'] ??
+          aiResponseText = jsonResponse['output']?[0]?['content']?[0]
+                  ?['text'] ??
               AppLocalizations.of(context)!.noResponseFromAI;
+
+          _conversationHistory.add({
+            "role": "assistant",
+            "content": [
+              {"type": "output_text", "text": aiResponseText}
+            ]
+          });
         }
+
         _addMessage('ai', aiResponseText);
       } else {
         logger.severe(
@@ -338,39 +353,37 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: null,
         centerTitle: false,
-        actions: [
-          if (_availableProviders.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _selectedAiProvider.isNotEmpty
-                      ? _selectedAiProvider
-                      : null,
-                  hint: Text(
-                    'Select AI provider',
+        title: _availableProviders.isNotEmpty
+            ? Row(
+                children: [
+                  DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _selectedAiProvider.isNotEmpty
+                          ? _selectedAiProvider
+                          : null,
+                      icon: const Icon(
+                        Icons.arrow_drop_down,
+                      ),
+                      items: _availableProviders.map((String provider) {
+                        return DropdownMenuItem<String>(
+                          value: provider,
+                          child: Text(provider),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            _selectedAiProvider = newValue;
+                          });
+                        }
+                      },
+                    ),
                   ),
-                  icon: const Icon(Icons.arrow_drop_down),
-                  dropdownColor: Theme.of(context).appBarTheme.backgroundColor,
-                  items: _availableProviders.map((String provider) {
-                    return DropdownMenuItem<String>(
-                      value: provider,
-                      child: Text(provider),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      setState(() {
-                        _selectedAiProvider = newValue;
-                      });
-                    }
-                  },
-                ),
-              ),
-            ),
-        ],
+                ],
+              )
+            : null,
+        actions: [],
       ),
       body: SafeArea(
         child: Column(
@@ -382,29 +395,47 @@ class _ChatScreenState extends State<ChatScreen> {
                 itemBuilder: (context, index) {
                   final message = _messages[index];
                   final isUser = message['type'] == 'user';
+
+                  final bubbleColor = isUser
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.tertiaryContainer;
+
+                  final textColor = isUser
+                      ? Theme.of(context).colorScheme.onPrimary
+                      : Theme.of(context).colorScheme.onTertiaryContainer;
+
                   return Align(
-                      alignment:
-                          isUser ? Alignment.centerRight : Alignment.centerLeft,
-                      child: SelectionArea(
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(vertical: 4.0),
-                          padding: const EdgeInsets.all(10.0),
-                          decoration: BoxDecoration(
-                            color: isUser ? Colors.blue[100] : Colors.grey[200],
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width * 0.75,
-                          ),
-                          child: isUser
-                              ? Text(message['content']!)
-                              : MarkdownBody(
-                                  data: message['content']!,
-                                  selectable: false,
-                                  shrinkWrap: true,
-                                ),
+                    alignment:
+                        isUser ? Alignment.centerRight : Alignment.centerLeft,
+                    child: SelectionArea(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 4.0),
+                        padding: const EdgeInsets.all(10.0),
+                        decoration: BoxDecoration(
+                          color: bubbleColor,
+                          borderRadius: BorderRadius.circular(12.0),
                         ),
-                      ));
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.75,
+                        ),
+                        child: isUser
+                            ? Text(
+                                message['content']!,
+                                style: TextStyle(color: textColor),
+                              )
+                            : MarkdownBody(
+                                data: message['content']!,
+                                selectable: false,
+                                shrinkWrap: true,
+                                styleSheet: MarkdownStyleSheet(
+                                  p: TextStyle(color: textColor),
+                                  code: TextStyle(color: textColor),
+                                  blockquote: TextStyle(color: textColor),
+                                ),
+                              ),
+                      ),
+                    ),
+                  );
                 },
               ),
             ),
@@ -445,7 +476,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   IconButton(
                     icon: const Icon(Icons.send),
                     onPressed: _sendMessage,
-                    color: Theme.of(context).primaryColor,
+                    color: Theme.of(context).colorScheme.primary,
                     disabledColor: Colors.grey,
                   ),
                 ],
