@@ -75,7 +75,7 @@ class _PdfReaderState extends State<PdfReader> {
             if (!_hideAI)
               IconButton(
                 icon: const Icon(Icons.chat_bubble_outline),
-                tooltip: 'Chat with AI',
+                tooltip: AppLocalizations.of(context)!.chatWithPdf,
                 onPressed: () async {
                   if (isPathResolved && resolvedPdfPath.isNotEmpty) {
                     Navigator.of(context).push(

@@ -733,6 +733,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.5+1"
+  remove_unused_localizations:
+    dependency: "direct dev"
+    description:
+      name: remove_unused_localizations
+      sha256: "20d97b8138938d0fb4ee717bcb5e7e5e9e8bc3d91e2c185f54d13771261b68d9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   rxdart:
     dependency: transitive
     description:
