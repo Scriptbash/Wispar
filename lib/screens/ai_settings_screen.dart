@@ -101,7 +101,7 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
       _deepseekModelNameController.text =
           prefs.getString('deepseek_model_name') ?? 'deepseek-chat';
       _chatgptModelNameController.text =
-          prefs.getString('chatgpt_model_name') ?? 'gpt-4o';
+          prefs.getString('chatgpt_model_name') ?? 'gpt-4.1-mini';
 
       _useCustomGeminiBaseUrl =
           prefs.getBool('use_custom_gemini_base_url') ?? false;
@@ -357,7 +357,7 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
                         : _selectedProvider == 'DeepSeek'
                             ? 'e.g., deepseek-chat'
                             : _selectedProvider == 'ChatGPT'
-                                ? 'e.g., gpt-4o'
+                                ? 'e.g., gpt-4.1-mini'
                                 : '',
                     border: const OutlineInputBorder(),
                   ),

@@ -54,7 +54,7 @@ class _ChatScreenState extends State<ChatScreen> {
   String _deepseekBaseUrl = 'https://api.deepseek.com/v1/chat/responses';
 
   String _geminiModelName = 'gemini-2.5-flash';
-  String _chatgptModelName = 'gpt-4o';
+  String _chatgptModelName = 'gpt-4.1-mini';
   String _deepseekModelName = 'deepseek-chat';
 
   bool _useCustomGeminiBaseUrl = false;
@@ -448,26 +448,20 @@ class _ChatScreenState extends State<ChatScreen> {
           }).toList()
         });
       } else if (_selectedAiProvider == "ChatGPT") {
-        if (_chatgptFileId != null) {
+        if (_conversationHistory.isEmpty && _chatgptFileId != null) {
           _conversationHistory.add({
             "role": "user",
             "content": [
-              {
-                "type": "input_text",
-                "text": userMessage,
-              },
-              {
-                "type": "input_file",
-                "file_id": _chatgptFileId,
-              }
+              {"type": "input_text", "text": userMessage},
+              {"type": "input_file", "file_id": _chatgptFileId},
             ],
           });
         } else {
           _conversationHistory.add({
             "role": "user",
             "content": [
-              {"type": "input_text", "text": userMessage}
-            ]
+              {"type": "input_text", "text": userMessage},
+            ],
           });
         }
 
