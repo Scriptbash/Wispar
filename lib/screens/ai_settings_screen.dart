@@ -15,6 +15,8 @@ class AISettingsScreen extends StatefulWidget {
 class _AISettingsScreenState extends State<AISettingsScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  bool _hideAI = false;
+
   final List<String> _providers = ['Gemini', 'DeepSeek', 'ChatGPT'];
   String? _selectedProvider;
 
@@ -81,6 +83,7 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
+      _hideAI = prefs.getBool('hide_ai_features') ?? false;
       _selectedProvider = prefs.getString('ai_provider') ?? _providers.first;
       _geminiApiKeyController.text = prefs.getString('gemini_api_key') ?? '';
       _deepseekApiKeyController.text =
@@ -121,6 +124,7 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
 
   Future<void> _saveSettings() async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hide_ai_features', _hideAI);
     if (_selectedProvider != null) {
       await prefs.setString('ai_provider', _selectedProvider!);
     }
@@ -439,6 +443,15 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
                       return null;
                     },
                   ),
+                const SizedBox(height: 16),
+                SwitchListTile(
+                  title: Text(AppLocalizations.of(context)!.hideAiFeatures),
+                  value: _hideAI,
+                  onChanged: (val) {
+                    setState(() => _hideAI = val);
+                    _saveSettings();
+                  },
+                ),
                 const SizedBox(height: 24),
                 FilledButton.icon(
                   icon: const Icon(Icons.save),

@@ -571,6 +571,8 @@
   "@cancel":{},
   "aiSettings": "AI settings",
   "@aiSettings":{},
+  "hideAiFeatures": "Hide all AI features",
+  "@hideAiFeatures":{},
   "aiProvider": "AI provider",
   "@aiProvider":{},
   "pleaseSelectProvider": "Please select a provider",

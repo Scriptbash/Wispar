@@ -52,6 +52,7 @@ class ArticleScreen extends StatefulWidget {
 
 class _ArticleScreenState extends State<ArticleScreen> {
   bool isLiked = false;
+  bool _hideAI = false;
   late DatabaseHelper databaseHelper;
   final logger = LogsService().logger;
   String? abstract;
@@ -76,6 +77,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
     super.initState();
     databaseHelper = DatabaseHelper();
     _loadScrapingSettings();
+    _loadHideAIPreference();
     checkIfLiked();
     abstract = widget.abstract;
 
@@ -93,6 +95,13 @@ class _ArticleScreenState extends State<ArticleScreen> {
     _translatedTitleController?.close();
     _translatedAbstractController?.close();
     super.dispose();
+  }
+
+  Future<void> _loadHideAIPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _hideAI = prefs.getBool('hide_ai_features') ?? false;
+    });
   }
 
   void _onShare(BuildContext context) async {
@@ -630,33 +639,34 @@ class _ArticleScreenState extends State<ArticleScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: _showTranslateSheet,
-                    borderRadius: BorderRadius.circular(8),
-                    splashColor: Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withValues(alpha: 0.3),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.translate_outlined, size: 30),
-                          const SizedBox(height: 4),
-                          Text(
-                            AppLocalizations.of(context)!.translate,
-                            style: const TextStyle(fontSize: 10),
-                          ),
-                        ],
+              if (!_hideAI)
+                Expanded(
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: _showTranslateSheet,
+                      borderRadius: BorderRadius.circular(8),
+                      splashColor: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.3),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.translate_outlined, size: 30),
+                            const SizedBox(height: 4),
+                            Text(
+                              AppLocalizations.of(context)!.translate,
+                              style: const TextStyle(fontSize: 10),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
               Expanded(
                 child: Material(
                   color: Colors.transparent,
