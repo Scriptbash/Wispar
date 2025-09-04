@@ -145,7 +145,11 @@ class _TranslateOptionsSheetState extends State<TranslateOptionsSheet> {
 
     final customPrompts =
         prefs.getStringList('custom_translation_prompts') ?? [];
-    _availableCustomPrompts = ['Default', ...customPrompts];
+
+    final filteredPrompts =
+        customPrompts.where((p) => p.trim().isNotEmpty).toList();
+
+    _availableCustomPrompts = ['Default', ...filteredPrompts];
 
     final savedPrompt = prefs.getString('selected_custom_prompt');
     _selectedCustomPrompt =

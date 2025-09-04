@@ -218,12 +218,17 @@ class _ChatScreenState extends State<ChatScreen> {
       if (startRes.statusCode != 200) {
         logger.severe(
             "Gemini upload init failed: ${startRes.statusCode} - ${startRes.body}");
+        _addMessage(
+            'ai',
+            AppLocalizations.of(context)!
+                .errorConnectingToAI(startRes.statusCode));
         return null;
       }
 
       final uploadUrl = startRes.headers["x-goog-upload-url"];
       if (uploadUrl == null) {
         logger.severe("Gemini upload URL missing in response headers");
+        _addMessage('ai', AppLocalizations.of(context)!.errorOccured);
         return null;
       }
 
@@ -246,6 +251,7 @@ class _ChatScreenState extends State<ChatScreen> {
       } else {
         logger.severe(
             "Gemini file upload failed: ${uploadRes.statusCode} - ${uploadRes.body}");
+        _addMessage('ai', AppLocalizations.of(context)!.errorOccured);
         return null;
       }
     } catch (e, st) {
@@ -282,10 +288,16 @@ class _ChatScreenState extends State<ChatScreen> {
       } else {
         logger.severe(
             'File upload failed: ${response.statusCode} - ${response.body}');
+        _addMessage(
+            'ai',
+            AppLocalizations.of(context)!
+                .errorConnectingToAI(response.statusCode));
+
         return null;
       }
     } catch (e, st) {
       logger.severe('Error uploading PDF: $e', e, st);
+      _addMessage('ai', AppLocalizations.of(context)!.errorOccured);
       return null;
     }
   }
