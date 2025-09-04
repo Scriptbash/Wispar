@@ -28,12 +28,17 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final List<Map<String, String>> _messages = [];
   bool _isLoadingResponse = false;
-  String? _base64Pdf;
   final logger = LogsService().logger;
 
+  String? _chatgptFileId;
+  String? _geminiFileUri;
+
   bool _didInitDependencies = false;
+  bool _isUploadingFile = false;
 
   List<Map<String, dynamic>> _conversationHistory = [];
+
+  final ScrollController _scrollController = ScrollController();
 
   String _selectedAiProvider = '';
   List<String> _availableProviders = [];
@@ -59,8 +64,40 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    _loadAndEncodePdf();
-    _loadAiSettings();
+    _loadAiSettings().then((_) {
+      if (_selectedAiProvider == "ChatGPT" && _chatgptApiKey.isNotEmpty) {
+        setState(() => _isUploadingFile = true);
+        _uploadPdfToChatGPT().then((fileId) {
+          if (fileId != null) {
+            setState(() {
+              _chatgptFileId = fileId;
+              _isUploadingFile = false;
+            });
+          }
+        });
+      } else if (_selectedAiProvider == "Gemini" && _geminiApiKey.isNotEmpty) {
+        setState(() => _isUploadingFile = true);
+        _uploadPdfToGemini().then((uri) {
+          if (uri != null) {
+            setState(() {
+              _geminiFileUri = uri;
+              _isUploadingFile = false;
+            });
+          }
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    if (_selectedAiProvider == "ChatGPT") {
+      _deleteChatGptFile();
+    } else if (_selectedAiProvider == "Gemini") {
+      _deleteGeminiFile();
+    }
+    _messageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -69,12 +106,6 @@ class _ChatScreenState extends State<ChatScreen> {
     if (!_didInitDependencies) {
       _didInitDependencies = true;
     }
-  }
-
-  @override
-  void dispose() {
-    _messageController.dispose();
-    super.dispose();
   }
 
   Future<void> _loadAiSettings() async {
@@ -156,28 +187,169 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  Future<void> _loadAndEncodePdf() async {
+  Future<String?> _uploadPdfToGemini() async {
     try {
       final file = File(widget.pdfPath);
-      if (await file.exists()) {
-        List<int> bytes = await file.readAsBytes();
-        setState(() {
-          _base64Pdf = base64Encode(bytes);
-        });
-        logger.info('PDF loaded and base64 encoded successfully.');
-      } else {
+      if (!await file.exists()) {
         logger.severe('PDF file not found at: ${widget.pdfPath}');
         _showErrorSnackBar(AppLocalizations.of(context)!.pdfNotFound);
+        return null;
+      }
+
+      final bytes = await file.readAsBytes();
+      final numBytes = bytes.length;
+
+      final startRes = await http.post(
+        Uri.parse(
+            "https://generativelanguage.googleapis.com/upload/v1beta/files"),
+        headers: {
+          "x-goog-api-key": _geminiApiKey,
+          "X-Goog-Upload-Protocol": "resumable",
+          "X-Goog-Upload-Command": "start",
+          "X-Goog-Upload-Header-Content-Length": "$numBytes",
+          "X-Goog-Upload-Header-Content-Type": "application/pdf",
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "file": {"display_name": p.basename(widget.pdfPath)}
+        }),
+      );
+
+      if (startRes.statusCode != 200) {
+        logger.severe(
+            "Gemini upload init failed: ${startRes.statusCode} - ${startRes.body}");
+        return null;
+      }
+
+      final uploadUrl = startRes.headers["x-goog-upload-url"];
+      if (uploadUrl == null) {
+        logger.severe("Gemini upload URL missing in response headers");
+        return null;
+      }
+
+      final uploadRes = await http.post(
+        Uri.parse(uploadUrl),
+        headers: {
+          "x-goog-api-key": _geminiApiKey,
+          "X-Goog-Upload-Command": "upload, finalize",
+          "X-Goog-Upload-Offset": "0",
+          "Content-Length": "$numBytes",
+        },
+        body: bytes,
+      );
+
+      if (uploadRes.statusCode == 200) {
+        final jsonResponse = jsonDecode(uploadRes.body);
+        final fileUri = jsonResponse['file']?['uri'];
+        logger.info("Gemini PDF uploaded: $fileUri");
+        return fileUri;
+      } else {
+        logger.severe(
+            "Gemini file upload failed: ${uploadRes.statusCode} - ${uploadRes.body}");
+        return null;
       }
     } catch (e, st) {
-      logger.severe('Error loading or encoding PDF: $e', e, st);
-      _showErrorSnackBar(AppLocalizations.of(context)!.errorLoadingPdf);
+      logger.severe("Error uploading PDF to Gemini: $e", e, st);
+      return null;
+    }
+  }
+
+  Future<String?> _uploadPdfToChatGPT() async {
+    try {
+      final file = File(widget.pdfPath);
+      if (!await file.exists()) {
+        logger.severe('PDF file not found at: ${widget.pdfPath}');
+        _showErrorSnackBar(AppLocalizations.of(context)!.pdfNotFound);
+        return null;
+      }
+
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('https://api.openai.com/v1/files'),
+      )
+        ..headers['Authorization'] = 'Bearer $_chatgptApiKey'
+        ..fields['purpose'] = 'user_data'
+        ..files.add(await http.MultipartFile.fromPath('file', widget.pdfPath));
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        final fileId = jsonResponse['id'];
+        logger.info('PDF uploaded successfully, file_id: $fileId');
+        return fileId;
+      } else {
+        logger.severe(
+            'File upload failed: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e, st) {
+      logger.severe('Error uploading PDF: $e', e, st);
+      return null;
+    }
+  }
+
+  Future<void> _deleteGeminiFile() async {
+    if (_geminiFileUri == null) return;
+
+    try {
+      final fileName = _geminiFileUri!.split('/').last;
+
+      final uri = Uri.parse(
+        'https://generativelanguage.googleapis.com/v1beta/files/$fileName',
+      );
+
+      final res = await http.delete(
+        uri,
+        headers: {"x-goog-api-key": _geminiApiKey},
+      );
+
+      if (res.statusCode == 200) {
+        logger.info("Deleted Gemini file: $fileName");
+      } else {
+        logger.warning(
+            "Failed to delete Gemini file $fileName: ${res.statusCode} - ${res.body}");
+      }
+    } catch (e, st) {
+      logger.severe("Error deleting Gemini file: $e", e, st);
+    }
+  }
+
+  Future<void> _deleteChatGptFile() async {
+    if (_chatgptFileId == null) return;
+
+    try {
+      final response = await http.delete(
+        Uri.parse('https://api.openai.com/v1/files/$_chatgptFileId'),
+        headers: {'Authorization': 'Bearer $_chatgptApiKey'},
+      );
+
+      if (response.statusCode == 200) {
+        logger.info('Deleted ChatGPT file: $_chatgptFileId');
+      } else {
+        logger.warning(
+          'Failed to delete ChatGPT file $_chatgptFileId: '
+          '${response.statusCode} - ${response.body}',
+        );
+      }
+    } catch (e, st) {
+      logger.severe('Error deleting ChatGPT file: $e', e, st);
     }
   }
 
   void _addMessage(String type, String content) {
     setState(() {
       _messages.add({'type': type, 'content': content});
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
     });
   }
 
@@ -237,66 +409,60 @@ class _ChatScreenState extends State<ChatScreen> {
       dynamic body;
 
       if (_selectedAiProvider == "Gemini") {
-        // Include PDF in the first request
-        if (_conversationHistory.isEmpty && _base64Pdf != null) {
-          body = jsonEncode({
-            "contents": [
-              {
-                "parts": [
-                  {
-                    "inline_data": {
-                      "mime_type": "application/pdf",
-                      "data": _base64Pdf
-                    }
-                  },
-                  {"text": userMessage}
-                ]
-              }
-            ]
-          });
-        } else {
-          // Only send the user message, without the PDF
-          body = jsonEncode({
-            "contents": [
-              {
-                "parts": [
-                  {"text": userMessage}
-                ]
-              }
-            ]
+        final contentParts = <Map<String, dynamic>>[
+          {"text": userMessage}
+        ];
+
+        if (_geminiFileUri != null) {
+          contentParts.add({
+            "file_data": {
+              "mime_type": "application/pdf",
+              "file_uri": _geminiFileUri,
+            }
           });
         }
+
+        _conversationHistory.add({
+          "role": "user",
+          "content": contentParts,
+        });
+
+        body = jsonEncode({
+          "contents": _conversationHistory.map((msg) {
+            return {
+              "role": msg['role'],
+              "parts": msg['content'],
+            };
+          }).toList()
+        });
       } else if (_selectedAiProvider == "ChatGPT") {
-        if (_conversationHistory.isEmpty && _base64Pdf != null) {
-          body = jsonEncode({
-            "model": modelName,
-            "input": [
+        if (_chatgptFileId != null) {
+          _conversationHistory.add({
+            "role": "user",
+            "content": [
               {
-                "role": "user",
-                "content": [
-                  {
-                    "type": "input_file",
-                    "filename": p.basename(widget.pdfPath),
-                    "file_data": "data:application/pdf;base64,$_base64Pdf"
-                  },
-                  {"type": "input_text", "text": userMessage}
-                ]
+                "type": "input_text",
+                "text": userMessage,
+              },
+              {
+                "type": "input_file",
+                "file_id": _chatgptFileId,
               }
-            ]
+            ],
           });
         } else {
-          body = jsonEncode({
-            "model": modelName,
-            "input": [
-              {
-                "role": "user",
-                "content": [
-                  {"type": "input_text", "text": userMessage}
-                ]
-              }
+          _conversationHistory.add({
+            "role": "user",
+            "content": [
+              {"type": "input_text", "text": userMessage}
             ]
           });
         }
+
+        body = jsonEncode({
+          "model": modelName,
+          "input": _conversationHistory,
+        });
       }
 
       final response = await http.post(
@@ -317,6 +483,13 @@ class _ChatScreenState extends State<ChatScreen> {
           aiResponseText = jsonResponse['candidates']?[0]?['content']?['parts']
                   ?[0]?['text'] ??
               AppLocalizations.of(context)!.noResponseFromAI;
+
+          _conversationHistory.add({
+            "role": "model",
+            "content": [
+              {"text": aiResponseText}
+            ]
+          });
         } else {
           aiResponseText = jsonResponse['output']?[0]?['content']?[0]
                   ?['text'] ??
@@ -352,139 +525,157 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        title: _availableProviders.isNotEmpty
-            ? Row(
-                children: [
-                  DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: _selectedAiProvider.isNotEmpty
-                          ? _selectedAiProvider
-                          : null,
-                      icon: const Icon(
-                        Icons.arrow_drop_down,
+        appBar: AppBar(
+          centerTitle: false,
+          title: _availableProviders.isNotEmpty
+              ? Row(
+                  children: [
+                    DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selectedAiProvider.isNotEmpty
+                            ? _selectedAiProvider
+                            : null,
+                        icon: const Icon(
+                          Icons.arrow_drop_down,
+                        ),
+                        items: _availableProviders.map((String provider) {
+                          return DropdownMenuItem<String>(
+                            value: provider,
+                            child: Text(provider),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) async {
+                          if (newValue != null &&
+                              newValue != _selectedAiProvider) {
+                            setState(() => _selectedAiProvider = newValue);
+                            setState(() => _isUploadingFile = true);
+
+                            if (newValue == "ChatGPT" &&
+                                _chatgptApiKey.isNotEmpty) {
+                              final fileId = await _uploadPdfToChatGPT();
+                              if (_geminiFileUri != null &&
+                                  _geminiFileUri!.isNotEmpty) {
+                                _deleteGeminiFile();
+                                _geminiFileUri = null;
+                              }
+                              setState(() => _chatgptFileId = fileId);
+                            } else if (newValue == "Gemini" &&
+                                _geminiApiKey.isNotEmpty) {
+                              final uri = await _uploadPdfToGemini();
+                              if (_chatgptFileId != null &&
+                                  _chatgptFileId!.isNotEmpty) {
+                                _deleteChatGptFile();
+                                _chatgptFileId = null;
+                              }
+                              setState(() => _geminiFileUri = uri);
+                            }
+
+                            setState(() {
+                              _conversationHistory.clear();
+                              _isUploadingFile = false;
+                            });
+                          }
+                        },
                       ),
-                      items: _availableProviders.map((String provider) {
-                        return DropdownMenuItem<String>(
-                          value: provider,
-                          child: Text(provider),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        if (newValue != null) {
-                          setState(() {
-                            _selectedAiProvider = newValue;
-                          });
-                        }
-                      },
                     ),
-                  ),
-                ],
-              )
-            : null,
-        actions: [],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(8.0),
-                itemCount: _messages.length,
-                itemBuilder: (context, index) {
-                  final message = _messages[index];
-                  final isUser = message['type'] == 'user';
+                  ],
+                )
+              : null,
+          actions: [],
+        ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(8.0),
+                  itemCount: _messages.length,
+                  itemBuilder: (context, index) {
+                    final message = _messages[index];
+                    final isUser = message['type'] == 'user';
+                    final bubbleColor = isUser
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.tertiaryContainer;
+                    final textColor = isUser
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.onTertiaryContainer;
 
-                  final bubbleColor = isUser
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.tertiaryContainer;
-
-                  final textColor = isUser
-                      ? Theme.of(context).colorScheme.onPrimary
-                      : Theme.of(context).colorScheme.onTertiaryContainer;
-
-                  return Align(
-                    alignment:
-                        isUser ? Alignment.centerRight : Alignment.centerLeft,
-                    child: SelectionArea(
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 4.0),
-                        padding: const EdgeInsets.all(10.0),
-                        decoration: BoxDecoration(
-                          color: bubbleColor,
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.75,
-                        ),
-                        child: isUser
-                            ? Text(
-                                message['content']!,
-                                style: TextStyle(color: textColor),
-                              )
-                            : MarkdownBody(
-                                data: message['content']!,
-                                selectable: false,
-                                shrinkWrap: true,
-                                styleSheet: MarkdownStyleSheet(
-                                  p: TextStyle(color: textColor),
-                                  code: TextStyle(color: textColor),
-                                  blockquote: TextStyle(color: textColor),
+                    return Align(
+                      alignment:
+                          isUser ? Alignment.centerRight : Alignment.centerLeft,
+                      child: SelectionArea(
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(vertical: 4.0),
+                          padding: const EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            color: bubbleColor,
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 0.75,
+                          ),
+                          child: isUser
+                              ? Text(
+                                  message['content']!,
+                                  style: TextStyle(color: textColor),
+                                )
+                              : MarkdownBody(
+                                  data: message['content']!,
+                                  selectable: false,
+                                  shrinkWrap: true,
+                                  styleSheet: MarkdownStyleSheet(
+                                    p: TextStyle(color: textColor),
+                                    code: TextStyle(color: textColor),
+                                    blockquote: TextStyle(color: textColor),
+                                  ),
                                 ),
-                              ),
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            if (_isLoadingResponse)
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: LinearProgressIndicator(),
-              ),
-            if (_availableProviders.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  AppLocalizations.of(context)!.noAiApiKeySetError,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    );
+                  },
                 ),
               ),
-            Padding(
-              padding: MediaQuery.of(context)
-                  .viewInsets
-                  .add(const EdgeInsets.all(8.0)),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _messageController,
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!.typeYourMessage,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
+              if (_isUploadingFile || _isLoadingResponse)
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: LinearProgressIndicator(),
+                ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _messageController,
+                        decoration: InputDecoration(
+                          hintText:
+                              AppLocalizations.of(context)!.typeYourMessage,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
                         ),
+                        onSubmitted: (_) => _sendMessage(),
+                        enabled: !_isLoadingResponse &&
+                            !_isUploadingFile &&
+                            _availableProviders.isNotEmpty,
                       ),
-                      onSubmitted: (_) => _sendMessage(),
-                      enabled:
-                          !_isLoadingResponse && _availableProviders.isNotEmpty,
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: _sendMessage,
-                    color: Theme.of(context).colorScheme.primary,
-                    disabledColor: Colors.grey,
-                  ),
-                ],
+                    IconButton(
+                      icon: const Icon(Icons.send),
+                      onPressed: (!_isLoadingResponse &&
+                              !_isUploadingFile &&
+                              _availableProviders.isNotEmpty)
+                          ? _sendMessage
+                          : null,
+                      color: Theme.of(context).colorScheme.primary,
+                      disabledColor: Colors.grey,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
+            ],
+          ),
+        ));
   }
 }
