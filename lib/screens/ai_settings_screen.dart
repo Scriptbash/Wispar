@@ -14,7 +14,7 @@ class AISettingsScreen extends StatefulWidget {
 
 class _AISettingsScreenState extends State<AISettingsScreen> {
   final _formKey = GlobalKey<FormState>();
-
+  bool passwordVisible = false;
   bool _hideAI = false;
 
   final List<String> _providers = ['Gemini', 'DeepSeek', 'ChatGPT'];
@@ -326,6 +326,7 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
                       .toList(),
                   onChanged: (val) {
                     setState(() => _selectedProvider = val);
+                    passwordVisible = false;
                   },
                   validator: (val) => val == null || val.isEmpty
                       ? AppLocalizations.of(context)!.pleaseSelectProvider
@@ -335,16 +336,27 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
                 TextFormField(
                   controller: _getCurrentApiKeyController(),
                   decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!
-                        .apiKeyLabel(_selectedProvider ?? ''),
-                    border: const OutlineInputBorder(),
-                  ),
+                      labelText: AppLocalizations.of(context)!
+                          .apiKeyLabel(_selectedProvider ?? ''),
+                      border: const OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          passwordVisible
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            passwordVisible = !passwordVisible;
+                          });
+                        },
+                      )),
                   onSaved: (val) {},
                   validator: (val) => (val == null || val.isEmpty)
                       ? AppLocalizations.of(context)!
                           .pleaseEnterAiAPIKey(_selectedProvider ?? '')
                       : null,
-                  obscureText: true,
+                  obscureText: !passwordVisible,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
