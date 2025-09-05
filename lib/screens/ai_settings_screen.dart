@@ -14,6 +14,8 @@ class AISettingsScreen extends StatefulWidget {
 
 class _AISettingsScreenState extends State<AISettingsScreen> {
   final _formKey = GlobalKey<FormState>();
+  bool passwordVisible = false;
+  bool _hideAI = false;
 
   final List<String> _providers = ['Gemini', 'DeepSeek', 'ChatGPT'];
   String? _selectedProvider;
@@ -81,6 +83,7 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
+      _hideAI = prefs.getBool('hide_ai_features') ?? false;
       _selectedProvider = prefs.getString('ai_provider') ?? _providers.first;
       _geminiApiKeyController.text = prefs.getString('gemini_api_key') ?? '';
       _deepseekApiKeyController.text =
@@ -98,7 +101,7 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
       _deepseekModelNameController.text =
           prefs.getString('deepseek_model_name') ?? 'deepseek-chat';
       _chatgptModelNameController.text =
-          prefs.getString('chatgpt_model_name') ?? 'gpt-4o';
+          prefs.getString('chatgpt_model_name') ?? 'gpt-4.1-mini';
 
       _useCustomGeminiBaseUrl =
           prefs.getBool('use_custom_gemini_base_url') ?? false;
@@ -121,6 +124,7 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
 
   Future<void> _saveSettings() async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hide_ai_features', _hideAI);
     if (_selectedProvider != null) {
       await prefs.setString('ai_provider', _selectedProvider!);
     }
@@ -322,6 +326,7 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
                       .toList(),
                   onChanged: (val) {
                     setState(() => _selectedProvider = val);
+                    passwordVisible = false;
                   },
                   validator: (val) => val == null || val.isEmpty
                       ? AppLocalizations.of(context)!.pleaseSelectProvider
@@ -331,16 +336,27 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
                 TextFormField(
                   controller: _getCurrentApiKeyController(),
                   decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!
-                        .apiKeyLabel(_selectedProvider ?? ''),
-                    border: const OutlineInputBorder(),
-                  ),
+                      labelText: AppLocalizations.of(context)!
+                          .apiKeyLabel(_selectedProvider ?? ''),
+                      border: const OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          passwordVisible
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            passwordVisible = !passwordVisible;
+                          });
+                        },
+                      )),
                   onSaved: (val) {},
                   validator: (val) => (val == null || val.isEmpty)
                       ? AppLocalizations.of(context)!
                           .pleaseEnterAiAPIKey(_selectedProvider ?? '')
                       : null,
-                  obscureText: true,
+                  obscureText: !passwordVisible,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -353,7 +369,7 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
                         : _selectedProvider == 'DeepSeek'
                             ? 'e.g., deepseek-chat'
                             : _selectedProvider == 'ChatGPT'
-                                ? 'e.g., gpt-4o'
+                                ? 'e.g., gpt-4.1-mini'
                                 : '',
                     border: const OutlineInputBorder(),
                   ),
@@ -439,6 +455,15 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
                       return null;
                     },
                   ),
+                const SizedBox(height: 16),
+                SwitchListTile(
+                  title: Text(AppLocalizations.of(context)!.hideAiFeatures),
+                  value: _hideAI,
+                  onChanged: (val) {
+                    setState(() => _hideAI = val);
+                    _saveSettings();
+                  },
+                ),
                 const SizedBox(height: 24),
                 FilledButton.icon(
                   icon: const Icon(Icons.save),

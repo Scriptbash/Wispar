@@ -13,7 +13,7 @@ class ChatgptTranslationProvider {
 
   String _currentBaseUrl = _defaultBaseUrl;
   bool _useCustomBaseUrl = false;
-  String _modelName = 'gpt-4o';
+  String _modelName = 'gpt-4.1-mini';
   double _temperature = 1.0;
 
   ChatgptTranslationProvider._privateConstructor();
@@ -25,7 +25,7 @@ class ChatgptTranslationProvider {
     if (_instance._apiKey == null ||
         (_instance._currentBaseUrl == _defaultBaseUrl &&
             !_instance._useCustomBaseUrl) ||
-        _instance._modelName == 'gpt-4o') {
+        _instance._modelName == 'gpt-4.1-mini') {
       await _instance._loadSettingsOnDemand();
     }
     return _instance;
@@ -36,7 +36,7 @@ class ChatgptTranslationProvider {
     _apiKey = prefs.getString('chatgpt_api_key');
     _useCustomBaseUrl = prefs.getBool('use_custom_chatgpt_base_url') ?? false;
     final storedBaseUrl = prefs.getString('chatgpt_base_url');
-    _modelName = prefs.getString('chatgpt_model_name') ?? 'gpt-4o';
+    _modelName = prefs.getString('chatgpt_model_name') ?? 'gpt-4.1-mini';
     _temperature = prefs.getDouble('chatgpt_temperature') ?? 1.0;
     if (_useCustomBaseUrl &&
         storedBaseUrl != null &&

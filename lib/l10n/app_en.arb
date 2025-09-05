@@ -47,10 +47,6 @@
   "@notificationTitleJournal": {},
   "notificationTitleQuery": "Queries were updated",
   "@notificationTitleQuery": {},
-  "fgNotificationContent": "Wispar is running in the background to update your journals",
-  "@fgNotificationContent": {},
-  "fgNotificationTitle": "Background updates service",
-  "@fgNotificationTitle": {},
   "selectFeed": "Select a feed",
   "@selectFeed": {},
   "createCustomFeed": "Create a custom feed",
@@ -571,6 +567,8 @@
   "@cancel":{},
   "aiSettings": "AI settings",
   "@aiSettings":{},
+  "hideAiFeatures": "Hide all AI features",
+  "@hideAiFeatures":{},
   "aiProvider": "AI provider",
   "@aiProvider":{},
   "pleaseSelectProvider": "Please select a provider",
@@ -601,6 +599,36 @@
   "@prompt":{},
   "missingPlaceholders": "Missing placeholder(s): {placeholders}",
   "@missingPlaceholders": {},
+  "pdfNotReadyForChat": "PDF not ready for chat. Please wait or try again.",
+  "@pdfNotReadyForChat":{},
+  "chatWithPdf": "Chat with PDF",
+  "@chatWithPdf":{},
+  "typeYourMessage": "Type your message...",
+  "@typeYourMessage":{},
+  "askAboutPdf": "Hello! I'm ready to chat about this PDF. What would you like to know or summarize? Keep in mind that chatting with a PDF consumes a lot of tokens!",
+  "@askAboutPdf":{},
+  "pdfNotFound": "PDF file could not be found.",
+  "@pdfNotFound":{},
+  "apiTokenMissing": "API key for {aiModel} is missing in settings. Please configure it.",
+  "@apiTokenMissing": {
+    "placeholders": {
+      "aiModel": {
+        "type": "String"
+      }
+    }
+  },
+  "noResponseFromAI": "No response received from AI.",
+  "@noResponseFromAI":{},
+  "errorConnectingToAI": "Error connecting to AI ({statusCode}). Please check your internet or API settings.",
+  "@errorConnectingToAI": {
+    "placeholders": {
+      "statusCode": {
+        "type": "int"
+      }
+    }
+  },
+  "networkError": "Network error or problem communicating with AI service.",
+  "@networkError":{},
   "pdfDownloadOptionsTitle": "PDF download options",
   "@pdfDownloadOptionsTitle": {},
   "openInExternalPdfViewer": "Open in external PDF viewer",

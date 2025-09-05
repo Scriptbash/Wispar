@@ -64,11 +64,13 @@ dependencies:
   flutter_slidable: ^4.0.0
   path: ^1.9.1
   sqflite_common_ffi: ^2.3.6
+  flutter_markdown_plus: ^1.0.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.14.1
+  remove_unused_localizations: ^1.0.1
 
 
 flutter_launcher_icons:

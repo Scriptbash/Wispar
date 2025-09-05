@@ -7,7 +7,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/logs_helper.dart';
+import '../screens/chat_screen.dart';
 
 class PdfReader extends StatefulWidget {
   final String pdfUrl;
@@ -28,6 +30,8 @@ class _PdfReaderState extends State<PdfReader> {
   bool isPathResolved = false;
   bool isDownloaded = false;
 
+  bool _hideAI = false;
+
   @override
   void dispose() {
     super.dispose();
@@ -38,6 +42,14 @@ class _PdfReaderState extends State<PdfReader> {
     super.initState();
     databaseHelper = DatabaseHelper();
     resolvePdfPath();
+    _loadHideAIPreference();
+  }
+
+  Future<void> _loadHideAIPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _hideAI = prefs.getBool('hide_ai_features') ?? false;
+    });
   }
 
   void resolvePdfPath() async {
@@ -60,6 +72,29 @@ class _PdfReaderState extends State<PdfReader> {
           centerTitle: false,
           title: Text(AppLocalizations.of(context)!.articleViewer),
           actions: <Widget>[
+            if (!_hideAI)
+              IconButton(
+                icon: const Icon(Icons.chat_bubble_outline),
+                tooltip: AppLocalizations.of(context)!.chatWithPdf,
+                onPressed: () async {
+                  if (isPathResolved && resolvedPdfPath.isNotEmpty) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ChatScreen(
+                          pdfPath: resolvedPdfPath,
+                          publicationCard: widget.publicationCard,
+                        ),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('The PDF is not ready yet'),
+                      ),
+                    );
+                  }
+                },
+              ),
             IconButton(
               icon: const Icon(Icons.open_in_browser),
               tooltip: AppLocalizations.of(context)!.openExternalPdfApp,
