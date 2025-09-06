@@ -182,7 +182,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           );
         },
       ),
-      if (!Platform.isIOS)
+      if (!Platform.isIOS && !Platform.isMacOS)
         _buildTile(
           icon: Icons.favorite_border,
           label: AppLocalizations.of(context)!.donate,
