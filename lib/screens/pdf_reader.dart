@@ -51,7 +51,7 @@ class _PdfReaderState extends State<PdfReader> {
 
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    final pdfThemeOption = prefs.getInt('pdfThemeOption') ?? 2;
+    final pdfThemeOption = prefs.getInt('pdfThemeOption') ?? 0;
     final pdfOrientation = prefs.getInt('pdfOrientationOption') ?? 0;
 
     bool darkTheme;

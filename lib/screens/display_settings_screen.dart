@@ -14,7 +14,7 @@ class DisplaySettingsScreen extends StatefulWidget {
 
 class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
   int _publicationCardOption = 1;
-  int _pdfThemeOption = 2;
+  int _pdfThemeOption = 0;
   int _pdfOrientationOption = 0;
 
   final Map<String, String> _languageLabels = {
@@ -70,7 +70,7 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
   void _loadPdfThemeOption() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _pdfThemeOption = prefs.getInt('pdfThemeOption') ?? 2;
+      _pdfThemeOption = prefs.getInt('pdfThemeOption') ?? 0;
     });
   }
 
