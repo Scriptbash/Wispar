@@ -10,6 +10,7 @@ import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/logs_helper.dart';
 import '../screens/chat_screen.dart';
+import 'dart:math';
 
 class PdfReader extends StatefulWidget {
   final String pdfUrl;
@@ -31,6 +32,9 @@ class _PdfReaderState extends State<PdfReader> {
   bool isDownloaded = false;
 
   bool _hideAI = false;
+  bool _darkPdfTheme = false;
+  int _pdfOrientation = 0;
+  bool _isZoomed = false;
 
   @override
   void dispose() {
@@ -42,13 +46,27 @@ class _PdfReaderState extends State<PdfReader> {
     super.initState();
     databaseHelper = DatabaseHelper();
     resolvePdfPath();
-    _loadHideAIPreference();
+    _loadPreferences();
   }
 
-  Future<void> _loadHideAIPreference() async {
+  Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
+    final pdfThemeOption = prefs.getInt('pdfThemeOption') ?? 2;
+    final pdfOrientation = prefs.getInt('pdfOrientationOption') ?? 0;
+
+    bool darkTheme;
+    if (pdfThemeOption == 0) {
+      darkTheme = false;
+    } else if (pdfThemeOption == 1) {
+      darkTheme = true;
+    } else {
+      final brightness = MediaQuery.of(context).platformBrightness;
+      darkTheme = brightness == Brightness.dark;
+    }
     setState(() {
       _hideAI = prefs.getBool('hide_ai_features') ?? false;
+      _darkPdfTheme = darkTheme;
+      _pdfOrientation = pdfOrientation;
     });
   }
 
@@ -149,32 +167,85 @@ class _PdfReaderState extends State<PdfReader> {
       body: SafeArea(
         child: isPathResolved
             ? Stack(children: [
-                PdfViewer.file(resolvedPdfPath,
-                    controller: controller,
-                    params: PdfViewerParams(
-                      maxScale: 8,
-                      loadingBannerBuilder:
-                          (context, bytesDownloaded, totalBytes) {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            value: totalBytes != null
-                                ? bytesDownloaded / totalBytes
-                                : null,
-                            backgroundColor: Colors.grey,
+                ColorFiltered(
+                    colorFilter: ColorFilter.mode(Colors.white,
+                        _darkPdfTheme ? BlendMode.difference : BlendMode.dst),
+                    child: PdfViewer.file(resolvedPdfPath,
+                        controller: controller,
+                        params: PdfViewerParams(
+                          layoutPages: _pdfOrientation == 1
+                              ? (pages, params) {
+                                  final height = pages.fold(
+                                          0.0,
+                                          (prev, page) =>
+                                              max(prev, page.height)) +
+                                      params.margin * 2;
+                                  final pageLayouts = <Rect>[];
+                                  double x = params.margin;
+                                  for (var page in pages) {
+                                    pageLayouts.add(
+                                      Rect.fromLTWH(
+                                        x,
+                                        (height - page.height) /
+                                            2, // center vertically
+                                        page.width,
+                                        page.height,
+                                      ),
+                                    );
+                                    x += page.width + params.margin;
+                                  }
+                                  return PdfPageLayout(
+                                    pageLayouts: pageLayouts,
+                                    documentSize: Size(x, height),
+                                  );
+                                }
+                              : null,
+                          maxScale: 8,
+                          loadingBannerBuilder:
+                              (context, bytesDownloaded, totalBytes) {
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value: totalBytes != null
+                                    ? bytesDownloaded / totalBytes
+                                    : null,
+                                backgroundColor: Colors.grey,
+                              ),
+                            );
+                          },
+                          linkHandlerParams: PdfLinkHandlerParams(
+                            linkColor: const Color.fromARGB(20, 255, 235, 59),
+                            onLinkTap: (link) {
+                              if (link.url != null) {
+                                launchUrl(link.url!);
+                              } else if (link.dest != null) {
+                                controller.goToDest(link.dest);
+                              }
+                            },
                           ),
-                        );
-                      },
-                      linkHandlerParams: PdfLinkHandlerParams(
-                        linkColor: const Color.fromARGB(20, 255, 235, 59),
-                        onLinkTap: (link) {
-                          if (link.url != null) {
-                            launchUrl(link.url!);
-                          } else if (link.dest != null) {
-                            controller.goToDest(link.dest);
-                          }
-                        },
-                      ),
-                    ))
+                          viewerOverlayBuilder:
+                              (context, size, handleLinkTap) => [
+                            GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onDoubleTap: () {
+                                setState(() {
+                                  if (_isZoomed) {
+                                    controller.zoomDown(loop: false);
+                                  } else {
+                                    controller.zoomUp(loop: false);
+                                  }
+                                  _isZoomed = !_isZoomed;
+                                });
+                              },
+                              onTapUp: (details) {
+                                handleLinkTap(details.localPosition);
+                              },
+                              child: IgnorePointer(
+                                child: SizedBox(
+                                    width: size.width, height: size.height),
+                              ),
+                            ),
+                          ],
+                        )))
               ])
             : const Center(child: CircularProgressIndicator()),
       ),
