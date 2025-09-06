@@ -14,6 +14,8 @@ class DisplaySettingsScreen extends StatefulWidget {
 
 class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
   int _publicationCardOption = 1;
+  int _pdfThemeOption = 2;
+  int _pdfOrientationOption = 0;
 
   final Map<String, String> _languageLabels = {
     'en': 'English',
@@ -53,6 +55,8 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
   void initState() {
     super.initState();
     _loadPublicationCardOption();
+    _loadPdfThemeOption();
+    _loadPdfOrientationOption();
   }
 
   void _loadPublicationCardOption() async {
@@ -61,6 +65,30 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
       _publicationCardOption = prefs.getInt('publicationCardAbstractSetting') ??
           1; // Default to "hide missing abstracts"
     });
+  }
+
+  void _loadPdfThemeOption() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _pdfThemeOption = prefs.getInt('pdfThemeOption') ?? 2;
+    });
+  }
+
+  void _savePdfThemeOption(int value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt('pdfThemeOption', value);
+  }
+
+  void _loadPdfOrientationOption() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _pdfOrientationOption = prefs.getInt('pdfOrientationOption') ?? 0;
+    });
+  }
+
+  void _savePdfOrientationOption(int value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt('pdfOrientationOption', value);
   }
 
   @override
@@ -74,6 +102,18 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
           Provider.of<ThemeProvider>(context).themeMode,
         ),
         "onTap": () => _showThemeDialog(context),
+      },
+      {
+        "icon": Icons.picture_as_pdf_outlined,
+        "label": AppLocalizations.of(context)!.pdfTheme,
+        "subtitle": _getPdfThemeSubtitle(_pdfThemeOption),
+        "onTap": () => _showPdfThemeDialog(context),
+      },
+      {
+        "icon": Icons.screen_rotation_alt_rounded,
+        "label": AppLocalizations.of(context)!.pdfReadingOrientation,
+        "subtitle": _getPdfOrientationSubtitle(_pdfOrientationOption),
+        "onTap": () => _showPdfOrientationDialog(context),
       },
       {
         "icon": Icons.article_outlined,
@@ -210,6 +250,122 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
         );
       },
     );
+  }
+
+  void _showPdfThemeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.pdfTheme),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<int>(
+                title: Text(AppLocalizations.of(context)!.light),
+                value: 0,
+                groupValue: _pdfThemeOption,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() => _pdfThemeOption = value);
+                    _savePdfThemeOption(value);
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+              RadioListTile<int>(
+                title: Text(AppLocalizations.of(context)!.dark),
+                value: 1,
+                groupValue: _pdfThemeOption,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() => _pdfThemeOption = value);
+                    _savePdfThemeOption(value);
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+              RadioListTile<int>(
+                title: Text(AppLocalizations.of(context)!.systemtheme),
+                value: 2,
+                groupValue: _pdfThemeOption,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() => _pdfThemeOption = value);
+                    _savePdfThemeOption(value);
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  String _getPdfThemeSubtitle(int option) {
+    switch (option) {
+      case 0:
+        return AppLocalizations.of(context)!.light;
+      case 1:
+        return AppLocalizations.of(context)!.dark;
+      case 2:
+        return AppLocalizations.of(context)!.systemtheme;
+      default:
+        return 'Unknown';
+    }
+  }
+
+  void _showPdfOrientationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.pdfReadingOrientation),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<int>(
+                title: Text(AppLocalizations.of(context)!.vertical),
+                value: 0,
+                groupValue: _pdfOrientationOption,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() => _pdfOrientationOption = value);
+                    _savePdfOrientationOption(value);
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+              RadioListTile<int>(
+                title: Text(AppLocalizations.of(context)!.horizontal),
+                value: 1,
+                groupValue: _pdfOrientationOption,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() => _pdfOrientationOption = value);
+                    _savePdfOrientationOption(value);
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  String _getPdfOrientationSubtitle(int option) {
+    switch (option) {
+      case 0:
+        return AppLocalizations.of(context)!.vertical;
+      case 1:
+        return AppLocalizations.of(context)!.horizontal;
+      default:
+        return 'Unknown';
+    }
   }
 
   void _showPublicationCardsDialog(BuildContext context) {
