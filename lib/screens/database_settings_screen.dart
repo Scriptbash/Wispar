@@ -76,8 +76,10 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       );
 
       if (outputDirectory == null) return;
-
-      final String outputFile = p.join(outputDirectory, 'wispar_backup.zip');
+      await _showLoadingDialog(AppLocalizations.of(context)!.exportingDatabase);
+      final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
+      final String outputFile =
+          p.join(outputDirectory, 'wispar_backup_$timestamp.zip');
 
       final appDir = await getApplicationDocumentsDirectory();
       final databasePath = await getDatabasesPath();
@@ -89,6 +91,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
           SnackBar(
               content: Text(AppLocalizations.of(context)!.databaseNotFound)),
         );
+        _hideLoadingDialog();
         return;
       }
 
@@ -108,14 +111,14 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.databaseExported)),
       );
+      _hideLoadingDialog();
       logger.info('The database was successfully exported to $outputFile');
     } catch (e, stackTrace) {
       logger.severe('Database export error.', e, stackTrace);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                "${AppLocalizations.of(context)!.databaseExportFailed}: $e")),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+              "${AppLocalizations.of(context)!.databaseExportFailed}: $e")));
+      _hideLoadingDialog();
     }
   }
 
@@ -126,6 +129,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
         allowedExtensions: ['zip'],
       );
       if (result == null) return;
+      await _showLoadingDialog(AppLocalizations.of(context)!.importingDatabase);
 
       File selectedFile = File(result.files.single.path!);
       final appDir = await getApplicationDocumentsDirectory();
@@ -154,16 +158,35 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.databaseImported)),
       );
-
       await openDatabase('$databasePath/wispar.db');
+      _hideLoadingDialog();
     } catch (e, stackTrace) {
       logger.severe('Database import error.', e, stackTrace);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.databaseImportFailed),
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(AppLocalizations.of(context)!.databaseImportFailed)));
+      _hideLoadingDialog();
     }
+  }
+
+  Future<void> _showLoadingDialog(String message) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(message),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _hideLoadingDialog() {
+    Navigator.of(context, rootNavigator: true).pop();
   }
 
   @override
