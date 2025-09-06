@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../generated_l10n/app_localizations.dart';
-import './institutions_screen.dart';
 import './zotero_settings_screen.dart';
 import './ai_settings_screen.dart';
 import './database_settings_screen.dart';
 import './display_settings_screen.dart';
 import './logs_screen.dart';
+import './institutional_settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -94,24 +94,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _buildTile(
         icon: Icons.school_outlined,
         label: AppLocalizations.of(context)!.institutionalAccess,
-        subtitleFuture: getInstitutionName(),
-        subtitleBuilder: (name) =>
-            name ?? AppLocalizations.of(context)!.noinstitution,
         onTap: () async {
-          Map<String, dynamic>? result = await Navigator.push(context,
-              MaterialPageRoute(builder: (context) => InstitutionScreen()));
-          if (result != null &&
-              result.containsKey('name') &&
-              result.containsKey('url')) {
-            String institutionName = result['name'] as String;
-            String institutionUrl = result['url'] as String;
-
-            if (institutionName == 'None') {
-              await unsetInstitution();
-            } else {
-              await saveInstitutionPreference(institutionName, institutionUrl);
-            }
-          }
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => InstitutionalSettingsScreen()));
         },
       ),
       _buildTile(
@@ -329,25 +316,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             )),
       ),
     );
-  }
-
-  Future<void> saveInstitutionPreference(String name, String url) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('institution_name', name);
-    prefs.setString('institution_url', url);
-  }
-
-  Future<String?> getInstitutionName() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {});
-    return prefs.getString('institution_name');
-  }
-
-  Future<void> unsetInstitution() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove('institution_name');
-    prefs.remove('institution_url');
-    setState(() {});
   }
 
   Future<void> saveUnpaywallPreference(String status) async {
