@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:wispar/services/logs_helper.dart';
+import '../services/database_helper.dart';
 
 class ArticleWebsite extends StatefulWidget {
   final PublicationCard publicationCard;
@@ -34,6 +35,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
   late String proxyUrl = '';
   bool isReadyToLoad = false;
   final logger = LogsService().logger;
+  final dbHelper = DatabaseHelper();
 
   String? _extractedPdfUrl;
   bool _isPdfInAppWebView = false;
@@ -47,7 +49,8 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
   bool _overrideUA = false;
   String? _customUA;
 
-  String? _webViewUserAgent;
+  bool _isProxiedLoad = false;
+  bool _showFeedbackButton = false;
 
   @override
   void initState() {
@@ -86,8 +89,9 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
       javaScriptCanOpenWindowsAutomatically: true,
       useOnDownloadStart: true,
       iframeAllowFullscreen: true,
-      userAgent:
-          (_overrideUA && (_customUA?.isNotEmpty ?? false)) ? _customUA : null,
+      userAgent: (_overrideUA && (_customUA?.isNotEmpty ?? false))
+          ? _customUA
+          : _platformUserAgent,
       supportMultipleWindows: true,
     );
   }
@@ -125,15 +129,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
     }
     // If no PDF from Unpaywall or Unpaywall is disabled, check the proxy
     if (pdfUrl.isEmpty) {
-      await loadProxyUrl();
-      if (proxyUrl.isNotEmpty) {
-        setState(() {
-          pdfUrl = proxyUrl + widget.publicationCard.url;
-        });
-        _showSnackBar(AppLocalizations.of(context)!.forwardedproxy);
-      } else {
-        pdfUrl = widget.publicationCard.url;
-      }
+      await _initProxyAndLoadUrl();
     }
     setState(() {
       isReadyToLoad =
@@ -144,12 +140,65 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
     });
   }
 
-  Future<void> loadProxyUrl() async {
+  // Handles the proxy logic
+  Future<void> _initProxyAndLoadUrl() async {
     final prefs = await SharedPreferences.getInstance();
+    String proxyUrlPref = prefs.getString('institution_url') ?? '';
+    proxyUrlPref = proxyUrlPref.replaceAll('\$@', '');
+
+    if (proxyUrlPref.isNotEmpty) {
+      this.proxyUrl = proxyUrlPref;
+      final baseUrl = Uri.parse(widget.publicationCard.url).host;
+      final knownUrlEntry = await dbHelper.getKnownUrlByString(baseUrl);
+
+      if (knownUrlEntry != null) {
+        if (knownUrlEntry['proxySuccess'] == 1) {
+          // Known to work, so apply the proxy.
+          _isProxiedLoad = true;
+          pdfUrl = '$proxyUrl${widget.publicationCard.url}';
+          _showSnackBar(AppLocalizations.of(context)!.forwardedproxy);
+        } else {
+          // Known to not work, so load without the proxy.
+          _isProxiedLoad = false;
+          pdfUrl = widget.publicationCard.url;
+        }
+      } else {
+        // When the base URL is not in the database, we try the proxy.
+        _isProxiedLoad = true;
+        pdfUrl = '$proxyUrl${widget.publicationCard.url}';
+      }
+    } else {
+      _isProxiedLoad = false;
+      pdfUrl = widget.publicationCard.url;
+    }
+  }
+
+  Future<void> _handleUserFeedback(int proxySuccessValue, {WebUri? url}) async {
+    final baseUrl = Uri.parse(widget.publicationCard.url).host;
+
     setState(() {
-      proxyUrl = prefs.getString('institution_url') ?? '';
-      proxyUrl = proxyUrl.replaceAll('\$@', '');
+      _showFeedbackButton = false;
     });
+
+    if (proxySuccessValue == 2) {
+      final currentHost = url?.host;
+      if (currentHost != null) {
+        await dbHelper.insertKnownUrl(currentHost, proxySuccessValue);
+      }
+      return;
+    } else {
+      await dbHelper.insertKnownUrl(baseUrl, proxySuccessValue);
+    }
+
+    if (proxySuccessValue == 1) {
+    } else if (proxySuccessValue == 0) {
+      // Reload with the raw article URL only if the proxy attempt failed
+      if (webViewController != null) {
+        await webViewController!.loadUrl(
+          urlRequest: URLRequest(url: WebUri(widget.publicationCard.url)),
+        );
+      }
+    }
   }
 
   void _showSnackBar(String message) {
@@ -335,13 +384,6 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                       },
                       onLoadStop: (controller, url) async {
                         pullToRefreshController?.endRefreshing();
-                        String? userAgent = await controller.evaluateJavascript(
-                            source: "navigator.userAgent;");
-                        if (userAgent != null) {
-                          _webViewUserAgent = userAgent;
-                          logger.info(
-                              'InAppWebView User-Agent: $_webViewUserAgent');
-                        }
                         setState(() {
                           this.url = url.toString();
                           urlController.text = this.url;
@@ -350,7 +392,28 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
 
                         await _extractCookiesFromWebView(url);
 
-                        await _extractPdfLink(controller);
+                        final baseUrl =
+                            Uri.parse(widget.publicationCard.url).host;
+                        final knownUrlEntry =
+                            await dbHelper.getKnownUrlByString(baseUrl);
+
+                        final currentHost = url?.host;
+                        final knownCurrentHostEntry = currentHost != null
+                            ? await dbHelper.getKnownUrlByString(currentHost)
+                            : null;
+                        if (_isProxiedLoad &&
+                            knownUrlEntry == null &&
+                            baseUrl != currentHost &&
+                            (knownCurrentHostEntry == null ||
+                                knownCurrentHostEntry['proxySuccess'] != 2)) {
+                          setState(() {
+                            _showFeedbackButton = true;
+                          });
+                        } else {
+                          setState(() {
+                            _showFeedbackButton = false;
+                          });
+                        }
 
                         // Check if the current URL is a PDF
                         if (url?.path.toLowerCase().endsWith('.pdf') == true ||
@@ -435,11 +498,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                           final title = result.trim();
                           if (title == "Host Needed") {
                             logger.warning(
-                                "Detected 'Host Needed' title, attempting without proxy for DOI: ${widget.publicationCard.doi}");
-                            controller.loadUrl(
-                              urlRequest: URLRequest(
-                                  url: WebUri(widget.publicationCard.url)),
-                            );
+                                "Detected 'Host Needed' title for DOI: ${widget.publicationCard.doi}");
                           }
                         }).catchError((error) {});
                       },
@@ -480,6 +539,44 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
               progress < 1.0
                   ? LinearProgressIndicator(value: progress)
                   : Container(),
+              if (_showFeedbackButton)
+                Positioned(
+                  bottom: 16.0,
+                  right: 16.0,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      FloatingActionButton.extended(
+                        heroTag: 'proxySuccessBtn',
+                        onPressed: () => _handleUserFeedback(1),
+                        label: Text(AppLocalizations.of(context)!.proxySuccess),
+                        icon: Icon(Icons.check),
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
+                      SizedBox(height: 10),
+                      FloatingActionButton.extended(
+                        heroTag: 'proxyFailureBtn',
+                        onPressed: () => _handleUserFeedback(0),
+                        label: Text(AppLocalizations.of(context)!.proxyFailure),
+                        icon: Icon(Icons.close),
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                      ),
+                      SizedBox(height: 10),
+                      FloatingActionButton.extended(
+                        heroTag: 'loginPageBtn',
+                        onPressed: () =>
+                            _handleUserFeedback(2, url: _currentWebViewUrl),
+                        label: Text(AppLocalizations.of(context)!.proxyLogin),
+                        icon: Icon(Icons.person),
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                      ),
+                    ],
+                  ),
+                ),
             ],
           ),
         ),

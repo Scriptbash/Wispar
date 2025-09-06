@@ -26,7 +26,7 @@ class DatabaseHelper {
     final path = await getDatabasesPath();
     final databasePath = join(path, 'wispar.db');
 
-    return openDatabase(databasePath, version: 7, onOpen: (db) async {
+    return openDatabase(databasePath, version: 8, onOpen: (db) async {
       await db.execute('PRAGMA foreign_keys = ON');
     }, onCreate: (db, version) async {
       await db.execute('PRAGMA foreign_keys = ON');
@@ -100,6 +100,14 @@ class DatabaseHelper {
         journals TEXT,
         dateCreated TEXT DEFAULT CURRENT_TIMESTAMP
       )
+      ''');
+
+      await db.execute('''
+        CREATE TABLE knownUrls (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          url TEXT,
+          proxySuccess INTEGER
+        )
       ''');
     }, onUpgrade: (db, oldVersion, newVersion) async {
       logger.info("Upgrading DB from ${oldVersion} to ${newVersion}");
@@ -206,6 +214,15 @@ class DatabaseHelper {
         ''');
         await db.execute('''
         ALTER TABLE articles ADD COLUMN translatedAbstract TEXT;
+      ''');
+      }
+      if (oldVersion < 8) {
+        await db.execute('''
+        CREATE TABLE knownUrls (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          url TEXT,
+          proxySuccess INTEGER
+        )
       ''');
       }
     });
@@ -1104,5 +1121,50 @@ class DatabaseHelper {
   Future<void> deleteFeedFilter(int id) async {
     final db = await database;
     await db.delete('feed_filters', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> insertKnownUrl(String url, int proxySuccess) async {
+    final db = await database;
+    return await db.insert(
+      'knownUrls',
+      {
+        'url': url,
+        'proxySuccess': proxySuccess,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<int> updateKnownUrl(int id, {String? url, int? proxySuccess}) async {
+    final db = await database;
+    final updateData = <String, Object?>{};
+    if (url != null) updateData['url'] = url;
+    if (proxySuccess != null) updateData['proxySuccess'] = proxySuccess;
+
+    return await db.update(
+      'knownUrls',
+      updateData,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<int> deleteKnownUrl(int id) async {
+    final db = await database;
+    return await db.delete(
+      'knownUrls',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<Map<String, dynamic>?> getKnownUrlByString(String url) async {
+    final db = await database;
+    final results = await db.query(
+      'knownUrls',
+      where: 'url = ?',
+      whereArgs: [url],
+    );
+    return results.isNotEmpty ? results.first : null;
   }
 }
