@@ -607,7 +607,7 @@ class _HomeScreenState extends State<HomeScreen> {
       (f) => f.name == _currentFeedName,
       orElse: () => FeedFilter(
         id: 0,
-        name: 'Home', // TODO Localize this probably
+        name: 'Home',
         include: '',
         exclude: '',
         journals: <String>{},

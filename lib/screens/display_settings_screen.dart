@@ -201,51 +201,38 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
   }
 
   void _showThemeDialog(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.appearance),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              RadioListTile<ThemeMode>(
-                title: Text(AppLocalizations.of(context)!.light),
-                value: ThemeMode.light,
-                groupValue: Provider.of<ThemeProvider>(context).themeMode,
-                onChanged: (ThemeMode? value) {
-                  if (value != null) {
-                    Provider.of<ThemeProvider>(context, listen: false)
-                        .setThemeMode(value);
-                  }
-                  Navigator.of(context).pop();
-                },
-              ),
-              RadioListTile<ThemeMode>(
-                title: Text(AppLocalizations.of(context)!.dark),
-                value: ThemeMode.dark,
-                groupValue: Provider.of<ThemeProvider>(context).themeMode,
-                onChanged: (ThemeMode? value) {
-                  if (value != null) {
-                    Provider.of<ThemeProvider>(context, listen: false)
-                        .setThemeMode(value);
-                  }
-                  Navigator.of(context).pop();
-                },
-              ),
-              RadioListTile<ThemeMode>(
-                title: Text(AppLocalizations.of(context)!.systemtheme),
-                value: ThemeMode.system,
-                groupValue: Provider.of<ThemeProvider>(context).themeMode,
-                onChanged: (ThemeMode? value) {
-                  if (value != null) {
-                    Provider.of<ThemeProvider>(context, listen: false)
-                        .setThemeMode(value);
-                  }
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+          content: RadioGroup<ThemeMode>(
+            groupValue: themeProvider.themeMode,
+            onChanged: (ThemeMode? value) {
+              if (value != null) {
+                themeProvider.setThemeMode(value);
+                Navigator.of(context).pop();
+              }
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                RadioListTile<ThemeMode>(
+                  title: Text(AppLocalizations.of(context)!.light),
+                  value: ThemeMode.light,
+                ),
+                RadioListTile<ThemeMode>(
+                  title: Text(AppLocalizations.of(context)!.dark),
+                  value: ThemeMode.dark,
+                ),
+                RadioListTile<ThemeMode>(
+                  title: Text(AppLocalizations.of(context)!.systemtheme),
+                  value: ThemeMode.system,
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -258,46 +245,32 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.pdfTheme),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RadioListTile<int>(
-                title: Text(AppLocalizations.of(context)!.light),
-                value: 0,
-                groupValue: _pdfThemeOption,
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _pdfThemeOption = value);
-                    _savePdfThemeOption(value);
-                    Navigator.of(context).pop();
-                  }
-                },
-              ),
-              RadioListTile<int>(
-                title: Text(AppLocalizations.of(context)!.dark),
-                value: 1,
-                groupValue: _pdfThemeOption,
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _pdfThemeOption = value);
-                    _savePdfThemeOption(value);
-                    Navigator.of(context).pop();
-                  }
-                },
-              ),
-              RadioListTile<int>(
-                title: Text(AppLocalizations.of(context)!.systemtheme),
-                value: 2,
-                groupValue: _pdfThemeOption,
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _pdfThemeOption = value);
-                    _savePdfThemeOption(value);
-                    Navigator.of(context).pop();
-                  }
-                },
-              ),
-            ],
+          content: RadioGroup<int>(
+            groupValue: _pdfThemeOption,
+            onChanged: (int? value) {
+              if (value != null) {
+                setState(() => _pdfThemeOption = value);
+                _savePdfThemeOption(value);
+                Navigator.of(context).pop();
+              }
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RadioListTile<int>(
+                  title: Text(AppLocalizations.of(context)!.light),
+                  value: 0,
+                ),
+                RadioListTile<int>(
+                  title: Text(AppLocalizations.of(context)!.dark),
+                  value: 1,
+                ),
+                RadioListTile<int>(
+                  title: Text(AppLocalizations.of(context)!.systemtheme),
+                  value: 2,
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -323,34 +296,28 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.pdfReadingOrientation),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RadioListTile<int>(
-                title: Text(AppLocalizations.of(context)!.vertical),
-                value: 0,
-                groupValue: _pdfOrientationOption,
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _pdfOrientationOption = value);
-                    _savePdfOrientationOption(value);
-                    Navigator.of(context).pop();
-                  }
-                },
-              ),
-              RadioListTile<int>(
-                title: Text(AppLocalizations.of(context)!.horizontal),
-                value: 1,
-                groupValue: _pdfOrientationOption,
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _pdfOrientationOption = value);
-                    _savePdfOrientationOption(value);
-                    Navigator.of(context).pop();
-                  }
-                },
-              ),
-            ],
+          content: RadioGroup<int>(
+            groupValue: _pdfOrientationOption,
+            onChanged: (int? value) {
+              if (value != null) {
+                setState(() => _pdfOrientationOption = value);
+                _savePdfOrientationOption(value);
+                Navigator.of(context).pop();
+              }
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RadioListTile<int>(
+                  title: Text(AppLocalizations.of(context)!.vertical),
+                  value: 0,
+                ),
+                RadioListTile<int>(
+                  title: Text(AppLocalizations.of(context)!.horizontal),
+                  value: 1,
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -374,52 +341,35 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.publicationCard),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              RadioListTile<int>(
-                title: Text(AppLocalizations.of(context)!.showAllAbstracts),
-                value: 0,
-                groupValue: _publicationCardOption,
-                onChanged: (int? value) {
-                  if (value != null) {
-                    setState(() {
-                      _publicationCardOption = value;
-                    });
-                    _savePublicationCardOption(value);
-                    Navigator.of(context).pop();
-                  }
-                },
-              ),
-              RadioListTile<int>(
-                title: Text(AppLocalizations.of(context)!.hideMissingAbstracts),
-                value: 1,
-                groupValue: _publicationCardOption,
-                onChanged: (int? value) {
-                  if (value != null) {
-                    setState(() {
-                      _publicationCardOption = value;
-                    });
-                    _savePublicationCardOption(value);
-                    Navigator.of(context).pop();
-                  }
-                },
-              ),
-              RadioListTile<int>(
-                title: Text(AppLocalizations.of(context)!.hideAllAbstracts),
-                value: 2,
-                groupValue: _publicationCardOption,
-                onChanged: (int? value) {
-                  if (value != null) {
-                    setState(() {
-                      _publicationCardOption = value;
-                    });
-                    _savePublicationCardOption(value);
-                    Navigator.of(context).pop();
-                  }
-                },
-              ),
-            ],
+          content: RadioGroup<int>(
+            groupValue: _publicationCardOption,
+            onChanged: (int? value) {
+              if (value != null) {
+                setState(() {
+                  _publicationCardOption = value;
+                });
+                _savePublicationCardOption(value);
+                Navigator.of(context).pop();
+              }
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                RadioListTile<int>(
+                  title: Text(AppLocalizations.of(context)!.showAllAbstracts),
+                  value: 0,
+                ),
+                RadioListTile<int>(
+                  title:
+                      Text(AppLocalizations.of(context)!.hideMissingAbstracts),
+                  value: 1,
+                ),
+                RadioListTile<int>(
+                  title: Text(AppLocalizations.of(context)!.hideAllAbstracts),
+                  value: 2,
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -443,31 +393,32 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.language),
           content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ...sortedLocales.map((locale) {
-                  final code = locale.languageCode;
-                  return RadioListTile<String>(
-                    title: Text(_languageLabels[code] ?? code),
-                    value: code,
-                    groupValue: currentLang,
-                    onChanged: (value) {
-                      provider.setLocale(value!);
-                      Navigator.of(context).pop();
-                    },
-                  );
-                }),
-                RadioListTile<String>(
-                  title: Text(AppLocalizations.of(context)!.system),
-                  value: 'system',
-                  groupValue: currentLang,
-                  onChanged: (_) {
-                    provider.clearLocale();
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
+            child: RadioGroup<String>(
+              groupValue: currentLang,
+              onChanged: (value) {
+                if (value == 'system') {
+                  provider.clearLocale();
+                } else {
+                  provider.setLocale(value!);
+                }
+                Navigator.of(context).pop();
+              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ...sortedLocales.map((locale) {
+                    final code = locale.languageCode;
+                    return RadioListTile<String>(
+                      title: Text(_languageLabels[code] ?? code),
+                      value: code,
+                    );
+                  }),
+                  RadioListTile<String>(
+                    title: Text(AppLocalizations.of(context)!.system),
+                    value: 'system',
+                  ),
+                ],
+              ),
             ),
           ),
         );

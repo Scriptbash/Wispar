@@ -69,21 +69,31 @@ class _SortDialogState extends State<SortDialog> {
             SizedBox(height: 24),
 
             // Sort by radio buttons
-            ...widget.sortByOptions.asMap().entries.map((entry) {
-              int index = entry.key;
-              String option = entry.value;
-              return RadioListTile<int>(
-                title: Text(option),
-                value: index,
-                groupValue: selectedSortBy,
-                onChanged: (value) {
+            RadioGroup<int>(
+              groupValue: selectedSortBy,
+              onChanged: (value) {
+                if (value != null) {
                   setState(() {
-                    selectedSortBy = value!;
+                    selectedSortBy = value;
                   });
-                  widget.onSortByChanged(value!);
-                },
-              );
-            }).toList(),
+                  widget.onSortByChanged(value);
+                }
+              },
+              child: Column(
+                children: widget.sortByOptions.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  String option = entry.value;
+                  return ListTile(
+                    title: Text(option),
+                    leading: Radio<int>(value: index),
+                    onTap: () => setState(() {
+                      selectedSortBy = index;
+                      widget.onSortByChanged(index);
+                    }),
+                  );
+                }).toList(),
+              ),
+            ),
           ],
         ),
       ),

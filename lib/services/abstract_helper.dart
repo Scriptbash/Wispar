@@ -30,11 +30,9 @@ class AbstractHelper {
       case AbstractSetting.hideMissing:
         return abstract.isNotEmpty ? abstract : ''; // Only show if not empty
       case AbstractSetting.showAll:
-      default:
-        return abstract.isNotEmpty
-            ? abstract
-            : AppLocalizations.of(context)!
-                .abstractunavailable; // Show default message if empty
     }
+    return abstract.isNotEmpty
+        ? abstract
+        : AppLocalizations.of(context)!.abstractunavailable;
   }
 }

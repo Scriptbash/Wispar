@@ -71,35 +71,32 @@ class _InstitutionalSettingsScreenState
                 ),
                 const SizedBox(height: 16),
                 StatefulBuilder(
-                  builder: (context, setDialogState) => Column(
-                    children: [
-                      RadioListTile<int>(
-                        title: Text(AppLocalizations.of(context)!
-                            .redirectsSuccessfully),
-                        value: 1,
-                        groupValue: proxySuccess,
-                        onChanged: (val) {
-                          setDialogState(() => proxySuccess = val!);
-                        },
-                      ),
-                      RadioListTile<int>(
-                        title:
-                            Text(AppLocalizations.of(context)!.failsToRedirect),
-                        value: 0,
-                        groupValue: proxySuccess,
-                        onChanged: (val) {
-                          setDialogState(() => proxySuccess = val!);
-                        },
-                      ),
-                      RadioListTile<int>(
-                        title: Text(AppLocalizations.of(context)!.loginPage),
-                        value: 2,
-                        groupValue: proxySuccess,
-                        onChanged: (val) {
-                          setDialogState(() => proxySuccess = val!);
-                        },
-                      ),
-                    ],
+                  builder: (context, setDialogState) => RadioGroup<int>(
+                    groupValue: proxySuccess,
+                    onChanged: (val) {
+                      if (val != null) setDialogState(() => proxySuccess = val);
+                    },
+                    child: Column(
+                      children: [
+                        ListTile(
+                          title: Text(AppLocalizations.of(context)!
+                              .redirectsSuccessfully),
+                          leading: Radio<int>(value: 1),
+                          onTap: () => setDialogState(() => proxySuccess = 1),
+                        ),
+                        ListTile(
+                          title: Text(
+                              AppLocalizations.of(context)!.failsToRedirect),
+                          leading: Radio<int>(value: 0),
+                          onTap: () => setDialogState(() => proxySuccess = 0),
+                        ),
+                        ListTile(
+                          title: Text(AppLocalizations.of(context)!.loginPage),
+                          leading: Radio<int>(value: 2),
+                          onTap: () => setDialogState(() => proxySuccess = 2),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -253,35 +250,32 @@ class _InstitutionalSettingsScreenState
                 ),
                 const SizedBox(height: 16),
                 StatefulBuilder(
-                  builder: (context, setDialogState) => Column(
-                    children: [
-                      RadioListTile<int>(
-                        title: Text(AppLocalizations.of(context)!
-                            .redirectsSuccessfully),
-                        value: 1,
-                        groupValue: proxySuccess,
-                        onChanged: (val) {
-                          setDialogState(() => proxySuccess = val!);
-                        },
-                      ),
-                      RadioListTile<int>(
-                        title:
-                            Text(AppLocalizations.of(context)!.failsToRedirect),
-                        value: 0,
-                        groupValue: proxySuccess,
-                        onChanged: (val) {
-                          setDialogState(() => proxySuccess = val!);
-                        },
-                      ),
-                      RadioListTile<int>(
-                        title: Text(AppLocalizations.of(context)!.loginPage),
-                        value: 2,
-                        groupValue: proxySuccess,
-                        onChanged: (val) {
-                          setDialogState(() => proxySuccess = val!);
-                        },
-                      ),
-                    ],
+                  builder: (context, setDialogState) => RadioGroup<int>(
+                    groupValue: proxySuccess,
+                    onChanged: (val) {
+                      if (val != null) setDialogState(() => proxySuccess = val);
+                    },
+                    child: Column(
+                      children: [
+                        ListTile(
+                          title: Text(AppLocalizations.of(context)!
+                              .redirectsSuccessfully),
+                          leading: Radio<int>(value: 1),
+                          onTap: () => setDialogState(() => proxySuccess = 1),
+                        ),
+                        ListTile(
+                          title: Text(
+                              AppLocalizations.of(context)!.failsToRedirect),
+                          leading: Radio<int>(value: 0),
+                          onTap: () => setDialogState(() => proxySuccess = 0),
+                        ),
+                        ListTile(
+                          title: Text(AppLocalizations.of(context)!.loginPage),
+                          leading: Radio<int>(value: 2),
+                          onTap: () => setDialogState(() => proxySuccess = 2),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

@@ -206,7 +206,7 @@ class _TranslateOptionsSheetState extends State<TranslateOptionsSheet> {
                   labelText: AppLocalizations.of(context)!.aiProvider,
                   border: OutlineInputBorder(),
                 ),
-                value: _selectedAiProvider,
+                initialValue: _selectedAiProvider,
                 items: _availableAiProviders
                     .map((provider) => DropdownMenuItem(
                           value: provider,
@@ -241,7 +241,7 @@ class _TranslateOptionsSheetState extends State<TranslateOptionsSheet> {
                 labelText: AppLocalizations.of(context)!.prompt,
                 border: OutlineInputBorder(),
               ),
-              value: _selectedCustomPrompt,
+              initialValue: _selectedCustomPrompt,
               items: _availableCustomPrompts.map((prompt) {
                 return DropdownMenuItem<String>(
                   value: prompt,
