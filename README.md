@@ -47,6 +47,7 @@ Wispar is a user-friendly and privacy-friendly Android/iOS app that seamlessly s
     <li> [x] Notifications and background journals updates</li>
     <li> [x] Create custom feeds</li>
     <li> [x] Translate title and abstracts (requires an AI API key)</li>
+    <li> [x] Chat with your papers using AI</li>
 </ul>
 
 ## Translations
