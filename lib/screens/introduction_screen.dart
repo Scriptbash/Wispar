@@ -115,33 +115,39 @@ class _IntroScreenState extends State<IntroScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.tonal(
-                    onPressed: () async {
-                      final Map<String, dynamic>? result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => InstitutionScreen(),
-                        ),
-                      );
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 400.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.tonal(
+                        onPressed: () async {
+                          final Map<String, dynamic>? result =
+                              await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => InstitutionScreen(),
+                            ),
+                          );
 
-                      if (result != null &&
-                          result.containsKey('name') &&
-                          result.containsKey('url')) {
-                        String institutionName = result['name'] as String;
-                        String institutionUrl = result['url'] as String;
+                          if (result != null &&
+                              result.containsKey('name') &&
+                              result.containsKey('url')) {
+                            String institutionName = result['name'] as String;
+                            String institutionUrl = result['url'] as String;
 
-                        await saveInstitutionPreference(
-                            institutionName, institutionUrl);
+                            await saveInstitutionPreference(
+                                institutionName, institutionUrl);
 
-                        setState(() {
-                          this.institutionName = institutionName;
-                        });
-                      }
-                    },
-                    child: Text(
-                        AppLocalizations.of(context)!.setupSelectInstitution),
+                            setState(() {
+                              this.institutionName = institutionName;
+                            });
+                          }
+                        },
+                        child: Text(AppLocalizations.of(context)!
+                            .setupSelectInstitution),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -190,19 +196,24 @@ class _IntroScreenState extends State<IntroScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.tonal(
-                    onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ZoteroSettings(),
-                        ),
-                      );
-                    },
-                    child:
-                        Text(AppLocalizations.of(context)!.setupLinkMyZotero),
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 400.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.tonal(
+                        onPressed: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ZoteroSettings(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                            AppLocalizations.of(context)!.setupLinkMyZotero),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
