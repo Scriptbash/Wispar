@@ -317,7 +317,7 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
                     labelText: AppLocalizations.of(context)!.aiProvider,
                     border: OutlineInputBorder(),
                   ),
-                  value: _selectedProvider,
+                  initialValue: _selectedProvider,
                   items: _providers
                       .map((provider) => DropdownMenuItem(
                             value: provider,

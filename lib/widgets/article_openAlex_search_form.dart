@@ -179,7 +179,7 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             DropdownButtonFormField<String>(
-              value: searchScope,
+              initialValue: searchScope,
               onChanged: (String? newValue) {
                 if (newValue != null) {
                   setState(() {
@@ -214,7 +214,7 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
               children: [
                 Expanded(
                   child: DropdownButtonFormField<String>(
-                    value: selectedSortField,
+                    initialValue: selectedSortField,
                     isExpanded: true,
                     onChanged: (String? newValue) {
                       if (newValue != null) {
@@ -251,7 +251,7 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                 SizedBox(width: 10),
                 Expanded(
                   child: DropdownButtonFormField<String>(
-                    value: selectedSortOrder,
+                    initialValue: selectedSortOrder,
                     isExpanded: true,
                     onChanged: (String? newValue) {
                       if (newValue != null) {

@@ -424,7 +424,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                     decoration: InputDecoration(
                       labelText: 'Sort by',
                     ),
-                    value: selectedSortBy,
+                    initialValue: selectedSortBy,
                     isExpanded: true,
                     onChanged: (int? newValue) {
                       setState(() {
@@ -440,7 +440,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                     decoration: InputDecoration(
                       labelText: 'Sort order',
                     ),
-                    value: selectedSortOrder,
+                    initialValue: selectedSortOrder,
                     isExpanded: true,
                     onChanged: (int? newValue) {
                       setState(() {

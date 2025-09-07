@@ -38,7 +38,6 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
   final dbHelper = DatabaseHelper();
 
   String? _extractedPdfUrl;
-  bool _isPdfInAppWebView = false;
   bool _isShowingDownloadOptions = false;
 
   String? _currentWebViewCookies;
@@ -284,7 +283,6 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                           this.url = url.toString();
                           urlController.text = this.url;
                           _extractedPdfUrl = null;
-                          _isPdfInAppWebView = false;
                           _currentWebViewUrl = url;
                         });
                       },
@@ -426,13 +424,6 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                                 url.queryParameters['download'] == 'true')) {
                           logger.info(
                               'Current URL ends with .pdf or strongly indicates a PDF. Marking as in-app PDF.');
-                          setState(() {
-                            _isPdfInAppWebView = true;
-                          });
-                        } else {
-                          setState(() {
-                            _isPdfInAppWebView = false;
-                          });
                         }
 
                         // --- Wiley-specific JavaScript injection for download ---
@@ -508,7 +499,6 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                             'WebView Error: ${error.description}', error);
 
                         setState(() {
-                          _isPdfInAppWebView = false;
                           _currentWebViewUrl = null;
                         });
                       },

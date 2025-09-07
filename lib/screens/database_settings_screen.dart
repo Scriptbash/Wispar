@@ -135,7 +135,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       final appDir = await getApplicationDocumentsDirectory();
       final databasePath = await getDatabasesPath();
 
-      final inputStream = InputFileStream(selectedFile.path!);
+      final inputStream = InputFileStream(selectedFile.path);
       final archive = ZipDecoder().decodeStream(inputStream);
 
       for (final file in archive) {
@@ -237,7 +237,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                     const SizedBox(height: 16),
                     DropdownButtonFormField<int>(
                       isExpanded: true,
-                      value: _fetchInterval,
+                      initialValue: _fetchInterval,
                       onChanged: (int? newValue) {
                         setState(() {
                           _fetchInterval = newValue!;
