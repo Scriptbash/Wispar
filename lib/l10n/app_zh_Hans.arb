@@ -610,5 +610,77 @@
     "overrideUserAgent": "覆盖用户代理",
     "@overrideUserAgent": {},
     "customUserAgent": "自定义用户代理",
-    "@customUserAgent": {}
+    "@customUserAgent": {},
+    "pdfTheme": "PDF 查看器主题",
+    "@pdfTheme": {},
+    "pdfReadingOrientation": "PDF 阅读方向",
+    "@pdfReadingOrientation": {},
+    "vertical": "竖屏",
+    "@vertical": {},
+    "horizontal": "横屏",
+    "@horizontal": {},
+    "proxySuccess": "代理连接成功",
+    "@proxySuccess": {},
+    "proxyFailure": "代理连接失败",
+    "@proxyFailure": {},
+    "proxyLogin": "这是登录页面",
+    "@proxyLogin": {},
+    "editKnownUrl": "编辑已知URL",
+    "@editKnownUrl": {},
+    "addKnownUrl": "添加已知URL",
+    "@addKnownUrl": {},
+    "redirectsSuccessfully": "重定向成功",
+    "@redirectsSuccessfully": {},
+    "failsToRedirect": "重定向失败",
+    "@failsToRedirect": {},
+    "loginPage": "登录页面",
+    "@loginPage": {},
+    "manageUrlsAndRedirect": "管理URL和重定向状态",
+    "@manageUrlsAndRedirect": {},
+    "exportingDatabase": "正在导出数据库，请稍候...",
+    "@exportingDatabase": {},
+    "importingDatabase": "正在导入数据库，请稍候...",
+    "@importingDatabase": {},
+    "hideAiFeatures": "隐藏所有AI功能",
+    "@hideAiFeatures": {},
+    "aiTemperature": "温度（AI模型的\"温度\"参数）",
+    "@aiTemperature": {},
+    "aiCustomPrompts": "自定义翻译提示",
+    "@aiCustomPrompts": {},
+    "aiCustomPromptsDescription": "使用 $src 和 $dst 表示源语言和目标语言，$text 表示待翻译文本。例如：将以下文本从 $src 翻译为 $dst：$text",
+    "@aiCustomPromptsDescription": {},
+    "prompt": "提示",
+    "@prompt": {},
+    "missingPlaceholders": "缺少占位符：{placeholders}",
+    "@missingPlaceholders": {},
+    "pdfNotReadyForChat": "PDF尚未准备好聊天。请稍等或重试。",
+    "@pdfNotReadyForChat": {},
+    "chatWithPdf": "与PDF对话",
+    "@chatWithPdf": {},
+    "typeYourMessage": "输入您的消息...",
+    "@typeYourMessage": {},
+    "askAboutPdf": "您好！我已准备好与您讨论这个PDF。您想了解或总结什么内容？请注意，与PDF对话会消耗大量token！",
+    "@askAboutPdf": {},
+    "pdfNotFound": "找不到PDF文件。",
+    "@pdfNotFound": {},
+    "apiTokenMissing": "设置中缺少 {aiModel} 的API密钥。请进行配置。",
+    "@apiTokenMissing": {
+        "placeholders": {
+            "aiModel": {
+                "type": "String"
+            }
+        }
+    },
+    "noResponseFromAI": "未收到AI响应。",
+    "@noResponseFromAI": {},
+    "errorConnectingToAI": "连接AI时出错（{statusCode}）。请检查您的网络或API设置。",
+    "@errorConnectingToAI": {
+        "placeholders": {
+            "statusCode": {
+                "type": "int"
+            }
+        }
+    },
+    "networkError": "网络错误或与AI服务通信时出现问题。",
+    "@networkError": {}
 }
