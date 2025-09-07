@@ -38,6 +38,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
   final dbHelper = DatabaseHelper();
 
   String? _extractedPdfUrl;
+  bool _isPdfInAppWebView = false;
   bool _isShowingDownloadOptions = false;
 
   String? _currentWebViewCookies;
@@ -235,7 +236,12 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
             ),
           if (_extractedPdfUrl != null)
             IconButton(
-              icon: const Icon(Icons.download),
+              icon: Image.asset(
+                'assets/icon/pdf.png',
+                width: 20,
+                height: 20,
+                color: Theme.of(context).iconTheme.color,
+              ),
               tooltip: AppLocalizations.of(context)!.downloadFoundPdf,
               onPressed: () {
                 _showDownloadOptions(context, Uri.parse(_extractedPdfUrl!));
@@ -283,6 +289,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                           this.url = url.toString();
                           urlController.text = this.url;
                           _extractedPdfUrl = null;
+                          _isPdfInAppWebView = false;
                           _currentWebViewUrl = url;
                         });
                       },
@@ -390,6 +397,10 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
 
                         await _extractCookiesFromWebView(url);
 
+                        if (!_isPdfInAppWebView) {
+                          _extractPdfLink(controller);
+                        }
+
                         final baseUrl =
                             Uri.parse(widget.publicationCard.url).host;
                         final knownUrlEntry =
@@ -424,6 +435,13 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                                 url.queryParameters['download'] == 'true')) {
                           logger.info(
                               'Current URL ends with .pdf or strongly indicates a PDF. Marking as in-app PDF.');
+                          setState(() {
+                            _isPdfInAppWebView = true;
+                          });
+                        } else {
+                          setState(() {
+                            _isPdfInAppWebView = false;
+                          });
                         }
 
                         // --- Wiley-specific JavaScript injection for download ---
@@ -499,6 +517,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                             'WebView Error: ${error.description}', error);
 
                         setState(() {
+                          _isPdfInAppWebView = false;
                           _currentWebViewUrl = null;
                         });
                       },
