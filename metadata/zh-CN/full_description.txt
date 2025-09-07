@@ -1,17 +1,17 @@
-Wispar 是您的个人科研助手——一款隐私友好的学术期刊与科学文献探索工具。 
+Wispar 是您的个人科研助手——一款隐私友好的学术期刊与科学文献探索工具。
 
-通过 Crossref 和 OpenAlex 接口，Wispar 助您追踪关注期刊的最新动态。无需注册即可订阅期刊，在主页获取最新研究摘要。 
+通过 Crossref 和 OpenAlex 接口，Wispar 助您追踪关注期刊的最新动态。无需注册即可订阅期刊，在主页获取最新研究摘要。
 
-- 检索学术论文与期刊  
-- 订阅期刊获取更新  
-- 自定义关键词订阅  
-- 通过 Unpaywall 获取开放论文  
-- 使用 EZproxy 访问付费墙文献  
-- 推送论文至 Zotero 文库  
-- 专为研究者、学生和学术爱好者设计  
+- 检索学术论文与期刊
+- 订阅期刊获取更新
+- 自定义关键词订阅
+- 通过 Unpaywall 获取开放论文
+- 使用 EZproxy 访问付费墙文献
+- 推送论文至 Zotero 文库
+- 专为研究者、学生和学术爱好者设计
 
-Wispar 界面友好、开源开发，始终尊重用户隐私。  
+Wispar 界面友好、开源开发，始终尊重用户隐私。
 
-本项目由社区共建，欢迎参与贡献！访问 GitHub 仓库：https://github.com/Scriptbash/Wispar  
+本项目由社区共建，欢迎参与贡献！访问 GitHub 仓库：https://github.com/Scriptbash/Wispar
 
 若应用未支持您的语言，欢迎通过 Weblate 平台协助翻译：https://hosted.weblate.org/engage/wispar
