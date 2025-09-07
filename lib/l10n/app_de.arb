@@ -1,122 +1,124 @@
 {
-  "welcomeWispar": "Willkommen bei Wispar!",
-  "@welcomeWispar": {},
-  "setupInstitutionalAccess": "Einrichtung des institutionellen Zugangs",
-  "@setupInstitutionalAccess": {},
-  "setupInstitutionalAccessLong": "Wählen Sie den EZproxy Ihrer Einrichtung aus, um Zugriff auf deren Zeitschriftenabonnements zu erhalten. Dadurch ist kein VPN oder lokaler Zugriff mehr erforderlich.",
-  "@setupInstitutionalAccessLong": {},
-  "setupSelectInstitution": "Meine Einrichtung auswählen",
-  "@setupSelectInstitution": {},
-  "setupSelectedInstitution": "Sie haben ausgewählt:",
-  "@setupSelectedInstitution": {},
-  "setupLinkZotero": "Link Zotero",
-  "@setupLinkZotero": {},
-  "setupZoteroLong": "Senden Sie Publikationen direkt an Ihre Zotero-Bibliothek. Sie werden einer speziellen Wispar-Sammlung hinzugefügt.",
-  "@setupZoteroLong": {},
-  "setupLinkMyZotero": "Mein Zotero-Konto verknüpfen",
-  "@setupLinkMyZotero": {},
-  "setupOtherSettings": "Weitere Einstellungen",
-  "@setupOtherSettings": {},
-  "setupOtherSettingsLong": "Weitere Einstellungen sind im Einstellungsmenü der App verfügbar. Rufen Sie es über den Startbildschirm auf, indem Sie auf das Menü mit den drei Punkten in der oberen rechten Ecke tippen.",
-  "@setupOtherSettingsLong": {},
-  "setupAlmostSet": "Alles bereit! … Fast!",
-  "@setupAlmostSet": {},
-  "setupAlmostSetLong": "Als Nächstes gelangen Sie zum Suchbildschirm, wo Sie Ihre Lieblingszeitschriften verfolgen können. Vergessen Sie nicht, das Kategorie-Menü von 'Artikel' auf 'Zeitschriften' umzustellen.",
-  "@setupAlmostSetLong": {},
-  "skip": "Überspringen",
-  "@skip": {},
-  "getStarted": "Loslegen",
-  "@getStarted": {},
-  "notifications": "Benachrichtigungen",
-  "@notifications": {},
-  "notifPermsGranted": "Genehmigung erteilt",
-  "@notifPermsGranted": {},
-  "notifPermsNotGranted": "Genehmigung nicht erteilt",
-  "@notifPermsNotGranted": {},
-  "openAppSettings": "Einstellungen öffnen",
-  "@openAppSettings": {},
-  "notificationSettingsMessage": "Benachrichtigungen sind dauerhaft deaktiviert. Um sie zu aktivieren, gehen Sie zu den Benachrichtigungseinstellungen der App.",
-  "@notificationSettingsMessage": {},
-  "notificationContent": "Neue Artikel sind verfügbar!",
-  "@notificationContent": {},
-  "notificationTitleJournal": "Zeitschriften wurden aktualisiert",
-  "@notificationTitleJournal": {},
-  "notificationTitleQuery": "Abfragen wurden aktualisiert",
-  "@notificationTitleQuery": {},
-  "fgNotificationContent": "Wispar läuft im Hintergrund, um Ihre Journale zu aktualisieren",
-  "@fgNotificationContent": {},
-  "fgNotificationTitle": "Hintergrund-Aktualisierungsdienst",
-  "@fgNotificationTitle": {},
-  "home": "Startseite",
-  "@home": {
-    "description": "The home menu button and the app bar title when in the home screen."
-  },
-  "favorites": "Favoriten",
-  "@favorites": {
-    "description": "The favorites menu button and the app bar title when in the favorites screen."
-  },
-  "download": "Herunterladen",
-  "@download": {
-    "description": "The verb to download, without the 'to'."
-  },
-  "delete": "Löschen",
-  "@delete": {},
-  "downloads": "Heruntergeladene Dateien",
-  "@downloads": {
-    "description": "The downloads menu button and the app bar title when in the downloads screen."
-  },
-  "downloadSuccessful": "Der Artikel wurde erfolgreich heruntergeladen!",
-  "@downloadSuccessful": {},
-  "downloadDeleted": "Der Artikel wurde gelöscht!",
-  "@downloadDeleted": {},
-  "noDownloads": "Sie haben keine Dateien heruntergeladen.",
-  "@noDownloads": {},
-  "settings": "Einstellungen",
-  "@settings": {
-    "description": "The settings option menu button and the app bar title when in the settings screen."
-  },
-  "journalLibraryEmpty": "Sie folgen derzeit keinen Zeitschriften. Verwenden Sie das Suchmenü, um Zeitschriften zu finden und zu abonnieren.",
-  "@journalLibraryEmpty": {
-    "description": "Message shown when the user is not following any journals."
-  },
-  "follow": "Folgen",
-  "@follow": {
-    "description": "The button text shown on journal cards when it is not followed."
-  },
-  "unfollow": "Entfolgen",
-  "@unfollow": {
-    "description": "The button text shown on journal cards when it is followed."
-  },
-  "library": "Bibliothek",
-  "@library": {
-    "description": "The library menu button and the app bar title when in the library screen."
-  },
-  "journals": "Zeitschriften",
-  "@journals": {
-    "description": "The journals menu button and the app bar title when in the journals screen."
-  },
-  "queries": "Abfragen",
-  "@queries": {
-    "description": "Title of the saved search queries tab."
-  },
-  "search": "Suchen",
-  "@search": {
-    "description": "Text shown inside the search screen app bar and for the seach button."
-  },
-  "searchPlaceholder": "Suchen…",
-  "@searchPlaceholder": {
-    "description": "Place holder text in the search input widget."
-  },
-  "filter": "Veröffentlichungskarten filtern",
-  "@filter": {},
-  "filterFavorites": "Filter Favoriten",
-  "@filterFavorites": {},
-  "filterResultsEmpty": "Es gibt keine Veröffentlichung, die Ihrem Filter entspricht",
-  "@filterResultsEmpty": {},
-  "filterDownloads": "Herunterladungen filtern",
-  "@filterDownloads": {},
-  "emptyDOIError": "Bitte geben Sie eine DOI ein",
-  "@emptyDOIError": {},
-  "appDescription": "Ihre Open-Source-App, um über wissenschaftliche Literatur auf dem Laufenden zu bleiben. Lassen Sie uns schnell loslegen!",
-  "@appDescription": {}
+    "welcomeWispar": "Willkommen bei Wispar!",
+    "@welcomeWispar": {},
+    "setupInstitutionalAccess": "Einrichtung des institutionellen Zugangs",
+    "@setupInstitutionalAccess": {},
+    "setupInstitutionalAccessLong": "Wählen Sie den EZproxy Ihrer Einrichtung aus, um Zugriff auf deren Zeitschriftenabonnements zu erhalten. Dadurch ist kein VPN oder lokaler Zugriff mehr erforderlich.",
+    "@setupInstitutionalAccessLong": {},
+    "setupSelectInstitution": "Meine Einrichtung auswählen",
+    "@setupSelectInstitution": {},
+    "setupSelectedInstitution": "Sie haben ausgewählt:",
+    "@setupSelectedInstitution": {},
+    "setupLinkZotero": "Link Zotero",
+    "@setupLinkZotero": {},
+    "setupZoteroLong": "Senden Sie Publikationen direkt an Ihre Zotero-Bibliothek. Sie werden einer speziellen Wispar-Sammlung hinzugefügt.",
+    "@setupZoteroLong": {},
+    "setupLinkMyZotero": "Mein Zotero-Konto verknüpfen",
+    "@setupLinkMyZotero": {},
+    "setupOtherSettings": "Weitere Einstellungen",
+    "@setupOtherSettings": {},
+    "setupOtherSettingsLong": "Weitere Einstellungen sind im Einstellungsmenü der App verfügbar. Rufen Sie es über den Startbildschirm auf, indem Sie auf das Menü mit den drei Punkten in der oberen rechten Ecke tippen.",
+    "@setupOtherSettingsLong": {},
+    "setupAlmostSet": "Alles bereit! … Fast!",
+    "@setupAlmostSet": {},
+    "setupAlmostSetLong": "Als Nächstes gelangen Sie zum Suchbildschirm, wo Sie Ihre Lieblingszeitschriften verfolgen können. Vergessen Sie nicht, das Kategorie-Menü von 'Artikel' auf 'Zeitschriften' umzustellen.",
+    "@setupAlmostSetLong": {},
+    "skip": "Überspringen",
+    "@skip": {},
+    "getStarted": "Loslegen",
+    "@getStarted": {},
+    "notifications": "Benachrichtigungen",
+    "@notifications": {},
+    "notifPermsGranted": "Genehmigung erteilt",
+    "@notifPermsGranted": {},
+    "notifPermsNotGranted": "Genehmigung nicht erteilt",
+    "@notifPermsNotGranted": {},
+    "openAppSettings": "Einstellungen öffnen",
+    "@openAppSettings": {},
+    "notificationSettingsMessage": "Benachrichtigungen sind dauerhaft deaktiviert. Um sie zu aktivieren, gehen Sie zu den Benachrichtigungseinstellungen der App.",
+    "@notificationSettingsMessage": {},
+    "notificationContent": "Neue Artikel sind verfügbar!",
+    "@notificationContent": {},
+    "notificationTitleJournal": "Zeitschriften wurden aktualisiert",
+    "@notificationTitleJournal": {},
+    "notificationTitleQuery": "Abfragen wurden aktualisiert",
+    "@notificationTitleQuery": {},
+    "fgNotificationContent": "Wispar läuft im Hintergrund, um Ihre Journale zu aktualisieren",
+    "@fgNotificationContent": {},
+    "fgNotificationTitle": "Hintergrund-Aktualisierungsdienst",
+    "@fgNotificationTitle": {},
+    "home": "Startseite",
+    "@home": {
+        "description": "The home menu button and the app bar title when in the home screen."
+    },
+    "favorites": "Favoriten",
+    "@favorites": {
+        "description": "The favorites menu button and the app bar title when in the favorites screen."
+    },
+    "download": "Herunterladen",
+    "@download": {
+        "description": "The verb to download, without the 'to'."
+    },
+    "delete": "Löschen",
+    "@delete": {},
+    "downloads": "Heruntergeladene Dateien",
+    "@downloads": {
+        "description": "The downloads menu button and the app bar title when in the downloads screen."
+    },
+    "downloadSuccessful": "Der Artikel wurde erfolgreich heruntergeladen!",
+    "@downloadSuccessful": {},
+    "downloadDeleted": "Der Artikel wurde gelöscht!",
+    "@downloadDeleted": {},
+    "noDownloads": "Sie haben keine Dateien heruntergeladen.",
+    "@noDownloads": {},
+    "settings": "Einstellungen",
+    "@settings": {
+        "description": "The settings option menu button and the app bar title when in the settings screen."
+    },
+    "journalLibraryEmpty": "Sie folgen derzeit keinen Zeitschriften. Verwenden Sie das Suchmenü, um Zeitschriften zu finden und zu abonnieren.",
+    "@journalLibraryEmpty": {
+        "description": "Message shown when the user is not following any journals."
+    },
+    "follow": "Folgen",
+    "@follow": {
+        "description": "The button text shown on journal cards when it is not followed."
+    },
+    "unfollow": "Entfolgen",
+    "@unfollow": {
+        "description": "The button text shown on journal cards when it is followed."
+    },
+    "library": "Bibliothek",
+    "@library": {
+        "description": "The library menu button and the app bar title when in the library screen."
+    },
+    "journals": "Zeitschriften",
+    "@journals": {
+        "description": "The journals menu button and the app bar title when in the journals screen."
+    },
+    "queries": "Abfragen",
+    "@queries": {
+        "description": "Title of the saved search queries tab."
+    },
+    "search": "Suchen",
+    "@search": {
+        "description": "Text shown inside the search screen app bar and for the seach button."
+    },
+    "searchPlaceholder": "Suchen…",
+    "@searchPlaceholder": {
+        "description": "Place holder text in the search input widget."
+    },
+    "filter": "Veröffentlichungskarten filtern",
+    "@filter": {},
+    "filterFavorites": "Filter Favoriten",
+    "@filterFavorites": {},
+    "filterResultsEmpty": "Es gibt keine Veröffentlichung, die Ihrem Filter entspricht",
+    "@filterResultsEmpty": {},
+    "filterDownloads": "Herunterladungen filtern",
+    "@filterDownloads": {},
+    "emptyDOIError": "Bitte geben Sie eine DOI ein",
+    "@emptyDOIError": {},
+    "appDescription": "Ihre Open-Source-App, um über wissenschaftliche Literatur auf dem Laufenden zu bleiben. Lassen Sie uns schnell loslegen!",
+    "@appDescription": {},
+    "horizontal": "Horizontal",
+    "@horizontal": {}
 }
