@@ -147,7 +147,7 @@
     "@selectinstitution": {},
     "sortby": "Ordenar por",
     "@sortby": {},
-    "sortorder": "Ordenar",
+    "sortorder": "Criterio de orden",
     "@sortorder": {},
     "followingsince": "Siguiendo desde {date}",
     "@followingsince": {},
@@ -336,7 +336,7 @@
     },
     "fgNotificationTitle": "Servicio de actualizaciones en segundo plano",
     "@fgNotificationTitle": {},
-    "notificationContent": "Hay artículos nuevos disponibles.",
+    "notificationContent": "¡Hay artículos nuevos disponibles!",
     "@notificationContent": {},
     "title": "Título",
     "@title": {},
@@ -394,7 +394,7 @@
     "@apiFetchIntervalHint": {},
     "saveSettings": "Guardar configuración",
     "@saveSettings": {},
-    "settingsSaved": "La configuración se guardó correctamente.",
+    "settingsSaved": "¡La configuración se guardó correctamente!",
     "@settingsSaved": {},
     "filter": "Filtrar tarjetas de publicación",
     "@filter": {},
@@ -438,7 +438,7 @@
     "@fetchingArticleFromJournal": {},
     "storagePermissionDenied": "Se denegó el permiso.",
     "@storagePermissionDenied": {},
-    "databaseExported": "La base de datos se exportó correctamente.",
+    "databaseExported": "¡La base de datos se exportó correctamente!",
     "@databaseExported": {},
     "exportDatabase": "Exportar base de datos",
     "@exportDatabase": {},
@@ -446,7 +446,7 @@
     "@importDatabase": {},
     "databaseImportFailed": "No se pudo importar la base de datos.",
     "@databaseImportFailed": {},
-    "databaseImported": "La base de datos se importó correctamente.",
+    "databaseImported": "¡La base de datos se importó correctamente!",
     "@databaseImported": {},
     "madeBy": "Hecho por {app_author}",
     "@madeBy": {},
@@ -647,5 +647,47 @@
     "downloadFoundPdf": "Descargando PDF encontrado",
     "@downloadFoundPdf": {},
     "downloadToApp": "Descargar en la app",
-    "@downloadToApp": {}
+    "@downloadToApp": {},
+    "aiTemperature": "Temperatura",
+    "@aiTemperature": {},
+    "aiCustomPrompts": "Indicaciones de traducción personalizadas",
+    "@aiCustomPrompts": {},
+    "aiCustomPromptsDescription": "Usa $src y $dst para los idiomas de origen y destino, y $text para el texto a traducir. Por ejemplo: Traduce el siguiente texto de $src a $dst: $text",
+    "@aiCustomPromptsDescription": {},
+    "prompt": "Indicaciones",
+    "@prompt": {},
+    "missingPlaceholders": "Faltan marcador(es) de posición: {placeholders}",
+    "@missingPlaceholders": {},
+    "pdfNotReadyForChat": "El PDF no está listo para el chat. Por favor, espera o intenta nuevamente.",
+    "@pdfNotReadyForChat": {},
+    "apiTokenMissing": "Falta la clave de API para {aiModel} en la configuración. Por favor, configúrala.",
+    "@apiTokenMissing": {
+        "placeholders": {
+            "aiModel": {
+                "type": "String"
+            }
+        }
+    },
+    "errorConnectingToAI": "Error al conectar con la IA ({statusCode}). Por favor, revisa tu conexión a Internet o la configuración de la API.",
+    "@errorConnectingToAI": {
+        "placeholders": {
+            "statusCode": {
+                "type": "int"
+            }
+        }
+    },
+    "exportingDatabase": "Exportando la base de datos, por favor espera.",
+    "@exportingDatabase": {},
+    "importingDatabase": "Importando la base de datos, por favor espera.",
+    "@importingDatabase": {},
+    "apiFetchInterval": "Intervalo de actualización de la API",
+    "@apiFetchInterval": {},
+    "overrideUserAgent": "Reemplazar el agente de usuario",
+    "@overrideUserAgent": {},
+    "customUserAgent": "Personalizar agente de usuario",
+    "@customUserAgent": {},
+    "pleaseEnterModelName": "Por favor, introduce el nombre del modelo de {provider}.",
+    "@pleaseEnterModelName": {},
+    "downloadToAppSubtitle": "Intenta descargar y visualizar el PDF directamente en Wispar para una mejor integración.",
+    "@downloadToAppSubtitle": {}
 }
