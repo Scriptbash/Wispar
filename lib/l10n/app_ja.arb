@@ -1,159 +1,167 @@
 {
-  "save": "保存",
-  "@save": {},
-  "home": "ホーム",
-  "@home": {
-    "description": "The home menu button and the app bar title when in the home screen."
-  },
-  "getStarted": "始める",
-  "@getStarted": {},
-  "light": "明るい",
-  "@light": {},
-  "setupOtherSettings": "その他の設定",
-  "@setupOtherSettings": {},
-  "setupLinkZotero": "Zoteroをリンクする",
-  "@setupLinkZotero": {},
-  "favorites": "お気に入り",
-  "@favorites": {
-    "description": "The favorites menu button and the app bar title when in the favorites screen."
-  },
-  "downloads": "ダウンロード",
-  "@downloads": {
-    "description": "The downloads menu button and the app bar title when in the downloads screen."
-  },
-  "downloadSuccessful": "論文がダウンロードされました！",
-  "@downloadSuccessful": {},
-  "library": "ライブラリ",
-  "@library": {
-    "description": "The library menu button and the app bar title when in the library screen."
-  },
-  "settings": "設定",
-  "@settings": {
-    "description": "The settings option menu button and the app bar title when in the settings screen."
-  },
-  "noDownloads": "ダウンロードがありません。",
-  "@noDownloads": {},
-  "skip": "スキップ",
-  "@skip": {},
-  "delete": "削除",
-  "@delete": {},
-  "everything": "すべて",
-  "@everything": {},
-  "viewarticle": "論文を読む",
-  "@viewarticle": {},
-  "dark": "暗い",
-  "@dark": {},
-  "zoteroSettings": "Zoteroの設定",
-  "@zoteroSettings": {},
-  "savedOn": "{date}に保存済み",
-  "@savedOn": {
-    "placeholders": {
-      "date": {
-        "type": "DateTime",
-        "format": "yMMMMd"
-      }
-    }
-  },
-  "hours": "時間",
-  "@hours": {},
-  "saveSettings": "設定を保存",
-  "@saveSettings": {},
-  "settingsSaved": "設定を保存しました！",
-  "@settingsSaved": {},
-  "download": "ダウンロードする",
-  "@download": {
-    "description": "The verb to download, without the 'to'."
-  },
-  "welcomeWispar": "Wisparにようこそ！",
-  "@welcomeWispar": {},
-  "articles": "論文",
-  "@articles": {
-    "description": "As in scientific articles."
-  },
-  "sendToZotero": "Zoteroに送る",
-  "@sendToZotero": {},
-  "setupLinkMyZotero": "私のZoteroアカウントをリンクする",
-  "@setupLinkMyZotero": {},
-  "abstract": "抄録",
-  "@abstract": {},
-  "language": "言語",
-  "@language": {},
-  "search": "検索",
-  "@search": {
-    "description": "Text shown inside the search screen app bar and for the seach button."
-  },
-  "searchPlaceholder": "検索…",
-  "@searchPlaceholder": {
-    "description": "Place holder text in the search input widget."
-  },
-  "theme": "テーマ",
-  "@theme": {},
-  "systemtheme": "システムのテーマ",
-  "@systemtheme": {},
-  "database": "データベース",
-  "@database": {},
-  "sourceCode": "ソースコード",
-  "@sourceCode": {},
-  "databaseSettings": "データベースの設定",
-  "@databaseSettings": {},
-  "system": "システム",
-  "@system": {},
-  "queries": "クエリ",
-  "@queries": {
-    "description": "Title of the saved search queries tab."
-  },
-  "saveQuery": "クエリを保存",
-  "@saveQuery": {},
-  "queryName": "クエリの名前",
-  "@queryName": {},
-  "noSavedQueries": "保存されたクエリがありません。",
-  "@noSavedQueries": {},
-  "zoteroValidKey": "APIキーが保存された！",
-  "@zoteroValidKey": {
-    "description": "Snackbar shown when a valid Zotero API key has been saved."
-  },
-  "journals": "学術誌",
-  "@journals": {
-    "description": "The journals menu button and the app bar title when in the journals screen."
-  },
-  "follow": "フォロー",
-  "@follow": {
-    "description": "The button text shown on journal cards when it is not followed."
-  },
-  "unfollow": "フォロー解除",
-  "@unfollow": {
-    "description": "The button text shown on journal cards when it is followed."
-  },
-  "titleAndAbstract": "論文名と抄録",
-  "@titleAndAbstract": {},
-  "title": "論文名",
-  "@title": {},
-  "journaltitle": "学術誌名",
-  "@journaltitle": {},
-  "articletitle": "論文名",
-  "@articletitle": {},
-  "notificationContent": "新しい論文があります！",
-  "@notificationContent": {},
-  "notifications": "通知",
-  "@notifications": {},
-  "done": "完了",
-  "@done": {},
-  "edit": "編集",
-  "@edit": {},
-  "feedName": "フィード名",
-  "@feedName": {},
-  "errorFeedNameEmpty": "フィード名を入力してください",
-  "@errorFeedNameEmpty": {},
-  "emptyDOIError": "DOIを入力してください",
-  "@emptyDOIError": {},
-  "copy": "コピー",
-  "@copy": {},
-  "copydoi": "DOIをコピー",
-  "@copydoi": {},
-  "copyAbstract": "抄録をコピー",
-  "@copyAbstract": {},
-  "copyUrl": "URLをコピー",
-  "@copyUrl": {},
-  "copyTitle": "論文名をコピー",
-  "@copyTitle": {}
+    "save": "保存",
+    "@save": {},
+    "home": "ホーム",
+    "@home": {
+        "description": "The home menu button and the app bar title when in the home screen."
+    },
+    "getStarted": "始める",
+    "@getStarted": {},
+    "light": "明るい",
+    "@light": {},
+    "setupOtherSettings": "その他の設定",
+    "@setupOtherSettings": {},
+    "setupLinkZotero": "Zoteroをリンクする",
+    "@setupLinkZotero": {},
+    "favorites": "お気に入り",
+    "@favorites": {
+        "description": "The favorites menu button and the app bar title when in the favorites screen."
+    },
+    "downloads": "ダウンロード",
+    "@downloads": {
+        "description": "The downloads menu button and the app bar title when in the downloads screen."
+    },
+    "downloadSuccessful": "論文がダウンロードされました！",
+    "@downloadSuccessful": {},
+    "library": "ライブラリ",
+    "@library": {
+        "description": "The library menu button and the app bar title when in the library screen."
+    },
+    "settings": "設定",
+    "@settings": {
+        "description": "The settings option menu button and the app bar title when in the settings screen."
+    },
+    "noDownloads": "ダウンロードがありません。",
+    "@noDownloads": {},
+    "skip": "スキップ",
+    "@skip": {},
+    "delete": "削除",
+    "@delete": {},
+    "everything": "すべて",
+    "@everything": {},
+    "viewarticle": "論文を読む",
+    "@viewarticle": {},
+    "dark": "暗い",
+    "@dark": {},
+    "zoteroSettings": "Zoteroの設定",
+    "@zoteroSettings": {},
+    "savedOn": "{date}に保存済み",
+    "@savedOn": {
+        "placeholders": {
+            "date": {
+                "type": "DateTime",
+                "format": "yMMMMd"
+            }
+        }
+    },
+    "hours": "時間",
+    "@hours": {},
+    "saveSettings": "設定を保存",
+    "@saveSettings": {},
+    "settingsSaved": "設定を保存しました！",
+    "@settingsSaved": {},
+    "download": "ダウンロードする",
+    "@download": {
+        "description": "The verb to download, without the 'to'."
+    },
+    "welcomeWispar": "Wisparにようこそ！",
+    "@welcomeWispar": {},
+    "articles": "論文",
+    "@articles": {
+        "description": "As in scientific articles."
+    },
+    "sendToZotero": "Zoteroに送る",
+    "@sendToZotero": {},
+    "setupLinkMyZotero": "私のZoteroアカウントをリンクする",
+    "@setupLinkMyZotero": {},
+    "abstract": "抄録",
+    "@abstract": {},
+    "language": "言語",
+    "@language": {},
+    "search": "検索",
+    "@search": {
+        "description": "Text shown inside the search screen app bar and for the seach button."
+    },
+    "searchPlaceholder": "検索…",
+    "@searchPlaceholder": {
+        "description": "Place holder text in the search input widget."
+    },
+    "theme": "テーマ",
+    "@theme": {},
+    "systemtheme": "システムのテーマ",
+    "@systemtheme": {},
+    "database": "データベース",
+    "@database": {},
+    "sourceCode": "ソースコード",
+    "@sourceCode": {},
+    "databaseSettings": "データベースの設定",
+    "@databaseSettings": {},
+    "system": "システム",
+    "@system": {},
+    "queries": "クエリ",
+    "@queries": {
+        "description": "Title of the saved search queries tab."
+    },
+    "saveQuery": "クエリを保存",
+    "@saveQuery": {},
+    "queryName": "クエリの名前",
+    "@queryName": {},
+    "noSavedQueries": "保存されたクエリがありません。",
+    "@noSavedQueries": {},
+    "zoteroValidKey": "APIキーが保存された！",
+    "@zoteroValidKey": {
+        "description": "Snackbar shown when a valid Zotero API key has been saved."
+    },
+    "journals": "学術誌",
+    "@journals": {
+        "description": "The journals menu button and the app bar title when in the journals screen."
+    },
+    "follow": "フォロー",
+    "@follow": {
+        "description": "The button text shown on journal cards when it is not followed."
+    },
+    "unfollow": "フォロー解除",
+    "@unfollow": {
+        "description": "The button text shown on journal cards when it is followed."
+    },
+    "titleAndAbstract": "論文名と抄録",
+    "@titleAndAbstract": {},
+    "title": "論文名",
+    "@title": {},
+    "journaltitle": "学術誌名",
+    "@journaltitle": {},
+    "articletitle": "論文名",
+    "@articletitle": {},
+    "notificationContent": "新しい論文があります！",
+    "@notificationContent": {},
+    "notifications": "通知",
+    "@notifications": {},
+    "done": "完了",
+    "@done": {},
+    "edit": "編集",
+    "@edit": {},
+    "feedName": "フィード名",
+    "@feedName": {},
+    "errorFeedNameEmpty": "フィード名を入力してください",
+    "@errorFeedNameEmpty": {},
+    "emptyDOIError": "DOIを入力してください",
+    "@emptyDOIError": {},
+    "copy": "コピー",
+    "@copy": {},
+    "copydoi": "DOIをコピー",
+    "@copydoi": {},
+    "copyAbstract": "抄録をコピー",
+    "@copyAbstract": {},
+    "copyUrl": "URLをコピー",
+    "@copyUrl": {},
+    "copyTitle": "論文名をコピー",
+    "@copyTitle": {},
+    "downloadToApp": "アプリ内でダウンロードする",
+    "@downloadToApp": {},
+    "downloadStarting": "",
+    "@downloadStarting": {},
+    "errorOpeningFile": "",
+    "@errorOpeningFile": {},
+    "aiSettings": "AIの設定",
+    "@aiSettings": {}
 }
