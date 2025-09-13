@@ -1,0 +1,17 @@
+Whispar ist dein eigener Forschungsbegleiter — eine datenschutzfreundliche App zum erkunden von wissenschaftlichen Zeitschriften und wissenschaftliche Artikel.
+
+Mithilfe der Apis von Crossref und OpenAlex hilft Whispar dir dabei, über Ihre Lieblingszeitschriften auf dem Laufenden zu bleiben. Folge Fachzeitschriften um die neusten Forschungszusammenfassungen in deinem Hauptfeed zu erhalten — Kein Account erforderlich.
+
+- Wissenschaftliche Artikel und Zeitschriften suchen
+- Folge Zeitschriften um auf dem neuesten Stand zu bleiben
+- Füge eigene Schlüsselwörter und Suchbegriffe zu deinem Feed hinzu
+- Bekommen sie mithilfe von Unpaywall Zugriff zu Open-Access-Artikel
+- Verwende EZproxy, um kostenpflichtige Forschungsinhalte freizuschalten
+- Sende Artikel zu deiner Zotero Bibliothek
+- Entwickelt für Wissenschaftler, Studenten, und akademisch Interessierte
+
+Whispar ist benutzerfreundlich, Open Source, und wurde entwickelt, um deine Privatsphäre zu schützen.
+
+Als ein von der Gemeinschaft entwickeltes Projekt, Beiträge sind jederzeit wilkommen! Wenn du mitwirken willst, besuche das Github Repo: https://github.com/Scriptbash/Wispar
+
+Wenn die App nicht in deiner Sprache verfügbar ist, bitte erwägen sie, bei Übersetzungen zu helfen indem du unsere Hosted Weblate Instanz besuchst: https://hosted.weblate.org/engage/wispar
