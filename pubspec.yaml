@@ -65,6 +65,7 @@ dependencies:
   path: ^1.9.1
   sqflite_common_ffi: ^2.3.6
   flutter_markdown_plus: ^1.0.3
+  flutter_tts: ^4.2.3
 
 dev_dependencies:
   flutter_test:

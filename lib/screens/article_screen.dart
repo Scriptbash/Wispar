@@ -15,6 +15,7 @@ import 'package:latext/latext.dart';
 import '../services/logs_helper.dart';
 import 'dart:async';
 import 'package:wispar/widgets/translate_sheet.dart';
+import './tts_reader.dart';
 
 class ArticleScreen extends StatefulWidget {
   final String doi;
@@ -667,6 +668,42 @@ class _ArticleScreenState extends State<ArticleScreen> {
                     ),
                   ),
                 ),
+              Expanded(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      final String textToRead =
+                          "$_accumulatedTranslatedTitle\n $_accumulatedTranslatedAbstract";
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TtsReader(
+                                  title: _accumulatedTranslatedTitle,
+                                  text: textToRead)));
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    splashColor: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.3),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.volume_up_outlined, size: 30),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Listen',
+                            style: const TextStyle(fontSize: 10),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               Expanded(
                 child: Material(
                   color: Colors.transparent,
