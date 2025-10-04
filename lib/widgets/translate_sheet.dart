@@ -155,6 +155,15 @@ class _TranslateOptionsSheetState extends State<TranslateOptionsSheet> {
     _selectedCustomPrompt =
         _availableCustomPrompts.contains(savedPrompt) ? savedPrompt : 'Default';
 
+    final savedProvider = prefs.getString('selected_ai_provider');
+    String? finalSelectedProvider;
+
+    if (savedProvider != null && available.contains(savedProvider)) {
+      finalSelectedProvider = savedProvider;
+    } else if (available.isNotEmpty) {
+      finalSelectedProvider = available.first;
+    }
+
     setState(() {
       _sourceLang = TranslateLanguage.values.firstWhere(
         (lang) => lang.bcpCode == sourceCode,
@@ -165,8 +174,7 @@ class _TranslateOptionsSheetState extends State<TranslateOptionsSheet> {
         orElse: () => TranslateLanguage.french,
       );
       _availableAiProviders = available;
-      _selectedAiProvider = prefs.getString('selected_ai_provider') ??
-          (available.isNotEmpty ? available.first : null);
+      _selectedAiProvider = finalSelectedProvider;
     });
   }
 
