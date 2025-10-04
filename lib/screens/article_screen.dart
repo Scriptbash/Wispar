@@ -561,6 +561,16 @@ class ArticleScreenState extends State<ArticleScreen> {
                         fit: BoxFit.cover,
                         color: Colors.black.withAlpha(138),
                         colorBlendMode: BlendMode.darken,
+                        errorBuilder: (context, error, stackTrace) {
+                          logger.severe(
+                              "Error displaying the graphical abstract",
+                              error,
+                              stackTrace);
+                          return Container(
+                            color: Colors.deepPurple,
+                            alignment: Alignment.center,
+                          );
+                        },
                       )
                     else if (widget.graphicalAbstractUrl != null)
                       const Center(child: LinearProgressIndicator())
