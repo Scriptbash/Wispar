@@ -10,13 +10,13 @@ import 'package:path/path.dart' as p;
 import '../services/logs_helper.dart';
 
 class DatabaseSettingsScreen extends StatefulWidget {
-  const DatabaseSettingsScreen({Key? key}) : super(key: key);
+  const DatabaseSettingsScreen({super.key});
 
   @override
-  _DatabaseSettingsScreenState createState() => _DatabaseSettingsScreenState();
+  DatabaseSettingsScreenState createState() => DatabaseSettingsScreenState();
 }
 
-class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
+class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
   final logger = LogsService().logger;
   final _formKey = GlobalKey<FormState>();
 
@@ -24,10 +24,11 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
   int _cleanupInterval = 7; // Default for cleanup interval
   int _fetchInterval = 6; // Default API fetch to 6 hours
   int _concurrentFetches = 3; // Default to 3 concurrent fetches
-  TextEditingController _cleanupIntervalController = TextEditingController();
+  final TextEditingController _cleanupIntervalController =
+      TextEditingController();
 
   bool _overrideUserAgent = false;
-  TextEditingController _userAgentController = TextEditingController();
+  final TextEditingController _userAgentController = TextEditingController();
 
   @override
   void initState() {
@@ -62,10 +63,11 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       if (_overrideUserAgent) {
         await prefs.setString('customUserAgent', _userAgentController.text);
       }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.settingsSaved)),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.settingsSaved)),
+        );
+      }
     }
   }
 
@@ -75,7 +77,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
         dialogTitle: AppLocalizations.of(context)!.selectDBExportLocation,
       );
 
-      if (outputDirectory == null) return;
+      if (outputDirectory == null || !mounted) return;
       await _showLoadingDialog(AppLocalizations.of(context)!.exportingDatabase);
       final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
       final String outputFile =
@@ -87,6 +89,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       File dbFile = File(dbPath);
 
       if (!await dbFile.exists()) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(AppLocalizations.of(context)!.databaseNotFound)),
@@ -106,8 +109,19 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
         }
       }
 
-      encoder.close();
+      final graphicalAbstractsDir =
+          Directory(p.join(appDir.path, 'graphical_abstracts'));
+      if (await graphicalAbstractsDir.exists()) {
+        for (var entity in graphicalAbstractsDir.listSync(recursive: true)) {
+          if (entity is File) {
+            final relativePath = p.relative(entity.path, from: appDir.path);
+            await encoder.addFile(entity, relativePath);
+          }
+        }
+      }
 
+      encoder.close();
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.databaseExported)),
       );
@@ -128,7 +142,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
         type: FileType.custom,
         allowedExtensions: ['zip'],
       );
-      if (result == null) return;
+      if (result == null || !mounted) return;
       await _showLoadingDialog(AppLocalizations.of(context)!.importingDatabase);
 
       File selectedFile = File(result.files.single.path!);
@@ -154,7 +168,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
 
       logger.info(
           'The database was successfully imported from ${selectedFile.path}');
-
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.databaseImported)),
       );
@@ -162,6 +176,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       _hideLoadingDialog();
     } catch (e, stackTrace) {
       logger.severe('Database import error.', e, stackTrace);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(AppLocalizations.of(context)!.databaseImportFailed)));
       _hideLoadingDialog();
