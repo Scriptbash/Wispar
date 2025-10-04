@@ -1,0 +1,17 @@
+Wispar é seu companheiro de pesquisa — um aplicativo amigo da sua privacidade para explorar artigos e revistas científicas.
+
+Usando o Crossref e OpenAlex, Wispar ajuda você a ficar atualizado com suas revistas favoritas. Siga revistas para receber os últimos resumos de artigos no seu feed principal — nenhuma conta é necessária.
+
+- Procure artigos e revistas
+- Siga revistas e fique atualizado
+- adicione parâmetros e palavras-chave para seu feed
+- Acesse artigos livremente distribuídos via Unpaywall
+- Use EZproxy para desbloquear pesquisas de acesso pago
+- Envie artigos para sua biblioteca Zotero
+- feito para pesquisadores, estudantes e curiosos acadêmicos
+
+Wispar é fácil de usar, de código aberto e feito para respeitar sua privacidade
+
+Com um projeto feito por uma comunidade, contribuições são sempre bem-vindas! Se você gostaria de contribuir, visite nosso repositório no Github: https://github.com/Scriptbash/Wispar
+
+se o aplicativo não está disponível em seu idioma, por favor considere ajudar com traduções, visitando nossa instância Weblate: https://hosted.weblate.org/engage/wispar
