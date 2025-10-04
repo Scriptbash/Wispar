@@ -11,6 +11,8 @@ import '../services/string_format_helper.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:latext/latext.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 enum SampleItem { itemOne, itemTwo, itemThree, itemFour }
 
@@ -88,12 +90,21 @@ class _PublicationCardState extends State<PublicationCard> {
             child: GestureDetector(
               onTap: () async {
                 String finalAbstract = widget.abstract;
+                String? newGraphAbstractPath;
                 if (widget.abstract.trim().isEmpty) {
                   final dbAbstract =
                       await databaseHelper.getAbstract(widget.doi);
                   if (dbAbstract != null && dbAbstract.isNotEmpty) {
                     finalAbstract = dbAbstract;
                   }
+                }
+                final graphicalAbstractPath =
+                    await databaseHelper.getGraphicalAbstractPath(widget.doi);
+                if (graphicalAbstractPath != null &&
+                    graphicalAbstractPath.isNotEmpty) {
+                  final directory = await getApplicationDocumentsDirectory();
+                  newGraphAbstractPath =
+                      p.join(directory.path, graphicalAbstractPath);
                 }
                 _openArticleScreen(
                   context,
@@ -109,6 +120,7 @@ class _PublicationCardState extends State<PublicationCard> {
                     license: widget.license,
                     licenseName: widget.licenseName,
                     publisher: widget.publisher,
+                    graphicalAbstractUrl: newGraphAbstractPath,
                     onAbstractChanged: () {
                       widget.onAbstractChanged?.call();
                     },

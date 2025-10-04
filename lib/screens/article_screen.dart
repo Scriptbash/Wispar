@@ -15,6 +15,9 @@ import 'package:latext/latext.dart';
 import '../services/logs_helper.dart';
 import 'dart:async';
 import 'package:wispar/widgets/translate_sheet.dart';
+import '../services/graphical_abstract_manager.dart';
+import '../screens/graphical_abstract_screen.dart';
+import 'dart:io';
 
 class ArticleScreen extends StatefulWidget {
   final String doi;
@@ -29,9 +32,10 @@ class ArticleScreen extends StatefulWidget {
   final String licenseName;
   final String? publisher;
   final VoidCallback? onAbstractChanged;
+  final String? graphicalAbstractUrl;
 
   const ArticleScreen({
-    Key? key,
+    super.key,
     required this.doi,
     required this.title,
     required this.issn,
@@ -44,13 +48,14 @@ class ArticleScreen extends StatefulWidget {
     required this.licenseName,
     this.publisher,
     this.onAbstractChanged,
-  }) : super(key: key);
+    this.graphicalAbstractUrl,
+  });
 
   @override
-  _ArticleScreenState createState() => _ArticleScreenState();
+  ArticleScreenState createState() => ArticleScreenState();
 }
 
-class _ArticleScreenState extends State<ArticleScreen> {
+class ArticleScreenState extends State<ArticleScreen> {
   bool isLiked = false;
   bool _hideAI = false;
   late DatabaseHelper databaseHelper;
@@ -58,6 +63,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
   String? abstract;
   bool isLoadingAbstract = false;
   bool _scrapeAbstracts = true;
+  File? graphicalAbstract;
+  bool isFetchingGraphicalAbstract = false;
 
   StreamController<String>? _translatedTitleController;
   StreamController<String>? _translatedAbstractController;
@@ -72,14 +79,34 @@ class _ArticleScreenState extends State<ArticleScreen> {
   String _accumulatedTranslatedTitle = '';
   String _accumulatedTranslatedAbstract = '';
 
+  late ScrollController _scrollController;
+  bool _isCollapsed = false;
+
   @override
   void initState() {
     super.initState();
+    // scrollController used for switching font color in app bar to avoid
+    // having white text on white background
+    _scrollController = ScrollController()
+      ..addListener(() {
+        bool isCollapsed = _scrollController.hasClients &&
+            _scrollController.offset > (320 - kToolbarHeight);
+        if (isCollapsed != _isCollapsed) {
+          setState(() {
+            _isCollapsed = isCollapsed;
+          });
+        }
+      });
     databaseHelper = DatabaseHelper();
     _loadScrapingSettings();
     _loadHideAIPreference();
+    _loadGraphicalAbstract();
     checkIfLiked();
-    abstract = widget.abstract;
+    if (widget.abstract.isEmpty) {
+      abstract = null;
+    } else {
+      abstract = widget.abstract;
+    }
 
     _accumulatedTranslatedTitle = widget.title;
     _accumulatedTranslatedAbstract = abstract ?? widget.abstract;
@@ -122,59 +149,124 @@ class _ArticleScreenState extends State<ArticleScreen> {
     setState(() {
       _scrapeAbstracts = prefs.getBool('scrapeAbstracts') ?? true;
     });
+    if (!mounted) return;
+
     if (_scrapeAbstracts) {
       final missingAbstractText =
           AppLocalizations.of(context)!.abstractunavailable;
 
-      if (abstract == null ||
+      // Check if the text abstract is missing
+      final bool isTextAbstractMissing = abstract == null ||
           abstract!.isEmpty ||
-          abstract == missingAbstractText) {
-        fetchAbstract();
+          abstract == missingAbstractText;
+      // Check if the gtraphical abstract is missing
+      final bool isGraphicalAbstractMissingInDB =
+          widget.graphicalAbstractUrl == null;
+
+      // If either is missing launch the scraper
+      if (isTextAbstractMissing || isGraphicalAbstractMissingInDB) {
+        fetchAbstract(scrapeTextAbstract: isTextAbstractMissing);
       }
     }
   }
 
-  Future<void> fetchAbstract() async {
+  Future<void> fetchAbstract({bool scrapeTextAbstract = true}) async {
     if (!mounted) return;
-    setState(() {
-      isLoadingAbstract = true;
-    });
+
+    final bool shouldScrapeGraphicalAbstract =
+        _scrapeAbstracts && graphicalAbstract == null;
+
+    if (scrapeTextAbstract) {
+      setState(() => isLoadingAbstract = true);
+    }
+    if (shouldScrapeGraphicalAbstract) {
+      setState(() => isFetchingGraphicalAbstract = true);
+    }
 
     AbstractScraper scraper = AbstractScraper();
-    String? scraped;
+    Map<String, String?>? scraped;
     try {
-      scraped = await scraper.scrapeAbstract(widget.url);
+      scraped = await scraper.scrapeAbstractAndGraphical(
+        widget.url,
+        textAbstract: scrapeTextAbstract,
+        graphicalAbstract: shouldScrapeGraphicalAbstract,
+      );
     } catch (e) {
-      logger.warning('Failed to scrape abstract from ${widget.url}: $e');
-      scraped = '';
+      logger.warning(
+          'Failed to scrape abstract/graphical from ${widget.url}: $e');
+      scraped = {};
     }
-    String finalAbstract = '';
-    if (scraped != null && scraped.isNotEmpty) {
-      finalAbstract = scraped;
-      try {
-        bool isArticleInDb = await databaseHelper.checkIfDoiExists(widget.doi);
-        if (isArticleInDb) {
-          databaseHelper.updateArticleAbstract(widget.doi, finalAbstract);
-          widget.onAbstractChanged!();
-        } else {
-          logger.warning(
-              'Unable to update the abstract for DOI ${widget.doi}. The article is not in the database.');
-        }
-      } catch (e, stackTrace) {
-        logger.severe(
-            'An error occurred while updating the abstract for DOI ${widget.doi}.',
-            e,
-            stackTrace);
-      }
-    } else {
-      finalAbstract = AppLocalizations.of(context)!.abstractunavailable;
-    }
+
+    // Text abstract handling
     if (!mounted) return;
+    String finalAbstract =
+        abstract ?? AppLocalizations.of(context)!.abstractunavailable;
+    bool abstractUpdated = false;
+    if (scrapeTextAbstract && scraped['abstract']?.isNotEmpty == true) {
+      finalAbstract = scraped['abstract']!;
+      abstractUpdated = true;
+      try {
+        if (await databaseHelper.checkIfDoiExists(widget.doi)) {
+          databaseHelper.updateArticleAbstract(widget.doi, finalAbstract);
+          widget.onAbstractChanged?.call();
+        }
+      } catch (e, st) {
+        logger.severe('Error updating abstract for ${widget.doi}', e, st);
+      }
+    }
+
+    // Graphical abstract handling
+    if (shouldScrapeGraphicalAbstract && scraped['graphicalUrl'] != null) {
+      File? file = await GraphicalAbstractManager.downloadAndSave(
+        widget.doi,
+        scraped['graphicalUrl']!,
+      );
+      if (file != null && mounted) {
+        setState(() => graphicalAbstract = file);
+        try {
+          databaseHelper.updateGraphicalAbstractPath(widget.doi, file);
+          widget.onAbstractChanged?.call();
+        } catch (e) {
+          logger.severe('Failed to update GA path in DB for ${widget.doi}', e);
+        }
+      }
+    }
+
+    if (!mounted) return;
+
     setState(() {
-      abstract = finalAbstract;
+      abstract = abstractUpdated
+          ? finalAbstract
+          : (abstract ?? AppLocalizations.of(context)!.abstractunavailable);
       isLoadingAbstract = false;
-      _translatedAbstractController!.add(abstract ?? widget.abstract);
+      isFetchingGraphicalAbstract = false;
+      _translatedAbstractController!.add(abstract!);
     });
+  }
+
+  Future<void> _loadGraphicalAbstract() async {
+    if (widget.graphicalAbstractUrl != null) {
+      if (mounted) {
+        setState(() {
+          isFetchingGraphicalAbstract = true;
+        });
+      }
+
+      File? file = await GraphicalAbstractManager.getLocalFile(widget.doi);
+      file ??= await GraphicalAbstractManager.downloadAndSave(
+        widget.doi,
+        widget.graphicalAbstractUrl!,
+      );
+      if (file != null && mounted) {
+        setState(() => graphicalAbstract = file);
+      }
+
+      if (mounted) {
+        setState(() {
+          isFetchingGraphicalAbstract = false;
+        });
+      }
+    }
   }
 
   Future<void> _loadTranslatedContent() async {
@@ -373,96 +465,48 @@ class _ArticleScreenState extends State<ArticleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: _showTranslatedTitle
-            ? StreamBuilder<String>(
-                stream: _translatedTitleController?.stream,
-                initialData: _accumulatedTranslatedTitle,
-                builder: (context, snapshot) {
-                  return LaTexT(
-                    breakDelimiter: r'\nl',
-                    laTeXCode: Text(
-                      snapshot.data!,
-                    ),
-                  );
-                },
-              )
-            : LaTexT(breakDelimiter: r'\nl', laTeXCode: Text(widget.title)),
-        actions: [
-          IconButton(
-            onPressed: () => _onCopy(context),
-            icon: const Icon(Icons.copy_outlined),
-            tooltip: AppLocalizations.of(context)!.copy,
-          ),
-          Builder(
-            builder: (BuildContext context) {
-              return IconButton(
-                onPressed: () => _onShare(context),
-                icon: const Icon(Icons.share_outlined),
-                tooltip: AppLocalizations.of(context)!.shareArticle,
-              );
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (_isTitleTranslated || _isAbstractTranslated)
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 0.0),
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _showTranslatedTitle = !_showTranslatedTitle;
-                            _showTranslatedAbstract = !_showTranslatedAbstract;
-                            if (_showTranslatedTitle) {
-                              _translatedTitleController!
-                                  .add(_accumulatedTranslatedTitle);
-                            } else {
-                              _translatedTitleController!.add(widget.title);
-                            }
+    final bool hasBannerContent =
+        graphicalAbstract != null || widget.graphicalAbstractUrl != null;
+    // Style for the text that goes over the banner image
+    final TextStyle onImageTitleStyle = TextStyle(
+        fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white);
 
-                            if (_showTranslatedAbstract) {
-                              _translatedAbstractController!
-                                  .add(_accumulatedTranslatedAbstract);
-                            } else {
-                              _translatedAbstractController!
-                                  .add(abstract ?? widget.abstract);
-                            }
-                          });
-                        },
-                        child: Text(
-                          _showTranslatedTitle || _showTranslatedAbstract
-                              ? AppLocalizations.of(context)!.showOriginal
-                              : AppLocalizations.of(context)!.showTranslation,
-                        ),
-                      ),
-                    ),
-                  ),
-                const SizedBox(height: 16),
-                Text(
-                  AppLocalizations.of(context)!
-                      .publishedon(widget.publishedDate!),
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                _showTranslatedTitle
+    void onBannerTap() {
+      if (graphicalAbstract != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ImageScreen(
+                imageFile: graphicalAbstract!,
+                title: AppLocalizations.of(context)!.graphicalAbstract),
+          ),
+        );
+      }
+    }
+
+    return Scaffold(
+      // -- APPBAR --
+      body: CustomScrollView(
+        controller: _scrollController,
+        slivers: <Widget>[
+          SliverAppBar(
+            expandedHeight: 320.0,
+            pinned: true,
+            foregroundColor: _isCollapsed
+                ? Theme.of(context).colorScheme.onSurface
+                : Colors.white,
+            iconTheme: IconThemeData(
+              color: _isCollapsed
+                  ? Theme.of(context).colorScheme.onSurface
+                  : Colors.white,
+            ),
+            actionsIconTheme: IconThemeData(
+              color: _isCollapsed
+                  ? Theme.of(context).colorScheme.onSurface
+                  : Colors.white,
+            ),
+            title: _isCollapsed
+                ? (_showTranslatedTitle
                     ? StreamBuilder<String>(
                         stream: _translatedTitleController?.stream,
                         initialData: _accumulatedTranslatedTitle,
@@ -471,10 +515,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
                             breakDelimiter: r'\nl',
                             laTeXCode: Text(
                               snapshot.data!,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           );
                         },
@@ -483,154 +525,341 @@ class _ArticleScreenState extends State<ArticleScreen> {
                         breakDelimiter: r'\nl',
                         laTeXCode: Text(
                           widget.title,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ))
+                : null,
+            actions: [
+              IconButton(
+                onPressed: () => _onCopy(context),
+                icon: const Icon(Icons.copy_outlined),
+                tooltip: AppLocalizations.of(context)!.copy,
+              ),
+              Builder(
+                builder: (BuildContext context) {
+                  return IconButton(
+                    onPressed: () => _onShare(context),
+                    icon: const Icon(Icons.share_outlined),
+                    tooltip: AppLocalizations.of(context)!.shareArticle,
+                  );
+                },
+              ),
+            ],
+
+            // -- BANNER, TITLE AND PUB. DATE --
+            flexibleSpace: FlexibleSpaceBar(
+              title: null,
+              background: GestureDetector(
+                onTap: onBannerTap,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (graphicalAbstract != null)
+                      Image.file(
+                        graphicalAbstract!,
+                        fit: BoxFit.cover,
+                        color: Colors.black.withAlpha(138),
+                        colorBlendMode: BlendMode.darken,
+                      )
+                    else if (widget.graphicalAbstractUrl != null)
+                      const Center(child: LinearProgressIndicator())
+                    else
+                      Container(
+                        color: Colors.deepPurple,
+                        alignment: Alignment.center,
+                      ),
+                    if (isFetchingGraphicalAbstract)
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: LinearProgressIndicator(
+                          minHeight: 4,
+                          backgroundColor: Colors.black,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: hasBannerContent
+                              ? LinearGradient(
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
+                                  colors: [
+                                    Colors.black.withAlpha(204),
+                                    Colors.transparent,
+                                  ],
+                                  stops: const [0.0, 1.0],
+                                )
+                              : null,
+                        ),
+                        padding:
+                            const EdgeInsets.fromLTRB(16.0, 48.0, 16.0, 16.0),
+                        child: IgnorePointer(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Published Date
+                              if (widget.publishedDate != null)
+                                Text(
+                                  AppLocalizations.of(context)!
+                                      .publishedon(widget.publishedDate!),
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              const SizedBox(height: 4),
+                              // Title
+                              _showTranslatedTitle
+                                  ? StreamBuilder<String>(
+                                      stream:
+                                          _translatedTitleController?.stream,
+                                      initialData: _accumulatedTranslatedTitle,
+                                      builder: (context, snapshot) {
+                                        return LaTexT(
+                                          breakDelimiter: r'\nl',
+                                          laTeXCode: Text(
+                                            snapshot.data!,
+                                            maxLines: 9,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: onImageTitleStyle,
+                                          ),
+                                        );
+                                      },
+                                    )
+                                  : LaTexT(
+                                      breakDelimiter: r'\nl',
+                                      laTeXCode: Text(
+                                        widget.title,
+                                        maxLines: 9,
+                                        softWrap: true,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: onImageTitleStyle,
+                                      ),
+                                    ),
+                            ],
                           ),
                         ),
                       ),
-                const SizedBox(height: 5),
-                SelectableText(getAuthorsNames(widget.authors),
-                    style: TextStyle(color: Colors.grey, fontSize: 15)),
-                const SizedBox(height: 15),
-                isLoadingAbstract
-                    ? const Center(child: CircularProgressIndicator())
-                    : _showTranslatedAbstract
-                        ? StreamBuilder<String>(
-                            stream: _translatedAbstractController?.stream,
-                            initialData: _accumulatedTranslatedAbstract,
-                            builder: (context, snapshot) {
-                              return LaTexT(
-                                breakDelimiter: r'\nl',
-                                laTeXCode: Text(
-                                  snapshot.data!,
-                                  textAlign: TextAlign.justify,
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              );
-                            },
-                          )
-                        : LaTexT(
-                            breakDelimiter: r'\nl',
-                            laTeXCode: Text(
-                              abstract ??
-                                  AppLocalizations.of(context)!
-                                      .abstractunavailable,
-                              textAlign: TextAlign.justify,
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'DOI: ${widget.doi}',
-                              style: TextStyle(
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: TextButton(
-                              onPressed: () async {
-                                String journalPublisher = "";
-                                Map<String, dynamic>? journalInfo;
-
-                                journalInfo =
-                                    await getJournalDetails(widget.issn);
-
-                                if (widget.publisher == null ||
-                                    widget.publisher!.isEmpty) {
-                                  if (journalInfo != null &&
-                                      journalInfo['publisher'] != null) {
-                                    journalPublisher = journalInfo['publisher'];
-                                  } else {
-                                    journalPublisher = widget.publisher ?? "";
-                                  }
-                                } else {
-                                  journalPublisher = widget.publisher!;
-                                }
-
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => JournalDetailsScreen(
-                                      title: widget.journalTitle,
-                                      publisher: journalPublisher,
-                                      issn: widget.issn,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: widget.journalTitle.isNotEmpty
-                                  ? Text(
-                                      '${AppLocalizations.of(context)!.publishedin} ${widget.journalTitle}',
-                                      style: TextStyle(color: Colors.grey),
-                                    )
-                                  : SizedBox(),
-                              style: TextButton.styleFrom(
-                                minimumSize: Size.zero,
-                                padding: EdgeInsets.zero,
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        isLiked ? Icons.favorite : Icons.favorite_border,
-                        color: isLiked
-                            ? Theme.of(context).colorScheme.primary
-                            : null,
-                      ),
-                      onPressed: () async {
-                        setState(() {
-                          isLiked = !isLiked;
-                        });
-
-                        if (isLiked) {
-                          await databaseHelper.insertArticle(
-                            PublicationCard(
-                              title: widget.title,
-                              abstract: widget.abstract,
-                              journalTitle: widget.journalTitle,
-                              issn: widget.issn,
-                              publishedDate: widget.publishedDate,
-                              doi: widget.doi,
-                              authors: widget.authors,
-                              url: widget.url,
-                              license: widget.license,
-                              licenseName: widget.licenseName,
-                              publisher: widget.publisher,
-                            ),
-                            isLiked: true,
-                          );
-                        } else {
-                          await databaseHelper.removeFavorite(widget.doi);
-                        }
-
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(isLiked
-                              ? '${widget.title} ${AppLocalizations.of(context)!.favoriteadded}'
-                              : '${widget.title} ${AppLocalizations.of(context)!.favoriteremoved}'),
-                        ));
-                      },
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+              ),
+            ),
+          ),
+
+          // -- Article Content --
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_isTitleTranslated || _isAbstractTranslated)
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 0.0),
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _showTranslatedTitle = !_showTranslatedTitle;
+                                  _showTranslatedAbstract =
+                                      !_showTranslatedAbstract;
+                                  if (_showTranslatedTitle) {
+                                    _translatedTitleController!
+                                        .add(_accumulatedTranslatedTitle);
+                                  } else {
+                                    _translatedTitleController!
+                                        .add(widget.title);
+                                  }
+
+                                  if (_showTranslatedAbstract) {
+                                    _translatedAbstractController!
+                                        .add(_accumulatedTranslatedAbstract);
+                                  } else {
+                                    _translatedAbstractController!
+                                        .add(abstract ?? widget.abstract);
+                                  }
+                                });
+                              },
+                              child: Text(
+                                _showTranslatedTitle || _showTranslatedAbstract
+                                    ? AppLocalizations.of(context)!.showOriginal
+                                    : AppLocalizations.of(context)!
+                                        .showTranslation,
+                              ),
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 16),
+                      // Authors
+                      SelectableText(getAuthorsNames(widget.authors),
+                          style: TextStyle(color: Colors.grey, fontSize: 13)),
+                      const SizedBox(height: 16),
+
+                      // Abstract
+                      isLoadingAbstract
+                          ? const Center(child: CircularProgressIndicator())
+                          : _showTranslatedAbstract
+                              ? StreamBuilder<String>(
+                                  stream: _translatedAbstractController?.stream,
+                                  initialData: _accumulatedTranslatedAbstract,
+                                  builder: (context, snapshot) {
+                                    return LaTexT(
+                                      breakDelimiter: r'\nl',
+                                      laTeXCode: Text(
+                                        snapshot.data!,
+                                        textAlign: TextAlign.justify,
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    );
+                                  },
+                                )
+                              : LaTexT(
+                                  breakDelimiter: r'\nl',
+                                  laTeXCode: Text(
+                                    abstract ??
+                                        AppLocalizations.of(context)!
+                                            .abstractunavailable,
+                                    textAlign: TextAlign.justify,
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              children: [
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'DOI: ${widget.doi}',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: TextButton(
+                                    onPressed: () async {
+                                      String journalPublisher = "";
+                                      Map<String, dynamic>? journalInfo;
+
+                                      journalInfo =
+                                          await getJournalDetails(widget.issn);
+
+                                      if (widget.publisher == null ||
+                                          widget.publisher!.isEmpty) {
+                                        if (journalInfo != null &&
+                                            journalInfo['publisher'] != null) {
+                                          journalPublisher =
+                                              journalInfo['publisher'];
+                                        } else {
+                                          journalPublisher =
+                                              widget.publisher ?? "";
+                                        }
+                                      } else {
+                                        journalPublisher = widget.publisher!;
+                                      }
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              JournalDetailsScreen(
+                                            title: widget.journalTitle,
+                                            publisher: journalPublisher,
+                                            issn: widget.issn,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    style: TextButton.styleFrom(
+                                      minimumSize: Size.zero,
+                                      padding: EdgeInsets.zero,
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    child: widget.journalTitle.isNotEmpty
+                                        ? Text(
+                                            '${AppLocalizations.of(context)!.publishedin} ${widget.journalTitle}',
+                                            style:
+                                                TextStyle(color: Colors.grey),
+                                          )
+                                        : SizedBox(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              isLiked ? Icons.favorite : Icons.favorite_border,
+                              color: isLiked
+                                  ? Theme.of(context).colorScheme.primary
+                                  : null,
+                            ),
+                            onPressed: () async {
+                              setState(() {
+                                isLiked = !isLiked;
+                              });
+
+                              if (isLiked) {
+                                await databaseHelper.insertArticle(
+                                  PublicationCard(
+                                    title: widget.title,
+                                    abstract: widget.abstract,
+                                    journalTitle: widget.journalTitle,
+                                    issn: widget.issn,
+                                    publishedDate: widget.publishedDate,
+                                    doi: widget.doi,
+                                    authors: widget.authors,
+                                    url: widget.url,
+                                    license: widget.license,
+                                    licenseName: widget.licenseName,
+                                    publisher: widget.publisher,
+                                  ),
+                                  isLiked: true,
+                                );
+                              } else {
+                                await databaseHelper.removeFavorite(widget.doi);
+                              }
+
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content: Text(isLiked
+                                    ? '${widget.title} ${AppLocalizations.of(context)!.favoriteadded}'
+                                    : '${widget.title} ${AppLocalizations.of(context)!.favoriteremoved}'),
+                              ));
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
-        ),
+        ],
       ),
       bottomNavigationBar: SafeArea(
         child: Container(
@@ -646,10 +875,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
                     child: InkWell(
                       onTap: _showTranslateSheet,
                       borderRadius: BorderRadius.circular(8),
-                      splashColor: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withValues(alpha: 0.3),
+                      splashColor:
+                          Theme.of(context).colorScheme.primary.withAlpha(77),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Column(
@@ -694,10 +921,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
                       );
                     },
                     borderRadius: BorderRadius.circular(8),
-                    splashColor: Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withValues(alpha: 0.3),
+                    splashColor:
+                        Theme.of(context).colorScheme.primary.withAlpha(77),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Column(
@@ -742,10 +967,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
                       );
                     },
                     borderRadius: BorderRadius.circular(8),
-                    splashColor: Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withValues(alpha: 0.3),
+                    splashColor:
+                        Theme.of(context).colorScheme.primary.withAlpha(77),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Column(

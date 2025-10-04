@@ -226,6 +226,8 @@
   },
   "abstract": "Abstract",
   "@abstract": {},
+  "graphicalAbstract": "Graphical abstract",
+  "@graphicalAbstract":{},
   "copy": "Copy",
   "@copy": {},
   "copydoi": "Copy DOI",
