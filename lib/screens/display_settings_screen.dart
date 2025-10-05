@@ -9,13 +9,15 @@ class DisplaySettingsScreen extends StatefulWidget {
   const DisplaySettingsScreen({super.key});
 
   @override
-  _DisplaySettingsScreenState createState() => _DisplaySettingsScreenState();
+  DisplaySettingsScreenState createState() => DisplaySettingsScreenState();
 }
 
-class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
+class DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
   int _publicationCardOption = 1;
   int _pdfThemeOption = 0;
   int _pdfOrientationOption = 0;
+
+  bool _showPublicationCount = false;
 
   final Map<String, String> _languageLabels = {
     'en': 'English',
@@ -57,6 +59,7 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
     _loadPublicationCardOption();
     _loadPdfThemeOption();
     _loadPdfOrientationOption();
+    _loadShowPublicationCount();
   }
 
   void _loadPublicationCardOption() async {
@@ -91,6 +94,18 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
     prefs.setInt('pdfOrientationOption', value);
   }
 
+  void _loadShowPublicationCount() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _showPublicationCount = prefs.getBool('showPublicationCount') ?? false;
+    });
+  }
+
+  void _saveShowPublicationCount(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('showPublicationCount', value);
+  }
+
   @override
   Widget build(BuildContext context) {
     final items = [
@@ -114,6 +129,14 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
         "label": AppLocalizations.of(context)!.pdfReadingOrientation,
         "subtitle": _getPdfOrientationSubtitle(_pdfOrientationOption),
         "onTap": () => _showPdfOrientationDialog(context),
+      },
+      {
+        "icon": Icons.format_list_numbered,
+        "label": AppLocalizations.of(context)!.showPublicationCount,
+        "subtitle": _showPublicationCount
+            ? AppLocalizations.of(context)!.enabled
+            : AppLocalizations.of(context)!.disabled,
+        "onTap": () => {},
       },
       {
         "icon": Icons.article_outlined,
@@ -148,52 +171,89 @@ class _DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
             final double minTileHeight = 100;
 
             return GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: tileWidth / minTileHeight,
-              ),
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                final item = items[index];
-                return Card(
-                  elevation: 2,
-                  child: InkWell(
-                    onTap: item["onTap"] as VoidCallback,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Row(
+                padding: const EdgeInsets.all(16),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: tileWidth / minTileHeight,
+                ),
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  final item = items[index];
+
+                  // Publication count tile
+                  if (item["label"] ==
+                      AppLocalizations.of(context)!.showPublicationCount) {
+                    return Card(
+                      elevation: 2,
+                      child: InkWell(
+                        onTap: () {
+                          setState(() =>
+                              _showPublicationCount = !_showPublicationCount);
+                          _saveShowPublicationCount(_showPublicationCount);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 14),
+                          child: Row(
                             children: [
                               Icon(item["icon"] as IconData),
-                              const SizedBox(width: 8),
-                              Expanded(child: Text(item["label"] as String)),
-                            ],
-                          ),
-                          if (item["subtitle"] != null)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8, left: 32),
-                              child: Text(
-                                item["subtitle"] as String,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey,
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  item["label"] as String,
                                 ),
                               ),
+                              Switch(
+                                value: _showPublicationCount,
+                                onChanged: (value) {
+                                  setState(() => _showPublicationCount = value);
+                                  _saveShowPublicationCount(value);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+
+                  // Default tiles
+                  return Card(
+                    elevation: 2,
+                    child: InkWell(
+                      onTap: item["onTap"] as VoidCallback,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 14),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(item["icon"] as IconData),
+                                const SizedBox(width: 8),
+                                Expanded(child: Text(item["label"] as String)),
+                              ],
                             ),
-                        ],
+                            if (item["subtitle"] != null)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 8, left: 32),
+                                child: Text(
+                                  item["subtitle"] as String,
+                                  style: const TextStyle(
+                                      fontSize: 13, color: Colors.grey),
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
-            );
+                  );
+                });
           },
         ),
       ),
