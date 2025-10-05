@@ -478,6 +478,7 @@ class ArticleScreenState extends State<ArticleScreen> {
           MaterialPageRoute(
             builder: (context) => ImageScreen(
                 imageFile: graphicalAbstract!,
+                imagePath: graphicalAbstract!.path,
                 title: AppLocalizations.of(context)!.graphicalAbstract),
           ),
         );
