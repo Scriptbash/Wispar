@@ -115,7 +115,7 @@ class _PdfReaderState extends State<PdfReader> {
               ),
             IconButton(
               icon: const Icon(Icons.open_in_browser),
-              tooltip: AppLocalizations.of(context)!.openExternalPdfApp,
+              tooltip: AppLocalizations.of(context)!.openInExternalPdfViewer,
               onPressed: () async {
                 try {
                   OpenFilex.open(resolvedPdfPath);

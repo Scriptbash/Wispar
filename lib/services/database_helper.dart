@@ -26,7 +26,7 @@ class DatabaseHelper {
     final path = await getDatabasesPath();
     final databasePath = join(path, 'wispar.db');
 
-    return openDatabase(databasePath, version: 8, onOpen: (db) async {
+    return openDatabase(databasePath, version: 9, onOpen: (db) async {
       await db.execute('PRAGMA foreign_keys = ON');
     }, onCreate: (db, version) async {
       await db.execute('PRAGMA foreign_keys = ON');
@@ -72,6 +72,7 @@ class DatabaseHelper {
           isSavedQuery INTEGER,
           isHidden INTEGER,
           query_id INTEGER,
+          graphAbstractPath,
           journal_id,
           FOREIGN KEY (journal_id) REFERENCES journals(journal_id)
         )
@@ -223,6 +224,11 @@ class DatabaseHelper {
           url TEXT,
           proxySuccess INTEGER
         )
+      ''');
+      }
+      if (oldVersion < 9) {
+        await db.execute('''
+        ALTER TABLE articles ADD COLUMN graphAbstractPath TEXT;
       ''');
       }
     });
@@ -875,6 +881,49 @@ class DatabaseHelper {
     );
 
     return result.isNotEmpty ? result.first['abstract'] as String? : null;
+  }
+
+  Future<void> updateGraphicalAbstractPath(
+      String doi, File graphicalAbstractFile) async {
+    final db = await database;
+
+    final String filename = basename(graphicalAbstractFile.path);
+
+    try {
+      final rowsAffected = await db.update(
+        'articles',
+        {
+          'graphAbstractPath': filename,
+        },
+        where: 'doi = ?',
+        whereArgs: [doi],
+      );
+
+      if (rowsAffected > 0) {
+        logger.info(
+            'Updated graphical abstract path for DOI: $doi with basename: $filename');
+      } else {
+        logger.warning(
+            'No article found with DOI: $doi to update graphical abstract path.');
+      }
+    } catch (e, stackTrace) {
+      logger.severe('Failed to update graphical abstract path for DOI: $doi', e,
+          stackTrace);
+    }
+  }
+
+  Future<String?> getGraphicalAbstractPath(String doi) async {
+    final db = await database;
+    final result = await db.query(
+      'articles',
+      columns: ['graphAbstractPath'],
+      where: 'doi = ?',
+      whereArgs: [doi],
+    );
+
+    return result.isNotEmpty
+        ? result.first['graphAbstractPath'] as String?
+        : null;
   }
 
   Future<void> removeDownloaded(String doi) async {
