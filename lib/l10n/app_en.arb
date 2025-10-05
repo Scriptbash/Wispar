@@ -47,6 +47,14 @@
   "@notificationTitleJournal": {},
   "notificationTitleQuery": "Queries were updated",
   "@notificationTitleQuery": {},
+  "numberPublications": "{count, plural, =0{No publications} =1{1 publication} other{{count} publications}}",
+  "@numberPublications": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "showPublicationCount": "Show publication count",
+  "@showPublicationCount":{},
   "selectFeed": "Select a feed",
   "@selectFeed": {},
   "createCustomFeed": "Create a custom feed",

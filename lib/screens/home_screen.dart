@@ -20,10 +20,10 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  HomeScreenState createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class HomeScreenState extends State<HomeScreen> {
   final logger = LogsService().logger;
   final DatabaseHelper dbHelper = DatabaseHelper();
   final StreamController<List<PublicationCard>> _feedStreamController =
@@ -34,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int sortOrder = 1; // Set the default sort order to descending
   int fetchIntervalInHours = 6; // Default to 6 hours for API fetch
   int _concurrentFetches = 3; // Default to 3 concurrent requests
+  bool _showPublicationCount = false;
   List<String> _currentJournalNames = [];
 
   // Variables related to the search bar in the appbar
@@ -47,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Map<String, dynamic>> savedQueries = [];
   bool _feedLoaded = false; // Needed to avoid conflicts wih onAbstractChanged
-  bool _useAndFilter = true;
+  final bool _useAndFilter = true;
 
   @override
   void initState() {
@@ -73,6 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       fetchIntervalInHours = prefs.getInt('fetchInterval') ?? 6;
       _concurrentFetches = prefs.getInt('concurrentFetches') ?? 3;
+      _showPublicationCount = prefs.getBool('showPublicationCount') ?? false;
     });
 
     final lastFeedName = prefs.getString('lastSelectedFeed');
@@ -351,7 +353,7 @@ class _HomeScreenState extends State<HomeScreen> {
             .where((j) => j.dateFollowed == null)
             .map((j) => j.title)
             .toList();
-
+        if (!mounted) return;
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,
@@ -536,11 +538,25 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           } else {
+            final feedItems = snapshot.data!;
+
             return ListView.builder(
-              itemCount: snapshot.data!.length,
+              itemCount: feedItems.length + (_showPublicationCount ? 1 : 0),
               cacheExtent: 1000.0,
               itemBuilder: (context, index) {
-                return snapshot.data![index];
+                if (_showPublicationCount && index == 0) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(
+                      child: Text(
+                        AppLocalizations.of(context)!
+                            .numberPublications(feedItems.length),
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                  );
+                }
+                return feedItems[index - (_showPublicationCount ? 1 : 0)];
               },
             );
           }
@@ -645,7 +661,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
 
     bool isEditing = false;
-
+    if (!mounted) return;
     await showDialog<void>(
       context: context,
       builder: (context) {
