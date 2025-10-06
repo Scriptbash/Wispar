@@ -682,5 +682,17 @@
         }
     },
     "networkError": "网络错误或与 AI 服务通信时出现问题。",
-    "@networkError": {}
+    "@networkError": {},
+    "openExternalApp": "在外部应用中打开",
+    "@openExternalApp": {},
+    "numberPublications": "{count, plural, =0{无发表} =1{1 篇发表} other{{count} 篇发表}}",
+    "@numberPublications": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "showPublicationCount": "显示发表数量",
+    "@showPublicationCount": {},
+    "graphicalAbstract": "图形摘要",
+    "@graphicalAbstract": {}
 }
