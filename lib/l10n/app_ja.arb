@@ -163,5 +163,7 @@
     "errorOpeningFile": "",
     "@errorOpeningFile": {},
     "aiSettings": "AIの設定",
-    "@aiSettings": {}
+    "@aiSettings": {},
+    "graphicalAbstract": "グラフィカルアブストラクト",
+    "@graphicalAbstract": {}
 }
