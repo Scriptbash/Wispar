@@ -1,17 +1,33 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path/path.dart' as p;
 import './logs_helper.dart';
 
 class GraphicalAbstractManager {
   static Future<String> _getDirectoryPath() async {
     final logger = LogsService().logger;
-    final dir = await getApplicationDocumentsDirectory();
-    final abstractsDir = Directory('${dir.path}/graphical_abstracts');
+    final prefs = await SharedPreferences.getInstance();
+
+    final useCustomPath = prefs.getBool('useCustomDatabasePath') ?? false;
+    final customPath = prefs.getString('customDatabasePath');
+
+    String basePath;
+
+    if (useCustomPath && customPath != null) {
+      basePath = customPath;
+    } else {
+      final dir = await getApplicationDocumentsDirectory();
+      basePath = dir.path;
+    }
+
+    final abstractsDir = Directory(p.join(basePath, 'graphical_abstracts'));
 
     if (!await abstractsDir.exists()) {
       await abstractsDir.create(recursive: true);
-      logger.info("A folder for the graphical abstracts was created.");
+      logger.info(
+          "A folder for the graphical abstracts was created at: ${abstractsDir.path}");
     }
 
     return abstractsDir.path;
@@ -26,7 +42,7 @@ class GraphicalAbstractManager {
     try {
       final path = await _getDirectoryPath();
       final fileName = '${_sanitizeFileName(doi)}.jpg';
-      final file = File('$path/$fileName');
+      final file = File(p.join(path, fileName));
 
       if (await file.exists()) {
         return file;
@@ -50,7 +66,7 @@ class GraphicalAbstractManager {
   static Future<File?> getLocalFile(String doi) async {
     final path = await _getDirectoryPath();
     final fileName = '${_sanitizeFileName(doi)}.jpg';
-    final file = File('$path/$fileName');
+    final file = File(p.join(path, fileName));
     if (await file.exists()) {
       return file;
     } else {

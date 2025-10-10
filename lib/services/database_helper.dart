@@ -23,8 +23,11 @@ class DatabaseHelper {
   }
 
   Future<Database> initDatabase() async {
-    final path = await getDatabasesPath();
-    final databasePath = join(path, 'wispar.db');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? customPath = prefs.getString('customDatabasePath');
+
+    final defaultPath = await getDatabasesPath();
+    final databasePath = join(customPath ?? defaultPath, 'wispar.db');
 
     return openDatabase(databasePath, version: 9, onOpen: (db) async {
       await db.execute('PRAGMA foreign_keys = ON');
@@ -232,6 +235,14 @@ class DatabaseHelper {
       ''');
       }
     });
+  }
+
+  Future<void> closeDatabase() async {
+    if (_database != null) {
+      await _database!.close();
+      _database = null;
+      logger.info('Database connection closed and reference cleared.');
+    }
   }
 
   // Functions for journals
