@@ -9,6 +9,7 @@ import 'package:archive/archive_io.dart';
 import 'package:path/path.dart' as p;
 import '../services/logs_helper.dart';
 import '../services/database_helper.dart';
+import 'package:flutter/services.dart';
 
 class DatabaseSettingsScreen extends StatefulWidget {
   const DatabaseSettingsScreen({super.key});
@@ -18,6 +19,7 @@ class DatabaseSettingsScreen extends StatefulWidget {
 }
 
 class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
+  static const platform = MethodChannel('app.wispar.wispar/database_access');
   final logger = LogsService().logger;
   final _formKey = GlobalKey<FormState>();
 
@@ -33,6 +35,8 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
 
   bool _useCustomPath = false;
   String? _customDatabasePath;
+  String?
+      _customDatabaseBookmark; // Bookmark needed for iOS to keep read/write permissions
 
   @override
   void initState() {
@@ -53,6 +57,7 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       _userAgentController.text = prefs.getString('customUserAgent') ?? '';
       _useCustomPath = prefs.getBool('useCustomDatabasePath') ?? false;
       _customDatabasePath = prefs.getString('customDatabasePath');
+      _customDatabaseBookmark = prefs.getString('customDatabaseBookmark');
     });
     _cleanupIntervalController.text = _cleanupInterval.toString();
   }
@@ -77,25 +82,32 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
     }
   }
 
-  Future<void> _saveCustomDatabaseSettings() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('useCustomDatabasePath', _useCustomPath);
-    if (_customDatabasePath != null) {
-      await prefs.setString('customDatabasePath', _customDatabasePath!);
+  Future<void> _moveDatabaseTo(String? pickedFolder) async {
+    if (pickedFolder == null) {
+      logger.info('No folder picked.');
+      return;
     }
-  }
 
-  Future<void> _moveDatabaseTo(String newDirectory) async {
     try {
       await _showLoadingDialog(AppLocalizations.of(context)!.movingDatabase);
       final dbHelper = DatabaseHelper();
       await dbHelper.closeDatabase();
 
+      String? targetPath;
+
+      if (Platform.isIOS) {
+        targetPath =
+            await DatabaseHelper.resolveCustomDatabasePath(pickedFolder);
+        if (targetPath == null) {
+          throw Exception('Failed to resolve custom database bookmark on iOS.');
+        }
+      } else {
+        targetPath = pickedFolder;
+      }
+
+      final defaultAppDir = await getApplicationDocumentsDirectory();
       final oldDBPath = p.join(await getDatabasesPath(), 'wispar.db');
-      final newDBPath = p.join(newDirectory, 'wispar.db');
-      final appDir = await getApplicationDocumentsDirectory();
-      final newGraphicalDir =
-          Directory(p.join(newDirectory, 'graphical_abstracts'));
+      final newDBPath = p.join(targetPath, 'wispar.db');
 
       // Move database
       final oldDBFile = File(oldDBPath);
@@ -105,9 +117,9 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       }
 
       // Move PDFs
-      for (final file in appDir.listSync()) {
+      await for (final file in defaultAppDir.list()) {
         if (file is File && file.path.endsWith('.pdf')) {
-          final newFile = File(p.join(newDirectory, p.basename(file.path)));
+          final newFile = File(p.join(targetPath, p.basename(file.path)));
           await file.copy(newFile.path);
           await file.delete();
         }
@@ -115,16 +127,17 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
 
       // Move graphical abstracts
       final oldGraphicalDir =
-          Directory(p.join(appDir.path, 'graphical_abstracts'));
+          Directory(p.join(defaultAppDir.path, 'graphical_abstracts'));
+      final newGraphicalDir =
+          Directory(p.join(targetPath, 'graphical_abstracts'));
+
       if (await oldGraphicalDir.exists()) {
         await for (final entity in oldGraphicalDir.list(recursive: true)) {
           if (entity is File) {
             final relativePath =
                 p.relative(entity.path, from: oldGraphicalDir.path);
             final newPath = p.join(newGraphicalDir.path, relativePath);
-
             await Directory(p.dirname(newPath)).create(recursive: true);
-
             await File(entity.path).copy(newPath);
             await File(entity.path).delete();
           }
@@ -132,17 +145,28 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
         await oldGraphicalDir.delete(recursive: true);
       }
 
+      // Save the new custom path
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      if (Platform.isIOS) {
+        await prefs.setString('customDatabaseBookmark', pickedFolder);
+      }
+      await prefs.setString('customDatabasePath', targetPath);
+      await prefs.setBool('useCustomDatabasePath', true);
+      setState(() {
+        _customDatabasePath = targetPath;
+        _customDatabaseBookmark = Platform.isIOS ? pickedFolder : null;
+        _useCustomPath = true;
+      });
       await dbHelper.database;
 
       _hideLoadingDialog();
-
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(AppLocalizations.of(context)!.databaseMoved),
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.databaseMoved)),
+        );
       }
 
-      logger.info('Database successfully moved to $newDirectory');
+      logger.info('Database successfully moved to $targetPath');
     } catch (e, stackTrace) {
       _hideLoadingDialog();
       logger.severe('Failed to move database.', e, stackTrace);
@@ -156,34 +180,148 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
     }
   }
 
-  Future<void> _exportDatabase() async {
+  Future<void> _moveDatabaseBackToDefault() async {
     try {
-      String? outputDirectory = await FilePicker.platform.getDirectoryPath(
-        dialogTitle: AppLocalizations.of(context)!.selectDBExportLocation,
-      );
+      await _showLoadingDialog(AppLocalizations.of(context)!.movingDatabase);
+      final dbHelper = DatabaseHelper();
+      await dbHelper.closeDatabase();
 
-      if (outputDirectory == null || !mounted) return;
+      final customPath = await _getUsableCustomPath();
+      if (customPath == null) {
+        throw Exception("Custom DB folder not accessible");
+      }
+
+      final defaultDBPath = p.join(await getDatabasesPath(), 'wispar.db');
+      final appDir = await getApplicationDocumentsDirectory();
+      final oldDBPath = p.join(customPath, 'wispar.db');
+      final oldGraphicalDir =
+          Directory(p.join(customPath, 'graphical_abstracts'));
+      final newGraphicalDir =
+          Directory(p.join(appDir.path, 'graphical_abstracts'));
+
+      // Move DB
+      final oldDBFile = File(oldDBPath);
+      if (await oldDBFile.exists()) {
+        await oldDBFile.copy(defaultDBPath);
+        await oldDBFile.delete();
+      }
+
+      // Move PDFs
+      final customDir = Directory(customPath);
+      await for (final file in customDir.list()) {
+        if (file is File && file.path.endsWith('.pdf')) {
+          final newFile = File(p.join(appDir.path, p.basename(file.path)));
+          await file.copy(newFile.path);
+          await file.delete();
+        }
+      }
+
+      // Move graphical abstracts
+      if (await oldGraphicalDir.exists()) {
+        await for (final entity in oldGraphicalDir.list(recursive: true)) {
+          if (entity is File) {
+            final relativePath =
+                p.relative(entity.path, from: oldGraphicalDir.path);
+            final newPath = p.join(newGraphicalDir.path, relativePath);
+            await Directory(p.dirname(newPath)).create(recursive: true);
+            await File(entity.path).copy(newPath);
+            await File(entity.path).delete();
+          }
+        }
+        await oldGraphicalDir.delete(recursive: true);
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('customDatabasePath');
+      await prefs.remove('customDatabaseBookmark');
+      await prefs.setBool('useCustomDatabasePath', false);
+
+      await dbHelper.database;
+      _hideLoadingDialog();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(AppLocalizations.of(context)!.databaseMoved),
+        ));
+      }
+
+      logger.info('Database successfully moved back to default app directory.');
+    } catch (e, stackTrace) {
+      _hideLoadingDialog();
+      logger.severe('Failed to move database back to default app directory.', e,
+          stackTrace);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text(AppLocalizations.of(context)!.databaseMoveFailed(e))),
+        );
+      }
+    }
+  }
+
+  Future<String?> _getUsableCustomPath() async {
+    final prefs = await SharedPreferences.getInstance();
+    final useCustomPath = prefs.getBool('useCustomDatabasePath') ?? false;
+    String? customPath = prefs.getString('customDatabasePath');
+
+    if (!useCustomPath || customPath == null) {
+      return null;
+    }
+
+    if (Platform.isIOS) {
+      final bookmark = prefs.getString('customDatabaseBookmark');
+      if (bookmark != null) {
+        final resolvedPath =
+            await platform.invokeMethod('resolveCustomPath', bookmark);
+
+        if (resolvedPath == null) {
+          logger.severe('Failed to resolve custom database bookmark on iOS.');
+        }
+        return resolvedPath;
+      }
+      return null; // Shouldnt'happen
+    }
+    // Return the path directly for Android
+    return customPath;
+  }
+
+  Future<void> _exportDatabase() async {
+    String? outputDirectory;
+    final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
+
+    try {
+      if (Platform.isIOS) {
+        final bookmark = await platform.invokeMethod('getExportDirectory');
+        if (bookmark != null) {
+          outputDirectory =
+              await platform.invokeMethod('resolveCustomPath', bookmark);
+        }
+      } else {
+        outputDirectory = await FilePicker.platform.getDirectoryPath(
+          dialogTitle: AppLocalizations.of(context)!.selectDBExportLocation,
+        );
+      }
+
+      if (outputDirectory == null || !mounted) {
+        return;
+      }
+
       await _showLoadingDialog(AppLocalizations.of(context)!.exportingDatabase);
-      final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
+
       final String outputFile =
           p.join(outputDirectory, 'wispar_backup_$timestamp.zip');
 
-      final prefs = await SharedPreferences.getInstance();
-      final useCustomPath = prefs.getBool('useCustomDatabasePath') ?? false;
-      final customPath = prefs.getString('customDatabasePath');
-
+      final customSourcePath = await _getUsableCustomPath();
       String sourceBasePath;
-      if (useCustomPath && customPath != null) {
-        sourceBasePath = customPath;
+      String dbDirectoryPath;
+
+      if (customSourcePath != null) {
+        sourceBasePath = customSourcePath;
+        dbDirectoryPath = customSourcePath;
       } else {
+        // Use default paths
         final defaultAppDir = await getApplicationDocumentsDirectory();
         sourceBasePath = defaultAppDir.path;
-      }
-
-      String dbDirectoryPath;
-      if (useCustomPath && customPath != null) {
-        dbDirectoryPath = customPath;
-      } else {
         dbDirectoryPath = await getDatabasesPath();
       }
 
@@ -237,8 +375,7 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
     } catch (e, stackTrace) {
       logger.severe('Database export error.', e, stackTrace);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-              "${AppLocalizations.of(context)!.databaseExportFailed}: $e")));
+          content: Text(AppLocalizations.of(context)!.databaseExportFailed)));
       _hideLoadingDialog();
     }
   }
@@ -318,92 +455,6 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(AppLocalizations.of(context)!.databaseImportFailed)));
       _hideLoadingDialog();
-    }
-  }
-
-  Future<void> _moveDatabaseBackToDefault() async {
-    if (_customDatabasePath == null) {
-      logger.warning(
-          'Attempted to move database back, but no custom path was set.');
-      return;
-    }
-
-    try {
-      await _showLoadingDialog(AppLocalizations.of(context)!.movingDatabase);
-      final dbHelper = DatabaseHelper();
-
-      await dbHelper.closeDatabase();
-
-      final oldCustomPath = _customDatabasePath!;
-      final defaultDBPath = p.join(await getDatabasesPath(), 'wispar.db');
-      final appDir = await getApplicationDocumentsDirectory();
-
-      final oldDBPath = p.join(oldCustomPath, 'wispar.db');
-      final oldGraphicalDir =
-          Directory(p.join(oldCustomPath, 'graphical_abstracts'));
-      final newGraphicalDir =
-          Directory(p.join(appDir.path, 'graphical_abstracts'));
-
-      // Move database
-      final oldDBFile = File(oldDBPath);
-      if (await oldDBFile.exists()) {
-        await oldDBFile.copy(defaultDBPath);
-        await oldDBFile.delete();
-      }
-
-      // Move PDFs
-      final customDir = Directory(oldCustomPath);
-      await for (final file in customDir.list()) {
-        if (file is File && file.path.endsWith('.pdf')) {
-          final newFile = File(p.join(appDir.path, p.basename(file.path)));
-          await file.copy(newFile.path);
-          await file.delete();
-        }
-      }
-
-      // Move graphical abstracts
-      if (await oldGraphicalDir.exists()) {
-        await for (final entity in oldGraphicalDir.list(recursive: true)) {
-          if (entity is File) {
-            final relativePath =
-                p.relative(entity.path, from: oldGraphicalDir.path);
-            final newPath = p.join(newGraphicalDir.path, relativePath);
-
-            await Directory(p.dirname(newPath)).create(recursive: true);
-
-            await File(entity.path).copy(newPath);
-            await File(entity.path).delete();
-          }
-        }
-        await oldGraphicalDir.delete(recursive: true);
-      }
-
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.remove('customDatabasePath');
-      await prefs.setBool('useCustomDatabasePath', false);
-
-      await dbHelper.database;
-
-      _hideLoadingDialog();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(AppLocalizations.of(context)!.databaseMoved),
-        ));
-      }
-
-      logger.info('Database successfully moved back to default app directory.');
-    } catch (e, stackTrace) {
-      _hideLoadingDialog();
-      logger.severe('Failed to move database back to default app directory.', e,
-          stackTrace);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text(AppLocalizations.of(context)!.databaseMoveFailed(e))),
-        );
-      }
     }
   }
 
@@ -581,46 +632,66 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                         ),
                       ),
                     const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: _saveSettings,
+                      child: Text(AppLocalizations.of(context)!.saveSettings),
+                    ),
+                    const SizedBox(height: 64),
+                    const Divider(),
+                    const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(AppLocalizations.of(context)!
                             .customDatabaseLocation),
                         Switch(
-                          value: _useCustomPath,
-                          onChanged: (bool value) async {
-                            if (value) {
-                              String? directory =
-                                  await FilePicker.platform.getDirectoryPath(
-                                dialogTitle: AppLocalizations.of(context)!
-                                    .selectCustomDBLocation,
-                              );
-                              if (directory != null) {
-                                await _moveDatabaseTo(directory);
+                            value: _useCustomPath,
+                            onChanged: (bool value) async {
+                              if (value) {
+                                String? pickedBookmark;
+                                String? directoryPath;
+
+                                if (Platform.isIOS) {
+                                  pickedBookmark = await platform
+                                      .invokeMethod('selectCustomDatabasePath');
+                                  if (pickedBookmark != null) {
+                                    directoryPath = await platform.invokeMethod(
+                                        'resolveCustomPath', pickedBookmark);
+                                  }
+                                } else {
+                                  directoryPath = await FilePicker.platform
+                                      .getDirectoryPath(
+                                    dialogTitle: AppLocalizations.of(context)!
+                                        .selectCustomDBLocation,
+                                  );
+                                }
+
+                                if (directoryPath != null) {
+                                  await _moveDatabaseTo(
+                                      pickedBookmark ?? directoryPath);
+                                } else if (Platform.isIOS) {
+                                  logger.info(
+                                      "Failed to get persistent access to folder.");
+                                }
+                              } else {
+                                if (_customDatabasePath != null) {
+                                  await _moveDatabaseBackToDefault();
+                                }
+
                                 setState(() {
-                                  _useCustomPath = true;
-                                  _customDatabasePath = directory;
+                                  _useCustomPath = false;
+                                  _customDatabasePath = null;
+                                  _customDatabaseBookmark = null;
                                 });
-                                await _saveCustomDatabaseSettings();
-                              }
-                            } else {
-                              if (_customDatabasePath != null) {
-                                await _moveDatabaseBackToDefault();
-                              }
 
-                              setState(() {
-                                _useCustomPath = false;
-                                _customDatabasePath = null;
-                              });
-
-                              SharedPreferences prefs =
-                                  await SharedPreferences.getInstance();
-                              await prefs.remove('customDatabasePath');
-                              await prefs.setBool(
-                                  'useCustomDatabasePath', false);
-                            }
-                          },
-                        ),
+                                SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.remove('customDatabasePath');
+                                await prefs.remove('customDatabaseBookmark');
+                                await prefs.setBool(
+                                    'useCustomDatabasePath', false);
+                              }
+                            }),
                       ],
                     ),
                     if (_customDatabasePath != null)
@@ -634,13 +705,6 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                         ),
                       ),
                     const SizedBox(height: 16),
-                    FilledButton(
-                      onPressed: _saveSettings,
-                      child: Text(AppLocalizations.of(context)!.saveSettings),
-                    ),
-                    const SizedBox(height: 64),
-                    const Divider(),
-                    const SizedBox(height: 8),
                     FilledButton.tonalIcon(
                       onPressed: _exportDatabase,
                       icon: Icon(Icons.save_alt),
