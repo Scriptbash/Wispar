@@ -82,6 +82,29 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
     }
   }
 
+  Future<String?> _showConflictDialog() async {
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.databaseConflictTitle),
+          content: Text(AppLocalizations.of(context)!.databaseConflictMessage),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop('use_existing'),
+              child: Text(AppLocalizations.of(context)!.useExistingFiles),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop('overwrite'),
+              child: Text(AppLocalizations.of(context)!.overwriteFiles),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _moveDatabaseTo(String? pickedFolder) async {
     if (pickedFolder == null) {
       logger.info('No folder picked.');
@@ -89,7 +112,6 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
     }
 
     try {
-      await _showLoadingDialog(AppLocalizations.of(context)!.movingDatabase);
       final dbHelper = DatabaseHelper();
       await dbHelper.closeDatabase();
 
@@ -105,44 +127,83 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
         targetPath = pickedFolder;
       }
 
-      final defaultAppDir = await getApplicationDocumentsDirectory();
-      final oldDBPath = p.join(await getDatabasesPath(), 'wispar.db');
-      final newDBPath = p.join(targetPath, 'wispar.db');
-
-      // Move database
-      final oldDBFile = File(oldDBPath);
-      if (await oldDBFile.exists()) {
-        await oldDBFile.copy(newDBPath);
-        await oldDBFile.delete();
-      }
-
-      // Move PDFs
-      await for (final file in defaultAppDir.list()) {
-        if (file is File && file.path.endsWith('.pdf')) {
-          final newFile = File(p.join(targetPath, p.basename(file.path)));
-          await file.copy(newFile.path);
-          await file.delete();
-        }
-      }
-
-      // Move graphical abstracts
-      final oldGraphicalDir =
-          Directory(p.join(defaultAppDir.path, 'graphical_abstracts'));
-      final newGraphicalDir =
+      final existingDBFile = File(p.join(targetPath, 'wispar.db'));
+      final existingGraphicalDir =
           Directory(p.join(targetPath, 'graphical_abstracts'));
 
-      if (await oldGraphicalDir.exists()) {
-        await for (final entity in oldGraphicalDir.list(recursive: true)) {
-          if (entity is File) {
-            final relativePath =
-                p.relative(entity.path, from: oldGraphicalDir.path);
-            final newPath = p.join(newGraphicalDir.path, relativePath);
-            await Directory(p.dirname(newPath)).create(recursive: true);
-            await File(entity.path).copy(newPath);
-            await File(entity.path).delete();
+      bool conflict =
+          await existingDBFile.exists() || await existingGraphicalDir.exists();
+      String? action = 'overwrite';
+
+      if (conflict && mounted) {
+        logger.warning("Existing database files were found. Prompting user.");
+        action = await _showConflictDialog();
+      }
+
+      if (action == null) {
+        return;
+      }
+
+      if (action == 'use_existing') {
+        logger.info('Using existing database files.');
+      } else {
+        try {
+          await _showLoadingDialog(
+              AppLocalizations.of(context)!.movingDatabase);
+          final dbHelper = DatabaseHelper();
+          await dbHelper.closeDatabase();
+
+          final defaultAppDir = await getApplicationDocumentsDirectory();
+          final oldDBPath = p.join(await getDatabasesPath(), 'wispar.db');
+          final newDBPath = p.join(targetPath, 'wispar.db');
+
+          // Move database
+          final oldDBFile = File(oldDBPath);
+          if (await oldDBFile.exists()) {
+            await oldDBFile.copy(newDBPath);
+            await oldDBFile.delete();
           }
+
+          // Move PDFs
+          await for (final file in defaultAppDir.list()) {
+            if (file is File && file.path.endsWith('.pdf')) {
+              final newFile = File(p.join(targetPath, p.basename(file.path)));
+              await file.copy(newFile.path);
+              await file.delete();
+            }
+          }
+
+          // Move graphical abstracts
+          final oldGraphicalDir =
+              Directory(p.join(defaultAppDir.path, 'graphical_abstracts'));
+          final newGraphicalDir =
+              Directory(p.join(targetPath, 'graphical_abstracts'));
+
+          if (await oldGraphicalDir.exists()) {
+            await for (final entity in oldGraphicalDir.list(recursive: true)) {
+              if (entity is File) {
+                final relativePath =
+                    p.relative(entity.path, from: oldGraphicalDir.path);
+                final newPath = p.join(newGraphicalDir.path, relativePath);
+                await Directory(p.dirname(newPath)).create(recursive: true);
+                await File(entity.path).copy(newPath);
+                await File(entity.path).delete();
+              }
+            }
+            await oldGraphicalDir.delete(recursive: true);
+          }
+        } catch (e, stackTrace) {
+          _hideLoadingDialog();
+          logger.severe('Failed to move database.', e, stackTrace);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text(
+                      AppLocalizations.of(context)!.databaseMoveFailed(e))),
+            );
+          }
+          return;
         }
-        await oldGraphicalDir.delete(recursive: true);
       }
 
       // Save the new custom path
