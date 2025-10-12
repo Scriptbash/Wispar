@@ -328,6 +328,14 @@
   "@unpaywallarticle": {
     "description": "Snackbar shown when an article was fetched from Unpaywall."
   },
+  "unpaywallArticleAvailable": "Article available via Unpaywall",
+  "@unpaywallArticleAvailable":{},
+  "unpaywallChoicePrompt":"This article is available via Unpaywall. How would you like to proceed?",
+  "@unpaywallChoicePrompt":{},
+  "useUnpaywall": "Open via Unpaywall",
+  "@useUnpaywall":{},
+  "goToWebsite": "Go to website",
+  "@goToWebsite":{},
   "forwardedproxy": "Forwarded through your institution proxy",
   "@forwardedproxy": {
     "description": "Snackbar shown when a request is intercepted and sent through the user's institution EZproxy."

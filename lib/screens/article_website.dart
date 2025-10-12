@@ -16,14 +16,13 @@ import '../services/database_helper.dart';
 class ArticleWebsite extends StatefulWidget {
   final PublicationCard publicationCard;
 
-  const ArticleWebsite({Key? key, required this.publicationCard})
-      : super(key: key);
+  const ArticleWebsite({super.key, required this.publicationCard});
 
   @override
-  _ArticleWebsiteState createState() => _ArticleWebsiteState();
+  ArticleWebsiteState createState() => ArticleWebsiteState();
 }
 
-class _ArticleWebsiteState extends State<ArticleWebsite> {
+class ArticleWebsiteState extends State<ArticleWebsite> {
   final GlobalKey webViewKey = GlobalKey();
   InAppWebViewController? webViewController;
 
@@ -124,13 +123,13 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
         setState(() {
           pdfUrl = result.pdfUrl;
         });
-        _showSnackBar(AppLocalizations.of(context)!.unpaywallarticle);
+        await _showUnpaywallChoiceDialog(pdfUrl);
+        return;
       }
     }
     // If no PDF from Unpaywall or Unpaywall is disabled, check the proxy
-    if (pdfUrl.isEmpty) {
-      await _initProxyAndLoadUrl();
-    }
+    await _initProxyAndLoadUrl();
+
     setState(() {
       isReadyToLoad =
           pdfUrl.isNotEmpty; // Ensure WebView only loads when URL is ready
@@ -147,7 +146,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
     proxyUrlPref = proxyUrlPref.replaceAll('\$@', '');
 
     if (proxyUrlPref.isNotEmpty) {
-      this.proxyUrl = proxyUrlPref;
+      proxyUrl = proxyUrlPref;
       final baseUrl = Uri.parse(widget.publicationCard.url).host;
       final knownUrlEntry = await dbHelper.getKnownUrlByString(baseUrl);
 
@@ -198,6 +197,45 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
           urlRequest: URLRequest(url: WebUri(widget.publicationCard.url)),
         );
       }
+    }
+  }
+
+  Future<void> _showUnpaywallChoiceDialog(String unpaywallPdfUrl) async {
+    if (!mounted) return;
+
+    final choice = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.unpaywallArticleAvailable),
+          content: Text(AppLocalizations.of(context)!.unpaywallChoicePrompt),
+          actions: <Widget>[
+            FilledButton(
+              onPressed: () => Navigator.pop(context, 'unpaywall'),
+              child: Text(AppLocalizations.of(context)!.useUnpaywall),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'website'),
+              child: Text(AppLocalizations.of(context)!.goToWebsite),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (choice == 'unpaywall') {
+      setState(() {
+        pdfUrl = unpaywallPdfUrl;
+        isReadyToLoad = true;
+        _currentWebViewUrl = WebUri(pdfUrl);
+      });
+      _showSnackBar(AppLocalizations.of(context)!.unpaywallarticle);
+    } else if (choice == null || choice == 'website') {
+      await _initProxyAndLoadUrl();
+      setState(() {
+        isReadyToLoad = true;
+        _currentWebViewUrl = WebUri(pdfUrl);
+      });
     }
   }
 
