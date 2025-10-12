@@ -682,5 +682,37 @@
     "downloadToApp": "Download in der App",
     "@downloadToApp": {},
     "downloadToAppSubtitle": "Versuche, die PDF-Datei direkt in Wispar herunterzuladen und anzuzeigen, um eine bessere Integration zu erzielen.",
-    "@downloadToAppSubtitle": {}
+    "@downloadToAppSubtitle": {},
+    "showPublicationCount": "Anzahl der Veröffentlichungen anzeigen",
+    "@showPublicationCount": {},
+    "graphicalAbstract": "Grafische Zusammenfassung",
+    "@graphicalAbstract": {},
+    "openExternalApp": "In externer App öffnen",
+    "@openExternalApp": {},
+    "customDatabaseLocation": "Benutzerdefinierter Speicherort der Datenbank",
+    "@customDatabaseLocation": {},
+    "selectCustomDBLocation": "Wähle einen Standort, an dem",
+    "@selectCustomDBLocation": {},
+    "currentDBLocation": "Aktueller Speicherort: {path}",
+    "@currentDBLocation": {},
+    "movingDatabase": "Verschieben der Datenbankdateien. Bitte warten.",
+    "@movingDatabase": {},
+    "databaseMoved": "Die Datenbankdateien wurden erfolgreich verschoben!",
+    "@databaseMoved": {},
+    "databaseMoveFailed": "Die Datenbankdateien können nicht verschoben werden: {error}",
+    "@databaseMoveFailed": {},
+    "databaseConflictTitle": "Vorhandene Wispar-Daten gefunden.",
+    "@databaseConflictTitle": {},
+    "databaseConflictMessage": "Wispar-Daten wurden im ausgewählten Ordner gefunden. Möchten Sie die vorhandenen Dateien verwenden oder sie mit der aktuellen Datenbank überschreiben?",
+    "@databaseConflictMessage": {},
+    "useExistingFiles": "Vorhandene Dateien verwenden",
+    "@useExistingFiles": {},
+    "overwriteFiles": "Mit aktueller Datenbank überschreiben",
+    "@overwriteFiles": {},
+    "numberPublications": "{count, plural, =0{Keine Veröffentlichungen} =1{1 Veröffentlichung} other{{count} Veröffentlichungen}}",
+    "@numberPublications": {
+        "placeholders": {
+            "count": {}
+        }
+    }
 }
