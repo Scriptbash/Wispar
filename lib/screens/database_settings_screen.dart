@@ -703,8 +703,21 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(AppLocalizations.of(context)!
-                            .customDatabaseLocation),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(AppLocalizations.of(context)!
+                                  .customDatabaseLocation),
+                              Text(
+                                "(Experimental - Use at your own risk!)",
+                                style:
+                                    TextStyle(fontSize: 12, color: Colors.red),
+                              )
+                            ],
+                          ),
+                        ),
                         Switch(
                             value: _useCustomPath,
                             onChanged: (bool value) async {
