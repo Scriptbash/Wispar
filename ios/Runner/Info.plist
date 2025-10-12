@@ -32,6 +32,12 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>A dependency of the app requires access to the photo library. The app uses this permission to allow users to backup and restore their database.</string>
+	<key>NSDocumentsUsageDescription</key>
+	<string>This is required for being able to store the database in a user specified directory.</string>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>UISupportsDocumentBrowser</key>
+	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>

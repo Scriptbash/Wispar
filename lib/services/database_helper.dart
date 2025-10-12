@@ -10,8 +10,28 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import './logs_helper.dart';
+import 'package:flutter/services.dart';
 
 class DatabaseHelper {
+  static const platform = MethodChannel('app.wispar.wispar/database_access');
+
+  static Future<String?> resolveCustomDatabasePath(String? path) async {
+    if (path == null) return null;
+
+    if (Platform.isIOS) {
+      try {
+        final resolvedPath =
+            await platform.invokeMethod('resolveCustomPath', path);
+        return resolvedPath;
+      } catch (e) {
+        return null;
+      }
+    } else {
+      // Android can use the path directly
+      return path;
+    }
+  }
+
   static Database? _database;
   final logger = LogsService().logger;
 
@@ -23,8 +43,22 @@ class DatabaseHelper {
   }
 
   Future<Database> initDatabase() async {
-    final path = await getDatabasesPath();
-    final databasePath = join(path, 'wispar.db');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? customPath = prefs.getString('customDatabasePath');
+    String? bookmark = prefs.getString('customDatabaseBookmark');
+
+    if (Platform.isIOS && bookmark != null) {
+      final resolvedPath = await DatabaseHelper.platform
+          .invokeMethod('resolveCustomPath', bookmark);
+      if (resolvedPath != null) {
+        customPath = resolvedPath;
+      } else {
+        customPath = null;
+      }
+    }
+
+    final defaultPath = await getDatabasesPath();
+    final databasePath = join(customPath ?? defaultPath, 'wispar.db');
 
     return openDatabase(databasePath, version: 9, onOpen: (db) async {
       await db.execute('PRAGMA foreign_keys = ON');
@@ -111,7 +145,7 @@ class DatabaseHelper {
         )
       ''');
     }, onUpgrade: (db, oldVersion, newVersion) async {
-      logger.info("Upgrading DB from ${oldVersion} to ${newVersion}");
+      logger.info("Upgrading DB from $oldVersion to $newVersion");
       await db.execute('PRAGMA foreign_keys = ON');
       if (oldVersion < 2) {
         // Ads the new column to the savedQueries table
@@ -232,6 +266,14 @@ class DatabaseHelper {
       ''');
       }
     });
+  }
+
+  Future<void> closeDatabase() async {
+    if (_database != null) {
+      await _database!.close();
+      _database = null;
+      logger.info('Database connection closed and reference cleared.');
+    }
   }
 
   // Functions for journals

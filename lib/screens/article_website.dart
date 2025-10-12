@@ -826,7 +826,20 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                           response.bodyBytes[1] == 0x50 &&
                           response.bodyBytes[2] == 0x44 &&
                           response.bodyBytes[3] == 0x46) {
-                        final appDir = await getApplicationDocumentsDirectory();
+                        final prefs = await SharedPreferences.getInstance();
+                        final useCustomPath =
+                            prefs.getBool('useCustomDatabasePath') ?? false;
+                        final customPath =
+                            prefs.getString('customDatabasePath');
+                        final String baseDirPath;
+
+                        if (useCustomPath && customPath != null) {
+                          baseDirPath = customPath;
+                        } else {
+                          final defaultAppDir =
+                              await getApplicationDocumentsDirectory();
+                          baseDirPath = defaultAppDir.path;
+                        }
                         String cleanedDoi = widget.publicationCard.doi
                             .replaceAll(RegExp(r'[^\w\s.-]'), '_')
                             .replaceAll(' ', '_');
@@ -837,7 +850,7 @@ class _ArticleWebsiteState extends State<ArticleWebsite> {
                         }
 
                         final fileName = '$cleanedDoi.pdf';
-                        final pdfFile = File('${appDir.path}/$fileName');
+                        final pdfFile = File('$baseDirPath/$fileName');
                         await pdfFile.writeAsBytes(response.bodyBytes);
                         if (mounted) {
                           Navigator.of(this.context).push(MaterialPageRoute(

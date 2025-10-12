@@ -16,14 +16,14 @@ class PdfReader extends StatefulWidget {
   final String pdfUrl;
   final PublicationCard publicationCard;
 
-  PdfReader({Key? key, required this.pdfUrl, required this.publicationCard})
-      : super(key: key);
+  const PdfReader(
+      {super.key, required this.pdfUrl, required this.publicationCard});
 
   @override
-  _PdfReaderState createState() => _PdfReaderState();
+  PdfReaderState createState() => PdfReaderState();
 }
 
-class _PdfReaderState extends State<PdfReader> {
+class PdfReaderState extends State<PdfReader> {
   final logger = LogsService().logger;
   final controller = PdfViewerController();
   late DatabaseHelper databaseHelper;
@@ -31,6 +31,8 @@ class _PdfReaderState extends State<PdfReader> {
   bool isPathResolved = false;
   bool isDownloaded = false;
 
+  bool _useCustomPath = false;
+  String? _customPath;
   bool _hideAI = false;
   bool _darkPdfTheme = false;
   int _pdfOrientation = 0;
@@ -45,8 +47,9 @@ class _PdfReaderState extends State<PdfReader> {
   void initState() {
     super.initState();
     databaseHelper = DatabaseHelper();
-    resolvePdfPath();
-    _loadPreferences();
+    _loadPreferences().then((_) {
+      resolvePdfPath();
+    });
   }
 
   Future<void> _loadPreferences() async {
@@ -60,10 +63,13 @@ class _PdfReaderState extends State<PdfReader> {
     } else if (pdfThemeOption == 1) {
       darkTheme = true;
     } else {
+      if (!mounted) return;
       final brightness = MediaQuery.of(context).platformBrightness;
       darkTheme = brightness == Brightness.dark;
     }
     setState(() {
+      _useCustomPath = prefs.getBool('useCustomDatabasePath') ?? false;
+      _customPath = prefs.getString('customDatabasePath');
       _hideAI = prefs.getBool('hide_ai_features') ?? false;
       _darkPdfTheme = darkTheme;
       _pdfOrientation = pdfOrientation;
@@ -71,9 +77,15 @@ class _PdfReaderState extends State<PdfReader> {
   }
 
   void resolvePdfPath() async {
-    final directory = await getApplicationDocumentsDirectory();
+    String basePath;
+    if (_useCustomPath && _customPath != null) {
+      basePath = _customPath!;
+    } else {
+      final defaultDirectory = await getApplicationDocumentsDirectory();
+      basePath = defaultDirectory.path;
+    }
     final pdfFileName = p.basename(widget.pdfUrl);
-    final newPdfPath = p.join(directory.path, pdfFileName);
+    final newPdfPath = p.join(basePath, pdfFileName);
 
     setState(() {
       resolvedPdfPath = newPdfPath;

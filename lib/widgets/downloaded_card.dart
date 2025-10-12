@@ -8,22 +8,22 @@ import '../services/string_format_helper.dart';
 import 'package:latext/latext.dart';
 
 class DownloadedCard extends StatefulWidget {
-  final pdfPath;
+  final String pdfPath;
   final PublicationCard publicationCard;
   final VoidCallback onDelete;
 
   const DownloadedCard({
-    Key? key,
+    super.key,
     required this.pdfPath,
     required this.publicationCard,
     required this.onDelete,
-  }) : super(key: key);
+  });
 
   @override
-  _DownloadedCardState createState() => _DownloadedCardState();
+  DownloadedCardState createState() => DownloadedCardState();
 }
 
-class _DownloadedCardState extends State<DownloadedCard> {
+class DownloadedCardState extends State<DownloadedCard> {
   bool isLiked = false;
   late DatabaseHelper databaseHelper;
 
@@ -80,15 +80,15 @@ class _DownloadedCardState extends State<DownloadedCard> {
                             );
                           }
                         },
-                        child: Text(
-                          widget.publicationCard.journalTitle,
-                          style: TextStyle(fontSize: 16),
-                          softWrap: true,
-                        ),
                         style: TextButton.styleFrom(
                           minimumSize: Size.zero,
                           padding: EdgeInsets.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          widget.publicationCard.journalTitle,
+                          style: TextStyle(fontSize: 16),
+                          softWrap: true,
                         ),
                       ),
                     ),

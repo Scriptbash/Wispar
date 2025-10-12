@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:latext/latext.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum SampleItem { itemOne, itemTwo, itemThree, itemFour }
 
@@ -36,7 +37,7 @@ class PublicationCard extends StatefulWidget {
   final VoidCallback? onHide;
 
   const PublicationCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.abstract,
     required this.journalTitle,
@@ -54,14 +55,13 @@ class PublicationCard extends StatefulWidget {
     this.showHideBtn,
     this.isHidden,
     this.onHide,
-  })  : authors = authors,
-        super(key: key);
+  }) : authors = authors;
 
   @override
-  _PublicationCardState createState() => _PublicationCardState();
+  PublicationCardState createState() => PublicationCardState();
 }
 
-class _PublicationCardState extends State<PublicationCard> {
+class PublicationCardState extends State<PublicationCard> {
   bool isLiked = false;
   late DatabaseHelper databaseHelper;
 
@@ -102,9 +102,21 @@ class _PublicationCardState extends State<PublicationCard> {
                     await databaseHelper.getGraphicalAbstractPath(widget.doi);
                 if (graphicalAbstractPath != null &&
                     graphicalAbstractPath.isNotEmpty) {
-                  final directory = await getApplicationDocumentsDirectory();
+                  final prefs = await SharedPreferences.getInstance();
+                  final useCustomPath =
+                      prefs.getBool('useCustomDatabasePath') ?? false;
+                  final customPath = prefs.getString('customDatabasePath');
+
+                  String basePath;
+                  if (useCustomPath && customPath != null) {
+                    basePath = customPath;
+                  } else {
+                    final defaultDirectory =
+                        await getApplicationDocumentsDirectory();
+                    basePath = defaultDirectory.path;
+                  }
                   newGraphAbstractPath =
-                      p.join(directory.path, graphicalAbstractPath);
+                      p.join(basePath, graphicalAbstractPath);
                 }
                 _openArticleScreen(
                   context,
@@ -164,16 +176,16 @@ class _PublicationCardState extends State<PublicationCard> {
                                     );
                                   }
                                 },
-                                child: Text(
-                                  widget.journalTitle,
-                                  style: const TextStyle(fontSize: 16),
-                                  softWrap: true,
-                                ),
                                 style: TextButton.styleFrom(
                                   minimumSize: Size.zero,
                                   padding: EdgeInsets.zero,
                                   tapTargetSize:
                                       MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: Text(
+                                  widget.journalTitle,
+                                  style: const TextStyle(fontSize: 16),
+                                  softWrap: true,
                                 ),
                               ),
                             ),
@@ -293,6 +305,12 @@ class _PublicationCardState extends State<PublicationCard> {
                                     launchUrl(Uri.parse(widget.license));
                                   }
                                 },
+                                style: TextButton.styleFrom(
+                                  minimumSize: Size.zero,
+                                  padding: EdgeInsets.zero,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
                                 child: Text(
                                   widget.licenseName.isNotEmpty
                                       ? widget.licenseName
@@ -303,12 +321,6 @@ class _PublicationCardState extends State<PublicationCard> {
                                               .unknownLicense),
                                   style: const TextStyle(color: Colors.grey),
                                   textAlign: TextAlign.left,
-                                ),
-                                style: TextButton.styleFrom(
-                                  minimumSize: Size.zero,
-                                  padding: EdgeInsets.zero,
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
                                 ),
                               ),
                             ),
