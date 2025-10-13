@@ -6,13 +6,13 @@ import 'package:wispar/services/translations/gemini_translation_provider.dart';
 import 'package:wispar/services/translations/chatgpt_translation_provider.dart';
 
 class AISettingsScreen extends StatefulWidget {
-  const AISettingsScreen({Key? key}) : super(key: key);
+  const AISettingsScreen({super.key});
 
   @override
-  State<AISettingsScreen> createState() => _AISettingsScreenState();
+  State<AISettingsScreen> createState() => AISettingsScreenState();
 }
 
-class _AISettingsScreenState extends State<AISettingsScreen> {
+class AISettingsScreenState extends State<AISettingsScreen> {
   final _formKey = GlobalKey<FormState>();
   bool passwordVisible = false;
   bool _hideAI = false;
@@ -302,7 +302,6 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.aiSettings),
-        centerTitle: false,
       ),
       body: SafeArea(
         child: Padding(
@@ -465,9 +464,8 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
                   },
                 ),
                 const SizedBox(height: 24),
-                FilledButton.icon(
-                  icon: const Icon(Icons.save),
-                  label: Text(AppLocalizations.of(context)!.save),
+                FilledButton(
+                  child: Text(AppLocalizations.of(context)!.saveSettings),
                   onPressed: () async {
                     if (_formKey.currentState?.validate() ?? false) {
                       _formKey.currentState?.save();

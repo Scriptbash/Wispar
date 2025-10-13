@@ -5,14 +5,14 @@ import 'package:wispar/generated_l10n/app_localizations.dart';
 import '../services/logs_helper.dart';
 
 class LogsScreen extends StatelessWidget {
-  const LogsScreen({Key? key}) : super(key: key);
+  const LogsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.logs),
-        centerTitle: false,
+        centerTitle: true,
         actions: [
           IconButton(
             icon: Icon(Icons.download,

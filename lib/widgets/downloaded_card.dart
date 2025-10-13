@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../screens/pdf_reader.dart';
 import '../generated_l10n/app_localizations.dart';
 import '../screens/journals_details_screen.dart';
-import 'publication_card.dart';
+import 'publication_card/publication_card.dart';
 import '../services/database_helper.dart';
 import '../services/string_format_helper.dart';
 import 'package:latext/latext.dart';

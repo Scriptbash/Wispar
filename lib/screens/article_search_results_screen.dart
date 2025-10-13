@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../generated_l10n/app_localizations.dart';
-import '../widgets/publication_card.dart';
+import '../widgets/publication_card/publication_card.dart';
 import '../models/crossref_journals_works_models.dart' as journalsWorks;
 import '../services/crossref_api.dart';
 import '../services/openAlex_api.dart';
@@ -13,19 +13,19 @@ class ArticleSearchResultsScreen extends StatefulWidget {
   final String source;
 
   const ArticleSearchResultsScreen({
-    Key? key,
+    super.key,
     required this.initialSearchResults,
     required this.initialHasMore,
     required this.queryParams,
     required this.source,
-  }) : super(key: key);
+  });
 
   @override
-  _ArticleSearchResultsScreenState createState() =>
-      _ArticleSearchResultsScreenState();
+  ArticleSearchResultsScreenState createState() =>
+      ArticleSearchResultsScreenState();
 }
 
-class _ArticleSearchResultsScreenState
+class ArticleSearchResultsScreenState
     extends State<ArticleSearchResultsScreen> {
   final logger = LogsService().logger;
   late List<journalsWorks.Item> _searchResults;
@@ -89,6 +89,7 @@ class _ArticleSearchResultsScreenState
         _hasMoreResults = hasMore;
       });
     } catch (e, stackTrace) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(AppLocalizations.of(context)!.failedLoadMoreResults)),

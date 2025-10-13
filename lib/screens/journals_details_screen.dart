@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../generated_l10n/app_localizations.dart';
 import '../services/crossref_api.dart';
 import '../services/abstract_helper.dart';
-import '../models/crossref_journals_works_models.dart' as journalsWorks;
-import '../widgets/publication_card.dart';
+import '../models/crossref_journals_works_models.dart' as journals_works;
+import '../widgets/publication_card/publication_card.dart';
 import '../widgets/journal_header.dart';
 import '../widgets/latest_works_header.dart';
 import '../services/database_helper.dart';
@@ -16,20 +16,20 @@ class JournalDetailsScreen extends StatefulWidget {
   final Function(bool)? onFollowStatusChanged;
 
   const JournalDetailsScreen({
-    Key? key,
+    super.key,
     required this.title,
     required this.publisher,
     required this.issn,
     this.onFollowStatusChanged,
-  }) : super(key: key);
+  });
 
   @override
-  _JournalDetailsScreenState createState() => _JournalDetailsScreenState();
+  JournalDetailsScreenState createState() => JournalDetailsScreenState();
 }
 
-class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
+class JournalDetailsScreenState extends State<JournalDetailsScreen> {
   final logger = LogsService().logger;
-  late List<journalsWorks.Item> allWorks;
+  late List<journals_works.Item> allWorks;
   bool isLoading = false;
   late ScrollController _scrollController;
   bool hasMoreResults = true;
@@ -210,7 +210,7 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
     setState(() => isLoading = true);
 
     try {
-      ListAndMore<journalsWorks.Item> newWorks =
+      ListAndMore<journals_works.Item> newWorks =
           await CrossRefApi.getJournalWorks(widget.issn);
 
       setState(() {

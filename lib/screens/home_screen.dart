@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import '../generated_l10n/app_localizations.dart';
-import 'settings_screen.dart';
-import '../services/database_helper.dart';
-import '../services/feed_service.dart';
-import '../services/abstract_helper.dart';
-import '../models/feed_filter_entity.dart';
-import '../widgets/publication_card.dart';
-import '../widgets/sort_dialog.dart';
-import '../widgets/custom_feed_bottom_sheet.dart';
-import './hidden_articles_screen.dart';
+import 'dart:io' show Platform;
+import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/screens/settings_screen.dart';
+import 'package:wispar/services/database_helper.dart';
+import 'package:wispar/services/feed_service.dart';
+import 'package:wispar/services/abstract_helper.dart';
+import 'package:wispar/models/feed_filter_entity.dart';
+import 'package:wispar/widgets/publication_card/publication_card.dart';
+import 'package:wispar/screens/publication_card_settings_screen.dart';
+import 'package:wispar/widgets/sort_dialog.dart';
+import 'package:wispar/widgets/custom_feed_bottom_sheet.dart';
+import 'package:wispar/screens/hidden_articles_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../services/logs_helper.dart';
-import '../widgets/appbar_dropdown_menu.dart';
-import 'dart:io' show Platform;
+import 'package:wispar/services/logs_helper.dart';
+import 'package:wispar/widgets/appbar_dropdown_menu.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -50,6 +51,15 @@ class HomeScreenState extends State<HomeScreen> {
   bool _feedLoaded = false; // Needed to avoid conflicts wih onAbstractChanged
   final bool _useAndFilter = true;
 
+  SwipeAction _swipeLeftAction = SwipeAction.hide;
+  SwipeAction _swipeRightAction = SwipeAction.favorite;
+  bool _showJournalTitle = true;
+  bool _showPublicationDate = true;
+  bool _showAuthorNames = true;
+  bool _showLicense = true;
+  bool _showOptionsMenu = true;
+  bool _showFavoriteButton = true;
+
   @override
   void initState() {
     super.initState();
@@ -75,7 +85,26 @@ class HomeScreenState extends State<HomeScreen> {
       fetchIntervalInHours = prefs.getInt('fetchInterval') ?? 6;
       _concurrentFetches = prefs.getInt('concurrentFetches') ?? 3;
       _showPublicationCount = prefs.getBool('showPublicationCount') ?? false;
+      _showJournalTitle =
+          prefs.getBool(PublicationCardSettingsScreen.showJournalTitleKey) ??
+              true;
+      _showPublicationDate =
+          prefs.getBool(PublicationCardSettingsScreen.showPublicationDateKey) ??
+              true;
+      _showAuthorNames =
+          prefs.getBool(PublicationCardSettingsScreen.showAuthorNamesKey) ??
+              true;
+      _showLicense =
+          prefs.getBool(PublicationCardSettingsScreen.showLicenseKey) ?? true;
+      _showOptionsMenu =
+          prefs.getBool(PublicationCardSettingsScreen.showOptionsMenuKey) ??
+              true;
+      _showFavoriteButton =
+          prefs.getBool(PublicationCardSettingsScreen.showFavoriteButtonKey) ??
+              true;
     });
+
+    await _loadSwipePreferences();
 
     final lastFeedName = prefs.getString('lastSelectedFeed');
     if (lastFeedName != null && lastFeedName != 'Home') {
@@ -104,6 +133,37 @@ class HomeScreenState extends State<HomeScreen> {
         _currentFeedName = 'Home';
         _activeFeed = List.from(_allFeed);
         _filteredFeed = List.from(_allFeed);
+      });
+    }
+  }
+
+  Future<void> _loadSwipePreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final leftActionName =
+        prefs.getString('swipeLeftAction') ?? SwipeAction.hide.name;
+    final rightActionName =
+        prefs.getString('swipeRightAction') ?? SwipeAction.favorite.name;
+
+    SwipeAction newLeftAction = SwipeAction.hide;
+    SwipeAction newRightAction = SwipeAction.favorite;
+
+    try {
+      newLeftAction = SwipeAction.values.byName(leftActionName);
+    } catch (_) {
+      newLeftAction = SwipeAction.hide;
+    }
+    try {
+      newRightAction = SwipeAction.values.byName(rightActionName);
+    } catch (_) {
+      newRightAction = SwipeAction.favorite;
+    }
+
+    if (_swipeLeftAction != newLeftAction ||
+        _swipeRightAction != newRightAction) {
+      setState(() {
+        _swipeLeftAction = newLeftAction;
+        _swipeRightAction = newRightAction;
       });
     }
   }
@@ -287,11 +347,23 @@ class HomeScreenState extends State<HomeScreen> {
         onAbstractChanged: onAbstractChanged,
         showHideBtn: true,
         onHide: _onAbstractChanged,
+        swipeLeftAction: _swipeLeftAction,
+        swipeRightAction: _swipeRightAction,
+        showJournalTitle: _showJournalTitle,
+        showPublicationDate: _showPublicationDate,
+        showAuthorNames: _showAuthorNames,
+        showLicense: _showLicense,
+        showOptionsMenu: _showOptionsMenu,
+        showFavoriteButton: _showFavoriteButton,
       );
     }).toList());
   }
 
   void _onAbstractChanged() async {
+    await _loadSwipePreferences();
+
+    await _loadPreferences();
+
     final List<PublicationCard> cachedFeed =
         await _getCachedFeed(context, _onAbstractChanged);
     setState(() {
@@ -381,9 +453,12 @@ class HomeScreenState extends State<HomeScreen> {
         _onAbstractChanged();
         break;
       case 3:
-        Navigator.push(
+        await Navigator.push(
           context,
-          MaterialPageRoute<void>(builder: (context) => const SettingsScreen()),
+          MaterialPageRoute<void>(
+            builder: (context) =>
+                SettingsScreen(onSettingsUpdated: _onAbstractChanged),
+          ),
         );
         break;
     }
@@ -541,8 +616,8 @@ class HomeScreenState extends State<HomeScreen> {
             final feedItems = snapshot.data!;
 
             return ListView.builder(
+              //cacheExtent: 300,
               itemCount: feedItems.length + (_showPublicationCount ? 1 : 0),
-              cacheExtent: 1000.0,
               itemBuilder: (context, index) {
                 if (_showPublicationCount && index == 0) {
                   return Padding(

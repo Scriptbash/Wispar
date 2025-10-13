@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import '../generated_l10n/app_localizations.dart';
-import '../widgets/publication_card.dart';
+import '../widgets/publication_card/publication_card.dart';
 import '../services/database_helper.dart';
 import '../services/abstract_helper.dart';
 import '../widgets/sort_dialog.dart';
 import '../services/logs_helper.dart';
 
 class FavoritesScreen extends StatefulWidget {
-  const FavoritesScreen({Key? key}) : super(key: key);
+  const FavoritesScreen({super.key});
 
   @override
-  _FavoritesScreenState createState() => _FavoritesScreenState();
+  FavoritesScreenState createState() => FavoritesScreenState();
 }
 
-class _FavoritesScreenState extends State<FavoritesScreen> {
+class FavoritesScreenState extends State<FavoritesScreen> {
   final logger = LogsService().logger;
   late Future<List<PublicationCard>> _favoriteArticles;
   int sortBy = 0; // Set the sort by option to Article title by default

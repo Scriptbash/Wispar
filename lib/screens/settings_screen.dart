@@ -1,25 +1,30 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../generated_l10n/app_localizations.dart';
-import './zotero_settings_screen.dart';
-import './ai_settings_screen.dart';
-import './database_settings_screen.dart';
-import './display_settings_screen.dart';
-import './logs_screen.dart';
-import './institutional_settings_screen.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/screens/zotero_settings_screen.dart';
+import 'package:wispar/screens/ai_settings_screen.dart';
+import 'package:wispar/screens/database_settings_screen.dart';
+import 'package:wispar/screens/display_settings_screen.dart';
+import 'package:wispar/screens/publication_card_settings_screen.dart';
+import 'package:wispar/screens/logs_screen.dart';
+import 'package:wispar/screens/institutional_settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+  final VoidCallback? onSettingsUpdated;
+  const SettingsScreen({
+    super.key,
+    this.onSettingsUpdated,
+  });
 
   @override
-  _SettingsScreenState createState() => _SettingsScreenState();
+  SettingsScreenState createState() => SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class SettingsScreenState extends State<SettingsScreen> {
   bool isNotificationEnabled = false;
 
   @override
@@ -83,6 +88,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             context,
             MaterialPageRoute(
                 builder: (context) => const DisplaySettingsScreen())),
+      ),
+      _buildTile(
+        icon: Icons.article_outlined,
+        label: AppLocalizations.of(context)!.publicationCard,
+        onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const PublicationCardSettingsScreen())),
       ),
       _buildTile(
         icon: Icons.lock_open_outlined,
@@ -192,36 +205,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
     ];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.settings),
-      ),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final double maxTileWidth = 400;
-            final int crossAxisCount =
-                (constraints.maxWidth / maxTileWidth).floor().clamp(1, 4);
+    return PopScope(
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) {
+            widget.onSettingsUpdated?.call();
+          }
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(AppLocalizations.of(context)!.settings),
+          ),
+          body: SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final double maxTileWidth = 400;
+                final int crossAxisCount =
+                    (constraints.maxWidth / maxTileWidth).floor().clamp(1, 4);
 
-            final double tileWidth =
-                (constraints.maxWidth - (crossAxisCount - 1) * 16) /
-                    crossAxisCount;
+                final double tileWidth =
+                    (constraints.maxWidth - (crossAxisCount - 1) * 16) /
+                        crossAxisCount;
 
-            return GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: tileWidth / 120,
-              ),
-              itemCount: settingsItems.length,
-              itemBuilder: (context, index) => settingsItems[index],
-            );
-          },
-        ),
-      ),
-    );
+                return GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: tileWidth / 120,
+                  ),
+                  itemCount: settingsItems.length,
+                  itemBuilder: (context, index) => settingsItems[index],
+                );
+              },
+            ),
+          ),
+        ));
   }
 
   Widget _buildTile({

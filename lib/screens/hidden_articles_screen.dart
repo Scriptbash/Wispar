@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import '../services/database_helper.dart';
-import '../widgets/publication_card.dart';
-import '../generated_l10n/app_localizations.dart';
+import 'package:wispar/services/database_helper.dart';
+import 'package:wispar/widgets/publication_card/publication_card.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
 
 class HiddenArticlesScreen extends StatefulWidget {
   const HiddenArticlesScreen({super.key});
 
   @override
-  _HiddenArticlesScreenState createState() => _HiddenArticlesScreenState();
+  HiddenArticlesScreenState createState() => HiddenArticlesScreenState();
 }
 
-class _HiddenArticlesScreenState extends State<HiddenArticlesScreen> {
+class HiddenArticlesScreenState extends State<HiddenArticlesScreen> {
   final DatabaseHelper dbHelper = DatabaseHelper();
   List<PublicationCard> _hiddenPublications = [];
 
@@ -26,6 +26,7 @@ class _HiddenArticlesScreenState extends State<HiddenArticlesScreen> {
     setState(() {
       _hiddenPublications = hidden.map((card) {
         return PublicationCard(
+          key: ValueKey(card.doi),
           doi: card.doi,
           title: card.title,
           issn: card.issn,
@@ -39,8 +40,9 @@ class _HiddenArticlesScreenState extends State<HiddenArticlesScreen> {
           showHideBtn: true,
           isHidden: true,
           onHide: () async {
-            await dbHelper.unhideArticle(card.doi);
-            _loadHiddenPublications();
+            setState(() {
+              _hiddenPublications.removeWhere((c) => c.doi == card.doi);
+            });
           },
         );
       }).toList();
