@@ -9,6 +9,7 @@ class CardSwipeBackground extends StatelessWidget {
   final double dismissThreshold;
   final bool isLiked;
   final bool? isHidden;
+  final bool showHideBtn;
 
   const CardSwipeBackground({
     super.key,
@@ -19,6 +20,7 @@ class CardSwipeBackground extends StatelessWidget {
     required this.dismissThreshold,
     required this.isLiked,
     this.isHidden,
+    this.showHideBtn = false,
   });
 
   double _getIconOpacity() {
@@ -67,7 +69,9 @@ class CardSwipeBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (action == SwipeAction.none) return const SizedBox.shrink();
-
+    if (action == SwipeAction.hide && showHideBtn == false) {
+      return const SizedBox.shrink();
+    }
     final bool isOppositeVisible =
         direction == TextDirection.rtl ? dragExtent < 0 : dragExtent > 0;
 

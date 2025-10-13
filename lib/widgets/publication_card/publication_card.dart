@@ -31,7 +31,7 @@ class PublicationCard extends StatefulWidget {
   final VoidCallback? onFavoriteChanged;
   final VoidCallback? onAbstractChanged;
   final String? publisher;
-  final bool? showHideBtn;
+  final bool showHideBtn;
   final bool? isHidden;
   final VoidCallback? onHide;
 
@@ -61,7 +61,7 @@ class PublicationCard extends StatefulWidget {
     this.onFavoriteChanged,
     this.onAbstractChanged,
     this.publisher,
-    this.showHideBtn,
+    this.showHideBtn = false,
     this.isHidden,
     this.onHide,
     this.swipeLeftAction = SwipeAction.hide,
@@ -230,6 +230,11 @@ class PublicationCardState extends State<PublicationCard>
                 : widget.swipeRightAction;
           }
 
+          if (actionToPerform == SwipeAction.hide &&
+              widget.showHideBtn == false) {
+            actionToPerform = SwipeAction.none;
+          }
+
           final double currentControllerValue = _swipeController.value;
 
           if (actionToPerform == SwipeAction.none) {
@@ -291,6 +296,7 @@ class PublicationCardState extends State<PublicationCard>
               dismissThreshold: _dismissThreshold,
               isLiked: isLiked,
               isHidden: widget.isHidden,
+              showHideBtn: widget.showHideBtn,
             ),
             SlideTransition(
               position: _slideAnimation,
