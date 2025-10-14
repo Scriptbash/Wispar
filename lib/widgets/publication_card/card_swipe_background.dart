@@ -47,6 +47,11 @@ class CardSwipeBackground extends StatelessWidget {
         return Icons.book_outlined;
       case SwipeAction.share:
         return Icons.share_outlined;
+      case SwipeAction.goToWebsite:
+        return Icons.public_outlined;
+      case SwipeAction.copy:
+        return Icons.copy_outlined;
+
       case SwipeAction.none:
     }
     return Icons.do_not_disturb_on_outlined;
@@ -60,6 +65,8 @@ class CardSwipeBackground extends StatelessWidget {
       case SwipeAction.favorite:
       case SwipeAction.sendToZotero:
       case SwipeAction.share:
+      case SwipeAction.goToWebsite:
+      case SwipeAction.copy:
         return theme.colorScheme.primary;
       case SwipeAction.none:
     }

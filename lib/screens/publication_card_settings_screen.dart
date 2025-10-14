@@ -63,6 +63,11 @@ class PublicationCardSettingsScreenState
         title: loc.sendToZotero,
         icon: Icons.book_outlined
       ),
+      SwipeAction.goToWebsite: (
+        title: loc.goToWebsite,
+        icon: Icons.public_outlined
+      ),
+      SwipeAction.copy: (title: loc.copy, icon: Icons.copy_outlined),
       SwipeAction.share: (title: loc.shareArticle, icon: Icons.share_outlined),
     };
   }

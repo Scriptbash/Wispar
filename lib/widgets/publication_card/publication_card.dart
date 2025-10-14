@@ -4,6 +4,7 @@ import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:wispar/models/crossref_journals_works_models.dart';
 import 'package:wispar/screens/article_screen.dart';
 import 'package:wispar/screens/journals_details_screen.dart';
+import 'package:wispar/screens/article_website.dart';
 import 'package:wispar/services/database_helper.dart';
 import 'package:wispar/services/zotero_api.dart';
 import 'package:wispar/widgets/publication_card/publication_card_content.dart';
@@ -14,7 +15,15 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum SwipeAction { none, hide, favorite, sendToZotero, share }
+enum SwipeAction {
+  none,
+  hide,
+  favorite,
+  sendToZotero,
+  share,
+  goToWebsite,
+  copy
+}
 
 class PublicationCard extends StatefulWidget {
   final String title;
@@ -175,6 +184,33 @@ class PublicationCardState extends State<PublicationCard>
       case SwipeAction.share:
         _shareArticle();
         break;
+      case SwipeAction.goToWebsite:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ArticleWebsite(
+              publicationCard: PublicationCard(
+                doi: widget.doi,
+                title: widget.title,
+                authors: widget.authors,
+                publishedDate: widget.publishedDate,
+                journalTitle: widget.journalTitle,
+                issn: widget.issn,
+                url: widget.url,
+                license: widget.license,
+                licenseName: widget.licenseName,
+                abstract: widget.abstract,
+                publisher: widget.publisher,
+              ),
+            ),
+          ),
+        );
+        break;
+
+      case SwipeAction.copy:
+        _showCopyOptions();
+        break;
+
       case SwipeAction.none:
         break;
     }
