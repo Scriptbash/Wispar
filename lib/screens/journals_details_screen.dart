@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import '../generated_l10n/app_localizations.dart';
-import '../services/crossref_api.dart';
-import '../services/abstract_helper.dart';
-import '../models/crossref_journals_works_models.dart' as journals_works;
-import '../widgets/publication_card/publication_card.dart';
-import '../widgets/journal_header.dart';
-import '../widgets/latest_works_header.dart';
-import '../services/database_helper.dart';
-import '../services/logs_helper.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/services/crossref_api.dart';
+import 'package:wispar/services/abstract_helper.dart';
+import 'package:wispar/models/crossref_journals_works_models.dart'
+    as journals_works;
+import 'package:wispar/widgets/publication_card/publication_card.dart';
+import 'package:wispar/widgets/journal_header.dart';
+import 'package:wispar/widgets/latest_works_header.dart';
+import 'package:wispar/services/database_helper.dart';
+import 'package:wispar/services/logs_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class JournalDetailsScreen extends StatefulWidget {
   final String title;
@@ -36,15 +38,55 @@ class JournalDetailsScreenState extends State<JournalDetailsScreen> {
   Map<String, String> abstractCache = {};
   late bool _isFollowed = false;
 
+  SwipeAction _swipeLeftAction = SwipeAction.hide;
+  SwipeAction _swipeRightAction = SwipeAction.favorite;
+
   @override
   void initState() {
     super.initState();
-    _initFollowStatus();
-    _scrollController = ScrollController();
-    _scrollController.addListener(_onScroll);
     allWorks = [];
     CrossRefApi.resetJournalWorksCursor();
+    _loadAllData();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+
     _loadMoreWorks();
+  }
+
+  Future<void> _loadAllData() async {
+    await _loadSwipePreferences();
+    await _initFollowStatus();
+    await _loadMoreWorks();
+  }
+
+  Future<void> _loadSwipePreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final leftActionName =
+        prefs.getString('swipeLeftAction') ?? SwipeAction.hide.name;
+    final rightActionName =
+        prefs.getString('swipeRightAction') ?? SwipeAction.favorite.name;
+
+    SwipeAction newLeftAction = SwipeAction.hide;
+    SwipeAction newRightAction = SwipeAction.favorite;
+
+    try {
+      newLeftAction = SwipeAction.values.byName(leftActionName);
+    } catch (_) {
+      newLeftAction = SwipeAction.hide;
+    }
+    try {
+      newRightAction = SwipeAction.values.byName(rightActionName);
+    } catch (_) {
+      newRightAction = SwipeAction.favorite;
+    }
+
+    if (mounted) {
+      setState(() {
+        _swipeLeftAction = newLeftAction;
+        _swipeRightAction = newRightAction;
+      });
+    }
   }
 
   Future<void> _initFollowStatus() async {
@@ -161,6 +203,8 @@ class JournalDetailsScreenState extends State<JournalDetailsScreen> {
                                   license: work.license,
                                   licenseName: work.licenseName,
                                   publisher: work.publisher,
+                                  swipeLeftAction: _swipeLeftAction,
+                                  swipeRightAction: _swipeRightAction,
                                 );
                               }
                             },
@@ -178,6 +222,8 @@ class JournalDetailsScreenState extends State<JournalDetailsScreen> {
                             license: work.license,
                             licenseName: work.licenseName,
                             publisher: work.publisher,
+                            swipeLeftAction: _swipeLeftAction,
+                            swipeRightAction: _swipeRightAction,
                           );
                         }
                       } else if (hasMoreResults) {

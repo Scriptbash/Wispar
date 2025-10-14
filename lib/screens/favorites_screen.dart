@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import '../generated_l10n/app_localizations.dart';
-import '../widgets/publication_card/publication_card.dart';
-import '../services/database_helper.dart';
-import '../services/abstract_helper.dart';
-import '../widgets/sort_dialog.dart';
-import '../services/logs_helper.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/widgets/publication_card/publication_card.dart';
+import 'package:wispar/services/database_helper.dart';
+import 'package:wispar/services/abstract_helper.dart';
+import 'package:wispar/widgets/sort_dialog.dart';
+import 'package:wispar/services/logs_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -24,24 +25,70 @@ class FavoritesScreenState extends State<FavoritesScreen> {
   final TextEditingController _filterController = TextEditingController();
   List<PublicationCard> _allFavorites = [];
   List<PublicationCard> _filteredFavorites = [];
+  final ScrollController _scrollController = ScrollController();
 
   bool _useAndFilter = true;
   bool _showSearchBar = false;
 
+  SwipeAction _swipeLeftAction = SwipeAction.hide;
+  SwipeAction _swipeRightAction = SwipeAction.favorite;
+
   @override
   void initState() {
     super.initState();
-    _favoriteArticles = _loadFavoriteArticles();
+    _favoriteArticles = _loadAllData();
 
     _filterController.addListener(() {
       _filterFeed(_filterController.text);
     });
   }
 
+  Future<List<PublicationCard>> _loadAllData() async {
+    await _loadSwipePreferences();
+    return _loadFavoriteArticles();
+  }
+
+  Future<void> _loadSwipePreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final leftActionName =
+        prefs.getString('swipeLeftAction') ?? SwipeAction.hide.name;
+    final rightActionName =
+        prefs.getString('swipeRightAction') ?? SwipeAction.favorite.name;
+
+    SwipeAction newLeftAction = SwipeAction.hide;
+    SwipeAction newRightAction = SwipeAction.favorite;
+
+    try {
+      newLeftAction = SwipeAction.values.byName(leftActionName);
+    } catch (_) {
+      newLeftAction = SwipeAction.hide;
+    }
+    try {
+      newRightAction = SwipeAction.values.byName(rightActionName);
+    } catch (_) {
+      newRightAction = SwipeAction.favorite;
+    }
+
+    if (mounted) {
+      setState(() {
+        _swipeLeftAction = newLeftAction;
+        _swipeRightAction = newRightAction;
+      });
+    }
+  }
+
   Future<List<PublicationCard>> _loadFavoriteArticles() async {
     try {
       List<PublicationCard> favorites =
           await DatabaseHelper().getFavoriteArticles();
+
+      for (var card in favorites) {
+        String formattedAbstract =
+            await AbstractHelper.buildAbstract(context, card.abstract);
+        abstractCache[card.doi] = formattedAbstract;
+      }
+
       setState(() {
         _allFavorites = favorites;
         _filteredFavorites = _sortFavorites(favorites);
@@ -140,9 +187,17 @@ class FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   Future<void> _updateAbstract() async {
+    List<PublicationCard> currentFavorites =
+        await DatabaseHelper().getFavoriteArticles();
+
+    for (var card in currentFavorites) {
+      String formattedAbstract =
+          await AbstractHelper.buildAbstract(context, card.abstract);
+      abstractCache[card.doi] = formattedAbstract;
+    }
     setState(() {
-      abstractCache = {};
-      _favoriteArticles = _loadFavoriteArticles();
+      _allFavorites = currentFavorites;
+      _filterFeed(_filterController.text);
     });
   }
 
@@ -248,76 +303,36 @@ class FavoritesScreenState extends State<FavoritesScreen> {
                     (constraints.maxWidth - totalSpacing) / columns;
 
                 return SingleChildScrollView(
+                  controller: _scrollController,
                   padding: EdgeInsets.all(spacing),
                   child: Wrap(
                     spacing: spacing,
                     runSpacing: spacing,
                     children: _filteredFavorites.map((publicationCard) {
-                      Widget cardWidget;
+                      String cachedAbstract =
+                          abstractCache[publicationCard.doi] ??
+                              publicationCard.abstract;
 
-                      String? cachedAbstract =
-                          abstractCache[publicationCard.doi];
-                      if (cachedAbstract != null) {
-                        cardWidget = PublicationCard(
-                          key: ValueKey(publicationCard.doi),
-                          title: publicationCard.title,
-                          abstract: cachedAbstract,
-                          journalTitle: publicationCard.journalTitle,
-                          issn: publicationCard.issn,
-                          publishedDate: publicationCard.publishedDate,
-                          doi: publicationCard.doi,
-                          authors: publicationCard.authors,
-                          url: publicationCard.url,
-                          license: publicationCard.license,
-                          licenseName: publicationCard.licenseName,
-                          dateLiked: publicationCard.dateLiked,
-                          onFavoriteChanged: () {
-                            _removeFavorite(context, publicationCard);
-                          },
-                          onAbstractChanged: _updateAbstract,
-                        );
-                      } else {
-                        cardWidget = FutureBuilder<String>(
-                          future: AbstractHelper.buildAbstract(
-                              context, publicationCard.abstract),
-                          builder: (context, abstractSnapshot) {
-                            if (abstractSnapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (abstractSnapshot.hasError) {
-                              return Center(
-                                  child:
-                                      Text('Error: ${abstractSnapshot.error}'));
-                            } else if (!abstractSnapshot.hasData) {
-                              return Center(
-                                  child: Text('No abstract available'));
-                            } else {
-                              String formattedAbstract = abstractSnapshot.data!;
-                              abstractCache[publicationCard.doi] =
-                                  formattedAbstract;
-
-                              return PublicationCard(
-                                key: ValueKey(publicationCard.doi),
-                                title: publicationCard.title,
-                                abstract: formattedAbstract,
-                                journalTitle: publicationCard.journalTitle,
-                                issn: publicationCard.issn,
-                                publishedDate: publicationCard.publishedDate,
-                                doi: publicationCard.doi,
-                                authors: publicationCard.authors,
-                                url: publicationCard.url,
-                                license: publicationCard.license,
-                                licenseName: publicationCard.licenseName,
-                                dateLiked: publicationCard.dateLiked,
-                                onFavoriteChanged: () {
-                                  _removeFavorite(context, publicationCard);
-                                },
-                                onAbstractChanged: _updateAbstract,
-                              );
-                            }
-                          },
-                        );
-                      }
+                      final cardWidget = PublicationCard(
+                        key: ValueKey(publicationCard.doi),
+                        title: publicationCard.title,
+                        abstract: cachedAbstract,
+                        journalTitle: publicationCard.journalTitle,
+                        issn: publicationCard.issn,
+                        publishedDate: publicationCard.publishedDate,
+                        doi: publicationCard.doi,
+                        authors: publicationCard.authors,
+                        url: publicationCard.url,
+                        license: publicationCard.license,
+                        licenseName: publicationCard.licenseName,
+                        dateLiked: publicationCard.dateLiked,
+                        swipeLeftAction: _swipeLeftAction,
+                        swipeRightAction: _swipeRightAction,
+                        onFavoriteChanged: () {
+                          _removeFavorite(context, publicationCard);
+                        },
+                        onAbstractChanged: _updateAbstract,
+                      );
 
                       return SizedBox(width: cardWidth, child: cardWidget);
                     }).toList(),
@@ -334,6 +349,7 @@ class FavoritesScreenState extends State<FavoritesScreen> {
   @override
   void dispose() {
     _filterController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 }

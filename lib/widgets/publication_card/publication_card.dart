@@ -287,6 +287,7 @@ class PublicationCardState extends State<PublicationCard>
               dismissThreshold: _dismissThreshold,
               isLiked: isLiked,
               isHidden: widget.isHidden,
+              showHideBtn: widget.showHideBtn,
             ),
             CardSwipeBackground(
               direction: TextDirection.ltr,

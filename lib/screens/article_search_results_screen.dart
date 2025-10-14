@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import '../generated_l10n/app_localizations.dart';
-import '../widgets/publication_card/publication_card.dart';
-import '../models/crossref_journals_works_models.dart' as journalsWorks;
-import '../services/crossref_api.dart';
-import '../services/openAlex_api.dart';
-import '../services/logs_helper.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/widgets/publication_card/publication_card.dart';
+import 'package:wispar/models/crossref_journals_works_models.dart'
+    as journals_works;
+import 'package:wispar/services/crossref_api.dart';
+import 'package:wispar/services/openAlex_api.dart';
+import 'package:wispar/services/logs_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ArticleSearchResultsScreen extends StatefulWidget {
-  final List<journalsWorks.Item> initialSearchResults;
+  final List<journals_works.Item> initialSearchResults;
   final bool initialHasMore;
   final Map<String, dynamic> queryParams;
   final String source;
@@ -28,17 +30,22 @@ class ArticleSearchResultsScreen extends StatefulWidget {
 class ArticleSearchResultsScreenState
     extends State<ArticleSearchResultsScreen> {
   final logger = LogsService().logger;
-  late List<journalsWorks.Item> _searchResults;
+  late List<journals_works.Item> _searchResults;
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
   bool _hasMoreResults = true;
   int _currentOpenAlexPage = 1;
+
+  SwipeAction _swipeLeftAction = SwipeAction.hide;
+  SwipeAction _swipeRightAction = SwipeAction.favorite;
 
   @override
   void initState() {
     super.initState();
     _searchResults = widget.initialSearchResults;
     _hasMoreResults = widget.initialHasMore;
+
+    _loadSwipePreferences();
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
@@ -50,6 +57,36 @@ class ArticleSearchResultsScreenState
     });
   }
 
+  Future<void> _loadSwipePreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final leftActionName =
+        prefs.getString('swipeLeftAction') ?? SwipeAction.hide.name;
+    final rightActionName =
+        prefs.getString('swipeRightAction') ?? SwipeAction.favorite.name;
+
+    SwipeAction newLeftAction = SwipeAction.hide;
+    SwipeAction newRightAction = SwipeAction.favorite;
+
+    try {
+      newLeftAction = SwipeAction.values.byName(leftActionName);
+    } catch (_) {
+      newLeftAction = SwipeAction.hide;
+    }
+    try {
+      newRightAction = SwipeAction.values.byName(rightActionName);
+    } catch (_) {
+      newRightAction = SwipeAction.favorite;
+    }
+
+    if (mounted) {
+      setState(() {
+        _swipeLeftAction = newLeftAction;
+        _swipeRightAction = newRightAction;
+      });
+    }
+  }
+
   Future<void> _loadMoreResults() async {
     if (_isLoadingMore || !_hasMoreResults) return;
 
@@ -58,11 +95,11 @@ class ArticleSearchResultsScreenState
     });
 
     try {
-      List<journalsWorks.Item> newResults;
+      List<journals_works.Item> newResults;
       bool hasMore = false;
 
       if (widget.source == 'Crossref') {
-        final ListAndMore<journalsWorks.Item> response =
+        final ListAndMore<journals_works.Item> response =
             await CrossRefApi.getWorksByQuery(widget.queryParams);
         newResults = response.list;
         hasMore =
@@ -143,6 +180,8 @@ class ArticleSearchResultsScreenState
                   license: item.license,
                   licenseName: item.licenseName,
                   publisher: item.publisher,
+                  swipeLeftAction: _swipeLeftAction,
+                  swipeRightAction: _swipeRightAction,
                 );
               },
             )
