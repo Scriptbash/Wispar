@@ -5,6 +5,7 @@ import 'package:wispar/services/abstract_helper.dart';
 import 'package:wispar/models/crossref_journals_works_models.dart'
     as journals_works;
 import 'package:wispar/widgets/publication_card/publication_card.dart';
+import 'package:wispar/screens/publication_card_settings_screen.dart';
 import 'package:wispar/widgets/journal_header.dart';
 import 'package:wispar/widgets/latest_works_header.dart';
 import 'package:wispar/services/database_helper.dart';
@@ -41,6 +42,13 @@ class JournalDetailsScreenState extends State<JournalDetailsScreen> {
   SwipeAction _swipeLeftAction = SwipeAction.hide;
   SwipeAction _swipeRightAction = SwipeAction.favorite;
 
+  bool _showJournalTitle = true;
+  bool _showPublicationDate = true;
+  bool _showAuthorNames = true;
+  bool _showLicense = true;
+  bool _showOptionsMenu = true;
+  bool _showFavoriteButton = true;
+
   @override
   void initState() {
     super.initState();
@@ -54,12 +62,12 @@ class JournalDetailsScreenState extends State<JournalDetailsScreen> {
   }
 
   Future<void> _loadAllData() async {
-    await _loadSwipePreferences();
+    await _loadCardPreferences();
     await _initFollowStatus();
     await _loadMoreWorks();
   }
 
-  Future<void> _loadSwipePreferences() async {
+  Future<void> _loadCardPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final leftActionName =
@@ -85,6 +93,23 @@ class JournalDetailsScreenState extends State<JournalDetailsScreen> {
       setState(() {
         _swipeLeftAction = newLeftAction;
         _swipeRightAction = newRightAction;
+        _showJournalTitle =
+            prefs.getBool(PublicationCardSettingsScreen.showJournalTitleKey) ??
+                true;
+        _showPublicationDate = prefs.getBool(
+                PublicationCardSettingsScreen.showPublicationDateKey) ??
+            true;
+        _showAuthorNames =
+            prefs.getBool(PublicationCardSettingsScreen.showAuthorNamesKey) ??
+                true;
+        _showLicense =
+            prefs.getBool(PublicationCardSettingsScreen.showLicenseKey) ?? true;
+        _showOptionsMenu =
+            prefs.getBool(PublicationCardSettingsScreen.showOptionsMenuKey) ??
+                true;
+        _showFavoriteButton = prefs
+                .getBool(PublicationCardSettingsScreen.showFavoriteButtonKey) ??
+            true;
       });
     }
   }
@@ -205,6 +230,12 @@ class JournalDetailsScreenState extends State<JournalDetailsScreen> {
                                   publisher: work.publisher,
                                   swipeLeftAction: _swipeLeftAction,
                                   swipeRightAction: _swipeRightAction,
+                                  showJournalTitle: _showJournalTitle,
+                                  showPublicationDate: _showPublicationDate,
+                                  showAuthorNames: _showAuthorNames,
+                                  showLicense: _showLicense,
+                                  showOptionsMenu: _showOptionsMenu,
+                                  showFavoriteButton: _showFavoriteButton,
                                 );
                               }
                             },
@@ -224,6 +255,12 @@ class JournalDetailsScreenState extends State<JournalDetailsScreen> {
                             publisher: work.publisher,
                             swipeLeftAction: _swipeLeftAction,
                             swipeRightAction: _swipeRightAction,
+                            showJournalTitle: _showJournalTitle,
+                            showPublicationDate: _showPublicationDate,
+                            showAuthorNames: _showAuthorNames,
+                            showLicense: _showLicense,
+                            showOptionsMenu: _showOptionsMenu,
+                            showFavoriteButton: _showFavoriteButton,
                           );
                         }
                       } else if (hasMoreResults) {

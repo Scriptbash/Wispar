@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:wispar/widgets/publication_card/publication_card.dart';
+import 'package:wispar/screens/publication_card_settings_screen.dart';
 import 'package:wispar/models/crossref_journals_works_models.dart'
     as journals_works;
 import 'package:wispar/services/crossref_api.dart';
@@ -39,13 +40,20 @@ class ArticleSearchResultsScreenState
   SwipeAction _swipeLeftAction = SwipeAction.hide;
   SwipeAction _swipeRightAction = SwipeAction.favorite;
 
+  bool _showJournalTitle = true;
+  bool _showPublicationDate = true;
+  bool _showAuthorNames = true;
+  bool _showLicense = true;
+  bool _showOptionsMenu = true;
+  bool _showFavoriteButton = true;
+
   @override
   void initState() {
     super.initState();
     _searchResults = widget.initialSearchResults;
     _hasMoreResults = widget.initialHasMore;
 
-    _loadSwipePreferences();
+    _loadCardPreferences();
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
@@ -57,7 +65,7 @@ class ArticleSearchResultsScreenState
     });
   }
 
-  Future<void> _loadSwipePreferences() async {
+  Future<void> _loadCardPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final leftActionName =
@@ -83,6 +91,23 @@ class ArticleSearchResultsScreenState
       setState(() {
         _swipeLeftAction = newLeftAction;
         _swipeRightAction = newRightAction;
+        _showJournalTitle =
+            prefs.getBool(PublicationCardSettingsScreen.showJournalTitleKey) ??
+                true;
+        _showPublicationDate = prefs.getBool(
+                PublicationCardSettingsScreen.showPublicationDateKey) ??
+            true;
+        _showAuthorNames =
+            prefs.getBool(PublicationCardSettingsScreen.showAuthorNamesKey) ??
+                true;
+        _showLicense =
+            prefs.getBool(PublicationCardSettingsScreen.showLicenseKey) ?? true;
+        _showOptionsMenu =
+            prefs.getBool(PublicationCardSettingsScreen.showOptionsMenuKey) ??
+                true;
+        _showFavoriteButton = prefs
+                .getBool(PublicationCardSettingsScreen.showFavoriteButtonKey) ??
+            true;
       });
     }
   }
@@ -182,6 +207,12 @@ class ArticleSearchResultsScreenState
                   publisher: item.publisher,
                   swipeLeftAction: _swipeLeftAction,
                   swipeRightAction: _swipeRightAction,
+                  showJournalTitle: _showJournalTitle,
+                  showPublicationDate: _showPublicationDate,
+                  showAuthorNames: _showAuthorNames,
+                  showLicense: _showLicense,
+                  showOptionsMenu: _showOptionsMenu,
+                  showFavoriteButton: _showFavoriteButton,
                 );
               },
             )

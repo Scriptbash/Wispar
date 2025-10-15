@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:wispar/widgets/publication_card/publication_card.dart';
+import 'package:wispar/screens/publication_card_settings_screen.dart';
 import 'package:wispar/services/database_helper.dart';
 import 'package:wispar/services/abstract_helper.dart';
 import 'package:wispar/widgets/sort_dialog.dart';
@@ -33,6 +34,13 @@ class FavoritesScreenState extends State<FavoritesScreen> {
   SwipeAction _swipeLeftAction = SwipeAction.hide;
   SwipeAction _swipeRightAction = SwipeAction.favorite;
 
+  bool _showJournalTitle = true;
+  bool _showPublicationDate = true;
+  bool _showAuthorNames = true;
+  bool _showLicense = true;
+  bool _showOptionsMenu = true;
+  bool _showFavoriteButton = true;
+
   @override
   void initState() {
     super.initState();
@@ -44,11 +52,11 @@ class FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   Future<List<PublicationCard>> _loadAllData() async {
-    await _loadSwipePreferences();
+    await _loadCardPreferences();
     return _loadFavoriteArticles();
   }
 
-  Future<void> _loadSwipePreferences() async {
+  Future<void> _loadCardPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final leftActionName =
@@ -74,6 +82,23 @@ class FavoritesScreenState extends State<FavoritesScreen> {
       setState(() {
         _swipeLeftAction = newLeftAction;
         _swipeRightAction = newRightAction;
+        _showJournalTitle =
+            prefs.getBool(PublicationCardSettingsScreen.showJournalTitleKey) ??
+                true;
+        _showPublicationDate = prefs.getBool(
+                PublicationCardSettingsScreen.showPublicationDateKey) ??
+            true;
+        _showAuthorNames =
+            prefs.getBool(PublicationCardSettingsScreen.showAuthorNamesKey) ??
+                true;
+        _showLicense =
+            prefs.getBool(PublicationCardSettingsScreen.showLicenseKey) ?? true;
+        _showOptionsMenu =
+            prefs.getBool(PublicationCardSettingsScreen.showOptionsMenuKey) ??
+                true;
+        _showFavoriteButton = prefs
+                .getBool(PublicationCardSettingsScreen.showFavoriteButtonKey) ??
+            true;
       });
     }
   }
@@ -328,6 +353,12 @@ class FavoritesScreenState extends State<FavoritesScreen> {
                         dateLiked: publicationCard.dateLiked,
                         swipeLeftAction: _swipeLeftAction,
                         swipeRightAction: _swipeRightAction,
+                        showJournalTitle: _showJournalTitle,
+                        showPublicationDate: _showPublicationDate,
+                        showAuthorNames: _showAuthorNames,
+                        showLicense: _showLicense,
+                        showOptionsMenu: _showOptionsMenu,
+                        showFavoriteButton: _showFavoriteButton,
                         onFavoriteChanged: () {
                           _removeFavorite(context, publicationCard);
                         },
