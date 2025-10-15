@@ -64,7 +64,8 @@ class JournalCard extends StatelessWidget {
               child: Text(
                 journal.title,
                 style: TextStyle(fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis,
+                overflow: TextOverflow.visible,
+                softWrap: true,
               ),
             ),
             Visibility(
