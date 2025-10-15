@@ -244,7 +244,7 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
-          duration: const Duration(seconds: 2),
+          duration: const Duration(seconds: 3),
         ),
       );
     }
@@ -282,7 +282,19 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
               ),
               tooltip: AppLocalizations.of(context)!.downloadFoundPdf,
               onPressed: () {
-                _showDownloadOptions(context, Uri.parse(_extractedPdfUrl!));
+                final extractedUri = Uri.parse(_extractedPdfUrl!);
+                final isElsevier =
+                    extractedUri.host.contains('sciencedirect-com') ||
+                        extractedUri.host.contains('sciencedirect.com');
+                if (isElsevier) {
+                  webViewController?.loadUrl(
+                      urlRequest:
+                          URLRequest(url: WebUri(extractedUri.toString())));
+                  logger.info(
+                      'Elsevier PDF detected. Forcing WebView navigation to trigger download.');
+                } else {
+                  _showDownloadOptions(context, extractedUri);
+                }
               },
             ),
         ],
@@ -683,6 +695,26 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
                   """) as String?;
 
       if (pdfLink == null || pdfLink.isEmpty) {
+        logger.info('Trying Elsevier .ViewPDF selector');
+        pdfLink = await controller.evaluateJavascript(source: r"""
+                  (function() {
+                    const match = window.location.href.match(/article\/pii\/([^\/?#]+)/i);
+                    if (!match) return null;
+                    const currentPii = match[1];
+
+                    const pdfLinks = Array.from(document.querySelectorAll('li.ViewPDF a[href]'));
+                    for (const link of pdfLinks) {
+                      const href = link.getAttribute('href') || '';
+                      if (href.includes(currentPii) && href.includes('/pdfft')) {
+                        return href;
+                      }
+                    }
+                    return null;
+                  })();
+                """);
+      }
+
+      if (pdfLink == null || pdfLink.isEmpty) {
         pdfLink = await controller.evaluateJavascript(
                 source:
                     "document.querySelector('meta[name=\"citation_pdf_url\"]')?.getAttribute('content');")
@@ -697,7 +729,7 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
       }
 
       if (pdfLink == null || pdfLink.isEmpty) {
-        logger.fine('Trying to find PDF link in div.downloadPDFLink a');
+        logger.info('Trying to find PDF link in div.downloadPDFLink a');
         pdfLink = await controller.evaluateJavascript(
                 source:
                     "document.querySelector('div.downloadPDFLink a')?.getAttribute('href');")
@@ -789,9 +821,66 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
                     try {
                       final currentWebViewUrl =
                           await webViewController?.getUrl();
+                      String linkToProcess =
+                          _extractedPdfUrl ?? downloadUri.toString();
+
+                      Uri finalDownloadUri = Uri.parse(linkToProcess);
+
+                      if (currentWebViewUrl != null &&
+                          (finalDownloadUri.host.contains('wiley-com') ||
+                              finalDownloadUri.host.contains('wiley.com') ||
+                              finalDownloadUri.host
+                                  .contains('sciencedirect-com') ||
+                              finalDownloadUri.host
+                                  .contains('sciencedirect.com'))) {
+                        final correctHost = currentWebViewUrl.host;
+
+                        finalDownloadUri =
+                            finalDownloadUri.replace(host: correctHost);
+                        logger
+                            .info('Host correction applied: $finalDownloadUri');
+                      }
+
+                      // -- WILEY SPECIFIC PATH CORRECTION --
+                      if (finalDownloadUri.host.contains('wiley-com') ||
+                          finalDownloadUri.host.contains('wiley.com')) {
+                        final isPdfPath =
+                            finalDownloadUri.path.contains('/doi/pdf/') ||
+                                finalDownloadUri.path.contains('/doi/epdf/');
+
+                        if (isPdfPath &&
+                            !finalDownloadUri.path.contains('pdfdirect')) {
+                          // Replace /doi/pdf/ (or /doi/epdf/) with /doi/pdfdirect/
+                          String newPath = finalDownloadUri.path
+                              .replaceFirst('/doi/pdf/', '/doi/pdfdirect/')
+                              .replaceFirst('/doi/epdf/', '/doi/pdfdirect/');
+
+                          finalDownloadUri =
+                              finalDownloadUri.replace(path: newPath);
+
+                          logger.info(
+                              'Transformed Wiley path to PDFDirect: $finalDownloadUri');
+                        }
+
+                        if (finalDownloadUri.path.contains('/doi/pdf/') ||
+                            finalDownloadUri.path.contains('/doi/epdf/') ||
+                            finalDownloadUri.path.contains('/doi/pdfdirect/')) {
+                          String newQuery = finalDownloadUri.query;
+                          if (!newQuery.contains('download=true')) {
+                            newQuery = newQuery.isEmpty
+                                ? 'download=true'
+                                : '$newQuery&download=true';
+
+                            finalDownloadUri =
+                                finalDownloadUri.replace(query: newQuery);
+                            logger.info(
+                                'Appended download=true to link: $finalDownloadUri');
+                          }
+                        }
+                      }
 
                       Map<String, String> headers = {
-                        'Host': downloadUri.host,
+                        //'Host': downloadUri.host,
                         'Accept':
                             'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                         'Accept-Language':
@@ -840,12 +929,12 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
                             'No cookies available for HTTP download. This might fail for authenticated content.');
                       }
 
-                      logger.info('HTTP Request URL: $downloadUri');
+                      logger.info('HTTP Request URL: $finalDownloadUri');
                       logger.info(
                           'Full HTTP Request Headers being sent: $headers');
 
                       final response =
-                          await http.get(downloadUri, headers: headers);
+                          await http.get(finalDownloadUri, headers: headers);
 
                       if (!mounted) {
                         logger.warning(
