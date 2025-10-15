@@ -695,23 +695,29 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
                   """) as String?;
 
       if (pdfLink == null || pdfLink.isEmpty) {
-        logger.info('Trying Elsevier .ViewPDF selector');
-        pdfLink = await controller.evaluateJavascript(source: r"""
-                  (function() {
-                    const match = window.location.href.match(/article\/pii\/([^\/?#]+)/i);
-                    if (!match) return null;
-                    const currentPii = match[1];
+        const int retries = 10;
+        const int delayMs = 500;
+        for (int i = 0; i < retries; i++) {
+          pdfLink = await controller.evaluateJavascript(source: r"""
+      (function() {
+        const match = window.location.href.match(/article\/pii\/([^\/?#]+)/i);
+        if (!match) return null;
+        const currentPii = match[1];
 
-                    const pdfLinks = Array.from(document.querySelectorAll('li.ViewPDF a[href]'));
-                    for (const link of pdfLinks) {
-                      const href = link.getAttribute('href') || '';
-                      if (href.includes(currentPii) && href.includes('/pdfft')) {
-                        return href;
-                      }
-                    }
-                    return null;
-                  })();
-                """);
+        const pdfLinks = Array.from(document.querySelectorAll('li.ViewPDF a[href]'));
+        for (const link of pdfLinks) {
+          const href = link.getAttribute('href') || '';
+          if (href.includes(currentPii) && href.includes('/pdfft')) {
+            return href;
+          }
+        }
+        return null;
+      })();
+    """);
+
+          if (pdfLink != null && pdfLink.isNotEmpty) break;
+          await Future.delayed(Duration(milliseconds: delayMs));
+        }
       }
 
       if (pdfLink == null || pdfLink.isEmpty) {
