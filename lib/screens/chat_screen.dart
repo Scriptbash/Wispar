@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 
-import '../widgets/publication_card.dart';
+import '../widgets/publication_card/publication_card.dart';
 import '../generated_l10n/app_localizations.dart';
 import '../services/logs_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,16 +15,16 @@ class ChatScreen extends StatefulWidget {
   final PublicationCard publicationCard;
 
   const ChatScreen({
-    Key? key,
+    super.key,
     required this.pdfPath,
     required this.publicationCard,
-  }) : super(key: key);
+  });
 
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  ChatScreenState createState() => ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final List<Map<String, String>> _messages = [];
   bool _isLoadingResponse = false;

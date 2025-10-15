@@ -1,8 +1,8 @@
 import '../models/journal_entity.dart';
-import '../models/crossref_journals_works_models.dart' as journalWorks;
+import '../models/crossref_journals_works_models.dart' as journal_works;
 import '../services/feed_api.dart';
 import '../services/database_helper.dart';
-import '../widgets/publication_card.dart';
+import '../widgets/publication_card/publication_card.dart';
 import '../services/logs_helper.dart';
 
 class FeedService {
@@ -36,7 +36,7 @@ class FeedService {
               journalsToUpdate.add(journalId);
             }
           } else {
-            logger.warning('No journal found for journal_id ${journalId}');
+            logger.warning('No journal found for journal_id $journalId');
           }
         } else {
           logger.warning('No journal_id found for ISSN ${journal.issn}');
@@ -76,7 +76,7 @@ class FeedService {
       logger.severe('Error retrieving saved queries to update.', e, stackTrace);
     }
     if (queriesToUpdate.isNotEmpty) {
-      logger.info('Found saved queries to update ${queriesToUpdate}');
+      logger.info('Found saved queries to update $queriesToUpdate');
     }
     return queriesToUpdate;
   }
@@ -123,11 +123,11 @@ class FeedService {
               await _dbHelper.getJournalTitleById(journalIdInBatch);
           await _dbHelper.updateJournalLastUpdated(journalIdInBatch);
 
-          List<journalWorks.Item> recentFeed =
+          List<journal_works.Item> recentFeed =
               await FeedApi.getRecentFeed(journal.issn);
 
           // Cache the articles into the DB
-          for (journalWorks.Item item in recentFeed) {
+          for (journal_works.Item item in recentFeed) {
             await _dbHelper.insertArticle(
               PublicationCard(
                 title: item.title,
@@ -183,7 +183,7 @@ class FeedService {
             await _dbHelper.updateSavedQueryLastFetched(query['query_id']);
 
             String provider = query['queryProvider'];
-            List<journalWorks.Item> queryArticles = [];
+            List<journal_works.Item> queryArticles = [];
 
             if (provider == "Crossref") {
               Map<String, dynamic> queryMap =
@@ -198,7 +198,7 @@ class FeedService {
               return;
             }
 
-            for (journalWorks.Item item in queryArticles) {
+            for (journal_works.Item item in queryArticles) {
               if (item.title.isNotEmpty) {
                 await _dbHelper.insertArticle(
                   PublicationCard(

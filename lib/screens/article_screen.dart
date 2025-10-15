@@ -4,7 +4,7 @@ import '../generated_l10n/app_localizations.dart';
 import 'package:wispar/screens/article_website.dart';
 import '../models/crossref_journals_works_models.dart';
 import '../services/database_helper.dart';
-import '../widgets/publication_card.dart';
+import '../widgets/publication_card/publication_card.dart';
 import './journals_details_screen.dart';
 import '../services/zotero_api.dart';
 import '../services/string_format_helper.dart';

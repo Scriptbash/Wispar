@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../generated_l10n/app_localizations.dart';
 import 'package:pdfrx/pdfrx.dart';
-import '../widgets/publication_card.dart';
+import '../widgets/publication_card/publication_card.dart';
 import '../services/database_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:open_filex/open_filex.dart';

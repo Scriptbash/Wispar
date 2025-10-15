@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import '../generated_l10n/app_localizations.dart';
-import '../services/crossref_api.dart';
-import '../services/abstract_helper.dart';
-import '../models/crossref_journals_works_models.dart' as journalsWorks;
-import '../widgets/publication_card.dart';
-import '../widgets/journal_header.dart';
-import '../widgets/latest_works_header.dart';
-import '../services/database_helper.dart';
-import '../services/logs_helper.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/services/crossref_api.dart';
+import 'package:wispar/services/abstract_helper.dart';
+import 'package:wispar/models/crossref_journals_works_models.dart'
+    as journals_works;
+import 'package:wispar/widgets/publication_card/publication_card.dart';
+import 'package:wispar/screens/publication_card_settings_screen.dart';
+import 'package:wispar/widgets/journal_header.dart';
+import 'package:wispar/widgets/latest_works_header.dart';
+import 'package:wispar/services/database_helper.dart';
+import 'package:wispar/services/logs_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class JournalDetailsScreen extends StatefulWidget {
   final String title;
@@ -16,35 +19,99 @@ class JournalDetailsScreen extends StatefulWidget {
   final Function(bool)? onFollowStatusChanged;
 
   const JournalDetailsScreen({
-    Key? key,
+    super.key,
     required this.title,
     required this.publisher,
     required this.issn,
     this.onFollowStatusChanged,
-  }) : super(key: key);
+  });
 
   @override
-  _JournalDetailsScreenState createState() => _JournalDetailsScreenState();
+  JournalDetailsScreenState createState() => JournalDetailsScreenState();
 }
 
-class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
+class JournalDetailsScreenState extends State<JournalDetailsScreen> {
   final logger = LogsService().logger;
-  late List<journalsWorks.Item> allWorks;
+  late List<journals_works.Item> allWorks;
   bool isLoading = false;
   late ScrollController _scrollController;
   bool hasMoreResults = true;
   Map<String, String> abstractCache = {};
   late bool _isFollowed = false;
 
+  SwipeAction _swipeLeftAction = SwipeAction.hide;
+  SwipeAction _swipeRightAction = SwipeAction.favorite;
+
+  bool _showJournalTitle = true;
+  bool _showPublicationDate = true;
+  bool _showAuthorNames = true;
+  bool _showLicense = true;
+  bool _showOptionsMenu = true;
+  bool _showFavoriteButton = true;
+
   @override
   void initState() {
     super.initState();
-    _initFollowStatus();
-    _scrollController = ScrollController();
-    _scrollController.addListener(_onScroll);
     allWorks = [];
     CrossRefApi.resetJournalWorksCursor();
+    _loadAllData();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+
     _loadMoreWorks();
+  }
+
+  Future<void> _loadAllData() async {
+    await _loadCardPreferences();
+    await _initFollowStatus();
+    await _loadMoreWorks();
+  }
+
+  Future<void> _loadCardPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final leftActionName =
+        prefs.getString('swipeLeftAction') ?? SwipeAction.hide.name;
+    final rightActionName =
+        prefs.getString('swipeRightAction') ?? SwipeAction.favorite.name;
+
+    SwipeAction newLeftAction = SwipeAction.hide;
+    SwipeAction newRightAction = SwipeAction.favorite;
+
+    try {
+      newLeftAction = SwipeAction.values.byName(leftActionName);
+    } catch (_) {
+      newLeftAction = SwipeAction.hide;
+    }
+    try {
+      newRightAction = SwipeAction.values.byName(rightActionName);
+    } catch (_) {
+      newRightAction = SwipeAction.favorite;
+    }
+
+    if (mounted) {
+      setState(() {
+        _swipeLeftAction = newLeftAction;
+        _swipeRightAction = newRightAction;
+        _showJournalTitle =
+            prefs.getBool(PublicationCardSettingsScreen.showJournalTitleKey) ??
+                true;
+        _showPublicationDate = prefs.getBool(
+                PublicationCardSettingsScreen.showPublicationDateKey) ??
+            true;
+        _showAuthorNames =
+            prefs.getBool(PublicationCardSettingsScreen.showAuthorNamesKey) ??
+                true;
+        _showLicense =
+            prefs.getBool(PublicationCardSettingsScreen.showLicenseKey) ?? true;
+        _showOptionsMenu =
+            prefs.getBool(PublicationCardSettingsScreen.showOptionsMenuKey) ??
+                true;
+        _showFavoriteButton = prefs
+                .getBool(PublicationCardSettingsScreen.showFavoriteButtonKey) ??
+            true;
+      });
+    }
   }
 
   Future<void> _initFollowStatus() async {
@@ -161,6 +228,14 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
                                   license: work.license,
                                   licenseName: work.licenseName,
                                   publisher: work.publisher,
+                                  swipeLeftAction: _swipeLeftAction,
+                                  swipeRightAction: _swipeRightAction,
+                                  showJournalTitle: _showJournalTitle,
+                                  showPublicationDate: _showPublicationDate,
+                                  showAuthorNames: _showAuthorNames,
+                                  showLicense: _showLicense,
+                                  showOptionsMenu: _showOptionsMenu,
+                                  showFavoriteButton: _showFavoriteButton,
                                 );
                               }
                             },
@@ -178,6 +253,14 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
                             license: work.license,
                             licenseName: work.licenseName,
                             publisher: work.publisher,
+                            swipeLeftAction: _swipeLeftAction,
+                            swipeRightAction: _swipeRightAction,
+                            showJournalTitle: _showJournalTitle,
+                            showPublicationDate: _showPublicationDate,
+                            showAuthorNames: _showAuthorNames,
+                            showLicense: _showLicense,
+                            showOptionsMenu: _showOptionsMenu,
+                            showFavoriteButton: _showFavoriteButton,
                           );
                         }
                       } else if (hasMoreResults) {
@@ -210,7 +293,7 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
     setState(() => isLoading = true);
 
     try {
-      ListAndMore<journalsWorks.Item> newWorks =
+      ListAndMore<journals_works.Item> newWorks =
           await CrossRefApi.getJournalWorks(widget.issn);
 
       setState(() {

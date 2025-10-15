@@ -1,7 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/crossref_journals_works_models.dart';
-import '../widgets/publication_card.dart';
+import '../widgets/publication_card/publication_card.dart';
 import '../widgets/downloaded_card.dart';
 import '../models/journal_entity.dart';
 import '../models/feed_filter_entity.dart';

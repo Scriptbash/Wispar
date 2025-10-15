@@ -5,13 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/zotero_api.dart';
 
 class ZoteroSettings extends StatefulWidget {
-  const ZoteroSettings({Key? key}) : super(key: key);
+  const ZoteroSettings({super.key});
 
   @override
-  _ZoteroSettingsState createState() => _ZoteroSettingsState();
+  ZoteroSettingsState createState() => ZoteroSettingsState();
 }
 
-class _ZoteroSettingsState extends State<ZoteroSettings> {
+class ZoteroSettingsState extends State<ZoteroSettings> {
   final TextEditingController _apiKeyController = TextEditingController();
   bool passwordVisible = false;
 
@@ -37,7 +37,6 @@ class _ZoteroSettingsState extends State<ZoteroSettings> {
 
     return Scaffold(
       appBar: AppBar(
-        centerTitle: false,
         title: Text(AppLocalizations.of(context)!.zoteroSettings),
       ),
       body: Padding(

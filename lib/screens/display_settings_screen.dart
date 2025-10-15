@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../generated_l10n/app_localizations.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../theme_provider.dart';
-import '../locale_provider.dart';
+import 'package:wispar/theme_provider.dart';
+import 'package:wispar/locale_provider.dart';
 
 class DisplaySettingsScreen extends StatefulWidget {
   const DisplaySettingsScreen({super.key});
@@ -13,7 +13,6 @@ class DisplaySettingsScreen extends StatefulWidget {
 }
 
 class DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
-  int _publicationCardOption = 1;
   int _pdfThemeOption = 0;
   int _pdfOrientationOption = 0;
 
@@ -56,18 +55,9 @@ class DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadPublicationCardOption();
     _loadPdfThemeOption();
     _loadPdfOrientationOption();
     _loadShowPublicationCount();
-  }
-
-  void _loadPublicationCardOption() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _publicationCardOption = prefs.getInt('publicationCardAbstractSetting') ??
-          1; // Default to "hide missing abstracts"
-    });
   }
 
   void _loadPdfThemeOption() async {
@@ -137,13 +127,6 @@ class DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
             ? AppLocalizations.of(context)!.enabled
             : AppLocalizations.of(context)!.disabled,
         "onTap": () => {},
-      },
-      {
-        "icon": Icons.article_outlined,
-        "label": AppLocalizations.of(context)!.publicationCard,
-        "subtitle":
-            _getPublicationCardSubtitle(context, _publicationCardOption),
-        "onTap": () => _showPublicationCardsDialog(context),
       },
       {
         "icon": Icons.language,
@@ -395,47 +378,6 @@ class DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
     }
   }
 
-  void _showPublicationCardsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.publicationCard),
-          content: RadioGroup<int>(
-            groupValue: _publicationCardOption,
-            onChanged: (int? value) {
-              if (value != null) {
-                setState(() {
-                  _publicationCardOption = value;
-                });
-                _savePublicationCardOption(value);
-                Navigator.of(context).pop();
-              }
-            },
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                RadioListTile<int>(
-                  title: Text(AppLocalizations.of(context)!.showAllAbstracts),
-                  value: 0,
-                ),
-                RadioListTile<int>(
-                  title:
-                      Text(AppLocalizations.of(context)!.hideMissingAbstracts),
-                  value: 1,
-                ),
-                RadioListTile<int>(
-                  title: Text(AppLocalizations.of(context)!.hideAllAbstracts),
-                  value: 2,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   void _showLanguageDialog(BuildContext context) {
     final provider = Provider.of<LocaleProvider>(context, listen: false);
     final currentLang = provider.locale?.languageCode ?? 'system';
@@ -495,11 +437,6 @@ class DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
         AppLocalizations.of(context)!.system;
   }
 
-  void _savePublicationCardOption(int value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setInt('publicationCardAbstractSetting', value);
-  }
-
   String _getThemeSubtitle(BuildContext context, ThemeMode? themeMode) {
     switch (themeMode) {
       case ThemeMode.light:
@@ -508,19 +445,6 @@ class DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
         return AppLocalizations.of(context)!.dark;
       case ThemeMode.system:
         return AppLocalizations.of(context)!.systemtheme;
-      default:
-        return 'Unknown';
-    }
-  }
-
-  String _getPublicationCardSubtitle(BuildContext context, int option) {
-    switch (option) {
-      case 0:
-        return AppLocalizations.of(context)!.showAllAbstracts;
-      case 1:
-        return AppLocalizations.of(context)!.hideMissingAbstracts;
-      case 2:
-        return AppLocalizations.of(context)!.hideAllAbstracts;
       default:
         return 'Unknown';
     }

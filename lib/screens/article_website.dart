@@ -3,7 +3,7 @@ import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wispar/services/unpaywall_api.dart';
 import 'pdf_reader.dart';
-import 'package:wispar/widgets/publication_card.dart';
+import 'package:wispar/widgets/publication_card/publication_card.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
