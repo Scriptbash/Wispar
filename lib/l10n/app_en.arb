@@ -568,7 +568,7 @@
   "databaseImported": "Database imported successfully!",
   "customDatabaseLocation": "Custom database location",
   "@customDatabaseLocation":{},
-  "selectCustomDBLocation": "Select a location where",
+  "selectCustomDBLocation": "Select a location where to store the database files",
   "@selectCustomDBLocation":{},
   "currentDBLocation": "Current location: {path}",
   "@currentDBLocation":{},
