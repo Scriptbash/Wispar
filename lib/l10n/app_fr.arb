@@ -694,5 +694,7 @@
     "useExistingFiles": "Utiliser les données existantes",
     "@useExistingFiles": {},
     "overwriteFiles": "Remplacer par la base de données actuelle",
-    "@overwriteFiles": {}
+    "@overwriteFiles": {},
+    "selectCustomDBLocation": "Sélectionnez un emplacement où stocker les fichiers de la base de données",
+    "@selectCustomDBLocation": {}
 }
