@@ -727,7 +727,7 @@
   "@openInExternalPdfViewerSubtitle": {},
   "downloadingFile": "Downloading file…",
   "@downloadingFile": {},
-  "downloadFailedInAppViewer": "Failed to open in-app. Trying external viewer.",
+  "downloadFailedInAppViewer": "Failed to open in-app. You may try the website's PDF download button or choose the external PDF viewer option.",
   "@downloadFailedInAppViewer": {},
   "errorOpeningFile": "Could not open file.",
   "@errorOpeningFile": {},
