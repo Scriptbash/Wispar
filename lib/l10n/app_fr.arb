@@ -696,5 +696,9 @@
     "overwriteFiles": "Remplacer par la base de données actuelle",
     "@overwriteFiles": {},
     "selectCustomDBLocation": "Sélectionnez un emplacement où stocker les fichiers de la base de données",
-    "@selectCustomDBLocation": {}
+    "@selectCustomDBLocation": {},
+    "cachedArticleRetentionDays": "Rétention des articles mis en cache (jours)",
+    "@cachedArticleRetentionDays": {},
+    "cachedArticleRetentionDaysDesc": "Définissez le nombre de jours pendant lesquels conserver les articles mis en cache. Les articles plus anciens seront supprimés de la base de données ainsi que leurs fichiers PDF et résumés graphiques. Les favoris, les PDF téléchargés et les articles cachés ne seront pas supprimés. Une valeur de 0 désactive la fonction de nettoyage, mais les fichiers orphelins seront tout de même supprimés.",
+    "@cachedArticleRetentionDaysDesc": {}
 }
