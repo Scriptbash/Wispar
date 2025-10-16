@@ -7,7 +7,10 @@ Using the Crossref and OpenAlex APIs, Wispar helps you stay updated on your favo
 - Add custom keywords and queries to your feed
 - Access open-access articles via Unpaywall
 - Use EZproxy to unlock paywalled research
+- Chat with AI about your downloaded papers
 - Send articles to your Zotero library
+- View graphical abstracts
+- Translate abstracts to your preferred language
 - Built for researchers, students, and the academically curious
 
 Wispar is user-friendly, open-source, and designed to respect your privacy.
