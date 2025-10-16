@@ -1,16 +1,18 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import '../models/crossref_journals_works_models.dart';
-import '../widgets/publication_card/publication_card.dart';
-import '../widgets/downloaded_card.dart';
-import '../models/journal_entity.dart';
-import '../models/feed_filter_entity.dart';
-import './string_format_helper.dart';
+import 'package:wispar/models/crossref_journals_works_models.dart';
+import 'package:wispar/widgets/publication_card/publication_card.dart';
+import 'package:wispar/widgets/downloaded_card.dart';
+import 'package:wispar/models/journal_entity.dart';
+import 'package:wispar/models/feed_filter_entity.dart';
+import 'package:wispar/services/string_format_helper.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
-import './logs_helper.dart';
+import 'package:wispar/services/logs_helper.dart';
 import 'package:flutter/services.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 class DatabaseHelper {
   static const platform = MethodChannel('app.wispar.wispar/database_access');
@@ -1100,55 +1102,164 @@ class DatabaseHelper {
     return false;
   }
 
-  // Cleanup the database, removing old articles
+  // Cleanup the database, removing old articles + PDFs + graphical abstracts
   Future<void> cleanupOldArticles() async {
     final db = await database;
-
-    // Retrieve CleanupInterval from SharedPreferences
     final prefs = await SharedPreferences.getInstance();
-    final int cleanupInterval =
-        prefs.getInt('CleanupInterval') ?? 7; // Default to 7 days if not set
+
+    final int cleanupThreshold =
+        prefs.getInt('cleanupThreshold') ?? 90; // Default to 3 months (90 days)
+    final useCustomPath = prefs.getBool('useCustomDatabasePath') ?? false;
+    final customPath = prefs.getString('customDatabasePath');
+
+    String baseDirPath;
+    if (useCustomPath && customPath != null) {
+      baseDirPath = customPath;
+    } else {
+      final dir = await getApplicationDocumentsDirectory();
+      baseDirPath = dir.path;
+    }
+
+    final String graphicalAbstractsPath =
+        p.join(baseDirPath, 'graphical_abstracts');
 
     final DateTime thresholdDate =
-        DateTime.now().subtract(Duration(days: cleanupInterval));
+        DateTime.now().subtract(Duration(days: cleanupThreshold));
     final String thresholdDateString =
         thresholdDate.toIso8601String().substring(0, 10);
 
     try {
-      final List<Map<String, dynamic>> oldArticles = await db.rawQuery('''
-      SELECT * FROM articles
-      WHERE dateCached < ? AND dateLiked IS NULL AND dateDownloaded IS NULL AND (isHidden IS NULL OR isHidden = 0)
-    ''', [thresholdDateString]);
+      if (cleanupThreshold != 0) {
+        final List<Map<String, dynamic>> oldArticles = await db.rawQuery('''
+        SELECT article_id, pdfPath, graphAbstractPath FROM articles
+        WHERE dateCached < ? 
+          AND dateLiked IS NULL 
+          AND dateDownloaded IS NULL 
+          AND (isHidden IS NULL OR isHidden = 0)
+      ''', [thresholdDateString]);
 
-      // Delete the old articles
-      if (oldArticles.isNotEmpty) {
-        for (var article in oldArticles) {
-          // If pdfPath is not null, try to delete the file
-          String? pdfPath = article['pdfPath'];
-          if (pdfPath != null && pdfPath.isNotEmpty) {
-            try {
-              final file = File(pdfPath);
-              if (await file.exists()) {
-                await file.delete();
+        if (oldArticles.isNotEmpty) {
+          final List<int> articlesToDelete = [];
+          for (var article in oldArticles) {
+            String? pdfFilename = article['pdfPath'];
+            if (pdfFilename != null && pdfFilename.isNotEmpty) {
+              final fullPdfPath = p.join(baseDirPath, pdfFilename);
+              try {
+                final file = File(fullPdfPath);
+                if (await file.exists()) {
+                  await file.delete();
+                  logger.info(
+                      'Deleted PDF: $fullPdfPath (linked to old article)');
+                }
+              } catch (e, stackTrace) {
+                logger.severe(
+                    'Error deleting PDF file at $fullPdfPath', e, stackTrace);
               }
-            } catch (e, stackTrace) {
-              logger.severe(
-                  'Error deleting PDF file at $pdfPath', e, stackTrace);
             }
+
+            String? gaFilename = article['graphAbstractPath'];
+            if (gaFilename != null && gaFilename.isNotEmpty) {
+              final fullGaPath = p.join(graphicalAbstractsPath, gaFilename);
+              try {
+                final file = File(fullGaPath);
+                if (await file.exists()) {
+                  await file.delete();
+                  logger.info(
+                      'Deleted Graphical Abstract: $fullGaPath (linked to old article)');
+                }
+              } catch (e, stackTrace) {
+                logger.severe(
+                    'Error deleting GA file at $fullGaPath', e, stackTrace);
+              }
+            }
+
+            articlesToDelete.add(article['article_id'] as int);
           }
 
-          // Delete the article entry from the database
           await db.delete(
             'articles',
-            where: 'article_id = ?',
-            whereArgs: [article['article_id']],
+            where: 'article_id IN (${articlesToDelete.join(',')})',
           );
+          logger.info(
+              'Deleted ${articlesToDelete.length} old articles from database.');
+        } else {
+          logger.info("No old articles to clean up in the database.");
         }
       } else {
-        logger.info("No old articles to clean up");
+        logger.info(
+            "Cleanup threshold is set to 0. Skipping DB cleanup, proceeding with orphaned files.");
       }
+
+      logger.info('Starting cleanup for orphaned PDF files.');
+
+      final List<Map<String, dynamic>> allPdfPathsDb = await db.query(
+        'articles',
+        columns: ['pdfPath'],
+        where: 'pdfPath IS NOT NULL',
+      );
+      final Set<String> dbLinkedPdfFilenames = allPdfPathsDb
+          .map((row) => row['pdfPath'] as String)
+          .where((filename) => filename.isNotEmpty)
+          .toSet();
+
+      final Directory pdfDir = Directory(baseDirPath);
+      if (await pdfDir.exists()) {
+        await for (final FileSystemEntity entity in pdfDir.list()) {
+          if (entity is File && entity.path.toLowerCase().endsWith('.pdf')) {
+            final filename = p.basename(entity.path);
+
+            if (!dbLinkedPdfFilenames.contains(filename)) {
+              try {
+                await entity.delete();
+                logger.info('Deleted orphaned PDF: ${entity.path}');
+              } catch (e, stackTrace) {
+                logger.severe(
+                    'Error deleting orphaned PDF file at ${entity.path}',
+                    e,
+                    stackTrace);
+              }
+            }
+          }
+        }
+      }
+      logger.info('Completed cleanup for orphaned PDF files.');
+
+      logger.info('Starting cleanup for orphaned graphical abstracts.');
+
+      final List<Map<String, dynamic>> allGaFilenamesDb = await db.query(
+        'articles',
+        columns: ['graphAbstractPath'],
+        where: 'graphAbstractPath IS NOT NULL',
+      );
+      final Set<String> dbLinkedGaFilenames = allGaFilenamesDb
+          .map((row) => row['graphAbstractPath'] as String)
+          .where((filename) => filename.isNotEmpty)
+          .toSet();
+
+      final Directory gaDir = Directory(graphicalAbstractsPath);
+      if (await gaDir.exists()) {
+        await for (final FileSystemEntity entity in gaDir.list()) {
+          if (entity is File) {
+            final filename = p.basename(entity.path);
+
+            if (!dbLinkedGaFilenames.contains(filename)) {
+              try {
+                await entity.delete();
+                logger.info(
+                    'Deleted orphaned graphical abstract: ${entity.path}');
+              } catch (e, stackTrace) {
+                logger.severe(
+                    'Error deleting orphaned graphical abstract file at ${entity.path}',
+                    e,
+                    stackTrace);
+              }
+            }
+          }
+        }
+      }
+      logger.info('Completed cleanup for orphaned graphical abstracts.');
     } catch (e, stackTrace) {
-      logger.severe('Error cleaning up the database', e, stackTrace);
+      logger.severe('Error during DB cleanup', e, stackTrace);
     }
   }
 
