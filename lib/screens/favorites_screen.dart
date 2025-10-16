@@ -318,7 +318,7 @@ class FavoritesScreenState extends State<FavoritesScreen> {
           } else {
             return LayoutBuilder(
               builder: (context, constraints) {
-                final spacing = 8.0;
+                final spacing = 1.0;
                 final minCardWidth = 400.0;
                 int columns = (constraints.maxWidth / minCardWidth).floor();
                 columns = columns > 0 ? columns : 1;
@@ -329,7 +329,7 @@ class FavoritesScreenState extends State<FavoritesScreen> {
 
                 return SingleChildScrollView(
                   controller: _scrollController,
-                  padding: EdgeInsets.all(spacing),
+                  padding: EdgeInsets.symmetric(horizontal: 1.0),
                   child: Wrap(
                     spacing: spacing,
                     runSpacing: spacing,
