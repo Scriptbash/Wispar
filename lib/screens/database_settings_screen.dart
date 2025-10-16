@@ -24,10 +24,10 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
   final _formKey = GlobalKey<FormState>();
 
   bool _scrapeAbstracts = true; // Default to scraping missing abstracts
-  int _cleanupInterval = 7; // Default for cleanup interval
+  int _cleanupThreshold = 90; // Default for cleanup interval
   int _fetchInterval = 6; // Default API fetch to 6 hours
   int _concurrentFetches = 3; // Default to 3 concurrent fetches
-  final TextEditingController _cleanupIntervalController =
+  final TextEditingController _cleanupThresholdController =
       TextEditingController();
 
   bool _overrideUserAgent = false;
@@ -49,7 +49,7 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       // Load the values from SharedPreferences if available
-      _cleanupInterval = prefs.getInt('cleanupInterval') ?? 7;
+      _cleanupThreshold = prefs.getInt('cleanupThreshold') ?? 90;
       _fetchInterval = prefs.getInt('fetchInterval') ?? 6;
       _scrapeAbstracts = prefs.getBool('scrapeAbstracts') ?? true;
       _concurrentFetches = prefs.getInt('concurrentFetches') ?? 3;
@@ -59,14 +59,14 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       _customDatabasePath = prefs.getString('customDatabasePath');
       _customDatabaseBookmark = prefs.getString('customDatabaseBookmark');
     });
-    _cleanupIntervalController.text = _cleanupInterval.toString();
+    _cleanupThresholdController.text = _cleanupThreshold.toString();
   }
 
   // Save settings to SharedPreferences
   Future<void> _saveSettings() async {
     if (_formKey.currentState?.validate() ?? false) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('cleanupInterval', _cleanupInterval);
+      await prefs.setInt('cleanupThreshold', _cleanupThreshold);
       await prefs.setInt('fetchInterval', _fetchInterval);
       await prefs.setBool('scrapeAbstracts', _scrapeAbstracts);
       await prefs.setInt('concurrentFetches', _concurrentFetches);
@@ -541,6 +541,13 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
   }
 
   @override
+  void dispose() {
+    _cleanupThresholdController.dispose();
+    _userAgentController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -556,18 +563,18 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     TextFormField(
-                      controller: _cleanupIntervalController,
+                      controller: _cleanupThresholdController,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        labelText:
-                            AppLocalizations.of(context)!.cleanupInterval,
+                        labelText: AppLocalizations.of(context)!
+                            .cachedArticleRetentionDays,
                         hintText:
                             AppLocalizations.of(context)!.cleanupIntervalHint,
                       ),
                       onChanged: (value) {
                         setState(() {
-                          _cleanupInterval =
-                              int.tryParse(value) ?? _cleanupInterval;
+                          _cleanupThreshold =
+                              int.tryParse(value) ?? _cleanupThreshold;
                         });
                       },
                       validator: (value) {
@@ -577,13 +584,19 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                         }
                         final intValue = int.tryParse(value);
                         if (intValue == null ||
-                            intValue < 1 ||
+                            intValue < 0 ||
                             intValue > 365) {
                           return AppLocalizations.of(context)!
                               .cleanupIntervalNumberNotBetween;
                         }
                         return null;
                       },
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      AppLocalizations.of(context)!
+                          .cachedArticleRetentionDaysDesc,
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<int>(
