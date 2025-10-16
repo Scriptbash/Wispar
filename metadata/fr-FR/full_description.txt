@@ -7,7 +7,10 @@ Grâce aux API de Crossref et OpenAlex, Wispar vous aide à rester informé des 
 - Ajoutez des mots-clés et requêtes personnalisés à votre fil principal
 - Accédez aux articles en libre accès via Unpaywall
 - Utilisez EZproxy pour débloquer les publications payantes
+- Clavarder avec un IA à propos d'articles téléchargés
 - Envoyez des articles vers votre bibliothèque Zotero
+- Visualisez des résumés graphiques
+- Traduisez les résumés dans votre langue de préférence
 - Conçu pour les chercheurs, les étudiants et les curieux du savoir
 
 Wispar est facile à utiliser, open source, et conçu pour respecter votre vie privée.
