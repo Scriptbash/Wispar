@@ -682,5 +682,17 @@
     "customBaseUrl": "URL base customizada",
     "@customBaseUrl": {},
     "proxySuccess": "O proxy foi bem-sucedido",
-    "@proxySuccess": {}
+    "@proxySuccess": {},
+    "showPublicationCount": "Mostrar contado de publicações",
+    "@showPublicationCount": {},
+    "graphicalAbstract": "Abstração gráfica",
+    "@graphicalAbstract": {},
+    "openExternalApp": "Abrir em aplicativo externo",
+    "@openExternalApp": {},
+    "numberPublications": "{count, plural, =0{Nenhuma publicação} =1{1 Publicação} other{{count} Publicações}}",
+    "@numberPublications": {
+        "placeholders": {
+            "count": {}
+        }
+    }
 }
