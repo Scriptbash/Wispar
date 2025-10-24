@@ -2,7 +2,7 @@ import type {ReactNode} from 'react';
 import clsx from 'clsx';
 import Heading from '@theme/Heading';
 import styles from './styles.module.css';
-import { BookOpen, Send, Globe2, Download, Shield, Unlock } from 'lucide-react';
+import { BookOpen, Send, Globe2, Download, Shield, Unlock, Cpu, Sliders, Image } from 'lucide-react';
 
 
 type FeatureItem = {
@@ -23,9 +23,14 @@ const FeatureList: FeatureItem[] = [
     description: <>Link your Zotero account and send publications directly.</>,
   },
   {
-    title: 'Unpaywall & EZproxy',
+    title: 'Unpaywall & Institutional Access',
     Svg: <Unlock size={48} />,
     description: <>Get open-access papers or bypass paywalls via EZproxy.</>,
+  },
+  {
+    title: 'Graphical Abstracts',
+    Svg: <Image size={48} />,
+    description: <>Visual summaries of papers for quick insight.</>,
   },
   {
     title: 'Abstract Translations',
@@ -36,6 +41,16 @@ const FeatureList: FeatureItem[] = [
     title: 'Offline Reading',
     Svg: <Download size={48} />,
     description: <>Save articles and PDFs for offline use anywhere.</>,
+  },
+   {
+    title: 'Ask AI Questions About Papers',
+    Svg: <Cpu size={48} />,
+    description: <>Get AI-powered insights on articles. Disable AI features anytime with a single switch.</>,
+  },
+  {
+    title: 'Customizable',
+    Svg: <Sliders size={48} />,
+    description: <>Adjust swipe gestures and display options to fit your preferences.</>,
   },
   {
     title: 'Private & Open Source',

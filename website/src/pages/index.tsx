@@ -25,13 +25,20 @@ function HomepageHeader() {
           </Heading>
         </div>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.buttons}>
+        <div className={styles.buttons} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <Link
             className="button button--secondary button--lg"
             to="#download"
           >
-            Download now!
+            Get it now!
           </Link>
+          <iframe
+            src="https://ghbtns.com/github-btn.html?user=Scriptbash&repo=Wispar&type=star&count=true&size=large"
+            width="150"
+            height="30"
+            title="GitHub"
+            style={{ verticalAlign: 'middle', marginRight: '10px' }}
+          ></iframe>
         </div>
       </div>
     </header>
