@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkwispar=self.webpackChunkwispar||[]).push([[8121],{8070:e=>{e.exports=JSON.parse('{"tags":[{"label":"welcome","permalink":"/blog/tags/welcome","count":1},{"label":"wispar","permalink":"/blog/tags/wispar","count":1}]}')}}]);
