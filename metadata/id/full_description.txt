@@ -1,0 +1,20 @@
+Wispar adalah teman riset pribadi Anda — aplikasi ramah privasi untuk menjelajahi jurnal akademik dan artikel ilmiah.
+
+Dengan menggunakan API Crossref dan OpenAlex, Wispar membantu Anda tetap terupdate dengan jurnal favorit Anda. Ikuti jurnal untuk menerima abstrak riset terbaru di feed utama Anda — tanpa perlu akun.
+
+- Cari artikel ilmiah dan jurnal
+- Ikuti jurnal untuk tetap terupdate
+- Tambahkan kata kunci dan kueri kustom ke feed Anda
+- Akses artikel akses terbuka melalui Unpaywall
+- Gunakan EZproxy untuk membuka akses penelitian yang diblokir
+- Berbincang dengan AI tentang artikel yang Anda unduh
+- Kirim artikel ke perpustakaan Zotero Anda
+- Lihat abstrak grafis
+- Terjemahkan abstrak ke bahasa pilihan Anda
+- Didesain untuk peneliti, mahasiswa, dan mereka yang tertarik secara akademis
+
+Wispar ramah pengguna, sumber terbuka, dan dirancang untuk menghormati privasi Anda.
+
+Sebagai proyek yang dibangun oleh komunitas, kontribusi selalu diterima! Jika Anda ingin berkontribusi, silakan kunjungi repositori GitHub kami: https://github.com/Scriptbash/Wispar
+
+Jika aplikasi tidak tersedia dalam bahasa Anda, pertimbangkan untuk membantu terjemahan dengan mengunjungi instance Weblate yang kami host: https://hosted.weblate.org/engage/wispar
