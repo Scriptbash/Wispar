@@ -738,5 +738,15 @@
     "movingDatabase": "正在移动数据库文件。请等待。",
     "@movingDatabase": {},
     "customDatabaseLocation": "自定义数据库位置",
-    "@customDatabaseLocation": {}
+    "@customDatabaseLocation": {},
+    "databaseMoved": "成功移动了数据库文件！",
+    "@databaseMoved": {},
+    "databaseMoveFailed": "无法移动数据库文件：{error}",
+    "@databaseMoveFailed": {},
+    "databaseConflictTitle": "找到了现有的 Wispar 数据。",
+    "@databaseConflictTitle": {},
+    "useExistingFiles": "使用现有文件",
+    "@useExistingFiles": {},
+    "overwriteFiles": "用现有数据库覆盖",
+    "@overwriteFiles": {}
 }
