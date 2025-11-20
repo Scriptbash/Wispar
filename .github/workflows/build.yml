@@ -9,7 +9,7 @@ jobs:
     name: Build for Android
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Install Ninja
       run: sudo apt-get install -y ninja-build
     - uses: actions/setup-java@v5
@@ -41,7 +41,7 @@ jobs:
     name: Build for iOS
     runs-on: macos-14
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: latest-stable

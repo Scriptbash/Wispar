@@ -8,7 +8,7 @@ jobs:
     name: Build for Android
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Install Ninja
       run: sudo apt-get install -y ninja-build
     - uses: actions/setup-java@v5
