@@ -64,19 +64,26 @@ class JournalSearchFormState extends State<JournalSearchForm> {
                       Container(
                         width: constraints.maxWidth / 3 - 1.5,
                         alignment: Alignment.center,
-                        child:
-                            Text(AppLocalizations.of(context)!.searchByTitle),
+                        child: Text(
+                          AppLocalizations.of(context)!.searchByTitle,
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                       Container(
                         width: constraints.maxWidth / 3 - 1.5,
                         alignment: Alignment.center,
-                        child:
-                            Text(AppLocalizations.of(context)!.searchByTopic),
+                        child: Text(
+                          AppLocalizations.of(context)!.searchByTopic,
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                       Container(
                         width: constraints.maxWidth / 3 - 1.5,
                         alignment: Alignment.center,
-                        child: Text(AppLocalizations.of(context)!.searchByISSN),
+                        child: Text(
+                          AppLocalizations.of(context)!.searchByISSN,
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ],
                   );
