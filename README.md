@@ -87,6 +87,7 @@ If you run into any issue while using Wispar, have a question or want to share y
     <li><a href="https://unpaywall.org/" target='_blank'>Unpaywall</a></li>
     <li><a href="https://www.crossref.org/" target='_blank'>Crossref</a></li>
     <li><a href="https://openalex.org/" target='_blank'>OpenAlex</a></li>
+    <li><a href="https://github.com/hitfyd/ShowJCR" target='_blank'>Journal topics database</a> by <a href="https://github.com/hitfyd"target='_blank'> hitfyd</a></li>
 </ul>
 
 ## Screenshots
