@@ -678,21 +678,25 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
 
     try {
       pdfLink = await controller.evaluateJavascript(source: r"""
-                  var directPdfLink = document.querySelector('a[href*="/doi/pdfdirect/"][href*="?download=true"]');
-                  if (directPdfLink) {
-                      return directPdfLink.href;
-                  }
+        (function() {
+           
+            var apsButton = document.querySelector('div.right a.sm-primary-button[href*="/pdf/"]');
+            if (apsButton) return apsButton.href;
+            var apsJournalLink = document.querySelector('a[href^="/prl/pdf/"], a[href^="/pra/pdf/"], a[href^="/prb/pdf/"], a[href^="/pre/pdf/"], a[href^="/prx/pdf/"]');
+            if (apsJournalLink) return apsJournalLink.href;
 
-                  var link = document.querySelector('a.read-link[data-track-action="Download PDF"], a[data-track-label="PdfLink"], a.pdf-link, a[href*="/doi/pdf/"]');
-                  if (link) {
-                      return link.href;
-                  }
-                  link = document.querySelector('a[aria-label*="Download PDF"]');
-                  if (link) {
-                      return link.href;
-                  }
-                  return null;
-                  """) as String?;
+            var directPdfLink = document.querySelector('a[href*="/doi/pdfdirect/"][href*="?download=true"]');
+            if (directPdfLink) return directPdfLink.href;
+
+            var link = document.querySelector('a.read-link[data-track-action="Download PDF"], a[data-track-label="PdfLink"], a.pdf-link, a[href*="/doi/pdf/"]');
+            if (link) return link.href;
+
+            var ariaLink = document.querySelector('a[aria-label*="Download PDF"]');
+            if (ariaLink) return ariaLink.href;
+
+            return null;
+        })();
+      """) as String?;
 
       if (pdfLink == null || pdfLink.isEmpty) {
         const int retries = 10;
