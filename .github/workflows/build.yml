@@ -39,7 +39,7 @@ jobs:
         path: build/app/outputs/apk/debug/app-debug.apk
   build-ios:
     name: Build for iOS
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
     - uses: actions/checkout@v6
     - uses: maxim-lobanov/setup-xcode@v1
