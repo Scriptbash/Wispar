@@ -24,7 +24,7 @@ Future<List<JournalTopicsCsv>> fetchCsvCategories() async {
     final eissn =
         (row[2].toString().toUpperCase() == 'N/A') ? '' : row[2].toString();
     final categories = row[3].toString().split(';').map((c) {
-      String clean = c.replaceAll(RegExp(r'\([A-Z]+\)$'), '').trim();
+      String clean = c.replaceAll(RegExp(r'\s*\([^)]*\)'), '').trim();
       return clean
           .toLowerCase()
           .split(' ')
