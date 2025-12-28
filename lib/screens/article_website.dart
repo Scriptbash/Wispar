@@ -939,8 +939,15 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
                       logger.info(
                           'Full HTTP Request Headers being sent: $headers');
 
+                      final client = http.Client();
+
+                      final request = http.Request('GET', finalDownloadUri)
+                        ..headers.addAll(headers)
+                        ..followRedirects = true;
+
+                      final streamedResponse = await client.send(request);
                       final response =
-                          await http.get(finalDownloadUri, headers: headers);
+                          await http.Response.fromStream(streamedResponse);
 
                       if (!mounted) {
                         logger.warning(

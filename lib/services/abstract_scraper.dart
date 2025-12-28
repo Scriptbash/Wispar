@@ -92,6 +92,13 @@ class AbstractScraper {
         }
       }
     }
+    if (!output.abstract) {
+      let sectionAbstract = document.getElementById('abstract') || document.querySelector('section.abstract');
+      if (sectionAbstract) {
+        let inner = sectionAbstract.querySelector('.content, .abstract-text, .wrapper');
+        output.abstract = extractFullText(inner || sectionAbstract);
+      }
+    }
 
     let abstractDiv = [...document.querySelectorAll('div, section')]
       .find(el => /abstract/i.test(el.className) || /abstract/i.test(el.id));
