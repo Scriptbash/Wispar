@@ -68,7 +68,6 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          architecture: x64
       - run: flutter pub get
       - run: flutter build macos --debug
       - uses: actions/upload-artifact@v6
