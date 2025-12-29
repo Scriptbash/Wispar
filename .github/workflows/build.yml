@@ -35,8 +35,9 @@ jobs:
     - run: flutter build apk --debug
     - uses: actions/upload-artifact@v6
       with:
-        name: release-apk
+        name: android-debug-apk
         path: build/app/outputs/apk/debug/app-debug.apk
+
   build-ios:
     name: Build for iOS
     runs-on: macos-15
@@ -50,4 +51,44 @@ jobs:
         channel: 'stable'
         architecture: x64
     - run: flutter pub get
-    - run: flutter build ios --release --no-codesign
+    - run: flutter build ios --debug --no-codesign
+    - uses: actions/upload-artifact@v6
+      with:
+        name: ios-debug-app
+        path: build/ios/iphoneos/*.app
+    
+  build-macos:
+    name: Build for macOS
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          architecture: x64
+      - run: flutter pub get
+      - run: flutter build macos --debug
+      - uses: actions/upload-artifact@v6
+        with:
+          name: macos-debug-app
+          path: build/macos/Build/Products/Debug/*.app
+
+  build-windows:
+    name: Build for Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - run: flutter pub get
+      - run: flutter build windows --debug
+      - uses: actions/upload-artifact@v6
+        with:
+          name: windows-debug
+          path: build/windows/x64/runner/Debug/
+      
+      
