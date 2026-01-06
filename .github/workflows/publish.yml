@@ -106,7 +106,7 @@ jobs:
             security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $KEYCHAIN_PASSWORD build.keychain
             security find-identity
-            /usr/bin/codesign --force --deep -s "$MACOS_SIGN_IDENTITY" build/macos/Build/Products/Release/Wispar.app
+            /usr/bin/codesign --force --deep --options runtime -s "$MACOS_SIGN_IDENTITY" build/macos/Build/Products/Release/Wispar.app
             /usr/bin/codesign --verify --deep --strict --verbose=2 build/macos/Build/Products/Release/Wispar.app
       - name: Notarize app
         env:
