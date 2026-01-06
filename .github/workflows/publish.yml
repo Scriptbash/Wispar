@@ -108,6 +108,39 @@ jobs:
             security find-identity
             /usr/bin/codesign --force --deep -s "$MACOS_SIGN_IDENTITY" build/macos/Build/Products/Release/Wispar.app
             /usr/bin/codesign --verify --deep --strict --verbose=2 build/macos/Build/Products/Release/Wispar.app
+      - name: Notarize app
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+        run: |
+          cd build/macos/Build/Products/Release
+          ditto -c -k --keepParent Wispar.app Wispar.zip
+          REQUEST_UUID=$(xcrun altool --notarize-app \
+          --primary-bundle-id "app.wispar.wispar" \
+          --username "$APPLE_ID" \
+          --password "$APPLE_PASSWORD" \
+          --file Wispar.zip 2>&1 | grep "RequestUUID" | awk '{print $NF}')
+          echo "Notarization Request UUID: $REQUEST_UUID"
+
+          while true; do
+            STATUS=$(xcrun altool --notarization-info "$REQUEST_UUID" \
+            --username "$APPLE_ID" \
+            --password "$APPLE_PASSWORD" 2>&1 | grep "Status:" | awk '{$1=""; print $0}' | xargs)
+
+            echo "Current notarization status: $STATUS"
+
+            if [[ "$STATUS" == "success" ]]; then
+              echo "Notarization succeeded!"
+              break
+            elif [[ "$STATUS" == "in progress" ]]; then
+              echo "Still processing... waiting 30s"
+              sleep 30
+            else
+              echo "Notarization failed!"
+              exit 1
+            fi
+          done
+          xcrun stapler staple Wispar.app
       - name: Create dmg
         env:
           MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
@@ -121,7 +154,6 @@ jobs:
             "Wispar.dmg" \
             build/macos/Build/Products/Release/Wispar.app
           /usr/bin/codesign --force -s "$MACOS_SIGN_IDENTITY" Wispar.dmg
-
       - uses: actions/upload-artifact@v6
         with:
           name: wispar-macos-dmg
