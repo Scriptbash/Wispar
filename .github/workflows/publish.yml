@@ -112,35 +112,15 @@ jobs:
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+        uses: lando/notarize-action@v2
+        with:
+          product-path: "build/macos/Build/Products/Release/Wispar.app"
+          appstore-connect-username: ${{ secrets.APPLE_ID }}
+          appstore-connect-password: ${{ secrets.APPLE_PASSWORD }}
+          appstore-connect-team-id: ${{ secrets.APPLE_TEAM_ID }}
+      - name: Staple notarization
         run: |
-          cd build/macos/Build/Products/Release
-          ditto -c -k --keepParent Wispar.app Wispar.zip
-          REQUEST_UUID=$(xcrun altool --notarize-app \
-          --primary-bundle-id "app.wispar.wispar" \
-          --username "$APPLE_ID" \
-          --password "$APPLE_PASSWORD" \
-          --file Wispar.zip 2>&1 | grep "RequestUUID" | awk '{print $NF}')
-          echo "Notarization Request UUID: $REQUEST_UUID"
-
-          while true; do
-            STATUS=$(xcrun altool --notarization-info "$REQUEST_UUID" \
-            --username "$APPLE_ID" \
-            --password "$APPLE_PASSWORD" 2>&1 | grep "Status:" | awk '{$1=""; print $0}' | xargs)
-
-            echo "Current notarization status: $STATUS"
-
-            if [[ "$STATUS" == "success" ]]; then
-              echo "Notarization succeeded!"
-              break
-            elif [[ "$STATUS" == "in progress" ]]; then
-              echo "Still processing... waiting 30s"
-              sleep 30
-            else
-              echo "Notarization failed!"
-              exit 1
-            fi
-          done
-          xcrun stapler staple Wispar.app
+          xcrun stapler staple build/macos/Build/Products/Release/Wispar.app
       - name: Create dmg
         env:
           MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
