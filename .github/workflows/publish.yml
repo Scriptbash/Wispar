@@ -173,17 +173,17 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Download Android artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: android-artifacts
           path: android-artifacts
       - name: Download macOS artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: wispar-macos-dmg
           path: macos-artifacts
       - name: Download Windows artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: windows-artifacts
           path: windows-artifacts
