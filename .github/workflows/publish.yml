@@ -142,11 +142,11 @@ jobs:
       - name: Copy required DLLs
         shell: powershell
         run: |
-          Copy-Item "C:\Windows\System32\msvcp140.dll" -Destination ".\build\windows\runner\Release\"
-          Copy-Item "C:\Windows\System32\msvcp140_1.dll" -Destination ".\build\windows\runner\Release\"
-          Copy-Item "C:\Windows\System32\msvcp140_2.dll" -Destination ".\build\windows\runner\Release\"
-          Copy-Item "C:\Windows\System32\vcruntime140.dll" -Destination ".\build\windows\runner\Release\"
-          Copy-Item "C:\Windows\System32\vcruntime140_1.dll" -Destination ".\build\windows\runner\Release\"
+          Copy-Item "C:\Windows\System32\msvcp140.dll" -Destination ".\build\windows\x64\Release\"
+          Copy-Item "C:\Windows\System32\msvcp140_1.dll" -Destination ".\build\windows\x64\Release\"
+          Copy-Item "C:\Windows\System32\msvcp140_2.dll" -Destination ".\build\windows\x64\Release\"
+          Copy-Item "C:\Windows\System32\vcruntime140.dll" -Destination ".\build\windows\x64\Release\"
+          Copy-Item "C:\Windows\System32\vcruntime140_1.dll" -Destination ".\build\windows\x64\Release\"
       - name: Install Inno Setup
         shell: powershell
         run: |
@@ -160,7 +160,7 @@ jobs:
       - name: Upload Windows installer
         uses: actions/upload-artifact@v6
         with:
-          name: wispar-windows-installer
+          name: windows-artifacts
           path: windows\output\wispar_setup.exe
 
   create-release:
@@ -180,6 +180,11 @@ jobs:
         with:
           name: wispar-macos-dmg
           path: macos-artifacts
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v6
+        with:
+          name: windows-artifacts
+          path: windows-artifacts
       - name: Extract version from pubspec.yaml
         id: extract_version
         run: |
@@ -191,7 +196,7 @@ jobs:
           artifacts: |
             android-artifacts/app-release.apk,
             android-artifacts/app-release.aab,
-            macos-artifacts/Wispar.dmg
+            macos-artifacts/Wispar.dmg,
             windows-artifacts/wispar_setup.exe
           tag: v${{ env.VERSION }}
           token: ${{ secrets.TOKEN }}
