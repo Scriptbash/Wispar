@@ -44,13 +44,16 @@ jobs:
       run: flutter build apk --release
     - name: Build appBundle
       run: flutter build appbundle
+    - name: Prepare Android artifacts
+      run: |
+        mkdir -p release-artifacts
+        cp build/app/outputs/flutter-apk/app-release.apk release-artifacts/
+        cp build/app/outputs/bundle/release/app-release.aab release-artifacts/
     - name: Upload Artifacts
       uses: actions/upload-artifact@v6
       with:
-        name: Releases
-        path: |
-         build/app/outputs/flutter-apk/app-release.apk
-         build/app/outputs/bundle/release/app-release.aab
+        name: android-artifacts
+        path: release-artifacts/
     - name: Create google_service_account.json
       run: |
        echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT }}" | base64 --decode > android/google_service_account.json
@@ -60,11 +63,11 @@ jobs:
         ruby-version: '3.4.7'
         bundler-cache: true
         working-directory: 'android'
-    # - name: Deploy to Play Store
-    #   uses: maierj/fastlane-action@v3.1.0
-    #   with:
-    #     lane: deploy
-    #     subdirectory: android
+    - name: Deploy to Play Store
+      uses: maierj/fastlane-action@v3.1.0
+      with:
+        lane: deploy
+        subdirectory: android
 
   build-macos:
     name: Build for macOS
@@ -172,7 +175,7 @@ jobs:
       - name: Download Android artifacts
         uses: actions/download-artifact@v6
         with:
-          name: Releases
+          name: android-artifacts
           path: android-artifacts
       - name: Download macOS artifact
         uses: actions/download-artifact@v6
