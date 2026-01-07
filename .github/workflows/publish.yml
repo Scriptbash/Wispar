@@ -1,4 +1,4 @@
-name: Signed builds and upload to Play Store
+name: Release and publish apps
 
 on:
   workflow_dispatch:
@@ -25,7 +25,7 @@ jobs:
         PDFRX_PATH=$(find $HOME/.pub-cache -type d -name "pdfrx-*" | head -n 1)
         CMAKE_FILE="$PDFRX_PATH/android/CMakeLists.txt"
         if [ -f "$CMAKE_FILE" ]; then
-          sed -i '2i add_link_options("LINKER:--build-id=none")' "$CMAKE_FILE"
+         sed -i '2i add_link_options("LINKER:--build-id=none")' "$CMAKE_FILE"
           echo "Patched CMakeLists.txt in $CMAKE_FILE"
         else
           echo "CMakeLists.txt not found in expected location"
@@ -51,19 +51,6 @@ jobs:
         path: |
          build/app/outputs/flutter-apk/app-release.apk
          build/app/outputs/bundle/release/app-release.aab
-    - name: Extract version from pubspec.yaml
-      id: extract_version
-      run: |
-        version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
-        echo "VERSION=$version" >> $GITHUB_ENV
-    - name: Create GitHub Release
-      uses: ncipollo/release-action@v1
-      with:
-        artifacts: "build/app/outputs/flutter-apk/app-release.apk,build/app/outputs/bundle/release/app-release.aab"
-        tag: v${{ env.VERSION }}
-        token: ${{ secrets.TOKEN }}
-        draft: true
-        generateReleaseNotes: true
     - name: Create google_service_account.json
       run: |
        echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT }}" | base64 --decode > android/google_service_account.json
@@ -78,3 +65,96 @@ jobs:
       with:
         lane: deploy
         subdirectory: android
+
+  build-macos:
+    name: Build for macOS
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - run: flutter pub get
+      - run: flutter build macos --release
+      - name: Codesign executable
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.MACOS_KEYCHAIN_PASSWORD }}
+          MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+        run: |
+            echo "$MACOS_CERTIFICATE" | base64 --decode > certificate.p12
+            security create-keychain -p $KEYCHAIN_PASSWORD build.keychain
+            security default-keychain -s build.keychain
+            security unlock-keychain -p $KEYCHAIN_PASSWORD build.keychain
+            security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
+            security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $KEYCHAIN_PASSWORD build.keychain
+            security find-identity
+            /usr/bin/codesign --force --deep --options runtime -s "$MACOS_SIGN_IDENTITY" build/macos/Build/Products/Release/Wispar.app
+            /usr/bin/codesign --verify --deep --strict --verbose=2 build/macos/Build/Products/Release/Wispar.app
+      - name: Notarize app
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+        uses: lando/notarize-action@v2
+        with:
+          product-path: "build/macos/Build/Products/Release/Wispar.app"
+          appstore-connect-username: ${{ secrets.APPLE_ID }}
+          appstore-connect-password: ${{ secrets.APPLE_PASSWORD }}
+          appstore-connect-team-id: ${{ secrets.APPLE_TEAM_ID }}
+      - name: Staple notarization
+        run: |
+          xcrun stapler staple build/macos/Build/Products/Release/Wispar.app
+      - name: Create dmg
+        env:
+          MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+        run: |
+          brew install create-dmg
+          create-dmg \
+            --volname "Wispar" \
+            --window-size 800 529 \
+            --icon-size 130 \
+            --app-drop-link 540 250 \
+            "Wispar.dmg" \
+            build/macos/Build/Products/Release/Wispar.app
+          /usr/bin/codesign --force -s "$MACOS_SIGN_IDENTITY" Wispar.dmg
+      - uses: actions/upload-artifact@v6
+        with:
+          name: wispar-macos-dmg
+          path: Wispar.dmg
+
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [build-android, build-macos]
+    steps:
+      - uses: actions/checkout@v6
+      - name: Download Android artifacts
+        uses: actions/download-artifact@v6
+        with:
+          name: Releases
+          path: android-artifacts
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v6
+        with:
+          name: wispar-macos-dmg
+          path: macos-artifacts
+      - name: Extract version from pubspec.yaml
+        id: extract_version
+        run: |
+          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+          echo "VERSION=$version" >> $GITHUB_ENV
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: |
+            android-artifacts/app-release.apk,
+            android-artifacts/app-release.aab,
+            macos-artifacts/Wispar.dmg
+          tag: v${{ env.VERSION }}
+          token: ${{ secrets.TOKEN }}
+          draft: true
+          generateReleaseNotes: true
