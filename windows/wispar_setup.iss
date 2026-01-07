@@ -25,13 +25,13 @@ ArchitecturesAllowed=x64compatible
 ; the 64-bit view of the registry.
 ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
-LicenseFile=../../LICENSE
+LicenseFile=../LICENSE
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
 ;PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=output
 OutputBaseFilename=wispar_setup
-SetupIconFile=../../website/static/img/favicon.ico
+SetupIconFile=../website/static/img/favicon.ico
 SolidCompression=yes
 WizardStyle=modern
 
@@ -70,22 +70,22 @@ Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "../../build/windows/runner/Release/{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../build/windows/runner/Release/flutter_inappwebview_windows_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../build/windows/runner/Release/flutter_local_notifications_windows.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../build/windows/runner/Release/flutter_windows.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../build/windows/runner/Release/msvcp140.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../build/windows/runner/Release/msvcp140_1.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../build/windows/runner/Release/msvcp140_2.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../build/windows/runner/Release/pdfium.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../build/windows/runner/Release/pdfrx.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../build/windows/runner/Release/permission_handler_windows_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../build/windows/runner/Release/share_plus_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../build/windows/runner/Release/url_launcher_windows_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../build/windows/runner/Release/vcruntime140.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../build/windows/runner/Release/vcruntime140_1.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../build/windows/runner/Release/WebView2Loader.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../build/windows/runner/Release/data\*"; DestDir: "{app}\data"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "../../build/windows/x64/runner/Release/{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../build/windows/x64/runner/Release/flutter_inappwebview_windows_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../build/windows/x64/runner/Release/flutter_local_notifications_windows.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../build/windows/x64/runner/Release/flutter_windows.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../build/windows/x64/runner/Release/msvcp140.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../build/windows/x64/runner/Release/msvcp140_1.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../build/windows/x64/runner/Release/msvcp140_2.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../build/windows/x64/runner/Release/pdfium.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../build/windows/x64/runner/Release/pdfrx.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../build/windows/x64/runner/Release/permission_handler_windows_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../build/windows/x64/runner/Release/share_plus_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../build/windows/x64/runner/Release/url_launcher_windows_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../build/windows/x64/runner/Release/vcruntime140.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../build/windows/x64/runner/Release/vcruntime140_1.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../build/windows/x64/runner/Release/WebView2Loader.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../build/windows/x64/runner/Release/data\*"; DestDir: "{app}\data"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
