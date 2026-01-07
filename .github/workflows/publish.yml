@@ -151,8 +151,8 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: |
-            android-artifacts/build/app/outputs/flutter-apk/app-release.apk,
-            android-artifacts/build/app/outputs/bundle/release/app-release.aab,
+            android-artifacts/app-release.apk,
+            android-artifacts/app-release.aab,
             macos-artifacts/Wispar.dmg
           tag: v${{ env.VERSION }}
           token: ${{ secrets.TOKEN }}
