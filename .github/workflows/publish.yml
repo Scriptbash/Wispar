@@ -166,8 +166,7 @@ jobs:
   create-release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    #needs: [build-android, build-macos, build-windows]
-    needs: [build-windows]
+    needs: [build-android, build-macos, build-windows]
     steps:
       - uses: actions/checkout@v6
       - name: Download Android artifacts
