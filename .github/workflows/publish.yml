@@ -142,11 +142,11 @@ jobs:
       - name: Copy required DLLs
         shell: powershell
         run: |
-          Copy-Item "C:\Windows\System32\msvcp140.dll" -Destination ".\build\windows\x64\Release\"
-          Copy-Item "C:\Windows\System32\msvcp140_1.dll" -Destination ".\build\windows\x64\Release\"
-          Copy-Item "C:\Windows\System32\msvcp140_2.dll" -Destination ".\build\windows\x64\Release\"
-          Copy-Item "C:\Windows\System32\vcruntime140.dll" -Destination ".\build\windows\x64\Release\"
-          Copy-Item "C:\Windows\System32\vcruntime140_1.dll" -Destination ".\build\windows\x64\Release\"
+          Copy-Item "C:\Windows\System32\msvcp140.dll" -Destination ".\build\windows\x64\runner\Release\"
+          Copy-Item "C:\Windows\System32\msvcp140_1.dll" -Destination ".\build\windows\x64\runner\Release\"
+          Copy-Item "C:\Windows\System32\msvcp140_2.dll" -Destination ".\build\windows\x64\runner\Release\"
+          Copy-Item "C:\Windows\System32\vcruntime140.dll" -Destination ".\build\windows\x64\runner\Release\"
+          Copy-Item "C:\Windows\System32\vcruntime140_1.dll" -Destination ".\build\windows\x64\runner\Release\"
       - name: Install Inno Setup
         shell: powershell
         run: |
