@@ -66,6 +66,7 @@ dependencies:
   flutter_markdown_plus: ^1.0.3
   path_provider: ^2.1.5
   archive: ^4.0.7
+  csv: ^6.0.0
 
 dev_dependencies:
   flutter_test:
