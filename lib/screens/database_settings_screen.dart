@@ -118,8 +118,7 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       String? targetPath;
 
       if (Platform.isIOS) {
-        targetPath =
-            await DatabaseHelper.resolveCustomDatabasePath(pickedFolder);
+        targetPath = await DatabaseHelper.resolveBookmarkPath(pickedFolder);
         if (targetPath == null) {
           throw Exception('Failed to resolve custom database bookmark on iOS.');
         }
@@ -150,22 +149,21 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
         try {
           await _showLoadingDialog(
               AppLocalizations.of(context)!.movingDatabase);
-          final dbHelper = DatabaseHelper();
           await dbHelper.closeDatabase();
+          final oldDbPath = await dbHelper.getDbPath();
+          final oldBaseDir = Directory(p.dirname(oldDbPath));
 
-          final defaultAppDir = await getApplicationDocumentsDirectory();
-          final oldDBPath = p.join(await getDatabasesPath(), 'wispar.db');
-          final newDBPath = p.join(targetPath, 'wispar.db');
+          final newDbPath = p.join(targetPath, 'wispar.db');
 
           // Move database
-          final oldDBFile = File(oldDBPath);
+          final oldDBFile = File(oldDbPath);
           if (await oldDBFile.exists()) {
-            await oldDBFile.copy(newDBPath);
+            await oldDBFile.copy(newDbPath);
             await oldDBFile.delete();
           }
 
           // Move PDFs
-          await for (final file in defaultAppDir.list()) {
+          await for (final file in oldBaseDir.list()) {
             if (file is File && file.path.endsWith('.pdf')) {
               final newFile = File(p.join(targetPath, p.basename(file.path)));
               await file.copy(newFile.path);
@@ -175,7 +173,7 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
 
           // Move graphical abstracts
           final oldGraphicalDir =
-              Directory(p.join(defaultAppDir.path, 'graphical_abstracts'));
+              Directory(p.join(oldBaseDir.path, 'graphical_abstracts'));
           final newGraphicalDir =
               Directory(p.join(targetPath, 'graphical_abstracts'));
 
@@ -251,14 +249,24 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       if (customPath == null) {
         throw Exception("Custom DB folder not accessible");
       }
+      String defaultDBPath;
+      Directory defaultBaseDir;
 
-      final defaultDBPath = p.join(await getDatabasesPath(), 'wispar.db');
-      final appDir = await getApplicationDocumentsDirectory();
+      if (Platform.isWindows) {
+        final appDir = await getApplicationDocumentsDirectory();
+        defaultDBPath = p.join(appDir.path, 'wispar.db');
+        defaultBaseDir = appDir;
+      } else {
+        final defaultPath = await getDatabasesPath();
+        defaultDBPath = p.join(defaultPath, 'wispar.db');
+        defaultBaseDir = Directory(defaultPath);
+      }
+
       final oldDBPath = p.join(customPath, 'wispar.db');
       final oldGraphicalDir =
           Directory(p.join(customPath, 'graphical_abstracts'));
       final newGraphicalDir =
-          Directory(p.join(appDir.path, 'graphical_abstracts'));
+          Directory(p.join(defaultBaseDir.path, 'graphical_abstracts'));
 
       // Move DB
       final oldDBFile = File(oldDBPath);
@@ -271,7 +279,8 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       final customDir = Directory(customPath);
       await for (final file in customDir.list()) {
         if (file is File && file.path.endsWith('.pdf')) {
-          final newFile = File(p.join(appDir.path, p.basename(file.path)));
+          final newFile =
+              File(p.join(defaultBaseDir.path, p.basename(file.path)));
           await file.copy(newFile.path);
           await file.delete();
         }
@@ -372,22 +381,9 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       final String outputFile =
           p.join(outputDirectory, 'wispar_backup_$timestamp.zip');
 
-      final customSourcePath = await _getUsableCustomPath();
-      String sourceBasePath;
-      String dbDirectoryPath;
-
-      if (customSourcePath != null) {
-        sourceBasePath = customSourcePath;
-        dbDirectoryPath = customSourcePath;
-      } else {
-        // Use default paths
-        final defaultAppDir = await getApplicationDocumentsDirectory();
-        sourceBasePath = defaultAppDir.path;
-        dbDirectoryPath = await getDatabasesPath();
-      }
-
-      String dbPath = p.join(dbDirectoryPath, "wispar.db");
-      File dbFile = File(dbPath);
+      final dbPath = await DatabaseHelper().getDbPath();
+      final dbFile = File(dbPath);
+      final sourceBasePath = p.dirname(dbPath);
 
       final sourceDir = Directory(sourceBasePath);
 
@@ -453,17 +449,12 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       await dbHelper.closeDatabase();
       File selectedFile = File(result.files.single.path!);
 
+      final dbPath = await dbHelper.getDbPath();
+      final dbDirectoryPath = p.dirname(dbPath);
+
       final prefs = await SharedPreferences.getInstance();
       final useCustomPath = prefs.getBool('useCustomDatabasePath') ?? false;
       final customPath = prefs.getString('customDatabasePath');
-
-      String dbDestinationPath;
-      if (useCustomPath && customPath != null) {
-        dbDestinationPath = customPath;
-      } else {
-        dbDestinationPath = await getDatabasesPath();
-      }
-
       String docsDestinationPath;
       if (useCustomPath && customPath != null) {
         docsDestinationPath = customPath;
@@ -478,7 +469,7 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
 
       for (final file in archive) {
         final destinationBasePath =
-            file.name == 'wispar.db' ? dbDestinationPath : docsDestinationPath;
+            file.name == 'wispar.db' ? dbDirectoryPath : docsDestinationPath;
 
         final filePath = p.join(destinationBasePath, file.name);
         final outFile = File(filePath);
@@ -502,7 +493,7 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       }
 
       logger.info(
-          'The database was successfully imported to $dbDestinationPath from ${selectedFile.path}');
+          'The database was successfully imported to $dbDirectoryPath from ${selectedFile.path}');
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

@@ -17,7 +17,7 @@ import 'package:path_provider/path_provider.dart';
 class DatabaseHelper {
   static const platform = MethodChannel('app.wispar.wispar/database_access');
 
-  static Future<String?> resolveCustomDatabasePath(String? path) async {
+  static Future<String?> resolveBookmarkPath(String? path) async {
     if (path == null) return null;
 
     if (Platform.isIOS) {
@@ -29,7 +29,6 @@ class DatabaseHelper {
         return null;
       }
     } else {
-      // Android can use the path directly
       return path;
     }
   }
@@ -44,23 +43,26 @@ class DatabaseHelper {
     return _database!;
   }
 
-  Future<Database> initDatabase() async {
+  Future<String> getDbPath() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? customPath = prefs.getString('customDatabasePath');
     String? bookmark = prefs.getString('customDatabaseBookmark');
 
     if (Platform.isIOS && bookmark != null) {
-      final resolvedPath = await DatabaseHelper.platform
-          .invokeMethod('resolveCustomPath', bookmark);
-      if (resolvedPath != null) {
-        customPath = resolvedPath;
-      } else {
-        customPath = null;
-      }
+      final resolved = await resolveBookmarkPath(bookmark);
+      if (resolved != null) customPath = resolved;
     }
-
-    final defaultPath = await getDatabasesPath();
+    String defaultPath = await getDatabasesPath();
+    if (Platform.isWindows) {
+      final dir = await getApplicationDocumentsDirectory();
+      defaultPath = dir.path;
+    }
     final databasePath = join(customPath ?? defaultPath, 'wispar.db');
+    return databasePath;
+  }
+
+  Future<Database> initDatabase() async {
+    String databasePath = await getDbPath();
 
     return openDatabase(databasePath, version: 9, onOpen: (db) async {
       await db.execute('PRAGMA foreign_keys = ON');
