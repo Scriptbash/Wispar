@@ -17,6 +17,9 @@ class GraphicalAbstractManager {
 
     if (useCustomPath && customPath != null) {
       basePath = customPath;
+    } else if (Platform.isWindows) {
+      final dir = await getApplicationSupportDirectory();
+      basePath = dir.path;
     } else {
       final dir = await getApplicationDocumentsDirectory();
       basePath = dir.path;

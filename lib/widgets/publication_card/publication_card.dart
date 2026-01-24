@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
@@ -401,6 +402,9 @@ class PublicationCardState extends State<PublicationCard>
       String basePath;
       if (useCustomPath && customPath != null) {
         basePath = customPath;
+      } else if (Platform.isWindows) {
+        final defaultDirectory = await getApplicationSupportDirectory();
+        basePath = defaultDirectory.path;
       } else {
         final defaultDirectory = await getApplicationDocumentsDirectory();
         basePath = defaultDirectory.path;

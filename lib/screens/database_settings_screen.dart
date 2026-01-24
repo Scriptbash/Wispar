@@ -253,7 +253,7 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       Directory defaultBaseDir;
 
       if (Platform.isWindows) {
-        final appDir = await getApplicationDocumentsDirectory();
+        final appDir = await getApplicationSupportDirectory();
         defaultDBPath = p.join(appDir.path, 'wispar.db');
         defaultBaseDir = appDir;
       } else {
@@ -458,6 +458,9 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       String docsDestinationPath;
       if (useCustomPath && customPath != null) {
         docsDestinationPath = customPath;
+      } else if (Platform.isWindows) {
+        final appDir = await getApplicationSupportDirectory();
+        docsDestinationPath = appDir.path;
       } else {
         final appDir = await getApplicationDocumentsDirectory();
         docsDestinationPath = appDir.path;

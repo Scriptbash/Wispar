@@ -979,6 +979,10 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
 
                         if (useCustomPath && customPath != null) {
                           baseDirPath = customPath;
+                        } else if (Platform.isWindows) {
+                          final defaultAppDir =
+                              await getApplicationSupportDirectory();
+                          baseDirPath = defaultAppDir.path;
                         } else {
                           final defaultAppDir =
                               await getApplicationDocumentsDirectory();

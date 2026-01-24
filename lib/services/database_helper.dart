@@ -54,7 +54,7 @@ class DatabaseHelper {
     }
     String defaultPath = await getDatabasesPath();
     if (Platform.isWindows) {
-      final dir = await getApplicationDocumentsDirectory();
+      final dir = await getApplicationSupportDirectory();
       defaultPath = dir.path;
     }
     final databasePath = join(customPath ?? defaultPath, 'wispar.db');
@@ -1117,6 +1117,9 @@ class DatabaseHelper {
     String baseDirPath;
     if (useCustomPath && customPath != null) {
       baseDirPath = customPath;
+    } else if (Platform.isWindows) {
+      final dir = await getApplicationSupportDirectory();
+      baseDirPath = dir.path;
     } else {
       final dir = await getApplicationDocumentsDirectory();
       baseDirPath = dir.path;
