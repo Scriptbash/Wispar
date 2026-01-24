@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "lucide-react": "^0.562.0",
+    "lucide-react": "^0.563.0",
     "swiper": "^12.0.0"
   }
 }
