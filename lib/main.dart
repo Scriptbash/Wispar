@@ -17,11 +17,9 @@ import './services/logs_helper.dart';
 import 'package:background_fetch/background_fetch.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:wispar/webview_env.dart';
 import 'dart:io' show Platform;
-
-WebViewEnvironment? webViewEnvironment;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

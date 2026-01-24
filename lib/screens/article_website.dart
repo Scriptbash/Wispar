@@ -11,7 +11,8 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:wispar/services/logs_helper.dart';
-import '../services/database_helper.dart';
+import 'package:wispar/webview_env.dart';
+import 'package:wispar/services/database_helper.dart';
 
 class ArticleWebsite extends StatefulWidget {
   final PublicationCard publicationCard;
@@ -307,6 +308,8 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
               isReadyToLoad
                   ? InAppWebView(
                       key: webViewKey,
+                      webViewEnvironment:
+                          Platform.isWindows ? webViewEnvironment : null,
                       initialUrlRequest: URLRequest(url: WebUri(pdfUrl)),
                       initialSettings: settings,
                       pullToRefreshController: pullToRefreshController,
