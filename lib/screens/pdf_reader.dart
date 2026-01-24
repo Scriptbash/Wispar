@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../generated_l10n/app_localizations.dart';
 import 'package:pdfrx/pdfrx.dart';
@@ -80,6 +81,9 @@ class PdfReaderState extends State<PdfReader> {
     String basePath;
     if (_useCustomPath && _customPath != null) {
       basePath = _customPath!;
+    } else if (Platform.isWindows) {
+      final defaultDirectory = await getApplicationSupportDirectory();
+      basePath = defaultDirectory.path;
     } else {
       final defaultDirectory = await getApplicationDocumentsDirectory();
       basePath = defaultDirectory.path;

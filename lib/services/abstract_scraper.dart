@@ -2,8 +2,9 @@ import 'dart:async';
 import 'dart:io' show Platform;
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import './string_format_helper.dart';
-import './logs_helper.dart';
+import 'package:wispar/webview_env.dart';
+import 'package:wispar/services/string_format_helper.dart';
+import 'package:wispar/services/logs_helper.dart';
 
 class AbstractScraper {
   Completer<Map<String, String?>> _completer =
@@ -47,6 +48,7 @@ class AbstractScraper {
         initialSettings: InAppWebViewSettings(
           userAgent: userAgent,
         ),
+        webViewEnvironment: Platform.isWindows ? webViewEnvironment : null,
         initialUrlRequest: URLRequest(url: WebUri(url)),
         onLoadStop: (controller, loadedUrl) async {
           await Future.delayed(const Duration(seconds: 3));

@@ -155,6 +155,25 @@ jobs:
         run: |
           choco install innosetup -y
           refreshenv
+      - name: Extract version from pubspec.yaml
+        shell: pwsh
+        id: extract_version
+        run: |
+          $pubspec = Get-Content pubspec.yaml
+          foreach ($line in $pubspec) {
+              if ($line -match '^version:\s*(.+)$') {
+                  $version = $matches[1]
+                  break
+              }
+          }
+          Write-Host "VERSION=$version"
+          echo "VERSION=$version" >> $env:GITHUB_ENV
+      - name: Patch ISS with correct version
+        shell: powershell
+        run: |
+          $issPath = ".\windows\wispar_setup.iss"
+          (Get-Content $issPath) -replace '#define MyAppVersion ".*"', '#define MyAppVersion "${{ env.VERSION }}"' | Set-Content $issPath
+          Write-Host "Patched ISS file with version ${{ env.VERSION }}"
       - name: Create Windows installer
         shell: powershell
         run: |
