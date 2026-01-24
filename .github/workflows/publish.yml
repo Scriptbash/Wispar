@@ -156,10 +156,18 @@ jobs:
           choco install innosetup -y
           refreshenv
       - name: Extract version from pubspec.yaml
+        shell: pwsh
         id: extract_version
         run: |
-          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
-          echo "VERSION=$version" >> $GITHUB_ENV
+          $pubspec = Get-Content pubspec.yaml
+          foreach ($line in $pubspec) {
+              if ($line -match '^version:\s*(.+)$') {
+                  $version = $matches[1]
+                  break
+              }
+          }
+          Write-Host "VERSION=$version"
+          echo "VERSION=$version" >> $env:GITHUB_ENV
       - name: Patch ISS with correct version
         shell: powershell
         run: |
