@@ -77,6 +77,9 @@ dev_dependencies:
 
 flutter_launcher_icons:
   android: true
+  adaptive_icon_foreground: "assets/icon/android_icon.png"
+  adaptive_icon_background: "#c0a6f4"
+  adaptive_icon_monochrome: "assets/icon/icon_mono.png"
   ios: true
   remove_alpha_ios: true
   background_color_ios: c0a6f4

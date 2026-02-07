@@ -22,7 +22,7 @@ jobs:
     - run: flutter pub get
     - name: Patch pdfrx
       run: |
-        PDFRX_PATH=$(find $HOME/.pub-cache -type d -name "pdfrx-*" | head -n 1)
+        PDFRX_PATH=$(find $HOME/.pub-cache -type d -name "pdfium_flutter-*" | head -n 1)
         CMAKE_FILE="$PDFRX_PATH/android/CMakeLists.txt"
         if [ -f "$CMAKE_FILE" ]; then
           sed -i '2i add_link_options("LINKER:--build-id=none")' "$CMAKE_FILE"
