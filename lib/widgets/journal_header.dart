@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../generated_l10n/app_localizations.dart';
-import '../models/crossref_journals_models.dart' as Journals;
-import './journal_follow_button.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/models/crossref_journals_models.dart' as Journals;
+import 'package:wispar/widgets/journal_follow_button.dart';
 
 class JournalInfoHeader extends SliverPersistentHeaderDelegate {
   final String title;
@@ -57,8 +57,9 @@ class JournalInfoHeader extends SliverPersistentHeaderDelegate {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: 8.0),
-                      Text(
-                          '${AppLocalizations.of(context)!.publisher}: ${publisher}'),
+                      if (publisher.isNotEmpty)
+                        Text(AppLocalizations.of(context)!
+                            .publisherName(publisher)),
                       Text('ISSN: ${issn}'),
                       SizedBox(height: 8.0),
                     ],

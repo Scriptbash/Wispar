@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
-import '../generated_l10n/app_localizations.dart';
-import '../services/crossref_api.dart';
-import '../models/crossref_journals_models.dart' as Journals;
-import '../widgets/journal_search_results_card.dart';
-import '../services/logs_helper.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/services/crossref_api.dart';
+import 'package:wispar/models/crossref_journals_models.dart' as Journals;
+import 'package:wispar/widgets/journal_search_results_card.dart';
+import 'package:wispar/services/logs_helper.dart';
 
 class SearchResultsScreen extends StatefulWidget {
   final ListAndMore<Journals.Item> searchResults;
   final String searchQuery;
 
   const SearchResultsScreen({
-    Key? key,
+    super.key,
     required this.searchResults,
     required this.searchQuery,
-  }) : super(key: key);
+  });
 
   @override
-  _SearchResultsScreenState createState() => _SearchResultsScreenState();
+  SearchResultsScreenState createState() => SearchResultsScreenState();
 }
 
-class _SearchResultsScreenState extends State<SearchResultsScreen> {
+class SearchResultsScreenState extends State<SearchResultsScreen> {
   final logger = LogsService().logger;
   List<Journals.Item> items = [];
   bool isLoading = false;
@@ -101,10 +101,12 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
         }
       });
     } catch (e, stackTrace) {
-      logger.severe('Failed to load more journals.', e, stackTrace);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content:
-              Text(AppLocalizations.of(context)!.failLoadMorePublication)));
+      if (mounted) {
+        logger.severe('Failed to load more journals.', e, stackTrace);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content:
+                Text(AppLocalizations.of(context)!.failLoadMorePublication)));
+      }
     } finally {
       setState(() => isLoading = false);
     }

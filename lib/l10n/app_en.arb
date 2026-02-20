@@ -135,6 +135,10 @@
   "@journals": {
     "description": "The journals menu button and the app bar title when in the journals screen."
   },
+   "countJournals": "{count, plural, =0{No journals} =1{1 journal} other{{count} journals}}",
+  "@countJournals": {
+    "placeholders": {"count": {}}
+  },
   "queries": "Queries",
   "@queries": {
     "description": "Title of the saved search queries tab."
@@ -189,6 +193,8 @@
   "@searchByDOI": {},
   "searchByTitle": "Search by title",
   "@searchByTitle": {},
+  "searchByTopic": "Search by topic",
+  "@searchByTopic":{},
   "searchByISSN": "Search by ISSN",
   "@searchByISSN": {},
   "queryHasNoNameError": "You must enter a query name in order to save it.",
@@ -215,6 +221,8 @@
   "@category": {},
   "publisher": "Publisher",
   "@publisher": {},
+  "publisherName": "Publisher: {publisherName}",
+  "@publisherName":{},
   "publishedin": "Published in",
   "@publishedin": {},
   "subjects": "Subjects",
