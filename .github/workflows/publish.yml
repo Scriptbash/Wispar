@@ -50,7 +50,7 @@ jobs:
         cp build/app/outputs/flutter-apk/app-release.apk release-artifacts/
         cp build/app/outputs/bundle/release/app-release.aab release-artifacts/
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: android-artifacts
         path: release-artifacts/
@@ -124,7 +124,7 @@ jobs:
             "Wispar.dmg" \
             build/macos/Build/Products/Release/Wispar.app
           /usr/bin/codesign --force -s "$MACOS_SIGN_IDENTITY" Wispar.dmg
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: wispar-macos-dmg
           path: Wispar.dmg
@@ -180,7 +180,7 @@ jobs:
           $issPath = ".\windows\wispar_setup.iss"
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" $issPath
       - name: Upload Windows installer
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: windows-artifacts
           path: windows\output\wispar_setup.exe
@@ -192,17 +192,17 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Download Android artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: android-artifacts
           path: android-artifacts
       - name: Download macOS artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: wispar-macos-dmg
           path: macos-artifacts
       - name: Download Windows artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: windows-artifacts
           path: windows-artifacts

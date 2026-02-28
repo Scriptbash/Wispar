@@ -33,7 +33,7 @@ jobs:
         fi
     - run: dart run pdfrx:remove_wasm_modules
     - run: flutter build apk --debug
-    - uses: actions/upload-artifact@v6
+    - uses: actions/upload-artifact@v7
       with:
         name: android-debug-apk
         path: build/app/outputs/apk/debug/app-debug.apk
@@ -52,7 +52,7 @@ jobs:
         architecture: x64
     - run: flutter pub get
     - run: flutter build ios --debug --no-codesign
-    - uses: actions/upload-artifact@v6
+    - uses: actions/upload-artifact@v7
       with:
         name: ios-debug-app
         path: build/ios/iphoneos/*.app
@@ -70,7 +70,7 @@ jobs:
           channel: 'stable'
       - run: flutter pub get
       - run: flutter build macos --debug
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: macos-debug-app
           path: build/macos/Build/Products/Debug/*.app
@@ -85,7 +85,7 @@ jobs:
           channel: 'stable'
       - run: flutter pub get
       - run: flutter build windows --debug
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: windows-debug
           path: build/windows/x64/runner/Debug/
