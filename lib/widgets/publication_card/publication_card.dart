@@ -10,11 +10,14 @@ import 'package:wispar/services/database_helper.dart';
 import 'package:wispar/services/zotero_api.dart';
 import 'package:wispar/widgets/publication_card/publication_card_content.dart';
 import 'package:wispar/widgets/publication_card/card_swipe_background.dart';
+import 'package:wispar/widgets/zotero_bottomsheet.dart';
+import 'package:wispar/models/zotero_models.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 enum SwipeAction {
   none,
@@ -180,7 +183,7 @@ class PublicationCardState extends State<PublicationCard>
         widget.onFavoriteChanged?.call();
         break;
       case SwipeAction.sendToZotero:
-        _sendToZotero();
+        await _sendToZotero();
         break;
       case SwipeAction.share:
         _shareArticle();
@@ -488,17 +491,53 @@ class PublicationCardState extends State<PublicationCard>
     return rows.isNotEmpty ? rows.first : null;
   }
 
-  void _sendToZotero() {
-    List<Map<String, dynamic>> authorsData = widget.authors
-        .map((author) => {
-              'creatorType': 'author',
-              'firstName': author.given,
-              'lastName': author.family,
-            })
-        .toList();
-    ZoteroService.sendToZotero(
+  Future<void> _sendToZotero() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final bool alwaysSend = prefs.getBool('zoteroAlwaysSend') ?? false;
+    final String? savedCollectionJson =
+        prefs.getString('zoteroDefaultCollection');
+
+    if (alwaysSend && savedCollectionJson != null) {
+      final ZoteroCollection savedCollection =
+          ZoteroCollection.fromJson(jsonDecode(savedCollectionJson));
+
+      await ZoteroService.sendToZotero(
+        context,
+        savedCollection,
+        widget.authors
+            .map((author) => {
+                  'creatorType': 'author',
+                  'firstName': author.given,
+                  'lastName': author.family,
+                })
+            .toList(),
+        widget.title,
+        widget.abstract,
+        widget.journalTitle,
+        widget.publishedDate,
+        widget.doi,
+        widget.issn,
+      );
+
+      return;
+    }
+
+    final ZoteroCollection? selectedCollection =
+        await selectZoteroCollection(context);
+
+    if (selectedCollection == null) return;
+
+    await ZoteroService.sendToZotero(
       context,
-      authorsData,
+      selectedCollection,
+      widget.authors
+          .map((author) => {
+                'creatorType': 'author',
+                'firstName': author.given,
+                'lastName': author.family,
+              })
+          .toList(),
       widget.title,
       widget.abstract,
       widget.journalTitle,

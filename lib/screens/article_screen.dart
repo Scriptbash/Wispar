@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../generated_l10n/app_localizations.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:wispar/screens/article_website.dart';
-import '../models/crossref_journals_works_models.dart';
-import '../services/database_helper.dart';
-import '../widgets/publication_card/publication_card.dart';
-import './journals_details_screen.dart';
-import '../services/zotero_api.dart';
-import '../services/string_format_helper.dart';
-import '../services/abstract_scraper.dart';
+import 'package:wispar/models/crossref_journals_works_models.dart';
+import 'package:wispar/services/database_helper.dart';
+import 'package:wispar/widgets/publication_card/publication_card.dart';
+import 'package:wispar/widgets/zotero_bottomsheet.dart';
+import 'package:wispar/models/zotero_models.dart';
+import 'package:wispar/screens/journals_details_screen.dart';
+import 'package:wispar/services/zotero_api.dart';
+import 'package:wispar/services/string_format_helper.dart';
+import 'package:wispar/services/abstract_scraper.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:latext/latext.dart';
-import '../services/logs_helper.dart';
+import 'package:wispar/services/logs_helper.dart';
 import 'dart:async';
 import 'package:wispar/widgets/translate_sheet.dart';
-import '../services/graphical_abstract_manager.dart';
-import '../screens/graphical_abstract_screen.dart';
+import 'package:wispar/services/graphical_abstract_manager.dart';
+import 'package:wispar/screens/graphical_abstract_screen.dart';
+import 'dart:convert';
 import 'dart:io';
 
 class ArticleScreen extends StatefulWidget {
@@ -955,27 +958,8 @@ class ArticleScreenState extends State<ArticleScreen> {
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () {
-                      List<Map<String, dynamic>> authorsData = [];
-                      for (PublicationAuthor author in widget.authors) {
-                        authorsData.add({
-                          'creatorType': 'author',
-                          'firstName': author.given,
-                          'lastName': author.family,
-                        });
-                      }
-                      ZoteroService.sendToZotero(
-                        context,
-                        authorsData,
-                        widget.title,
-                        _showTranslatedAbstract
-                            ? _accumulatedTranslatedAbstract
-                            : (abstract ?? widget.abstract),
-                        widget.journalTitle,
-                        widget.publishedDate,
-                        widget.doi,
-                        widget.issn,
-                      );
+                    onTap: () async {
+                      await _sendToZotero();
                     },
                     borderRadius: BorderRadius.circular(8),
                     splashColor:
@@ -1032,5 +1016,59 @@ class ArticleScreenState extends State<ArticleScreen> {
     );
 
     return rows.isNotEmpty ? rows.first : null;
+  }
+
+  Future<void> _sendToZotero() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final bool alwaysSend = prefs.getBool('zoteroAlwaysSend') ?? false;
+    final String? savedCollectionRaw =
+        prefs.getString('zoteroDefaultCollection');
+
+    final authorsData = widget.authors
+        .map((author) => {
+              'creatorType': 'author',
+              'firstName': author.given,
+              'lastName': author.family,
+            })
+        .toList();
+
+    if (alwaysSend && savedCollectionRaw != null) {
+      final ZoteroCollection savedCollection =
+          ZoteroCollection.fromJson(jsonDecode(savedCollectionRaw));
+
+      await ZoteroService.sendToZotero(
+        context,
+        savedCollection,
+        authorsData,
+        widget.title,
+        widget.abstract,
+        widget.journalTitle,
+        widget.publishedDate,
+        widget.doi,
+        widget.issn,
+      );
+
+      return;
+    }
+
+    final ZoteroCollection? selectedCollection =
+        await selectZoteroCollection(context);
+
+    if (selectedCollection == null) return;
+
+    await ZoteroService.sendToZotero(
+      context,
+      selectedCollection,
+      authorsData,
+      widget.title,
+      _showTranslatedAbstract
+          ? _accumulatedTranslatedAbstract
+          : (abstract ?? widget.abstract),
+      widget.journalTitle,
+      widget.publishedDate,
+      widget.doi,
+      widget.issn,
+    );
   }
 }
