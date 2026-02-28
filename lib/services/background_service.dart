@@ -3,10 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import '../models/journal_entity.dart';
-import '../services/database_helper.dart';
-import '../services/feed_service.dart';
-import '../generated_l10n/app_localizations.dart';
+import 'package:wispar/models/journal_entity.dart';
+import 'package:wispar/services/database_helper.dart';
+import 'package:wispar/services/feed_service.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -27,7 +27,8 @@ Future<void> initializeNotifications() async {
     iOS: initializationSettingsDarwin,
   );
 
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await flutterLocalNotificationsPlugin.initialize(
+      settings: initializationSettings);
 }
 
 Future<void> showNewJournalArticlesNotification() async {
@@ -54,10 +55,10 @@ Future<void> showNewJournalArticlesNotification() async {
       NotificationDetails(android: androidPlatformChannelSpecifics);
 
   await flutterLocalNotificationsPlugin.show(
-    0,
-    notificationTitle,
-    notificationContent,
-    platformChannelSpecifics,
+    id: 0,
+    title: notificationTitle,
+    body: notificationContent,
+    notificationDetails: platformChannelSpecifics,
   );
 }
 
@@ -85,10 +86,10 @@ Future<void> showNewQueryArticlesNotification() async {
       NotificationDetails(android: androidPlatformChannelSpecifics);
 
   await flutterLocalNotificationsPlugin.show(
-    1,
-    notificationTitle,
-    notificationContent,
-    platformChannelSpecifics,
+    id: 1,
+    title: notificationTitle,
+    body: notificationContent,
+    notificationDetails: platformChannelSpecifics,
   );
 }
 
@@ -98,7 +99,7 @@ Future<void> runFeedJob(
   int fetchIntervalInHours,
   int maxConcurrentUpdates,
 ) async {
-  debugPrint('Feed updated in background at ${DateTime.now()}');
+  //debugPrint('Feed updated in background at ${DateTime.now()}');
 
   int journalArticleCountBefore = await dbHelper.getArticleCount();
 
@@ -114,7 +115,7 @@ Future<void> runFeedJob(
   if (journalArticleCountBefore < journalArticleCountAfter) {
     await showNewJournalArticlesNotification();
   } else {
-    debugPrint("No new articles from journals received");
+    //debugPrint("No new articles from journals received");
   }
 
   int queryArticleCountBefore = await dbHelper.getArticleCount();
@@ -130,7 +131,7 @@ Future<void> runFeedJob(
   if (queryArticleCountBefore < queryArticleCountAfter) {
     await showNewQueryArticlesNotification();
   } else {
-    debugPrint("No new articles from queries received");
+    //debugPrint("No new articles from queries received");
   }
 }
 
