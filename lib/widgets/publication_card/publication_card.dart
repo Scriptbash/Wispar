@@ -183,7 +183,7 @@ class PublicationCardState extends State<PublicationCard>
         widget.onFavoriteChanged?.call();
         break;
       case SwipeAction.sendToZotero:
-        _sendToZotero();
+        await _sendToZotero();
         break;
       case SwipeAction.share:
         _shareArticle();
@@ -528,7 +528,7 @@ class PublicationCardState extends State<PublicationCard>
 
     if (selectedCollection == null) return;
 
-    ZoteroService.sendToZotero(
+    await ZoteroService.sendToZotero(
       context,
       selectedCollection,
       widget.authors

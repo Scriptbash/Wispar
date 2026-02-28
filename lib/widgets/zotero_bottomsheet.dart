@@ -12,6 +12,7 @@ Future<ZoteroCollection?> selectZoteroCollection(
   return showModalBottomSheet<ZoteroCollection?>(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
@@ -161,6 +162,12 @@ class _ZoteroCollectionSheetState extends State<_ZoteroCollectionSheet> {
     userId = await ZoteroService.loadUserId();
 
     if (apiKey == null || userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          AppLocalizations.of(context)!.zoteroApiKeyEmpty,
+        ),
+        duration: const Duration(seconds: 3),
+      ));
       if (mounted) Navigator.pop(context);
       return;
     }
