@@ -1,14 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../generated_l10n/app_localizations.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:archive/archive_io.dart';
 import 'package:path/path.dart' as p;
-import '../services/logs_helper.dart';
-import '../services/database_helper.dart';
+import 'package:wispar/services/logs_helper.dart';
+import 'package:wispar/services/database_helper.dart';
 import 'package:flutter/services.dart';
 
 class DatabaseSettingsScreen extends StatefulWidget {
@@ -23,15 +23,10 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
   final logger = LogsService().logger;
   final _formKey = GlobalKey<FormState>();
 
-  bool _scrapeAbstracts = true; // Default to scraping missing abstracts
   int _cleanupThreshold = 90; // Default for cleanup interval
-  int _fetchInterval = 6; // Default API fetch to 6 hours
-  int _concurrentFetches = 3; // Default to 3 concurrent fetches
+
   final TextEditingController _cleanupThresholdController =
       TextEditingController();
-
-  bool _overrideUserAgent = false;
-  final TextEditingController _userAgentController = TextEditingController();
 
   bool _useCustomPath = false;
   String? _customDatabasePath;
@@ -50,11 +45,6 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
     setState(() {
       // Load the values from SharedPreferences if available
       _cleanupThreshold = prefs.getInt('cleanupThreshold') ?? 90;
-      _fetchInterval = prefs.getInt('fetchInterval') ?? 6;
-      _scrapeAbstracts = prefs.getBool('scrapeAbstracts') ?? true;
-      _concurrentFetches = prefs.getInt('concurrentFetches') ?? 3;
-      _overrideUserAgent = prefs.getBool('overrideUserAgent') ?? false;
-      _userAgentController.text = prefs.getString('customUserAgent') ?? '';
       _useCustomPath = prefs.getBool('useCustomDatabasePath') ?? false;
       _customDatabasePath = prefs.getString('customDatabasePath');
       _customDatabaseBookmark = prefs.getString('customDatabaseBookmark');
@@ -67,13 +57,6 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
     if (_formKey.currentState?.validate() ?? false) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setInt('cleanupThreshold', _cleanupThreshold);
-      await prefs.setInt('fetchInterval', _fetchInterval);
-      await prefs.setBool('scrapeAbstracts', _scrapeAbstracts);
-      await prefs.setInt('concurrentFetches', _concurrentFetches);
-      await prefs.setBool('overrideUserAgent', _overrideUserAgent);
-      if (_overrideUserAgent) {
-        await prefs.setString('customUserAgent', _userAgentController.text);
-      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.settingsSaved)),
@@ -537,7 +520,6 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
   @override
   void dispose() {
     _cleanupThresholdController.dispose();
-    _userAgentController.dispose();
     super.dispose();
   }
 
@@ -586,119 +568,6 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      AppLocalizations.of(context)!
-                          .cachedArticleRetentionDaysDesc,
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 16),
-                    DropdownButtonFormField<int>(
-                      isExpanded: true,
-                      initialValue: _fetchInterval,
-                      onChanged: (int? newValue) {
-                        setState(() {
-                          _fetchInterval = newValue!;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText:
-                            AppLocalizations.of(context)!.apiFetchInterval,
-                        hintText:
-                            AppLocalizations.of(context)!.apiFetchIntervalHint,
-                      ),
-                      items: [
-                        DropdownMenuItem(
-                          value: 3,
-                          child:
-                              Text('3 ${AppLocalizations.of(context)!.hours}'),
-                        ),
-                        DropdownMenuItem(
-                          value: 6,
-                          child:
-                              Text('6 ${AppLocalizations.of(context)!.hours}'),
-                        ),
-                        DropdownMenuItem(
-                          value: 12,
-                          child:
-                              Text('12 ${AppLocalizations.of(context)!.hours}'),
-                        ),
-                        DropdownMenuItem(
-                          value: 24,
-                          child:
-                              Text('24 ${AppLocalizations.of(context)!.hours}'),
-                        ),
-                        DropdownMenuItem(
-                          value: 48,
-                          child:
-                              Text('48 ${AppLocalizations.of(context)!.hours}'),
-                        ),
-                        DropdownMenuItem(
-                          value: 72,
-                          child:
-                              Text('72 ${AppLocalizations.of(context)!.hours}'),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      AppLocalizations.of(context)!
-                          .concurrentFetches(_concurrentFetches),
-                    ),
-                    Slider(
-                      value: _concurrentFetches.toDouble(),
-                      min: 1,
-                      max: 5,
-                      divisions: 4,
-                      label: _concurrentFetches.toString(),
-                      onChanged: (double value) {
-                        setState(() {
-                          _concurrentFetches = value.toInt();
-                        });
-                      },
-                    ),
-                    SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!.scrapeAbstracts,
-                        ),
-                        Switch(
-                          value: _scrapeAbstracts,
-                          onChanged: (bool value) async {
-                            setState(() {
-                              _scrapeAbstracts = value;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(AppLocalizations.of(context)!.overrideUserAgent),
-                        Switch(
-                          value: _overrideUserAgent,
-                          onChanged: (bool value) {
-                            setState(() {
-                              _overrideUserAgent = value;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    if (_overrideUserAgent)
-                      TextFormField(
-                        controller: _userAgentController,
-                        decoration: InputDecoration(
-                          labelText:
-                              AppLocalizations.of(context)!.customUserAgent,
-                          hintText:
-                              "Mozilla/5.0 (Android 16; Mobile; LG-M255; rv:140.0) Gecko/140.0 Firefox/140.0",
-                        ),
-                      ),
                     const SizedBox(height: 16),
                     FilledButton(
                       onPressed: _saveSettings,
@@ -706,7 +575,6 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                     ),
                     const SizedBox(height: 64),
                     const Divider(),
-                    const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

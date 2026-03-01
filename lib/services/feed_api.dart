@@ -1,13 +1,16 @@
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import '../models/crossref_journals_works_models.dart' as journalWorks;
-import '../models/openAlex_works_models.dart';
+import 'package:wispar/models/crossref_journals_works_models.dart'
+    as journalWorks;
+import 'package:wispar/models/openAlex_works_models.dart';
 
 class FeedApi {
   static const String baseUrl = 'https://api.crossref.org';
   static const String journalsEndpoint = '/journals';
   static const String worksEndpoint = '/works';
   static const String email = 'mailto=wispar-app@protonmail.com';
+  static String? openAlexApiKey;
 
   static const String baseUrlOpenAlex = 'https://api.openalex.org';
   static const String worksEndpointOpenAlex = '/works?';
@@ -51,8 +54,10 @@ class FeedApi {
 
   static Future<List<journalWorks.Item>> getSavedQueryOpenAlex(
       String query) async {
+    final prefs = await SharedPreferences.getInstance();
+    openAlexApiKey = prefs.getString('openalex_api_key');
     final url = Uri.parse(
-        '$baseUrlOpenAlex$worksEndpointOpenAlex$query&per-page=50&$email');
+        '$baseUrlOpenAlex$worksEndpointOpenAlex$query&per-page=50${openAlexApiKey != null && openAlexApiKey!.isNotEmpty ? '&api_key=$openAlexApiKey' : ''}');
 
     final response = await http.get(url);
 

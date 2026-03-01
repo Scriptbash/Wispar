@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:wispar/services/openAlex_api.dart';
 import 'package:wispar/screens/article_search_results_screen.dart';
@@ -14,6 +15,7 @@ class OpenAlexSearchForm extends StatefulWidget {
 }
 
 class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
+  bool _hasApiKey = true;
   List<Map<String, dynamic>> queryParts = [];
   String searchScope = 'Everything';
   String selectedSortField = '-';
@@ -27,6 +29,12 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
   List<TextEditingController> controllers = [];
 
   final TextEditingController queryNameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkApiKey();
+  }
 
   void _addQueryPart(String type) {
     setState(() {
@@ -221,6 +229,15 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
     }
   }
 
+  Future<void> _checkApiKey() async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = prefs.getString('openalex_api_key') ?? '';
+
+    setState(() {
+      _hasApiKey = key.isNotEmpty;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -229,6 +246,20 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (!_hasApiKey)
+              Center(
+                child: Text(
+                  AppLocalizations.of(context)!.openAlexNoApiKey,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            const SizedBox(
+              height: 8,
+            ),
             DropdownButtonFormField<String>(
               initialValue: searchScope,
               onChanged: (String? newValue) {

@@ -306,6 +306,14 @@
   "@noFavorites": {
     "description": "The message shown when the user has no articles in their favorites."
   },
+  "apiSettings":"API settings",
+  "@apiSettings":{},
+  "openAlexApiKey":"OpenAlex API Key",
+  "@openAlexApiKey":{},
+  "openAlexApiKeyDesc":"OpenAlex requires a free API key to access their API. While requests may still work without a key, using one is strongly recommended to avoid rate limits and ensure reliability.",
+  "@openAlexApiKeyDesc":{},
+  "openAlexNoApiKey":"No OpenAlex API key set. Please add one in settings to prevent disruptions.",
+  "@openAlexNoApiKey":{},
   "display": "Display",
   "@display": {},
   "displaySettings": "Display settings",
