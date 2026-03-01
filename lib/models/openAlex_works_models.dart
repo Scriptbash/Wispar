@@ -67,17 +67,22 @@ class OpenAlexWorks {
 }
 
 String? reconstructAbstract(Map<String, dynamic>? invertedIndex) {
-  if (invertedIndex == null) return null;
+  if (invertedIndex == null || invertedIndex.isEmpty) return null;
 
-  int maxIndex = invertedIndex.values
-      .expand((positions) => positions)
-      .reduce((a, b) => a > b ? a : b);
+  final allPositions =
+      invertedIndex.values.expand((positions) => positions as List);
+
+  if (allPositions.isEmpty) return null;
+
+  int maxIndex = allPositions.reduce((a, b) => a > b ? a : b);
 
   List<String> words = List<String>.filled(maxIndex + 1, '', growable: false);
 
   invertedIndex.forEach((word, positions) {
-    for (int pos in positions) {
-      words[pos] = word;
+    for (int pos in (positions as List)) {
+      if (pos <= maxIndex) {
+        words[pos] = word;
+      }
     }
   });
 
