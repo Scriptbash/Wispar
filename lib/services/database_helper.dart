@@ -64,7 +64,7 @@ class DatabaseHelper {
   Future<Database> initDatabase() async {
     String databasePath = await getDbPath();
 
-    return openDatabase(databasePath, version: 9, onOpen: (db) async {
+    return openDatabase(databasePath, version: 10, onOpen: (db) async {
       await db.execute('PRAGMA foreign_keys = ON');
     }, onCreate: (db, version) async {
       await db.execute('PRAGMA foreign_keys = ON');
@@ -268,6 +268,17 @@ class DatabaseHelper {
         await db.execute('''
         ALTER TABLE articles ADD COLUMN graphAbstractPath TEXT;
       ''');
+      }
+      if (oldVersion < 10) {
+        await db.execute('''
+          ALTER TABLE feed_filters ADD COLUMN date_mode TEXT;
+        ''');
+        await db.execute('''
+          ALTER TABLE feed_filters ADD COLUMN date_after TEXT;
+        ''');
+        await db.execute('''
+          ALTER TABLE feed_filters ADD COLUMN date_before TEXT;
+        ''');
       }
     });
   }
@@ -1273,6 +1284,9 @@ class DatabaseHelper {
     required String include,
     required String exclude,
     required Set<String> journals,
+    String? dateMode,
+    String? dateAfter,
+    String? dateBefore,
   }) async {
     final db = await database;
 
@@ -1281,6 +1295,9 @@ class DatabaseHelper {
       'includedKeywords': include,
       'excludedKeywords': exclude,
       'journals': journals.join(','),
+      'date_mode': dateMode,
+      'date_after': dateAfter,
+      'date_before': dateBefore,
     });
   }
 
@@ -1298,6 +1315,9 @@ class DatabaseHelper {
         include: row['includedKeywords'] ?? '',
         exclude: row['excludedKeywords'] ?? '',
         journals: (row['journals'] ?? '').split(',').toSet(),
+        dateMode: row['date_mode'],
+        dateAfter: row['date_after'],
+        dateBefore: row['date_before'],
         dateCreated: row['dateCreated'],
       );
     }).toList();
@@ -1309,6 +1329,9 @@ class DatabaseHelper {
     required String include,
     required String exclude,
     required Set<String> journals,
+    String? dateMode,
+    String? dateAfter,
+    String? dateBefore,
   }) async {
     final db = await database;
 
@@ -1319,6 +1342,9 @@ class DatabaseHelper {
         'includedKeywords': include,
         'excludedKeywords': exclude,
         'journals': journals.join(','),
+        'date_mode': dateMode,
+        'date_after': dateAfter,
+        'date_before': dateBefore,
       },
       where: 'id = ?',
       whereArgs: [id],

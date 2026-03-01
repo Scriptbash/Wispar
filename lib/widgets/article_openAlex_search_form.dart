@@ -1,25 +1,40 @@
 import 'package:flutter/material.dart';
-import '../generated_l10n/app_localizations.dart';
-import '../services/openAlex_api.dart';
-import '../screens/article_search_results_screen.dart';
-import '../models/crossref_journals_works_models.dart' as journalsWorks;
-import '../services/database_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/services/openAlex_api.dart';
+import 'package:wispar/screens/article_search_results_screen.dart';
+import 'package:wispar/models/crossref_journals_works_models.dart'
+    as journals_works;
+import 'package:wispar/services/database_helper.dart';
 
 class OpenAlexSearchForm extends StatefulWidget {
+  const OpenAlexSearchForm({super.key});
+
   @override
-  _OpenAlexSearchFormState createState() => _OpenAlexSearchFormState();
+  OpenAlexSearchFormState createState() => OpenAlexSearchFormState();
 }
 
-class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
+class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
+  bool _hasApiKey = true;
   List<Map<String, dynamic>> queryParts = [];
   String searchScope = 'Everything';
   String selectedSortField = '-';
   String selectedSortOrder = '-';
+  DateTime? _publishedAfter;
+  DateTime? _publishedBefore;
+
+  String _dateMode = 'none';
   // bool _filtersExpanded = false;
   bool saveQuery = false;
   List<TextEditingController> controllers = [];
 
   final TextEditingController queryNameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkApiKey();
+  }
 
   void _addQueryPart(String type) {
     setState(() {
@@ -80,6 +95,26 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
     });
   }
 
+  Future<void> _pickDate(BuildContext context, bool isAfter) async {
+    final initialDate = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      setState(() {
+        if (isAfter) {
+          _publishedAfter = picked;
+        } else {
+          _publishedBefore = picked;
+        }
+      });
+    }
+  }
+
   void _executeSearch() async {
     String query = queryParts.map((part) => part['value']).join(' ');
     final scopeMap = {
@@ -92,6 +127,20 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
 
     String? sortField = selectedSortField == '-' ? null : selectedSortField;
     String? sortOrder = selectedSortOrder == '-' ? null : selectedSortOrder;
+    String? dateFilter;
+
+    String formatDate(DateTime d) => d.toIso8601String().split('T')[0];
+
+    if (_dateMode == 'after' && _publishedAfter != null) {
+      dateFilter = "from_publication_date:${formatDate(_publishedAfter!)}";
+    } else if (_dateMode == 'before' && _publishedBefore != null) {
+      dateFilter = "to_publication_date:${formatDate(_publishedBefore!)}";
+    } else if (_dateMode == 'between' &&
+        _publishedAfter != null &&
+        _publishedBefore != null) {
+      dateFilter = "from_publication_date:${formatDate(_publishedAfter!)},"
+          "to_publication_date:${formatDate(_publishedBefore!)}";
+    }
 
     try {
       showDialog(
@@ -103,7 +152,7 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
       );
 
       final dbHelper = DatabaseHelper();
-      List<journalsWorks.Item> results = [];
+      List<journals_works.Item> results = [];
       if (saveQuery) {
         final queryName = queryNameController.text.trim();
         if (queryName != '') {
@@ -126,13 +175,27 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
             selectedSortOrder = ':$sortOrder';
           }
 
-          queryString = '$searchField$query$selectedSortBy$selectedSortOrder';
+          String datePart = '';
+
+          if (dateFilter != null && dateFilter.isNotEmpty) {
+            if (searchField.startsWith('filter=')) {
+              datePart = ',$dateFilter';
+            } else {
+              datePart = '&filter=$dateFilter';
+            }
+          }
+
+          queryString = '$searchField$query'
+              '$datePart'
+              '$selectedSortBy'
+              '$selectedSortOrder';
           await dbHelper.saveSearchQuery(queryName, queryString, 'OpenAlex');
           results = await OpenAlexApi.getOpenAlexWorksByQuery(
             query,
             scope,
             sortField,
             sortOrder,
+            dateFilter,
           );
         } else {
           Navigator.pop(context);
@@ -145,11 +208,7 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
         }
       } else {
         results = await OpenAlexApi.getOpenAlexWorksByQuery(
-          query,
-          scope,
-          sortField,
-          sortOrder,
-        );
+            query, scope, sortField, sortOrder, dateFilter);
       }
       Navigator.pop(context);
       Navigator.push(
@@ -170,6 +229,15 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
     }
   }
 
+  Future<void> _checkApiKey() async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = prefs.getString('openalex_api_key') ?? '';
+
+    setState(() {
+      _hasApiKey = key.isNotEmpty;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -178,6 +246,20 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (!_hasApiKey)
+              Center(
+                child: Text(
+                  AppLocalizations.of(context)!.openAlexNoApiKey,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            const SizedBox(
+              height: 8,
+            ),
             DropdownButtonFormField<String>(
               initialValue: searchScope,
               onChanged: (String? newValue) {
@@ -234,10 +316,6 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                           child:
                               Text(AppLocalizations.of(context)!.citedByCount)),
                       DropdownMenuItem(
-                          value: "works_count",
-                          child:
-                              Text(AppLocalizations.of(context)!.worksCount)),
-                      DropdownMenuItem(
                           value: "publication_date",
                           child: Text(
                               AppLocalizations.of(context)!.publicationDate)),
@@ -278,6 +356,74 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                 ),
               ],
             ),
+            SizedBox(height: 16),
+
+            DropdownButtonFormField<String>(
+              initialValue: _dateMode,
+              onChanged: (value) {
+                setState(() {
+                  _dateMode = value!;
+                  _publishedAfter = null;
+                  _publishedBefore = null;
+                });
+              },
+              items: [
+                DropdownMenuItem(
+                    value: 'none',
+                    child: Text(AppLocalizations.of(context)!.noFilter)),
+                DropdownMenuItem(
+                    value: 'after',
+                    child: Text(AppLocalizations.of(context)!.publishedAfter)),
+                DropdownMenuItem(
+                    value: 'before',
+                    child: Text(AppLocalizations.of(context)!.publishedBefore)),
+                DropdownMenuItem(
+                    value: 'between',
+                    child:
+                        Text(AppLocalizations.of(context)!.publishedBetween)),
+              ],
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: AppLocalizations.of(context)!.publicationDate),
+            ),
+
+            SizedBox(height: 10),
+
+            if (_dateMode == 'after' || _dateMode == 'between')
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: ListTile(
+                  title: Text(
+                    _publishedAfter == null
+                        ? AppLocalizations.of(context)!.selectStartDate
+                        : _publishedAfter!.toIso8601String().split('T')[0],
+                  ),
+                  trailing: Icon(Icons.calendar_today,
+                      color: Theme.of(context).primaryColor),
+                  onTap: () => _pickDate(context, true),
+                ),
+              ),
+
+            if (_dateMode == 'before' || _dateMode == 'between')
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: ListTile(
+                  title: Text(_publishedBefore == null
+                      ? AppLocalizations.of(context)!.selectEndDate
+                      : _publishedBefore!.toIso8601String().split('T')[0]),
+                  trailing: Icon(Icons.calendar_today,
+                      color: Theme.of(context).primaryColor),
+                  onTap: () => _pickDate(context, false),
+                ),
+              ),
             SizedBox(height: 10),
 
             // Dynamic query builder
@@ -437,8 +583,8 @@ class _OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _executeSearch,
-        child: Icon(Icons.search),
         shape: CircleBorder(),
+        child: Icon(Icons.search),
       ),
     );
   }

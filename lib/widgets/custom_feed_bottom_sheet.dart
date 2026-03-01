@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
-import '../services/database_helper.dart';
+import 'package:wispar/services/database_helper.dart';
 
 class CustomizeFeedBottomSheet extends StatefulWidget {
   final List<String> followedJournals;
@@ -10,12 +10,18 @@ class CustomizeFeedBottomSheet extends StatefulWidget {
     Set<String> journals,
     String include,
     String exclude,
+    String dateMode,
+    String? dateAfter,
+    String? dateBefore,
   ) onApply;
 
   final String? initialName;
   final String? initialInclude;
   final String? initialExclude;
   final Set<String>? initialSelectedJournals;
+  final String? initialDateMode;
+  final String? initialDateAfter;
+  final String? initialDateBefore;
   final int? feedId;
 
   const CustomizeFeedBottomSheet(
@@ -27,14 +33,17 @@ class CustomizeFeedBottomSheet extends StatefulWidget {
       this.initialInclude,
       this.initialExclude,
       this.initialSelectedJournals,
+      this.initialDateMode,
+      this.initialDateAfter,
+      this.initialDateBefore,
       this.feedId});
 
   @override
-  _CustomizeFeedBottomSheetState createState() =>
-      _CustomizeFeedBottomSheetState();
+  CustomizeFeedBottomSheetState createState() =>
+      CustomizeFeedBottomSheetState();
 }
 
-class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
+class CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
   late TextEditingController _nameController;
   late TextEditingController _includeController;
   late TextEditingController _excludeController;
@@ -48,9 +57,23 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
   Set<String> _selectedJournals = {};
   bool _showMoreJournals = false;
 
+  DateTime? _publishedDateAfter;
+  DateTime? _publishedDateBefore;
+  String _dateMode = 'none';
+
   @override
   void initState() {
     super.initState();
+
+    _dateMode = widget.initialDateMode ?? 'none';
+
+    if (widget.initialDateAfter != null) {
+      _publishedDateAfter = DateTime.parse(widget.initialDateAfter!);
+    }
+
+    if (widget.initialDateBefore != null) {
+      _publishedDateBefore = DateTime.parse(widget.initialDateBefore!);
+    }
 
     _nameController = TextEditingController(text: widget.initialName ?? '');
     _includeController =
@@ -114,6 +137,25 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
         _selectedJournals.addAll(widget.moreJournals);
       }
     });
+  }
+
+  Future<void> _pickDate(BuildContext context, bool isAfter) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      setState(() {
+        if (isAfter) {
+          _publishedDateAfter = picked;
+        } else {
+          _publishedDateBefore = picked;
+        }
+      });
+    }
   }
 
   @override
@@ -282,6 +324,82 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                                 AppLocalizations.of(context)!.typePressSpace),
                       ),
                       const SizedBox(height: 24),
+                      DropdownButtonFormField<String>(
+                        initialValue: _dateMode,
+                        items: [
+                          DropdownMenuItem(
+                              value: 'none',
+                              child:
+                                  Text(AppLocalizations.of(context)!.noFilter)),
+                          DropdownMenuItem(
+                              value: 'after',
+                              child: Text(AppLocalizations.of(context)!
+                                  .publishedAfter)),
+                          DropdownMenuItem(
+                              value: 'before',
+                              child: Text(AppLocalizations.of(context)!
+                                  .publishedBefore)),
+                          DropdownMenuItem(
+                              value: 'between',
+                              child: Text(AppLocalizations.of(context)!
+                                  .publishedBetween)),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _dateMode = value!;
+                            if (_dateMode == 'none') {
+                              _publishedDateAfter = null;
+                              _publishedDateBefore = null;
+                            }
+                          });
+                        },
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText:
+                                AppLocalizations.of(context)!.publicationDate),
+                      ),
+                      const SizedBox(height: 8),
+                      if (_dateMode == 'after' || _dateMode == 'between')
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                color: Theme.of(context).dividerColor),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: ListTile(
+                            title: Text(_publishedDateAfter == null
+                                ? AppLocalizations.of(context)!.selectStartDate
+                                : _publishedDateAfter!
+                                    .toIso8601String()
+                                    .split('T')[0]),
+                            trailing: Icon(
+                              Icons.calendar_today,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                            onTap: () => _pickDate(context, true),
+                          ),
+                        ),
+
+                      if (_dateMode == 'before' || _dateMode == 'between')
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                color: Theme.of(context).dividerColor),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: ListTile(
+                            title: Text(_publishedDateBefore == null
+                                ? AppLocalizations.of(context)!.selectEndDate
+                                : _publishedDateBefore!
+                                    .toIso8601String()
+                                    .split('T')[0]),
+                            trailing: Icon(Icons.calendar_today,
+                                color: Theme.of(context).primaryColor),
+                            onTap: () => _pickDate(context, false),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -330,6 +448,9 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                             include: include,
                             exclude: exclude,
                             journals: _selectedJournals,
+                            dateMode: _dateMode,
+                            dateAfter: _publishedDateAfter?.toIso8601String(),
+                            dateBefore: _publishedDateBefore?.toIso8601String(),
                           );
                         } else {
                           await db.insertFeedFilter(
@@ -337,11 +458,21 @@ class _CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                             include: include,
                             exclude: exclude,
                             journals: _selectedJournals,
+                            dateMode: _dateMode,
+                            dateAfter: _publishedDateAfter?.toIso8601String(),
+                            dateBefore: _publishedDateBefore?.toIso8601String(),
                           );
                         }
 
                         widget.onApply(
-                            feedName, _selectedJournals, include, exclude);
+                          feedName,
+                          _selectedJournals,
+                          include,
+                          exclude,
+                          _dateMode,
+                          _publishedDateAfter?.toIso8601String(),
+                          _publishedDateBefore?.toIso8601String(),
+                        );
                         Navigator.pop(context);
                       },
                       label: Text(AppLocalizations.of(context)!.save),

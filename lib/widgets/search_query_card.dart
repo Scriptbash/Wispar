@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../generated_l10n/app_localizations.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
-import '../services/crossref_api.dart';
-import '../services/openAlex_api.dart';
-import '../services/string_format_helper.dart';
-import '../screens/article_search_results_screen.dart';
-import '../services/database_helper.dart';
+import 'package:wispar/services/crossref_api.dart';
+import 'package:wispar/services/openAlex_api.dart';
+import 'package:wispar/services/string_format_helper.dart';
+import 'package:wispar/screens/article_search_results_screen.dart';
+import 'package:wispar/services/database_helper.dart';
 
 class SearchQueryCard extends StatefulWidget {
   final int queryId;
@@ -17,7 +17,7 @@ class SearchQueryCard extends StatefulWidget {
   final VoidCallback? onDelete;
 
   const SearchQueryCard({
-    Key? key,
+    super.key,
     required this.queryId,
     required this.queryName,
     required this.queryParams,
@@ -25,13 +25,13 @@ class SearchQueryCard extends StatefulWidget {
     this.showDeleteButton = false,
     required this.dateSaved,
     this.onDelete,
-  }) : super(key: key);
+  });
 
   @override
-  _SearchQueryCardState createState() => _SearchQueryCardState();
+  SearchQueryCardState createState() => SearchQueryCardState();
 }
 
-class _SearchQueryCardState extends State<SearchQueryCard> {
+class SearchQueryCardState extends State<SearchQueryCard> {
   bool _includeInFeed = false;
   late DatabaseHelper databaseHelper;
 
@@ -67,6 +67,11 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
         var response;
         Map<String, String> queryMap = {};
         String? query;
+        int scope = 1;
+        String? sortField;
+        String? sortOrder;
+        String? dateFilter;
+        String? filterValue;
 
         if (widget.queryProvider == 'Crossref') {
           // Convert the params string to the needed mapstring
@@ -76,40 +81,48 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
         } else if (widget.queryProvider == 'OpenAlex') {
           queryMap = Uri.splitQueryString(widget.queryParams);
 
-          String? sortField = queryMap['sort'];
-          String? sortOrder = queryMap['sortOrder'];
-          int scope = 1;
-          String? query;
+          String? sortParam = queryMap['sort'];
+          String? filterValue = queryMap['filter'];
+          String? searchValue = queryMap['search'];
 
-          if (queryMap.containsKey('search') &&
-              !queryMap.containsKey('filter')) {
-            query = queryMap['search'];
-            scope = 1;
-          } else if (queryMap.containsKey('filter')) {
-            String filterValue = queryMap['filter'] ?? '';
+          sortField = null;
+          sortOrder = null;
 
-            if (filterValue.contains('title.search')) {
-              query = filterValue.replaceFirst('title.search:', '').trim();
-              scope = 3;
-            } else if (filterValue.contains('title_and_abstract')) {
-              query = filterValue.replaceFirst('title_and_abstract', '').trim();
-              scope = 2;
-            } else if (filterValue.contains('title')) {
-              query = filterValue.replaceFirst('title', '').trim();
-              scope = 3;
-            } else if (filterValue.contains('abstract')) {
-              query = filterValue.replaceFirst('abstract', '').trim();
-              scope = 4;
-            } else {
-              query = filterValue;
-              scope = 1;
+          if (sortParam != null && sortParam.contains(':')) {
+            final parts = sortParam.split(':');
+            sortField = parts[0];
+            sortOrder = parts.length > 1 ? parts[1] : null;
+          }
+
+          query = searchValue ?? '';
+          scope = 1;
+
+          if (filterValue != null) {
+            List<String> filters = filterValue.split(',');
+            List<String> remainingFilters = [];
+
+            for (var f in filters) {
+              if (f.startsWith('title.search:')) {
+                query = f.replaceFirst('title.search:', '');
+                scope = 3;
+              } else if (f.startsWith('title_and_abstract.search:')) {
+                query = f.replaceFirst('title_and_abstract.search:', '');
+                scope = 2;
+              } else if (f.startsWith('abstract.search:')) {
+                query = f.replaceFirst('abstract.search:', '');
+                scope = 4;
+              } else if (f.startsWith('from_publication_date:') ||
+                  f.startsWith('to_publication_date:')) {
+                remainingFilters.add(f);
+              }
+            }
+            if (remainingFilters.isNotEmpty) {
+              dateFilter = remainingFilters.join(',');
             }
           }
 
-          query ??= '';
-
           response = await OpenAlexApi.getOpenAlexWorksByQuery(
-              query, scope, sortField, sortOrder);
+              query ?? '', scope, sortField, sortOrder, dateFilter);
         }
 
         Navigator.pop(context);
@@ -129,7 +142,14 @@ class _SearchQueryCardState extends State<SearchQueryCard> {
                 return ArticleSearchResultsScreen(
                   initialSearchResults: response,
                   initialHasMore: response.isNotEmpty,
-                  queryParams: {'query': query},
+                  queryParams: {
+                    'query': query,
+                    'scope': scope,
+                    'sortField': sortField,
+                    'sortOrder': sortOrder,
+                    'dateFilter': dateFilter,
+                    'filter': filterValue,
+                  },
                   source: widget.queryProvider,
                 );
               }

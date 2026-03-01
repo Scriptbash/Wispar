@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:wispar/screens/zotero_settings_screen.dart';
+import 'package:wispar/screens/api_settings_screen.dart';
 import 'package:wispar/screens/ai_settings_screen.dart';
 import 'package:wispar/screens/database_settings_screen.dart';
 import 'package:wispar/screens/display_settings_screen.dart';
@@ -96,6 +97,16 @@ class SettingsScreenState extends State<SettingsScreen> {
             context,
             MaterialPageRoute(
                 builder: (context) => const PublicationCardSettingsScreen())),
+      ),
+      _buildTile(
+        icon: Icons.api_outlined,
+        label: AppLocalizations.of(context)!.apiSettings,
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ApiSettingsScreen(),
+          ),
+        ),
       ),
       _buildTile(
         icon: Icons.lock_open_outlined,

@@ -35,7 +35,7 @@ class ArticleSearchResultsScreenState
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
   bool _hasMoreResults = true;
-  int _currentOpenAlexPage = 1;
+  int _currentOpenAlexPage = 2;
 
   SwipeAction _swipeLeftAction = SwipeAction.hide;
   SwipeAction _swipeRightAction = SwipeAction.favorite;
@@ -135,14 +135,16 @@ class ArticleSearchResultsScreenState
           widget.queryParams['scope'] ?? 1,
           widget.queryParams['sortField'],
           widget.queryParams['sortOrder'],
+          widget.queryParams['dateFilter'],
           page: _currentOpenAlexPage,
         );
 
         if (newResults.isNotEmpty) {
           _currentOpenAlexPage++;
+
+          hasMore = newResults.length >= 25;
         } else {
           hasMore = false;
-          _isLoadingMore = false;
         }
       }
 

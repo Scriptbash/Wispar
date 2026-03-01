@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../generated_l10n/app_localizations.dart';
-import '../services/crossref_api.dart';
-import '../screens/article_search_results_screen.dart';
-import '../services/database_helper.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/services/crossref_api.dart';
+import 'package:wispar/screens/article_search_results_screen.dart';
+import 'package:wispar/services/database_helper.dart';
 
 class QuerySearchForm extends StatefulWidget {
   // The key allows to access the state of the form from outside
-  const QuerySearchForm({Key? key}) : super(key: key);
+  const QuerySearchForm({super.key});
 
   @override
   QuerySearchFormState createState() => QuerySearchFormState();
@@ -14,6 +14,9 @@ class QuerySearchForm extends StatefulWidget {
 
 class QuerySearchFormState extends State<QuerySearchForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  DateTime? _createdAfter;
+  DateTime? _createdBefore;
+  String _dateMode = 'none';
   bool isAdvancedSearchVisible = false;
   bool saveQuery = false;
   int selectedSortBy = 0;
@@ -192,6 +195,25 @@ class QuerySearchFormState extends State<QuerySearchForm> {
     super.dispose();
   }
 
+  Future<void> _pickDate(BuildContext context, bool isAfter) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      setState(() {
+        if (isAfter) {
+          _createdAfter = picked;
+        } else {
+          _createdBefore = picked;
+        }
+      });
+    }
+  }
+
   void submitForm() async {
     // Gather all input values, ignoring empty fields
     final Map<String, dynamic> queryParams = {};
@@ -213,8 +235,9 @@ class QuerySearchFormState extends State<QuerySearchForm> {
     if (affiliation.isNotEmpty) queryParams['query.affiliation'] = affiliation;
 
     final bibliographic = bibliographicController.text.trim();
-    if (bibliographic.isNotEmpty)
+    if (bibliographic.isNotEmpty) {
       queryParams['query.bibliographic'] = bibliographic;
+    }
 
     final degree = degreeController.text.trim();
     if (degree.isNotEmpty) queryParams['query.degree'] = degree;
@@ -230,19 +253,22 @@ class QuerySearchFormState extends State<QuerySearchForm> {
     }
 
     final eventAcronym = eventAcronymController.text.trim();
-    if (eventAcronym.isNotEmpty)
+    if (eventAcronym.isNotEmpty) {
       queryParams['query.event-acronym'] = eventAcronym;
+    }
 
     final eventLocation = eventLocationController.text.trim();
-    if (eventLocation.isNotEmpty)
+    if (eventLocation.isNotEmpty) {
       queryParams['query.event-location'] = eventLocation;
+    }
 
     final eventName = eventNameController.text.trim();
     if (eventName.isNotEmpty) queryParams['query.event-name'] = eventName;
 
     final eventSponsor = eventSponsorController.text.trim();
-    if (eventSponsor.isNotEmpty)
+    if (eventSponsor.isNotEmpty) {
       queryParams['query.event-sponsor'] = eventSponsor;
+    }
 
     final eventTheme = eventThemeController.text.trim();
     if (eventTheme.isNotEmpty) queryParams['query.event-theme'] = eventTheme;
@@ -251,16 +277,19 @@ class QuerySearchFormState extends State<QuerySearchForm> {
     if (funderName.isNotEmpty) queryParams['query.funder-name'] = funderName;
 
     final publisherLocation = publisherLocationController.text.trim();
-    if (publisherLocation.isNotEmpty)
+    if (publisherLocation.isNotEmpty) {
       queryParams['query.publisher-location'] = publisherLocation;
+    }
 
     final standardsBodyAcronym = standardsBodyAcronymController.text.trim();
-    if (standardsBodyAcronym.isNotEmpty)
+    if (standardsBodyAcronym.isNotEmpty) {
       queryParams['query.standards-body-acronym'] = standardsBodyAcronym;
+    }
 
     final standardsBodyName = standardsBodyNameController.text.trim();
-    if (standardsBodyName.isNotEmpty)
+    if (standardsBodyName.isNotEmpty) {
       queryParams['query.standards-body-name'] = standardsBodyName;
+    }
 
     // Handle sorting options
     if (selectedSortBy != 0) {
@@ -287,6 +316,27 @@ class QuerySearchFormState extends State<QuerySearchForm> {
       // Map the sortorderItems to the API request format
       final orderOptions = ['-', 'asc', 'desc'];
       queryParams['order'] = orderOptions[selectedSortOrder];
+    }
+
+    String? dateFilter;
+
+    String formatDate(DateTime d) => d.toIso8601String().split('T')[0];
+
+    if (_dateMode == 'after' && _createdAfter != null) {
+      dateFilter = 'from-created-date:${formatDate(_createdAfter!)}';
+    } else if (_dateMode == 'before' && _createdBefore != null) {
+      dateFilter = 'until-created-date:${formatDate(_createdBefore!)}';
+    } else if (_dateMode == 'between' &&
+        _createdAfter != null &&
+        _createdBefore != null) {
+      dateFilter = 'from-created-date:${formatDate(_createdAfter!)},'
+          'until-created-date:${formatDate(_createdBefore!)}';
+    }
+
+    if (dateFilter != null) {
+      queryParams['filter'] = queryParams.containsKey('filter')
+          ? '${queryParams['filter']},$dateFilter'
+          : dateFilter;
     }
 
     // Show loading indicator
@@ -415,6 +465,75 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                 border: OutlineInputBorder(),
               ),
             ),
+            SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              initialValue: _dateMode,
+              onChanged: (value) {
+                setState(() {
+                  _dateMode = value!;
+                  _createdAfter = null;
+                  _createdBefore = null;
+                });
+              },
+              items: [
+                DropdownMenuItem(
+                  value: 'none',
+                  child: Text(AppLocalizations.of(context)!.noFilter),
+                ),
+                DropdownMenuItem(
+                  value: 'after',
+                  child: Text(AppLocalizations.of(context)!.publishedAfter),
+                ),
+                DropdownMenuItem(
+                  value: 'before',
+                  child: Text(AppLocalizations.of(context)!.publishedBefore),
+                ),
+                DropdownMenuItem(
+                  value: 'between',
+                  child: Text(AppLocalizations.of(context)!.publishedBetween),
+                ),
+              ],
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.publicationDate,
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+            SizedBox(height: 8),
+
+            if (_dateMode == 'after' || _dateMode == 'between')
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: ListTile(
+                  title: Text(_createdAfter == null
+                      ? AppLocalizations.of(context)!.selectStartDate
+                      : _createdAfter!.toIso8601String().split('T')[0]),
+                  trailing: Icon(Icons.calendar_today,
+                      color: Theme.of(context).primaryColor),
+                  onTap: () => _pickDate(context, true),
+                ),
+              ),
+
+            if (_dateMode == 'before' || _dateMode == 'between')
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: ListTile(
+                  title: Text(_createdBefore == null
+                      ? AppLocalizations.of(context)!.selectEndDate
+                      : _createdBefore!.toIso8601String().split('T')[0]),
+                  trailing: Icon(Icons.calendar_today,
+                      color: Theme.of(context).primaryColor),
+                  onTap: () => _pickDate(context, false),
+                ),
+              ),
             SizedBox(height: 16),
             // Sort by and sort order fields
             Row(
