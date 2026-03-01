@@ -407,5 +407,15 @@
     "zoteroNewCollection": "Nouvelle collection",
     "zoteroCollectionName": "Nom de la collection",
     "create": "Créer",
-    "send": "Envoyer"
+    "send": "Envoyer",
+    "publishedAfter": "Publié après",
+    "publishedBefore": "Publié avant",
+    "publishedBetween": "Publié entre",
+    "noFilter": "Aucun filtre",
+    "selectStartDate": "Sélectionner une date de début",
+    "selectEndDate": "Sélectionner une date de fin",
+    "apiSettings": "Paramètres d'API",
+    "openAlexApiKey": "Clé API d'OpenAlex",
+    "openAlexApiKeyDesc": "OpenAlex nécessite une clé d'API gratuite afin d'utiliser leur API. Même si les requêtes peuvent fonctionner sans, l'utilisation d'une clé est fortement recommandée pour éviter les limitations de débit et assurer une meilleure fiabilité.",
+    "openAlexNoApiKey": "Aucune clé d'API pour OpenAlex n'est réglée. Veuillez en ajouter une dans les paramètres pour éviter des interruptions."
 }
