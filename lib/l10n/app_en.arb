@@ -718,65 +718,42 @@
   "modelNameLabel": "Enter {provider} model name",
   "@modelNameLabel":{},
     "pleaseEnterModelName": "Please enter the {provider} model name.",
-    "@pleaseEnterModelName": {},
-  "aiTemperature": "Temperature",
-  "@aiTemperature":{},
-  "aiCustomPrompts": "Custom translation prompts",
-  "@aiCustomPrompts":{},
-   "aiCustomPromptsDescription": "Use $src and $dst for the source and target languages and $text for the text to translate. For example: Translate the following text from $src to $dst: $text",
-  "@aiCustomPromptsDescription":{},
-  "prompt":"Prompt",
-  "@prompt":{},
-  "missingPlaceholders": "Missing placeholder(s): {placeholders}",
-  "@missingPlaceholders": {},
-  "pdfNotReadyForChat": "PDF not ready for chat. Please wait or try again.",
-  "@pdfNotReadyForChat":{},
-  "chatWithPdf": "Chat with PDF",
-  "@chatWithPdf":{},
-  "typeYourMessage": "Type your message...",
-  "@typeYourMessage":{},
-  "askAboutPdf": "Hello! I'm ready to chat about this PDF. What would you like to know or summarize? Keep in mind that chatting with a PDF consumes a lot of tokens!",
-  "@askAboutPdf":{},
-  "pdfNotFound": "PDF file could not be found.",
-  "@pdfNotFound":{},
-  "apiTokenMissing": "API key for {aiModel} is missing in settings. Please configure it.",
-  "@apiTokenMissing": {
-    "placeholders": {
-      "aiModel": {
-        "type": "String"
-      }
-    }
-  },
-  "noResponseFromAI": "No response received from AI.",
-  "@noResponseFromAI":{},
-  "errorConnectingToAI": "Error connecting to AI ({statusCode}). Please check your internet or API settings.",
-  "@errorConnectingToAI": {
-    "placeholders": {
-      "statusCode": {
-        "type": "int"
-      }
-    }
-  },
-  "networkError": "Network error or problem communicating with AI service.",
-  "@networkError":{},
-  "pdfDownloadOptionsTitle": "PDF download options",
-  "@pdfDownloadOptionsTitle": {},
-  "openInExternalPdfViewer": "Open in external PDF viewer",
-  "@openInExternalPdfViewer": {},
-  "openInExternalPdfViewerSubtitle": "Open the PDF in your device's default browser or PDF app.",
-  "@openInExternalPdfViewerSubtitle": {},
-  "downloadingFile": "Downloading file…",
-  "@downloadingFile": {},
-  "downloadFailedInAppViewer": "Failed to open in-app. You may try the website's PDF download button or choose the external PDF viewer option.",
-  "@downloadFailedInAppViewer": {},
-  "errorOpeningFile": "Could not open file.",
-  "@errorOpeningFile": {},
-  "downloadStarting": "Download starting.",
-  "@downloadStarting": {},
-  "downloadFoundPdf": "Download found pdf",
-  "@downloadFoundPdf": {},
-  "downloadToApp": "Download in app",
-  "@downloadToApp": {},
-  "downloadToAppSubtitle": "Attempt to download and view PDF directly in Wispar for better integration.",
-  "@downloadToAppSubtitle": {}
+    "aiTemperature": "Temperature",
+    "aiCustomPrompts": "Custom translation prompts",
+    "aiCustomPromptsDescription": "Use $src and $dst for the source and target languages and $text for the text to translate. For example: Translate the following text from $src to $dst: $text",
+    "prompt": "Prompt",
+    "missingPlaceholders": "Missing placeholder(s): {placeholders}",
+    "pdfNotReadyForChat": "PDF not ready for chat. Please wait or try again.",
+    "chatWithPdf": "Chat with PDF",
+    "typeYourMessage": "Type your message…",
+    "askAboutPdf": "Hello! I'm ready to chat about this PDF. What would you like to know or summarize? Keep in mind that chatting with a PDF consumes a lot of tokens!",
+    "pdfNotFound": "PDF file could not be found.",
+    "apiTokenMissing": "API key for {aiModel} is missing in settings. Please configure it.",
+    "@apiTokenMissing": {
+        "placeholders": {
+            "aiModel": {
+                "type": "String"
+            }
+        }
+    },
+    "noResponseFromAI": "No response received from AI.",
+    "errorConnectingToAI": "Error connecting to AI ({statusCode}). Please check your internet or API settings.",
+    "@errorConnectingToAI": {
+        "placeholders": {
+            "statusCode": {
+                "type": "int"
+            }
+        }
+    },
+    "networkError": "Network error or problem communicating with AI service.",
+    "pdfDownloadOptionsTitle": "PDF download options",
+    "openInExternalPdfViewer": "Open in external PDF viewer",
+    "openInExternalPdfViewerSubtitle": "Open the PDF in your device's default browser or PDF app.",
+    "downloadingFile": "Downloading file…",
+    "downloadFailedInAppViewer": "Failed to open in-app. You may try the website's PDF download button or choose the external PDF viewer option.",
+    "errorOpeningFile": "Could not open file.",
+    "downloadStarting": "Download starting.",
+    "downloadFoundPdf": "Download found PDF",
+    "downloadToApp": "Download in app",
+    "downloadToAppSubtitle": "Attempt to download and view PDF directly in Wispar for better integration."
 }
