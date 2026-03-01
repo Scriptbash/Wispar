@@ -126,7 +126,14 @@ class HomeScreenState extends State<HomeScreen> {
           _currentFeedName = match.name;
         });
         _applyAdvancedFilters(
-            match.name, match.journals, match.include, match.exclude);
+          match.name,
+          match.journals,
+          match.include,
+          match.exclude,
+          match.dateMode,
+          match.dateAfter,
+          match.dateBefore,
+        );
       }
     } else {
       setState(() {
@@ -436,9 +443,17 @@ class HomeScreenState extends State<HomeScreen> {
             return CustomizeFeedBottomSheet(
               followedJournals: followedJournals,
               moreJournals: unfollowedJournals,
-              onApply: (String feedName, Set<String> journals, String include,
-                  String exclude) {
-                _applyAdvancedFilters(feedName, journals, include, exclude);
+              onApply: (
+                String feedName,
+                Set<String> journals,
+                String include,
+                String exclude,
+                String? dateMode,
+                String? dateAfter,
+                String? dateBefore,
+              ) {
+                _applyAdvancedFilters(feedName, journals, include, exclude,
+                    dateMode, dateAfter, dateBefore);
               },
             );
           },
@@ -641,7 +656,14 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   void _applyAdvancedFilters(
-      String feedName, Set<String> journals, String include, String exclude) {
+    String feedName,
+    Set<String> journals,
+    String include,
+    String exclude,
+    String? dateMode,
+    String? dateAfter,
+    String? dateBefore,
+  ) {
     if (journals.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -680,6 +702,31 @@ class HomeScreenState extends State<HomeScreen> {
             ? true
             : excludeWords.every((word) => !content.contains(word));
 
+        if (dateMode != null && dateMode != 'none') {
+          final pubDate = pub.publishedDate;
+          if (pubDate == null) return false;
+
+          if (dateMode == 'after' && dateAfter != null) {
+            final afterDate = DateTime.parse(dateAfter);
+            if (!pubDate.isAfter(afterDate)) return false;
+          }
+
+          if (dateMode == 'before' && dateBefore != null) {
+            final beforeDate = DateTime.parse(dateBefore);
+            if (!pubDate.isBefore(beforeDate)) return false;
+          }
+
+          if (dateMode == 'between' &&
+              dateAfter != null &&
+              dateBefore != null) {
+            final afterDate = DateTime.parse(dateAfter);
+            final beforeDate = DateTime.parse(dateBefore);
+            if (pubDate.isBefore(afterDate) || pubDate.isAfter(beforeDate)) {
+              return false;
+            }
+          }
+        }
+
         return matchesInclude && matchesExclude;
       }).toList();
 
@@ -708,7 +755,14 @@ class HomeScreenState extends State<HomeScreen> {
 
     if (match.name != 'Home') {
       _applyAdvancedFilters(
-          match.name, match.journals, match.include, match.exclude);
+        match.name,
+        match.journals,
+        match.include,
+        match.exclude,
+        match.dateMode,
+        match.dateAfter,
+        match.dateBefore,
+      );
     }
   }
 
@@ -826,13 +880,28 @@ class HomeScreenState extends State<HomeScreen> {
                                             initialExclude: filter.exclude,
                                             initialSelectedJournals:
                                                 filter.journals,
+                                            initialDateMode: filter.dateMode,
+                                            initialDateAfter: filter.dateAfter,
+                                            initialDateBefore:
+                                                filter.dateBefore,
                                             feedId: filter.id,
-                                            onApply: (String feedName,
-                                                Set<String> journals,
-                                                String include,
-                                                String exclude) {
-                                              _applyAdvancedFilters(feedName,
-                                                  journals, include, exclude);
+                                            onApply: (
+                                              String feedName,
+                                              Set<String> journals,
+                                              String include,
+                                              String exclude,
+                                              String? dateMode,
+                                              String? dateAfter,
+                                              String? dateBefore,
+                                            ) {
+                                              _applyAdvancedFilters(
+                                                  feedName,
+                                                  journals,
+                                                  include,
+                                                  exclude,
+                                                  dateMode,
+                                                  dateAfter,
+                                                  dateBefore);
                                             },
                                           );
                                         },
@@ -893,7 +962,10 @@ class HomeScreenState extends State<HomeScreen> {
                                         filter.name,
                                         filter.journals,
                                         filter.include,
-                                        filter.exclude);
+                                        filter.exclude,
+                                        filter.dateMode,
+                                        filter.dateAfter,
+                                        filter.dateBefore);
                                   }
                                 }
                               : null,
