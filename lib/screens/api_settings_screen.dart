@@ -123,11 +123,6 @@ class ApiSettingsScreenState extends State<ApiSettingsScreen> {
                 onChanged: (value) {},
               ),
               const SizedBox(height: 16),
-              Text(
-                AppLocalizations.of(context)!.cachedArticleRetentionDaysDesc,
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-              ),
-              const SizedBox(height: 8),
               DropdownButtonFormField<int>(
                 isExpanded: true,
                 initialValue: _fetchInterval,

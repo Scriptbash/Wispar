@@ -538,6 +538,12 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Text(
+                      AppLocalizations.of(context)!
+                          .cachedArticleRetentionDaysDesc,
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 8),
                     TextFormField(
                       controller: _cleanupThresholdController,
                       keyboardType: TextInputType.number,
