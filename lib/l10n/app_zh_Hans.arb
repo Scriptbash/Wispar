@@ -368,7 +368,7 @@
     "downloadFailedInAppViewer": "应用内打开失败，可以试试网站的 PDF 下载按钮或选择外部 PDF 查看器选项。",
     "errorOpeningFile": "无法打开文件。",
     "downloadStarting": "开始下载。",
-    "downloadFoundPdf": "下载发现的 pdf",
+    "downloadFoundPdf": "下载找到的 PDF",
     "downloadToApp": "在应用内下载",
     "downloadToAppSubtitle": "尝试直接在 Wispar 应用中下载并查看 PDF 以获得更好的集成体验。",
     "noAiApiKeySetError": "未设置 AI API 密钥。请前往设置进行配置。",
@@ -412,7 +412,7 @@
     "missingPlaceholders": "缺少占位符：{placeholders}",
     "pdfNotReadyForChat": "PDF 尚未准备好聊天。请稍等或重试。",
     "chatWithPdf": "与 PDF 对话",
-    "typeYourMessage": "输入您的消息...",
+    "typeYourMessage": "输入你的消息…",
     "askAboutPdf": "您好！我已准备好与您讨论这个 PDF。您想了解或总结什么内容？请注意，与 PDF 对话会消耗大量 token！",
     "pdfNotFound": "找不到 PDF 文件。",
     "apiTokenMissing": "设置中缺少 {aiModel} 的 API 密钥。请进行配置。",
@@ -468,5 +468,14 @@
     "databaseMoveFailed": "无法移动数据库文件：{error}",
     "databaseConflictTitle": "找到了现有的 Wispar 数据。",
     "useExistingFiles": "使用现有文件",
-    "overwriteFiles": "用现有数据库覆盖"
+    "overwriteFiles": "用现有数据库覆盖",
+    "select": "选择",
+    "zoteroSpecificCollection": "始终发送到特定的集合",
+    "zoteroSelectCollection": "选择集合",
+    "noZoteroCollectionSelected": "未选中集合",
+    "zoteroSpecificCollection2": "始终发送到这个集合",
+    "zoteroNewCollection": "新建集合",
+    "zoteroCollectionName": "集合名",
+    "create": "创建",
+    "send": "发送"
 }
