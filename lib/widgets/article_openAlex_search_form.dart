@@ -285,10 +285,6 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                           child:
                               Text(AppLocalizations.of(context)!.citedByCount)),
                       DropdownMenuItem(
-                          value: "works_count",
-                          child:
-                              Text(AppLocalizations.of(context)!.worksCount)),
-                      DropdownMenuItem(
                           value: "publication_date",
                           child: Text(
                               AppLocalizations.of(context)!.publicationDate)),
