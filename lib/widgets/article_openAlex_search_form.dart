@@ -390,21 +390,39 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
             SizedBox(height: 10),
 
             if (_dateMode == 'after' || _dateMode == 'between')
-              ListTile(
-                title: Text(_publishedAfter == null
-                    ? AppLocalizations.of(context)!.selectStartDate
-                    : _publishedAfter!.toIso8601String().split('T')[0]),
-                trailing: Icon(Icons.calendar_today),
-                onTap: () => _pickDate(context, true),
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: ListTile(
+                  title: Text(
+                    _publishedAfter == null
+                        ? AppLocalizations.of(context)!.selectStartDate
+                        : _publishedAfter!.toIso8601String().split('T')[0],
+                  ),
+                  trailing: Icon(Icons.calendar_today,
+                      color: Theme.of(context).primaryColor),
+                  onTap: () => _pickDate(context, true),
+                ),
               ),
 
             if (_dateMode == 'before' || _dateMode == 'between')
-              ListTile(
-                title: Text(_publishedBefore == null
-                    ? AppLocalizations.of(context)!.selectEndDate
-                    : _publishedBefore!.toIso8601String().split('T')[0]),
-                trailing: Icon(Icons.calendar_today),
-                onTap: () => _pickDate(context, false),
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: ListTile(
+                  title: Text(_publishedBefore == null
+                      ? AppLocalizations.of(context)!.selectEndDate
+                      : _publishedBefore!.toIso8601String().split('T')[0]),
+                  trailing: Icon(Icons.calendar_today,
+                      color: Theme.of(context).primaryColor),
+                  onTap: () => _pickDate(context, false),
+                ),
               ),
             SizedBox(height: 10),
 

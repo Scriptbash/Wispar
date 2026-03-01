@@ -502,21 +502,37 @@ class QuerySearchFormState extends State<QuerySearchForm> {
             SizedBox(height: 8),
 
             if (_dateMode == 'after' || _dateMode == 'between')
-              ListTile(
-                title: Text(_createdAfter == null
-                    ? AppLocalizations.of(context)!.selectStartDate
-                    : _createdAfter!.toIso8601String().split('T')[0]),
-                trailing: Icon(Icons.calendar_today),
-                onTap: () => _pickDate(context, true),
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: ListTile(
+                  title: Text(_createdAfter == null
+                      ? AppLocalizations.of(context)!.selectStartDate
+                      : _createdAfter!.toIso8601String().split('T')[0]),
+                  trailing: Icon(Icons.calendar_today,
+                      color: Theme.of(context).primaryColor),
+                  onTap: () => _pickDate(context, true),
+                ),
               ),
 
             if (_dateMode == 'before' || _dateMode == 'between')
-              ListTile(
-                title: Text(_createdBefore == null
-                    ? AppLocalizations.of(context)!.selectEndDate
-                    : _createdBefore!.toIso8601String().split('T')[0]),
-                trailing: Icon(Icons.calendar_today),
-                onTap: () => _pickDate(context, false),
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: ListTile(
+                  title: Text(_createdBefore == null
+                      ? AppLocalizations.of(context)!.selectEndDate
+                      : _createdBefore!.toIso8601String().split('T')[0]),
+                  trailing: Icon(Icons.calendar_today,
+                      color: Theme.of(context).primaryColor),
+                  onTap: () => _pickDate(context, false),
+                ),
               ),
             SizedBox(height: 16),
             // Sort by and sort order fields
