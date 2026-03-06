@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:wispar/widgets/publication_card/publication_card.dart';
 import 'package:wispar/screens/publication_card_settings_screen.dart';
@@ -10,32 +11,28 @@ import 'package:wispar/services/logs_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ArticleSearchResultsScreen extends StatefulWidget {
-  final List<journals_works.Item> initialSearchResults;
-  final bool initialHasMore;
   final Map<String, dynamic> queryParams;
   final String source;
 
   const ArticleSearchResultsScreen({
     super.key,
-    required this.initialSearchResults,
-    required this.initialHasMore,
     required this.queryParams,
     required this.source,
   });
 
   @override
-  ArticleSearchResultsScreenState createState() =>
-      ArticleSearchResultsScreenState();
+  State<ArticleSearchResultsScreen> createState() =>
+      _ArticleSearchResultsScreenState();
 }
 
-class ArticleSearchResultsScreenState
+class _ArticleSearchResultsScreenState
     extends State<ArticleSearchResultsScreen> {
   final logger = LogsService().logger;
-  late List<journals_works.Item> _searchResults;
-  final ScrollController _scrollController = ScrollController();
-  bool _isLoadingMore = false;
-  bool _hasMoreResults = true;
-  int _currentOpenAlexPage = 2;
+
+  late final PagingController<dynamic, journals_works.Item> _pagingController;
+
+  String? _latestCrossrefCursor;
+  int _currentOpenAlexPage = 1;
 
   SwipeAction _swipeLeftAction = SwipeAction.hide;
   SwipeAction _swipeRightAction = SwipeAction.favorite;
@@ -50,19 +47,65 @@ class ArticleSearchResultsScreenState
   @override
   void initState() {
     super.initState();
-    _searchResults = widget.initialSearchResults;
-    _hasMoreResults = widget.initialHasMore;
+
+    _pagingController = PagingController<dynamic, journals_works.Item>(
+      getNextPageKey: (state) {
+        if (widget.source == 'Crossref') {
+          if (state.pages == null || state.pages!.isEmpty) {
+            return '*';
+          }
+          return _latestCrossrefCursor;
+        } else {
+          if (state.pages == null || state.pages!.isEmpty) {
+            return 1;
+          }
+          return _currentOpenAlexPage;
+        }
+      },
+      fetchPage: _fetchPage,
+    );
 
     _loadCardPreferences();
+  }
 
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-              _scrollController.position.maxScrollExtent - 70 &&
-          !_isLoadingMore &&
-          _hasMoreResults) {
-        _loadMoreResults();
+  Future<List<journals_works.Item>> _fetchPage(dynamic pageKey) async {
+    try {
+      if (widget.source == 'Crossref') {
+        final response = await CrossRefApi.getWorksByQuery(
+          queryParams: widget.queryParams,
+          cursor: pageKey ?? '*',
+        );
+
+        _latestCrossrefCursor =
+            response.nextCursor == null || response.items.isEmpty
+                ? null
+                : response.nextCursor;
+
+        return response.items;
+      } else {
+        final newItems = await OpenAlexApi.getOpenAlexWorksByQuery(
+          widget.queryParams['query'] ?? '',
+          widget.queryParams['scope'] ?? 1,
+          widget.queryParams['sortField'],
+          widget.queryParams['sortOrder'],
+          widget.queryParams['dateFilter'],
+          page: pageKey,
+        );
+
+        if (newItems.isNotEmpty) {
+          _currentOpenAlexPage = pageKey + 1;
+        }
+
+        return newItems;
       }
-    });
+    } catch (e, stackTrace) {
+      logger.severe(
+        'Failed to fetch article search results.',
+        e,
+        stackTrace,
+      );
+      rethrow;
+    }
   }
 
   Future<void> _loadCardPreferences() async {
@@ -73,104 +116,30 @@ class ArticleSearchResultsScreenState
     final rightActionName =
         prefs.getString('swipeRightAction') ?? SwipeAction.favorite.name;
 
-    SwipeAction newLeftAction = SwipeAction.hide;
-    SwipeAction newRightAction = SwipeAction.favorite;
-
-    try {
-      newLeftAction = SwipeAction.values.byName(leftActionName);
-    } catch (_) {
-      newLeftAction = SwipeAction.hide;
-    }
-    try {
-      newRightAction = SwipeAction.values.byName(rightActionName);
-    } catch (_) {
-      newRightAction = SwipeAction.favorite;
-    }
-
-    if (mounted) {
-      setState(() {
-        _swipeLeftAction = newLeftAction;
-        _swipeRightAction = newRightAction;
-        _showJournalTitle =
-            prefs.getBool(PublicationCardSettingsScreen.showJournalTitleKey) ??
-                true;
-        _showPublicationDate = prefs.getBool(
-                PublicationCardSettingsScreen.showPublicationDateKey) ??
-            true;
-        _showAuthorNames =
-            prefs.getBool(PublicationCardSettingsScreen.showAuthorNamesKey) ??
-                true;
-        _showLicense =
-            prefs.getBool(PublicationCardSettingsScreen.showLicenseKey) ?? true;
-        _showOptionsMenu =
-            prefs.getBool(PublicationCardSettingsScreen.showOptionsMenuKey) ??
-                true;
-        _showFavoriteButton = prefs
-                .getBool(PublicationCardSettingsScreen.showFavoriteButtonKey) ??
-            true;
-      });
-    }
-  }
-
-  Future<void> _loadMoreResults() async {
-    if (_isLoadingMore || !_hasMoreResults) return;
+    if (!mounted) return;
 
     setState(() {
-      _isLoadingMore = true;
+      _swipeLeftAction = SwipeAction.values.byName(leftActionName);
+      _swipeRightAction = SwipeAction.values.byName(rightActionName);
+
+      _showJournalTitle =
+          prefs.getBool(PublicationCardSettingsScreen.showJournalTitleKey) ??
+              true;
+      _showPublicationDate =
+          prefs.getBool(PublicationCardSettingsScreen.showPublicationDateKey) ??
+              true;
+      _showAuthorNames =
+          prefs.getBool(PublicationCardSettingsScreen.showAuthorNamesKey) ??
+              true;
+      _showLicense =
+          prefs.getBool(PublicationCardSettingsScreen.showLicenseKey) ?? true;
+      _showOptionsMenu =
+          prefs.getBool(PublicationCardSettingsScreen.showOptionsMenuKey) ??
+              true;
+      _showFavoriteButton =
+          prefs.getBool(PublicationCardSettingsScreen.showFavoriteButtonKey) ??
+              true;
     });
-
-    try {
-      List<journals_works.Item> newResults;
-      bool hasMore = false;
-
-      if (widget.source == 'Crossref') {
-        final ListAndMore<journals_works.Item> response =
-            await CrossRefApi.getWorksByQuery(widget.queryParams);
-        newResults = response.list;
-        hasMore =
-            response.hasMore && _searchResults.length < response.totalResults;
-      } else {
-        newResults = await OpenAlexApi.getOpenAlexWorksByQuery(
-          widget.queryParams['query'] ?? '',
-          widget.queryParams['scope'] ?? 1,
-          widget.queryParams['sortField'],
-          widget.queryParams['sortOrder'],
-          widget.queryParams['dateFilter'],
-          page: _currentOpenAlexPage,
-        );
-
-        if (newResults.isNotEmpty) {
-          _currentOpenAlexPage++;
-
-          hasMore = newResults.length >= 25;
-        } else {
-          hasMore = false;
-        }
-      }
-
-      setState(() {
-        _searchResults.addAll(newResults);
-        _hasMoreResults = hasMore;
-      });
-    } catch (e, stackTrace) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(AppLocalizations.of(context)!.failedLoadMoreResults)),
-      );
-      logger.severe(
-          'Failed to load more article search results.', e, stackTrace);
-    } finally {
-      setState(() {
-        _isLoadingMore = false;
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 
   @override
@@ -179,22 +148,14 @@ class ArticleSearchResultsScreenState
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.searchresults),
       ),
-      body: _searchResults.isNotEmpty
-          ? ListView.builder(
-              controller: _scrollController,
-              itemCount: _searchResults.length + (_hasMoreResults ? 1 : 0),
-              cacheExtent: 1000.0,
-              itemBuilder: (context, index) {
-                if (index == _searchResults.length) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
-
-                final item = _searchResults[index];
+      body: PagingListener<dynamic, journals_works.Item>(
+        controller: _pagingController,
+        builder: (context, state, fetchNextPage) {
+          return PagedListView<dynamic, journals_works.Item>(
+            state: state,
+            fetchNextPage: fetchNextPage,
+            builderDelegate: PagedChildBuilderDelegate<journals_works.Item>(
+              itemBuilder: (context, item, index) {
                 return PublicationCard(
                   title: item.title,
                   abstract: item.abstract,
@@ -217,10 +178,25 @@ class ArticleSearchResultsScreenState
                   showFavoriteButton: _showFavoriteButton,
                 );
               },
-            )
-          : Center(
-              child: Text(AppLocalizations.of(context)!.noresultsfound),
+              firstPageProgressIndicatorBuilder: (_) =>
+                  const Center(child: CircularProgressIndicator()),
+              newPageProgressIndicatorBuilder: (_) =>
+                  const Center(child: CircularProgressIndicator()),
+              noItemsFoundIndicatorBuilder: (_) => Center(
+                child: Text(
+                  AppLocalizations.of(context)!.noresultsfound,
+                ),
+              ),
             ),
+          );
+        },
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
   }
 }

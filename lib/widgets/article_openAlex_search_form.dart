@@ -190,13 +190,6 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
               '$selectedSortBy'
               '$selectedSortOrder';
           await dbHelper.saveSearchQuery(queryName, queryString, 'OpenAlex');
-          results = await OpenAlexApi.getOpenAlexWorksByQuery(
-            query,
-            scope,
-            sortField,
-            sortOrder,
-            dateFilter,
-          );
         } else {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -206,21 +199,23 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
           );
           return;
         }
-      } else {
-        results = await OpenAlexApi.getOpenAlexWorksByQuery(
-            query, scope, sortField, sortOrder, dateFilter);
       }
       Navigator.pop(context);
       Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ArticleSearchResultsScreen(
-              initialSearchResults: results,
-              initialHasMore: results.isNotEmpty,
-              queryParams: {'query': query},
-              source: 'OpenAlex',
-            ),
-          ));
+        context,
+        MaterialPageRoute(
+          builder: (context) => ArticleSearchResultsScreen(
+            queryParams: {
+              'query': query,
+              'scope': scope,
+              if (sortField != null) 'sortField': sortField,
+              if (sortOrder != null) 'sortOrder': sortOrder,
+              if (dateFilter != null) 'dateFilter': dateFilter,
+            },
+            source: 'OpenAlex',
+          ),
+        ),
+      );
     } catch (e) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
