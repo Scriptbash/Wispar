@@ -80,6 +80,21 @@ class _JournalDetailsScreenState extends State<JournalDetailsScreen> {
         cursor: cursor ?? '*',
       );
 
+      // This part is needed when the Crossref API returns deleted DOIs
+      // Without this filtering, the app spams the API endlessly
+      final usableItems = response.items.where((item) {
+        final isDeletedDoi =
+            item.journalTitle.contains("CrossRef Listing of Deleted DOIs");
+        final hasNoTitle = item.title.isEmpty;
+
+        return !isDeletedDoi && !hasNoTitle;
+      }).toList();
+
+      if (usableItems.isEmpty && response.nextCursor != null) {
+        _latestCursor = null;
+        return [];
+      }
+
       _latestCursor = response.nextCursor == null || response.items.isEmpty
           ? null
           : response.nextCursor;
