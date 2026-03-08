@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wispar/services/openalex_api.dart';
+import 'package:wispar/services/openAlex_api.dart';
 import 'package:wispar/models/openalex_domain_models.dart';
 
 class OpenAlexTopicSelector extends StatefulWidget {

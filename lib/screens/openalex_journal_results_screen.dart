@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
-import 'package:wispar/services/openalex_api.dart';
+import 'package:wispar/services/openAlex_api.dart';
 import 'package:wispar/widgets/journal_search_results_card.dart';
 import 'package:wispar/models/crossref_journals_models.dart' as Journals;
 
