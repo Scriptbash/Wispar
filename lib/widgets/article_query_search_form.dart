@@ -529,6 +529,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                 Expanded(
                   child: DropdownButtonFormField<int>(
                     decoration: InputDecoration(
+                      border: OutlineInputBorder(),
                       labelText: 'Sort by',
                     ),
                     initialValue: selectedSortBy,
@@ -545,6 +546,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                 Expanded(
                   child: DropdownButtonFormField<int>(
                     decoration: InputDecoration(
+                      border: OutlineInputBorder(),
                       labelText: 'Sort order',
                     ),
                     initialValue: selectedSortOrder,
