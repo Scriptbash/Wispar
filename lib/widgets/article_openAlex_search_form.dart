@@ -578,7 +578,6 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _executeSearch,
-        shape: CircleBorder(),
         child: Icon(Icons.search),
       ),
     );
