@@ -398,7 +398,7 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                         : _publishedAfter!.toIso8601String().split('T')[0],
                   ),
                   trailing: Icon(Icons.calendar_today,
-                      color: Theme.of(context).primaryColor),
+                      color: Theme.of(context).colorScheme.primary),
                   onTap: () => _pickDate(context, true),
                 ),
               ),
@@ -415,7 +415,7 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                       ? AppLocalizations.of(context)!.selectEndDate
                       : _publishedBefore!.toIso8601String().split('T')[0]),
                   trailing: Icon(Icons.calendar_today,
-                      color: Theme.of(context).primaryColor),
+                      color: Theme.of(context).colorScheme.primary),
                   onTap: () => _pickDate(context, false),
                 ),
               ),

@@ -501,7 +501,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                       ? AppLocalizations.of(context)!.selectStartDate
                       : _createdAfter!.toIso8601String().split('T')[0]),
                   trailing: Icon(Icons.calendar_today,
-                      color: Theme.of(context).primaryColor),
+                      color: Theme.of(context).colorScheme.primary),
                   onTap: () => _pickDate(context, true),
                 ),
               ),
@@ -518,7 +518,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                       ? AppLocalizations.of(context)!.selectEndDate
                       : _createdBefore!.toIso8601String().split('T')[0]),
                   trailing: Icon(Icons.calendar_today,
-                      color: Theme.of(context).primaryColor),
+                      color: Theme.of(context).colorScheme.primary),
                   onTap: () => _pickDate(context, false),
                 ),
               ),
