@@ -74,16 +74,6 @@ class _OpenAlexJournalResultsScreenState
             title: j.title,
             publisher: j.publisher,
             issn: j.issn,
-            lastStatusCheckTime: 0,
-            counts: Journals.Counts(
-              totalDois: 0,
-              currentDois: 0,
-              backfileDois: 0,
-            ),
-            breakdowns: Journals.Breakdowns(doisByIssuedYear: []),
-            coverage: {},
-            coverageType: Journals.CoverageType.fromJson({}),
-            flags: {},
             issnType: [],
           );
         }).toList();

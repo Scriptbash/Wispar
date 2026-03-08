@@ -27,18 +27,9 @@ class JournalInfoHeader extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    // a little bit hacky, but oh well :(
     final journalItem = Journals.Item(
-      lastStatusCheckTime: 0,
-      counts: Journals.Counts(currentDois: 0, backfileDois: 0, totalDois: 0),
-      breakdowns: Journals.Breakdowns(doisByIssuedYear: [
-        [0]
-      ]),
       publisher: publisher,
-      coverage: {},
       title: title,
-      coverageType: Journals.CoverageType(all: {}, backfile: {}, current: {}),
-      flags: {},
       issn: issn.split(','),
       issnType: [],
     );
