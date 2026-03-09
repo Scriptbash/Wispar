@@ -233,6 +233,8 @@
   "@category": {},
   "publisher": "Publisher",
   "@publisher": {},
+  "publisherWithValue": "Publisher: {name}",
+  "@publisherWithValue":{},
   "publishedin": "Published in",
   "@publishedin": {},
   "subjects": "Subjects",
