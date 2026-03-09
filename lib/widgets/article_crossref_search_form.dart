@@ -28,22 +28,13 @@ class CrossRefSearchFormState extends State<CrossRefSearchForm> {
 
   void _handleSearch() async {
     try {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        },
-      );
       if (selectedSearchIndex == 0) {
         // Query search
         if (_queryFormKey.currentState != null) {
-          _queryFormKey.currentState!
+          await _queryFormKey.currentState!
               .submitForm(); // Call the search function in QuerySearchForm
         } else {}
-        Navigator.pop(context);
+        return;
       } else {
         // DOI-based search
         String doi = doiController.text.trim();

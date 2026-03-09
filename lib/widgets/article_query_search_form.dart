@@ -213,7 +213,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
     }
   }
 
-  void submitForm() async {
+  Future<void> submitForm() async {
     // Gather all input values, ignoring empty fields
     final Map<String, dynamic> queryParams = {};
 
