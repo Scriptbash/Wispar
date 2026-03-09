@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
-import 'package:wispar/services/openAlex_api.dart';
 import 'package:wispar/screens/article_search_results_screen.dart';
-import 'package:wispar/models/crossref_journals_works_models.dart'
-    as journals_works;
 import 'package:wispar/services/database_helper.dart';
 
 class OpenAlexSearchForm extends StatefulWidget {
@@ -152,7 +149,7 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
       );
 
       final dbHelper = DatabaseHelper();
-      List<journals_works.Item> results = [];
+
       if (saveQuery) {
         final queryName = queryNameController.text.trim();
         if (queryName != '') {
