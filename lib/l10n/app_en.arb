@@ -561,6 +561,18 @@
       }
     }
   },
+  "zoomOut":"Zoom out",
+  "@zoomOut":{},
+  "zoomIn":"Zoom in",
+  "@zoomIn":{},
+  "goToFirstPage":"Go to first page",
+  "@goToFirstPage":{},
+  "goToLastPage":"Go to last page",
+  "@goToLastPage":{},
+  "nextMatch":"Next match",
+  "@nextMatch":{},
+  "previousMatch":"Previous match",
+  "@previousMatch":{},
   "sourceCode": "Source code",
   "@sourceCode": {},
   "reportIssue": "Report an issue",

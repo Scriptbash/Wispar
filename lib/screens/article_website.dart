@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/io_client.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wispar/services/unpaywall_api.dart';
@@ -8,7 +9,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:io';
+import 'dart:io' as io;
 import 'package:http/http.dart' as http;
 import 'package:wispar/services/logs_helper.dart';
 import 'package:wispar/webview_env.dart';
@@ -58,7 +59,7 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
     _initWebViewSettings();
     checkUnpaywallAvailability();
 
-    pullToRefreshController = Platform.isAndroid || Platform.isIOS
+    pullToRefreshController = io.Platform.isAndroid || io.Platform.isIOS
         ? PullToRefreshController(
             settings: PullToRefreshSettings(
               color: Colors.deepPurple,
@@ -97,15 +98,15 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
   }
 
   String _getPlatformUserAgent() {
-    if (Platform.isAndroid) {
+    if (io.Platform.isAndroid) {
       return "Mozilla/5.0 (Android 16; Mobile; LG-M255; rv:140.0) Gecko/140.0 Firefox/140.0";
-    } else if (Platform.isIOS) {
+    } else if (io.Platform.isIOS) {
       return "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile Safari/604.1";
-    } else if (Platform.isMacOS) {
+    } else if (io.Platform.isMacOS) {
       return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)";
-    } else if (Platform.isWindows) {
+    } else if (io.Platform.isWindows) {
       return "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0";
-    } else if (Platform.isLinux) {
+    } else if (io.Platform.isLinux) {
       return "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.3";
     } else {
       return "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0 Mobile Safari/537.36";
@@ -309,7 +310,7 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
                   ? InAppWebView(
                       key: webViewKey,
                       webViewEnvironment:
-                          Platform.isWindows ? webViewEnvironment : null,
+                          io.Platform.isWindows ? webViewEnvironment : null,
                       initialUrlRequest: URLRequest(url: WebUri(pdfUrl)),
                       initialSettings: settings,
                       pullToRefreshController: pullToRefreshController,
@@ -403,7 +404,7 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
                         return ServerTrustAuthResponse(
                             action: ServerTrustAuthResponseAction.PROCEED);
                       },
-                      onDownloadStartRequest: (controller, urlInfo) async {
+                      onDownloadStarting: (controller, urlInfo) async {
                         final Uri downloadUri = urlInfo.url;
                         final String? mimeType = urlInfo.mimeType;
                         final String? suggestedFilename =
@@ -946,7 +947,22 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
                       logger.info(
                           'Full HTTP Request Headers being sent: $headers');
 
-                      final client = http.Client();
+                      final io.HttpClient innerHttpClient = io.HttpClient()
+                        ..badCertificateCallback =
+                            ((io.X509Certificate cert, String host, int port) {
+                          final configuredProxyHost =
+                              Uri.tryParse(proxyUrl)?.host;
+
+                          if (configuredProxyHost != null &&
+                              host.contains(configuredProxyHost)) {
+                            logger.info(
+                                'Trusting certificate for proxy host: $host');
+                            return true;
+                          }
+                          return false;
+                        });
+
+                      final client = IOClient(innerHttpClient);
 
                       final request = http.Request('GET', finalDownloadUri)
                         ..headers.addAll(headers)
@@ -982,7 +998,7 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
 
                         if (useCustomPath && customPath != null) {
                           baseDirPath = customPath;
-                        } else if (Platform.isWindows) {
+                        } else if (io.Platform.isWindows) {
                           final defaultAppDir =
                               await getApplicationSupportDirectory();
                           baseDirPath = defaultAppDir.path;
@@ -1001,7 +1017,7 @@ class ArticleWebsiteState extends State<ArticleWebsite> {
                         }
 
                         final fileName = '$cleanedDoi.pdf';
-                        final pdfFile = File('$baseDirPath/$fileName');
+                        final pdfFile = io.File('$baseDirPath/$fileName');
                         await pdfFile.writeAsBytes(response.bodyBytes);
                         if (mounted) {
                           Navigator.of(this.context).push(MaterialPageRoute(

@@ -1,16 +1,17 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../generated_l10n/app_localizations.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:pdfrx/pdfrx.dart';
-import '../widgets/publication_card/publication_card.dart';
-import '../services/database_helper.dart';
+import 'package:wispar/widgets/pdf_control_overlay.dart';
+import 'package:wispar/widgets/publication_card/publication_card.dart';
+import 'package:wispar/services/database_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../services/logs_helper.dart';
-import '../screens/chat_screen.dart';
+import 'package:wispar/services/logs_helper.dart';
+import 'package:wispar/screens/chat_screen.dart';
 import 'dart:math';
 
 class PdfReader extends StatefulWidget {
@@ -38,9 +39,14 @@ class PdfReaderState extends State<PdfReader> {
   bool _darkPdfTheme = false;
   int _pdfOrientation = 0;
   bool _isZoomed = false;
+  bool _overlayVisible = true;
+
+  PdfTextSearcher? textSearcher;
 
   @override
   void dispose() {
+    textSearcher?.removeListener(_update);
+    textSearcher?.dispose();
     super.dispose();
   }
 
@@ -51,6 +57,10 @@ class PdfReaderState extends State<PdfReader> {
     _loadPreferences().then((_) {
       resolvePdfPath();
     });
+  }
+
+  void _update() {
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadPreferences() async {
@@ -189,6 +199,16 @@ class PdfReaderState extends State<PdfReader> {
                     child: PdfViewer.file(resolvedPdfPath,
                         controller: controller,
                         params: PdfViewerParams(
+                          onViewerReady: (document, controller) {
+                            setState(() {
+                              textSearcher = PdfTextSearcher(controller)
+                                ..addListener(_update);
+                            });
+                          },
+                          pagePaintCallbacks: [
+                            if (textSearcher != null)
+                              textSearcher!.pageTextMatchPaintCallback,
+                          ],
                           layoutPages: _pdfOrientation == 1
                               ? (pages, params) {
                                   final height = pages.fold(
@@ -254,11 +274,51 @@ class PdfReaderState extends State<PdfReader> {
                               },
                               onTapUp: (details) {
                                 handleLinkTap(details.localPosition);
+
+                                setState(() {
+                                  _overlayVisible = !_overlayVisible;
+                                });
                               },
                               child: IgnorePointer(
                                 child: SizedBox(
                                     width: size.width, height: size.height),
                               ),
+                            ),
+                            PdfViewerScrollThumb(
+                              controller: controller,
+                              orientation: _pdfOrientation == 1
+                                  ? ScrollbarOrientation.bottom
+                                  : ScrollbarOrientation.right,
+                              thumbSize: _pdfOrientation == 1
+                                  ? const Size(60, 26)
+                                  : const Size(40, 26),
+                              thumbBuilder:
+                                  (context, thumbSize, pageNumber, controller) {
+                                return AnimatedOpacity(
+                                  duration: const Duration(milliseconds: 200),
+                                  curve: Curves.easeOut,
+                                  opacity: _overlayVisible ? 1 : 0,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color:
+                                          Colors.black.withValues(alpha: 0.75),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      pageNumber.toString(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            PdfControlOverlay(
+                              controller: controller,
+                              textSearcher: textSearcher,
+                              overlayVisible: _overlayVisible,
                             ),
                           ],
                         )))
