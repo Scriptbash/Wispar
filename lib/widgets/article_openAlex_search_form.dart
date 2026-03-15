@@ -20,6 +20,7 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
   DateTime? _publishedAfter;
   DateTime? _publishedBefore;
   final TextEditingController issnController = TextEditingController();
+  bool _isOpenAccess = false;
 
   String _dateMode = 'none';
   // bool _filtersExpanded = false;
@@ -213,9 +214,21 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
             }
           }
 
+          String oaPart = '';
+          if (_isOpenAccess) {
+            if (searchField.startsWith('filter=')) {
+              oaPart = ',is_oa:true';
+            } else if (datePart.isNotEmpty || issnPart.isNotEmpty) {
+              oaPart = ',is_oa:true';
+            } else {
+              oaPart = '&filter=is_oa:true';
+            }
+          }
+
           queryString = '$searchField$query'
               '$datePart'
               '$issnPart'
+              '$oaPart'
               '$selectedSortBy'
               '$selectedSortOrder';
           await dbHelper.saveSearchQuery(queryName, queryString, 'OpenAlex');
@@ -241,6 +254,7 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
               if (sortOrder != null) 'sortOrder': sortOrder,
               if (dateFilter != null) 'dateFilter': dateFilter,
               if (issnFilter != null) 'issnFilter': issnFilter,
+              'isOpenAccess': _isOpenAccess,
             },
             source: 'OpenAlex',
           ),
@@ -459,8 +473,24 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                 ),
               ],
             ),
+            SizedBox(height: 16),
+            SwitchListTile(
+              title: Text(
+                AppLocalizations.of(context)!.openAccessOnly,
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
+              value: _isOpenAccess,
+              onChanged: (bool value) {
+                setState(() {
+                  _isOpenAccess = value;
+                });
+              },
+            ),
             SizedBox(height: 10),
-
+            Divider(
+              height: 5,
+            ),
+            SizedBox(height: 10),
             // Dynamic query builder
             Column(
               children: () {
@@ -591,11 +621,11 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
               ],
             ),*/
             SizedBox(height: 20),
-            Text(
-              AppLocalizations.of(context)!.saveQuery,
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Switch(
+            SwitchListTile(
+              title: Text(
+                AppLocalizations.of(context)!.saveQuery,
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
               value: saveQuery,
               onChanged: (bool value) {
                 setState(() {
@@ -603,15 +633,17 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                 });
               },
             ),
-            SizedBox(height: 8),
-            if (saveQuery)
+            if (saveQuery) ...[
+              const SizedBox(height: 8),
               TextFormField(
                 controller: queryNameController,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context)!.queryName,
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
               ),
+            ],
+
             SizedBox(height: 70),
           ],
         ),

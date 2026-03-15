@@ -18,6 +18,7 @@ class OpenAlexApi {
       String? sortOrder,
       String? dateFilter,
       String? issnFilter,
+      bool isOpenAccess,
       {int page = 1}) async {
     final prefs = await SharedPreferences.getInstance();
     apiKey = prefs.getString('openalex_api_key');
@@ -51,6 +52,14 @@ class OpenAlexApi {
         filterPart = 'filter=$issnFilter';
       } else {
         filterPart += ',$issnFilter';
+      }
+    }
+
+    if (isOpenAccess) {
+      if (filterPart.isEmpty) {
+        filterPart = 'filter=is_oa:true';
+      } else {
+        filterPart += ',is_oa:true';
       }
     }
 

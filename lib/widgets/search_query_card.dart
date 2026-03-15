@@ -70,6 +70,7 @@ class SearchQueryCardState extends State<SearchQueryCard> {
         String? dateFilter;
         String? issnFilter;
         String? filterValue;
+        bool isOpenAccess = false;
 
         if (widget.queryProvider == 'Crossref') {
           // Convert the params string to the needed mapstring
@@ -110,6 +111,8 @@ class SearchQueryCardState extends State<SearchQueryCard> {
               } else if (f.startsWith('from_publication_date:') ||
                   f.startsWith('to_publication_date:')) {
                 remainingFilters.add(f);
+              } else if (f == 'is_oa:true') {
+                isOpenAccess = true;
               } else if (f.startsWith('locations.source.issn:')) {
                 issnFilter = f;
               }
@@ -140,6 +143,7 @@ class SearchQueryCardState extends State<SearchQueryCard> {
                     'sortOrder': sortOrder,
                     'dateFilter': dateFilter,
                     'issnFilter': issnFilter,
+                    'isOpenAccess': isOpenAccess,
                     'filter': filterValue,
                   },
                   source: widget.queryProvider,
