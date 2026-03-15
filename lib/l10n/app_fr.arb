@@ -420,5 +420,11 @@
     "openAlexNoApiKey": "Aucune clé d'API pour OpenAlex n'est réglée. Veuillez en ajouter une dans les paramètres pour éviter des interruptions.",
     "selectTopicFirst": "Veuillez sélectionner un sujet !",
     "publisherWithValue": "Éditeur : {name}",
-    "searchByTopic": "Recherche par sujets"
+    "searchByTopic": "Recherche par sujets",
+    "zoomOut": "Zoom arrière",
+    "zoomIn": "Zoom avant",
+    "goToFirstPage": "Aller à la première page",
+    "goToLastPage": "Aller à la dernière page",
+    "nextMatch": "Prochaine occurrence",
+    "previousMatch": "Occurrence précédente"
 }
