@@ -191,20 +191,25 @@ class _OpenAlexTopicSelectorState extends State<OpenAlexTopicSelector> {
                     return InkWell(
                       onTap: () async {
                         setState(() {
-                          _selectedField = isSelectedField ? null : field;
-                          _selectedField = field;
-                          _selectedSubfield = null;
-                          _subfields = null;
+                          if (isSelectedField) {
+                            _selectedField = null;
+                            _selectedSubfield = null;
+                            _selectedTopic = null;
+                            _subfields = null;
+                          } else {
+                            _selectedField = field;
+                            _selectedSubfield = null;
+                            _selectedTopic = null;
+                            _subfields = null;
+                          }
                         });
-                        if (_selectedField != null) {
-                          await _loadSubfields(field);
 
+                        if (_selectedField != null) {
+                          await _loadSubfields(_selectedField!);
                           _scrollToSection(_subfieldSectionKey);
                         }
-                        widget.onSelectionChanged(
-                          domain: _selectedDomain,
-                          field: field,
-                        );
+
+                        _emitSelection();
                       },
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
@@ -265,14 +270,20 @@ class _OpenAlexTopicSelectorState extends State<OpenAlexTopicSelector> {
                       return InkWell(
                         onTap: () {
                           setState(() {
-                            _selectedSubfield = subfield;
+                            if (isSelectedSubfield) {
+                              _selectedSubfield = null;
+                              _selectedTopic = null;
+                            } else {
+                              _selectedSubfield = subfield;
+                              _selectedTopic = null;
+                            }
                           });
-                          widget.onSelectionChanged(
-                            domain: _selectedDomain,
-                            field: _selectedField,
-                            subfield: subfield,
-                          );
-                          _scrollToSection(_topicSectionKey);
+
+                          _emitSelection();
+
+                          if (_selectedSubfield != null) {
+                            _scrollToSection(_topicSectionKey);
+                          }
                         },
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
@@ -335,15 +346,14 @@ class _OpenAlexTopicSelectorState extends State<OpenAlexTopicSelector> {
                             );
 
                             setState(() {
-                              _selectedTopic = topicField;
+                              if (isSelectedTopic) {
+                                _selectedTopic = null;
+                              } else {
+                                _selectedTopic = topicField;
+                              }
                             });
 
-                            widget.onSelectionChanged(
-                              domain: _selectedDomain,
-                              field: _selectedField,
-                              subfield: _selectedSubfield,
-                              topic: topicField,
-                            );
+                            _emitSelection();
                           },
                           borderRadius: BorderRadius.circular(12),
                           child: Container(
@@ -387,5 +397,16 @@ class _OpenAlexTopicSelectorState extends State<OpenAlexTopicSelector> {
         );
       }
     });
+  }
+
+  void _emitSelection() {
+    widget.onSelectionChanged(
+      domain: _selectedDomain,
+      field: _selectedTopic == null && _selectedSubfield == null
+          ? _selectedField
+          : _selectedField,
+      subfield: _selectedTopic == null ? _selectedSubfield : _selectedSubfield,
+      topic: _selectedTopic,
+    );
   }
 }
