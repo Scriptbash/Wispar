@@ -281,73 +281,6 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                 border: OutlineInputBorder(),
               ),
             ),
-
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    initialValue: selectedSortField,
-                    isExpanded: true,
-                    onChanged: (String? newValue) {
-                      if (newValue != null) {
-                        setState(() {
-                          selectedSortField = newValue;
-                        });
-                      }
-                    },
-                    items: [
-                      DropdownMenuItem(value: "-", child: Text("-")),
-                      DropdownMenuItem(
-                          value: "display_name",
-                          child:
-                              Text(AppLocalizations.of(context)!.displayName)),
-                      DropdownMenuItem(
-                          value: "cited_by_count",
-                          child:
-                              Text(AppLocalizations.of(context)!.citedByCount)),
-                      DropdownMenuItem(
-                          value: "publication_date",
-                          child: Text(
-                              AppLocalizations.of(context)!.publicationDate)),
-                    ],
-                    decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)!.sortby,
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    initialValue: selectedSortOrder,
-                    isExpanded: true,
-                    onChanged: (String? newValue) {
-                      if (newValue != null) {
-                        setState(() {
-                          selectedSortOrder = newValue;
-                        });
-                      }
-                    },
-                    items: [
-                      DropdownMenuItem(value: '-', child: Text('-')),
-                      DropdownMenuItem(
-                          value: 'asc',
-                          child: Text(AppLocalizations.of(context)!.ascending)),
-                      DropdownMenuItem(
-                          value: 'desc',
-                          child:
-                              Text(AppLocalizations.of(context)!.descending)),
-                    ],
-                    decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)!.sortorder,
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
             SizedBox(height: 16),
 
             DropdownButtonFormField<String>(
@@ -416,6 +349,73 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                   onTap: () => _pickDate(context, false),
                 ),
               ),
+
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    initialValue: selectedSortField,
+                    isExpanded: true,
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          selectedSortField = newValue;
+                        });
+                      }
+                    },
+                    items: [
+                      DropdownMenuItem(value: "-", child: Text("-")),
+                      DropdownMenuItem(
+                          value: "display_name",
+                          child:
+                              Text(AppLocalizations.of(context)!.displayName)),
+                      DropdownMenuItem(
+                          value: "cited_by_count",
+                          child:
+                              Text(AppLocalizations.of(context)!.citedByCount)),
+                      DropdownMenuItem(
+                          value: "publication_date",
+                          child: Text(
+                              AppLocalizations.of(context)!.publicationDate)),
+                    ],
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.sortby,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    initialValue: selectedSortOrder,
+                    isExpanded: true,
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          selectedSortOrder = newValue;
+                        });
+                      }
+                    },
+                    items: [
+                      DropdownMenuItem(value: '-', child: Text('-')),
+                      DropdownMenuItem(
+                          value: 'asc',
+                          child: Text(AppLocalizations.of(context)!.ascending)),
+                      DropdownMenuItem(
+                          value: 'desc',
+                          child:
+                              Text(AppLocalizations.of(context)!.descending)),
+                    ],
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.sortorder,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
             SizedBox(height: 10),
 
             // Dynamic query builder
