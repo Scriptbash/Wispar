@@ -19,6 +19,7 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
   String selectedSortOrder = '-';
   DateTime? _publishedAfter;
   DateTime? _publishedBefore;
+  final TextEditingController issnController = TextEditingController();
 
   String _dateMode = 'none';
   // bool _filtersExpanded = false;
@@ -31,6 +32,13 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
   void initState() {
     super.initState();
     _checkApiKey();
+  }
+
+  @override
+  void dispose() {
+    issnController.dispose();
+    queryNameController.dispose();
+    super.dispose();
   }
 
   void _addQueryPart(String type) {
@@ -125,6 +133,7 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
     String? sortField = selectedSortField == '-' ? null : selectedSortField;
     String? sortOrder = selectedSortOrder == '-' ? null : selectedSortOrder;
     String? dateFilter;
+    String? issnFilter;
 
     String formatDate(DateTime d) => d.toIso8601String().split('T')[0];
 
@@ -137,6 +146,16 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
         _publishedBefore != null) {
       dateFilter = "from_publication_date:${formatDate(_publishedAfter!)},"
           "to_publication_date:${formatDate(_publishedBefore!)}";
+    }
+
+    if (issnController.text.trim().isNotEmpty) {
+      final issns = issnController.text
+          .split(',')
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .join('|');
+
+      issnFilter = "locations.source.issn:$issns";
     }
 
     try {
@@ -182,8 +201,21 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
             }
           }
 
+          String issnPart = '';
+
+          if (issnFilter != null && issnFilter.isNotEmpty) {
+            if (searchField.startsWith('filter=')) {
+              issnPart = ',$issnFilter';
+            } else if (datePart.isNotEmpty) {
+              issnPart = ',$issnFilter';
+            } else {
+              issnPart = '&filter=$issnFilter';
+            }
+          }
+
           queryString = '$searchField$query'
               '$datePart'
+              '$issnPart'
               '$selectedSortBy'
               '$selectedSortOrder';
           await dbHelper.saveSearchQuery(queryName, queryString, 'OpenAlex');
@@ -208,6 +240,7 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
               if (sortField != null) 'sortField': sortField,
               if (sortOrder != null) 'sortOrder': sortOrder,
               if (dateFilter != null) 'dateFilter': dateFilter,
+              if (issnFilter != null) 'issnFilter': issnFilter,
             },
             source: 'OpenAlex',
           ),
@@ -281,6 +314,16 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                 border: OutlineInputBorder(),
               ),
             ),
+            SizedBox(height: 16),
+            TextFormField(
+              controller: issnController,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.issnFilter,
+                hintText: "0022-1694, 1234-5678",
+                border: OutlineInputBorder(),
+              ),
+            ),
+
             SizedBox(height: 16),
 
             DropdownButtonFormField<String>(

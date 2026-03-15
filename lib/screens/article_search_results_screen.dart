@@ -89,6 +89,7 @@ class _ArticleSearchResultsScreenState
           widget.queryParams['sortField'],
           widget.queryParams['sortOrder'],
           widget.queryParams['dateFilter'],
+          widget.queryParams['issnFilter'],
           page: pageKey,
         );
 

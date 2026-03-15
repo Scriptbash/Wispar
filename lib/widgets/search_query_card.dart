@@ -68,6 +68,7 @@ class SearchQueryCardState extends State<SearchQueryCard> {
         String? sortField;
         String? sortOrder;
         String? dateFilter;
+        String? issnFilter;
         String? filterValue;
 
         if (widget.queryProvider == 'Crossref') {
@@ -77,7 +78,7 @@ class SearchQueryCardState extends State<SearchQueryCard> {
           queryMap = Uri.splitQueryString(widget.queryParams);
 
           String? sortParam = queryMap['sort'];
-          String? filterValue = queryMap['filter'];
+          filterValue = queryMap['filter'];
           String? searchValue = queryMap['search'];
 
           sortField = null;
@@ -109,6 +110,8 @@ class SearchQueryCardState extends State<SearchQueryCard> {
               } else if (f.startsWith('from_publication_date:') ||
                   f.startsWith('to_publication_date:')) {
                 remainingFilters.add(f);
+              } else if (f.startsWith('locations.source.issn:')) {
+                issnFilter = f;
               }
             }
             if (remainingFilters.isNotEmpty) {
@@ -136,6 +139,7 @@ class SearchQueryCardState extends State<SearchQueryCard> {
                     'sortField': sortField,
                     'sortOrder': sortOrder,
                     'dateFilter': dateFilter,
+                    'issnFilter': issnFilter,
                     'filter': filterValue,
                   },
                   source: widget.queryProvider,

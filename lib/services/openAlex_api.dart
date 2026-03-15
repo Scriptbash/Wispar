@@ -11,8 +11,13 @@ class OpenAlexApi {
   static const String worksEndpoint = '/works?';
   static String? apiKey;
 
-  static Future<List<journalWorks.Item>> getOpenAlexWorksByQuery(String query,
-      int scope, String? sortField, String? sortOrder, String? dateFilter,
+  static Future<List<journalWorks.Item>> getOpenAlexWorksByQuery(
+      String query,
+      int scope,
+      String? sortField,
+      String? sortOrder,
+      String? dateFilter,
+      String? issnFilter,
       {int page = 1}) async {
     final prefs = await SharedPreferences.getInstance();
     apiKey = prefs.getString('openalex_api_key');
@@ -39,6 +44,13 @@ class OpenAlexApi {
         filterPart = 'filter=$dateFilter';
       } else {
         filterPart += ',$dateFilter';
+      }
+    }
+    if (issnFilter != null && issnFilter.isNotEmpty) {
+      if (filterPart.isEmpty) {
+        filterPart = 'filter=$issnFilter';
+      } else {
+        filterPart += ',$issnFilter';
       }
     }
 
