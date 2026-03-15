@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
-import 'package:wispar/services/openAlex_api.dart';
 import 'package:wispar/screens/article_search_results_screen.dart';
-import 'package:wispar/models/crossref_journals_works_models.dart'
-    as journals_works;
 import 'package:wispar/services/database_helper.dart';
 
 class OpenAlexSearchForm extends StatefulWidget {
@@ -152,7 +149,7 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
       );
 
       final dbHelper = DatabaseHelper();
-      List<journals_works.Item> results = [];
+
       if (saveQuery) {
         final queryName = queryNameController.text.trim();
         if (queryName != '') {
@@ -190,13 +187,6 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
               '$selectedSortBy'
               '$selectedSortOrder';
           await dbHelper.saveSearchQuery(queryName, queryString, 'OpenAlex');
-          results = await OpenAlexApi.getOpenAlexWorksByQuery(
-            query,
-            scope,
-            sortField,
-            sortOrder,
-            dateFilter,
-          );
         } else {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -206,21 +196,23 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
           );
           return;
         }
-      } else {
-        results = await OpenAlexApi.getOpenAlexWorksByQuery(
-            query, scope, sortField, sortOrder, dateFilter);
       }
       Navigator.pop(context);
       Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ArticleSearchResultsScreen(
-              initialSearchResults: results,
-              initialHasMore: results.isNotEmpty,
-              queryParams: {'query': query},
-              source: 'OpenAlex',
-            ),
-          ));
+        context,
+        MaterialPageRoute(
+          builder: (context) => ArticleSearchResultsScreen(
+            queryParams: {
+              'query': query,
+              'scope': scope,
+              if (sortField != null) 'sortField': sortField,
+              if (sortOrder != null) 'sortOrder': sortOrder,
+              if (dateFilter != null) 'dateFilter': dateFilter,
+            },
+            source: 'OpenAlex',
+          ),
+        ),
+      );
     } catch (e) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -289,6 +281,74 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                 border: OutlineInputBorder(),
               ),
             ),
+            SizedBox(height: 16),
+
+            DropdownButtonFormField<String>(
+              initialValue: _dateMode,
+              onChanged: (value) {
+                setState(() {
+                  _dateMode = value!;
+                  _publishedAfter = null;
+                  _publishedBefore = null;
+                });
+              },
+              items: [
+                DropdownMenuItem(
+                    value: 'none',
+                    child: Text(AppLocalizations.of(context)!.noFilter)),
+                DropdownMenuItem(
+                    value: 'after',
+                    child: Text(AppLocalizations.of(context)!.publishedAfter)),
+                DropdownMenuItem(
+                    value: 'before',
+                    child: Text(AppLocalizations.of(context)!.publishedBefore)),
+                DropdownMenuItem(
+                    value: 'between',
+                    child:
+                        Text(AppLocalizations.of(context)!.publishedBetween)),
+              ],
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: AppLocalizations.of(context)!.publicationDate),
+            ),
+
+            SizedBox(height: 10),
+
+            if (_dateMode == 'after' || _dateMode == 'between')
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: ListTile(
+                  title: Text(
+                    _publishedAfter == null
+                        ? AppLocalizations.of(context)!.selectStartDate
+                        : _publishedAfter!.toIso8601String().split('T')[0],
+                  ),
+                  trailing: Icon(Icons.calendar_today,
+                      color: Theme.of(context).colorScheme.primary),
+                  onTap: () => _pickDate(context, true),
+                ),
+              ),
+
+            if (_dateMode == 'before' || _dateMode == 'between')
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: ListTile(
+                  title: Text(_publishedBefore == null
+                      ? AppLocalizations.of(context)!.selectEndDate
+                      : _publishedBefore!.toIso8601String().split('T')[0]),
+                  trailing: Icon(Icons.calendar_today,
+                      color: Theme.of(context).colorScheme.primary),
+                  onTap: () => _pickDate(context, false),
+                ),
+              ),
 
             SizedBox(height: 10),
             Row(
@@ -356,74 +416,6 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
                 ),
               ],
             ),
-            SizedBox(height: 16),
-
-            DropdownButtonFormField<String>(
-              initialValue: _dateMode,
-              onChanged: (value) {
-                setState(() {
-                  _dateMode = value!;
-                  _publishedAfter = null;
-                  _publishedBefore = null;
-                });
-              },
-              items: [
-                DropdownMenuItem(
-                    value: 'none',
-                    child: Text(AppLocalizations.of(context)!.noFilter)),
-                DropdownMenuItem(
-                    value: 'after',
-                    child: Text(AppLocalizations.of(context)!.publishedAfter)),
-                DropdownMenuItem(
-                    value: 'before',
-                    child: Text(AppLocalizations.of(context)!.publishedBefore)),
-                DropdownMenuItem(
-                    value: 'between',
-                    child:
-                        Text(AppLocalizations.of(context)!.publishedBetween)),
-              ],
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: AppLocalizations.of(context)!.publicationDate),
-            ),
-
-            SizedBox(height: 10),
-
-            if (_dateMode == 'after' || _dateMode == 'between')
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 4),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).dividerColor),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: ListTile(
-                  title: Text(
-                    _publishedAfter == null
-                        ? AppLocalizations.of(context)!.selectStartDate
-                        : _publishedAfter!.toIso8601String().split('T')[0],
-                  ),
-                  trailing: Icon(Icons.calendar_today,
-                      color: Theme.of(context).primaryColor),
-                  onTap: () => _pickDate(context, true),
-                ),
-              ),
-
-            if (_dateMode == 'before' || _dateMode == 'between')
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 4),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).dividerColor),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: ListTile(
-                  title: Text(_publishedBefore == null
-                      ? AppLocalizations.of(context)!.selectEndDate
-                      : _publishedBefore!.toIso8601String().split('T')[0]),
-                  trailing: Icon(Icons.calendar_today,
-                      color: Theme.of(context).primaryColor),
-                  onTap: () => _pickDate(context, false),
-                ),
-              ),
             SizedBox(height: 10),
 
             // Dynamic query builder
@@ -583,7 +575,6 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _executeSearch,
-        shape: CircleBorder(),
         child: Icon(Icons.search),
       ),
     );

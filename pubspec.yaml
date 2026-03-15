@@ -67,6 +67,7 @@ dependencies:
   path_provider: ^2.1.5
   archive: ^4.0.7
   window_manager: ^0.5.1
+  infinite_scroll_pagination: ^5.1.1
 
 dev_dependencies:
   flutter_test:

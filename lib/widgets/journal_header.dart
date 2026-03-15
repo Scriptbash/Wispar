@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../generated_l10n/app_localizations.dart';
-import '../models/crossref_journals_models.dart' as Journals;
-import './journal_follow_button.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/models/crossref_journals_models.dart' as Journals;
+import 'package:wispar/widgets/journal_follow_button.dart';
 
 class JournalInfoHeader extends SliverPersistentHeaderDelegate {
   final String title;
@@ -27,18 +27,9 @@ class JournalInfoHeader extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    // a little bit hacky, but oh well :(
     final journalItem = Journals.Item(
-      lastStatusCheckTime: 0,
-      counts: Journals.Counts(currentDois: 0, backfileDois: 0, totalDois: 0),
-      breakdowns: Journals.Breakdowns(doisByIssuedYear: [
-        [0]
-      ]),
       publisher: publisher,
-      coverage: {},
       title: title,
-      coverageType: Journals.CoverageType(all: {}, backfile: {}, current: {}),
-      flags: {},
       issn: issn.split(','),
       issnType: [],
     );
@@ -57,14 +48,17 @@ class JournalInfoHeader extends SliverPersistentHeaderDelegate {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: 8.0),
-                      Text(
-                          '${AppLocalizations.of(context)!.publisher}: ${publisher}'),
-                      Text('ISSN: ${issn}'),
+                      if (publisher.isNotEmpty)
+                        Text(
+                          AppLocalizations.of(context)!
+                              .publisherWithValue(publisher),
+                        ),
+                      Text('ISSN: $issn'),
                       SizedBox(height: 8.0),
                     ],
                   ),
                 ),
-                title.isNotEmpty && publisher.isNotEmpty && issn.isNotEmpty
+                title.isNotEmpty && issn.isNotEmpty
                     ? FollowButton(
                         item: journalItem,
                         isFollowed: isFollowed,

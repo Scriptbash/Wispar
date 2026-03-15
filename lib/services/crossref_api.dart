@@ -1,200 +1,147 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../models/crossref_journals_models.dart' as Journals;
-import '../models/crossref_journals_works_models.dart' as journalsWorks;
+import 'package:wispar/models/crossref_journals_models.dart' as Journals;
+import 'package:wispar/models/crossref_journals_works_models.dart'
+    as journalsWorks;
 
 class CrossRefApi {
   static const String baseUrl = 'https://api.crossref.org';
   static const String worksEndpoint = '/works';
   static const String journalsEndpoint = '/journals';
-  static const String email = 'mailto=wispar-app@protonmail.com';
-  static String? _journalCursor = '*';
-  static String? _journalWorksCursor = '*';
-  static String? _worksQueryCursor = '*';
-  static String? _currentQuery;
+  static const String mailto = 'wispar-app@protonmail.com';
 
-  // Query journals by name
-  static Future<ListAndMore<Journals.Item>> queryJournalsByName(
-      String query) async {
-    _currentQuery = query;
-    String apiUrl = '$baseUrl$journalsEndpoint?query=$query&rows=30&$email';
+  static Future<PaginatedResponse<Journals.Item>> queryJournalsByName({
+    required String query,
+    required String cursor,
+  }) async {
+    final uri = Uri.parse('$baseUrl$journalsEndpoint').replace(
+      queryParameters: {
+        'query': query,
+        'rows': '30',
+        'cursor': cursor,
+        'mailto': mailto,
+      },
+    );
 
-    if (_journalCursor != null) {
-      apiUrl += '&cursor=$_journalCursor';
+    final response = await http.get(uri);
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to query journals.');
     }
 
-    final response = await http.get(Uri.parse(apiUrl));
+    final parsed = Journals.crossrefjournalsFromJson(response.body);
 
-    if (response.statusCode == 200) {
-      final crossrefJournals = Journals.crossrefjournalsFromJson(response.body);
-
-      List<Journals.Item> items = crossrefJournals.message.items;
-
-      // Update the journal cursor
-      _journalCursor = crossrefJournals.message.nextCursor;
-
-      // Use nextCursor to determine if there are more results
-      bool hasMoreResults = _journalCursor != null && _journalCursor != "";
-
-      return ListAndMore(
-        list: items,
-        hasMore: hasMoreResults,
-        totalResults: crossrefJournals.message.totalResults,
-      );
-    } else {
-      throw Exception(
-          'Failed to query journals by name. Status code: ${response.statusCode}');
-    }
+    return PaginatedResponse(
+      items: parsed.message.items,
+      nextCursor: parsed.message.nextCursor,
+    );
   }
 
-  // Query journals by ISSN
-  static Future<ListAndMore<Journals.Item>> queryJournalsByISSN(
-      String query) async {
-    String apiUrl = '$baseUrl$journalsEndpoint/$query&$email';
+  static Future<Journals.Item?> queryJournalByISSN(String issn) async {
+    final uri = Uri.parse('$baseUrl$journalsEndpoint/$issn')
+        .replace(queryParameters: {'mailto': mailto});
 
-    final response = await http.get(Uri.parse(apiUrl));
+    final response = await http.get(uri);
 
-    if (response.statusCode == 200) {
-      Map<String, dynamic> jsonResponse = json.decode(response.body);
-      var message = jsonResponse['message'];
-
-      if (message != null) {
-        Journals.Item item = Journals.Item.fromJson(message, query);
-
-        return ListAndMore(
-          list: [item],
-          hasMore: false,
-          totalResults: 0,
-        );
-      } else {
-        throw Exception('Message object missing in response');
-      }
-    } else {
-      throw Exception(
-          'Failed to query journals by ISSN. Status code: ${response.statusCode}');
-    }
-  }
-
-  // Query works for a specific journal by ISSN
-  static Future<ListAndMore<journalsWorks.Item>> getJournalWorks(
-      List<String> issn) async {
-    final String issnFilter = issn.map((e) => 'issn:$e').join(',');
-    String apiUrl =
-        '$baseUrl$worksEndpoint?rows=30&sort=created&order=desc&$email&filter=$issnFilter';
-
-    if (_journalWorksCursor != null) {
-      apiUrl += '&cursor=$_journalWorksCursor';
+    if (response.statusCode != 200) {
+      throw Exception('Failed to query journal by ISSN.');
     }
 
-    final response = await http.get(Uri.parse(apiUrl));
-    if (response.statusCode == 200) {
-      final crossrefWorks =
-          journalsWorks.JournalWork.fromJson(json.decode(response.body));
-      List<journalsWorks.Item> items = crossrefWorks.message.items;
+    final data = json.decode(response.body);
+    final message = data['message'];
 
-      // Update the works cursor
-      _journalWorksCursor = crossrefWorks.message.nextCursor;
+    if (message == null) return null;
 
-      // Use nextCursor to determine if there are more results
-      bool hasMoreResults =
-          _journalWorksCursor != null && _journalWorksCursor != "";
+    return Journals.Item.fromJson(message, issn);
+  }
 
-      return ListAndMore(
-        list: items,
-        hasMore: hasMoreResults,
-        totalResults: crossrefWorks.message.totalResults,
-      );
-    } else {
-      throw Exception(
-          'Failed to query journal works: Status code: ${response.statusCode}');
+  static Future<PaginatedResponse<journalsWorks.Item>> getJournalWorks({
+    required List<String> issnList,
+    required String cursor,
+  }) async {
+    final issnFilter = issnList.map((e) => 'issn:$e').join(',');
+
+    final uri = Uri.parse('$baseUrl$worksEndpoint').replace(queryParameters: {
+      'filter': issnFilter,
+      'rows': '30',
+      'sort': 'created',
+      'order': 'desc',
+      'cursor': cursor,
+      'mailto': mailto,
+    });
+
+    final response = await http.get(uri);
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to query journal works.');
     }
+
+    final parsed =
+        journalsWorks.JournalWork.fromJson(json.decode(response.body));
+
+    return PaginatedResponse(
+      items: parsed.message.items,
+      nextCursor: parsed.message.nextCursor,
+    );
   }
 
-  // Getter method for _journalCursor
-  static String? get journalCursor => _journalCursor;
+  static Future<PaginatedResponse<journalsWorks.Item>> getWorksByQuery({
+    required Map<String, dynamic> queryParams,
+    required String cursor,
+  }) async {
+    final uri = Uri.parse('$baseUrl$worksEndpoint').replace(queryParameters: {
+      ...queryParams.map(
+        (key, value) => MapEntry(key, value.toString()),
+      ),
+      'rows': '50',
+      'cursor': cursor,
+      'mailto': mailto,
+    });
 
-  // Getter method for _journalWorksCursor
-  static String? get journalWorksCursor => _journalWorksCursor;
+    final response = await http.get(uri);
 
-  static String? getCurrentJournalCursor() => _journalCursor;
-  static String? getCurrentJournalWorksCursor() => _journalWorksCursor;
+    if (response.statusCode != 200) {
+      throw Exception('Failed to fetch works.');
+    }
 
-  static void resetJournalCursor() {
-    _journalCursor = '*';
-  }
+    final parsed =
+        journalsWorks.JournalWork.fromJson(json.decode(response.body));
 
-  static void resetJournalWorksCursor() {
-    _journalWorksCursor = '*';
-  }
-
-  static void resetWorksQueryCursor() {
-    _worksQueryCursor = '*';
-  }
-
-  static String? getCurrentQuery() {
-    return _currentQuery;
+    return PaginatedResponse(
+      items: parsed.message.items,
+      nextCursor: parsed.message.nextCursor,
+    );
   }
 
   static Future<journalsWorks.Item> getWorkByDOI(String doi) async {
-    final response = await http.get(Uri.parse('$baseUrl$worksEndpoint/$doi'));
+    final uri = Uri.parse('$baseUrl$worksEndpoint/$doi')
+        .replace(queryParameters: {'mailto': mailto});
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final dynamic message = data['message'];
+    final response = await http.get(uri);
 
-      if (message is Map<String, dynamic>) {
-        return journalsWorks.Item.fromJson(message);
-      } else {
-        throw Exception('Invalid response format for work by DOI');
-      }
-    } else {
-      throw Exception(
-          'Failed to get work by DOI. Status code: ${response.statusCode}');
+    if (response.statusCode != 200) {
+      throw Exception('Failed to get work by DOI.');
     }
-  }
 
-  static Future<ListAndMore<journalsWorks.Item>> getWorksByQuery(
-      Map<String, dynamic> queryParams) async {
-    String url = '$baseUrl$worksEndpoint';
-    // Construct the query parameters string by iterating over the queryParams map
-    String queryString = queryParams.entries
-        .map((entry) =>
-            '${Uri.encodeQueryComponent(entry.key)}=${Uri.encodeQueryComponent(entry.value.toString())}')
-        .join('&');
-    String apiUrl = '$url?$queryString&rows=50&$email';
-    if (_worksQueryCursor != null) {
-      apiUrl += '&cursor=$_worksQueryCursor';
-    }
-    final response = await http.get(Uri.parse(apiUrl));
-    //print('$url?$queryString');
+    final data = json.decode(response.body);
+    final message = data['message'];
 
-    if (response.statusCode == 200) {
-      final responseData =
-          journalsWorks.JournalWork.fromJson(json.decode(response.body));
-      List<journalsWorks.Item> feedItems = responseData.message.items;
-      _worksQueryCursor = responseData.message.nextCursor;
-      bool hasMoreResults =
-          _worksQueryCursor != null && _worksQueryCursor != "";
-      return ListAndMore(
-        list: feedItems,
-        hasMore: hasMoreResults,
-        totalResults: responseData.message.totalResults,
-      );
-    } else {
-      throw Exception(
-          'Failed to fetch results. Status code: ${response.statusCode}');
+    if (message is! Map<String, dynamic>) {
+      throw Exception('Invalid response format for DOI.');
     }
+
+    return journalsWorks.Item.fromJson(message);
   }
 }
 
-class ListAndMore<T> {
-  final List<T> list;
-  final bool hasMore;
-  final int totalResults;
+class PaginatedResponse<T> {
+  final List<T> items;
+  final String? nextCursor;
 
-  ListAndMore({
-    required this.list,
-    required this.hasMore,
-    required this.totalResults,
+  PaginatedResponse({
+    required this.items,
+    required this.nextCursor,
   });
+
+  bool get hasMore => nextCursor != null && items.isNotEmpty;
 }

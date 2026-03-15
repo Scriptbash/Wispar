@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
-import 'package:wispar/services/crossref_api.dart';
 import 'package:wispar/screens/article_search_results_screen.dart';
 import 'package:wispar/services/database_helper.dart';
 
@@ -214,7 +213,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
     }
   }
 
-  void submitForm() async {
+  Future<void> submitForm() async {
     // Gather all input values, ignoring empty fields
     final Map<String, dynamic> queryParams = {};
 
@@ -350,8 +349,6 @@ class QuerySearchFormState extends State<QuerySearchForm> {
 
     try {
       final dbHelper = DatabaseHelper();
-      late final response;
-      CrossRefApi.resetWorksQueryCursor(); // Reset the cursor on new search
       if (saveQuery) {
         final queryName = queryNameController.text.trim();
         if (queryName != '') {
@@ -360,12 +357,8 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                   '${Uri.encodeQueryComponent(entry.key)}=${Uri.encodeQueryComponent(entry.value.toString())}')
               .join('&');
 
-          // Call the save query function
           await dbHelper.saveSearchQuery(queryName, queryString, 'Crossref');
-          // Makes the API call
-          response = await CrossRefApi.getWorksByQuery(queryParams);
         } else {
-          // Close the loading indicator
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -374,8 +367,6 @@ class QuerySearchFormState extends State<QuerySearchForm> {
           );
           return;
         }
-      } else {
-        response = await CrossRefApi.getWorksByQuery(queryParams);
       }
 
       // Close the loading indicator
@@ -385,13 +376,10 @@ class QuerySearchFormState extends State<QuerySearchForm> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ArticleSearchResultsScreen(
-            initialSearchResults: response.list,
-            initialHasMore: response.hasMore,
-            queryParams: queryParams,
-            source: 'Crossref',
-          ),
-        ),
+            builder: (context) => ArticleSearchResultsScreen(
+                  queryParams: queryParams,
+                  source: 'Crossref',
+                )),
       );
     } catch (error) {
       // Close the loading indicator
@@ -513,7 +501,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                       ? AppLocalizations.of(context)!.selectStartDate
                       : _createdAfter!.toIso8601String().split('T')[0]),
                   trailing: Icon(Icons.calendar_today,
-                      color: Theme.of(context).primaryColor),
+                      color: Theme.of(context).colorScheme.primary),
                   onTap: () => _pickDate(context, true),
                 ),
               ),
@@ -530,7 +518,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                       ? AppLocalizations.of(context)!.selectEndDate
                       : _createdBefore!.toIso8601String().split('T')[0]),
                   trailing: Icon(Icons.calendar_today,
-                      color: Theme.of(context).primaryColor),
+                      color: Theme.of(context).colorScheme.primary),
                   onTap: () => _pickDate(context, false),
                 ),
               ),
@@ -541,6 +529,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                 Expanded(
                   child: DropdownButtonFormField<int>(
                     decoration: InputDecoration(
+                      border: OutlineInputBorder(),
                       labelText: 'Sort by',
                     ),
                     initialValue: selectedSortBy,
@@ -557,6 +546,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                 Expanded(
                   child: DropdownButtonFormField<int>(
                     decoration: InputDecoration(
+                      border: OutlineInputBorder(),
                       labelText: 'Sort order',
                     ),
                     initialValue: selectedSortOrder,

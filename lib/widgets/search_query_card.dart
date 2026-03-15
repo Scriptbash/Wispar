@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
-import 'package:wispar/services/crossref_api.dart';
-import 'package:wispar/services/openAlex_api.dart';
 import 'package:wispar/services/string_format_helper.dart';
 import 'package:wispar/screens/article_search_results_screen.dart';
 import 'package:wispar/services/database_helper.dart';
@@ -64,7 +62,6 @@ class SearchQueryCardState extends State<SearchQueryCard> {
             return const Center(child: CircularProgressIndicator());
           },
         );
-        var response;
         Map<String, String> queryMap = {};
         String? query;
         int scope = 1;
@@ -76,8 +73,6 @@ class SearchQueryCardState extends State<SearchQueryCard> {
         if (widget.queryProvider == 'Crossref') {
           // Convert the params string to the needed mapstring
           queryMap = Uri.splitQueryString(widget.queryParams);
-          CrossRefApi.resetWorksQueryCursor(); // Reset the cursor on new search
-          response = await CrossRefApi.getWorksByQuery(queryMap);
         } else if (widget.queryProvider == 'OpenAlex') {
           queryMap = Uri.splitQueryString(widget.queryParams);
 
@@ -120,9 +115,6 @@ class SearchQueryCardState extends State<SearchQueryCard> {
               dateFilter = remainingFilters.join(',');
             }
           }
-
-          response = await OpenAlexApi.getOpenAlexWorksByQuery(
-              query ?? '', scope, sortField, sortOrder, dateFilter);
         }
 
         Navigator.pop(context);
@@ -133,15 +125,11 @@ class SearchQueryCardState extends State<SearchQueryCard> {
             builder: (context) {
               if (widget.queryProvider == 'Crossref') {
                 return ArticleSearchResultsScreen(
-                  initialSearchResults: response.list,
-                  initialHasMore: response.hasMore,
                   queryParams: queryMap,
                   source: widget.queryProvider,
                 );
               } else {
                 return ArticleSearchResultsScreen(
-                  initialSearchResults: response,
-                  initialHasMore: response.isNotEmpty,
                   queryParams: {
                     'query': query,
                     'scope': scope,
