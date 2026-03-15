@@ -417,5 +417,8 @@
     "apiSettings": "Paramètres d'API",
     "openAlexApiKey": "Clé API d'OpenAlex",
     "openAlexApiKeyDesc": "OpenAlex nécessite une clé d'API gratuite afin d'utiliser leur API. Même si les requêtes peuvent fonctionner sans, l'utilisation d'une clé est fortement recommandée pour éviter les limitations de débit et assurer une meilleure fiabilité.",
-    "openAlexNoApiKey": "Aucune clé d'API pour OpenAlex n'est réglée. Veuillez en ajouter une dans les paramètres pour éviter des interruptions."
+    "openAlexNoApiKey": "Aucune clé d'API pour OpenAlex n'est réglée. Veuillez en ajouter une dans les paramètres pour éviter des interruptions.",
+    "selectTopicFirst": "Veuillez sélectionner un sujet !",
+    "publisherWithValue": "Éditeur : {name}",
+    "searchByTopic": "Recherche par sujets"
 }
