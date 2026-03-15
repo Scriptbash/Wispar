@@ -426,5 +426,7 @@
     "goToFirstPage": "Aller à la première page",
     "goToLastPage": "Aller à la dernière page",
     "nextMatch": "Prochaine occurrence",
-    "previousMatch": "Occurrence précédente"
+    "previousMatch": "Occurrence précédente",
+    "issnFilter": "Filtre ISSN",
+    "openAccessOnly": "Libre accès seulement"
 }
