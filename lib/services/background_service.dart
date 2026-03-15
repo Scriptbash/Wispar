@@ -13,7 +13,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 
 Future<void> initializeNotifications() async {
   const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
+      AndroidInitializationSettings('@drawable/ic_launcher_foreground');
 
   const DarwinInitializationSettings initializationSettingsDarwin =
       DarwinInitializationSettings(
@@ -45,7 +45,7 @@ Future<void> showNewJournalArticlesNotification() async {
         'Notification when new articles from followed journals are available',
     importance: Importance.high,
     priority: Priority.defaultPriority,
-    icon: '@mipmap/ic_launcher',
+    icon: '@drawable/ic_launcher_foreground',
     color: Color.fromARGB(255, 118, 54, 219),
     enableVibration: true,
     vibrationPattern: Int64List.fromList([0, 300, 100, 100, 100, 100, 300]),
@@ -76,7 +76,7 @@ Future<void> showNewQueryArticlesNotification() async {
         'Notification when new articles from saved queries are available',
     importance: Importance.high,
     priority: Priority.defaultPriority,
-    icon: '@mipmap/ic_launcher',
+    icon: '@drawable/ic_launcher_foreground',
     color: Color.fromARGB(255, 118, 54, 219),
     enableVibration: true,
     vibrationPattern: Int64List.fromList([0, 300, 100, 100, 100, 100, 300]),
