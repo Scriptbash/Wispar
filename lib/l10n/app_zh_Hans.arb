@@ -487,5 +487,16 @@
     "apiSettings": "API 设置",
     "openAlexApiKey": "OpenAlex API Key",
     "openAlexApiKeyDesc": "OpenAlex 需要免费 API key 访问其 API 。虽然没 key 请求仍然可能工作，但强烈建议使用 key 避免速率限制并确保可靠性。",
-    "openAlexNoApiKey": "未设置 OpenAlex key。请在设置中添加一个避免服务中断。"
+    "openAlexNoApiKey": "未设置 OpenAlex key。请在设置中添加一个避免服务中断。",
+    "issnFilter": "ISSN 筛选器",
+    "openAccessOnly": "仅打开权限",
+    "searchByTopic": "按主题搜索",
+    "selectTopicFirst": "先选择一个主题！",
+    "publisherWithValue": "出版商：{name}",
+    "zoomOut": "缩小",
+    "zoomIn": "放大",
+    "goToFirstPage": "转到第一页",
+    "goToLastPage": "转到最后一页",
+    "nextMatch": "下个匹配",
+    "previousMatch": "上个匹配"
 }
