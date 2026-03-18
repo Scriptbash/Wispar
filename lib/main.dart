@@ -14,6 +14,7 @@ import 'package:wispar/screens/downloads_screen.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:wispar/services/background_service.dart';
 import 'package:wispar/services/logs_helper.dart';
+import 'package:wispar/services/pocketbase_service.dart';
 import 'package:background_fetch/background_fetch.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -45,6 +46,7 @@ void main() async {
     databaseFactory = databaseFactoryFfi;
   }
   LogsService();
+  await PocketBaseService().init();
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     await windowManager.ensureInitialized();
     WindowOptions windowOptions = const WindowOptions(

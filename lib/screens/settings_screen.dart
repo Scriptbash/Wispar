@@ -9,6 +9,7 @@ import 'package:wispar/screens/display_settings_screen.dart';
 import 'package:wispar/screens/publication_card_settings_screen.dart';
 import 'package:wispar/screens/logs_screen.dart';
 import 'package:wispar/screens/institutional_settings_screen.dart';
+import 'package:wispar/screens/sync_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -97,6 +98,14 @@ class SettingsScreenState extends State<SettingsScreen> {
             context,
             MaterialPageRoute(
                 builder: (context) => const PublicationCardSettingsScreen())),
+      ),
+      _buildTile(
+        icon: Icons.sync,
+        label: AppLocalizations.of(context)!.cloudSync,
+        onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const SyncSettingsScreen())),
       ),
       _buildTile(
         icon: Icons.api_outlined,
