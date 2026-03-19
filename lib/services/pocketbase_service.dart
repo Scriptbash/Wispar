@@ -66,6 +66,14 @@ class PocketBaseService {
     }
   }
 
+  Future<void> requestPasswordReset(String email) async {
+    try {
+      await client.collection('users').requestPasswordReset(email);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<void> updateCustomUrl(String newUrl) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('pb_custom_url', newUrl);

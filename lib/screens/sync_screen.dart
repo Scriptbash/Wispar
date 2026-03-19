@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:pocketbase/pocketbase.dart';
 import 'package:wispar/services/pocketbase_service.dart';
 import 'package:wispar/services/sync_service.dart';
 import 'package:wispar/services/database_helper.dart';
@@ -26,6 +27,8 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
   final DatabaseHelper dbHelper = DatabaseHelper();
   final logger = LogsService().logger;
 
+  String? _errorMessage;
+
   @override
   void initState() {
     super.initState();
@@ -35,7 +38,10 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
   }
 
   Future<void> _handleLogin() async {
-    setState(() => _isSyncing = true);
+    setState(() {
+      _isSyncing = true;
+      _errorMessage = null;
+    });
     try {
       if (_isRegisterMode) {
         await pbService.register(
@@ -55,12 +61,9 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
       await _runSync();
     } catch (e, stackTrace) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-          AppLocalizations.of(context)!.authFailed(e),
-        )),
-      );
+      setState(() {
+        _errorMessage = _getCleanErrorMessage(e);
+      });
       logger.severe(
         'Failed to authenticate.',
         e,
@@ -119,6 +122,35 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
     }
   }
 
+  Future<void> _handleForgotPassword() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
+      setState(
+          () => _errorMessage = AppLocalizations.of(context)!.pleaseEnterEmail);
+      return;
+    }
+
+    setState(() {
+      _isSyncing = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await pbService.requestPasswordReset(email);
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(AppLocalizations.of(context)!.passwordResetSent)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _errorMessage = _getCleanErrorMessage(e));
+    } finally {
+      if (mounted) setState(() => _isSyncing = false);
+    }
+  }
+
   void _clearAuthForm() {
     _emailController.clear();
     _passwordController.clear();
@@ -147,6 +179,49 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
     } finally {
       setState(() => _isSyncing = false);
     }
+  }
+
+  String _getCleanErrorMessage(dynamic e) {
+    if (e is! ClientException) return e.toString();
+
+    final data = e.response['data'] as Map<String, dynamic>? ?? {};
+
+    if (e.statusCode == 400) {
+      if (data.containsKey('identity') || data.containsKey('email')) {
+        final emailErr = data['identity'] ?? data['email'];
+        final code = emailErr['code'];
+
+        if (code == 'validation_required') {
+          return AppLocalizations.of(context)!.pleaseEnterEmail;
+        }
+        if (code == 'validation_not_unique') {
+          return AppLocalizations.of(context)!.accountAlreadyExists;
+        }
+        if (code == 'validation_is_email') {
+          return AppLocalizations.of(context)!.pleaseEnterValidEmail;
+        }
+      }
+
+      if (data.containsKey('password')) {
+        final passErr = data['password'];
+        final code = passErr['code'];
+
+        if (code == 'validation_required') {
+          return AppLocalizations.of(context)!.pleaseEnterPassword;
+        }
+        if (code == 'validation_min_text_constraint') {
+          return AppLocalizations.of(context)!.passwordTooShort;
+        }
+      }
+
+      return AppLocalizations.of(context)!.checkdetailAndTryAgain;
+    }
+
+    if (e.statusCode == 401 || e.statusCode == 404) {
+      return AppLocalizations.of(context)!.invalidEmailOrPassword;
+    }
+
+    return AppLocalizations.of(context)!.cantConnectServer;
   }
 
   @override
@@ -210,7 +285,24 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
                   labelText: AppLocalizations.of(context)!.password),
               obscureText: true,
             ),
+            if (!_isRegisterMode && !_isSelfHosted)
+              TextButton(
+                onPressed: _isSyncing ? null : _handleForgotPassword,
+                child: Text(AppLocalizations.of(context)!.forgotPassword),
+              ),
             const SizedBox(height: 16),
+            if (_errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Text(
+                  _errorMessage!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
             FilledButton(
               onPressed: _isSyncing
                   ? null
