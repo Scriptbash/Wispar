@@ -790,6 +790,8 @@
     "@syncNow":{},
     "syncing":"Syncing...",
     "@syncing":{},
+    "lastSync":"Last sync: {time}",
+    "@lastSync":{},
     "authFailed":"Authentication failed: {error}",
     "@authFailed":{},
     "accountAlreadyExists":"This account already exists.",

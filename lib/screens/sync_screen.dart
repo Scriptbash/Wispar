@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:pocketbase/pocketbase.dart';
 import 'package:wispar/services/pocketbase_service.dart';
 import 'package:wispar/services/sync_service.dart';
@@ -27,6 +28,7 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
   final DatabaseHelper dbHelper = DatabaseHelper();
   final logger = LogsService().logger;
 
+  DateTime? _lastSyncDate;
   String? _errorMessage;
 
   @override
@@ -35,6 +37,7 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
     _urlController.text = pbService.baseURL;
     _isSelfHosted = pbService.baseURL !=
         'http://10.0.2.2:8090'; // Todo replace with sync.wispar.app
+    _loadLastSync();
   }
 
   Future<void> _handleLogin() async {
@@ -158,10 +161,22 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
     _isSyncing = false;
   }
 
+  Future<void> _loadLastSync() async {
+    final rawDate = await dbHelper.getLastSync();
+    if (rawDate != null) {
+      if (mounted) {
+        setState(() {
+          _lastSyncDate = DateTime.parse(rawDate).toLocal();
+        });
+      }
+    }
+  }
+
   Future<void> _runSync() async {
     setState(() => _isSyncing = true);
     try {
       await syncManager.sync();
+      await _loadLastSync();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.syncSuccess)),
@@ -245,7 +260,11 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
               ],
               selected: {_isSelfHosted},
               onSelectionChanged: (value) async {
-                setState(() => _isSelfHosted = value.first);
+                setState(() {
+                  _errorMessage = null;
+                  _isSelfHosted = value.first;
+                });
+
                 if (!_isSelfHosted) {
                   await pbService.updateCustomUrl(
                       'http://10.0.2.2:8090'); // Todo replace with sync.wispar.app
@@ -330,24 +349,39 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
               Text(AppLocalizations.of(context)!.syncDisclaimer)
           ] else ...[
             Card(
-              child: ListTile(
-                leading: Icon(Icons.cloud_done,
-                    color: Theme.of(context).colorScheme.primary),
-                title: Text(AppLocalizations.of(context)!
-                    .syncServer(_urlController.text)),
-                subtitle: Text(AppLocalizations.of(context)!.user(
-                    pbService.client.authStore.record?.get<String>("email") ??
-                        "Unknown")),
-                trailing: TextButton(
-                  onPressed: () {
-                    pbService.client.authStore.clear();
-                    _clearAuthForm();
-                    setState(() {});
-                  },
-                  child: Text(AppLocalizations.of(context)!.logout),
-                ),
+                child: ListTile(
+              leading: Icon(Icons.cloud_done,
+                  color: Theme.of(context).colorScheme.primary),
+              title: Text(
+                  pbService.client.authStore.record?.get<String>("email") ??
+                      "Unknown"),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(AppLocalizations.of(context)!
+                      .syncServer(_urlController.text)),
+                  if (_lastSyncDate != null)
+                    Text(
+                      AppLocalizations.of(context)!.lastSync(
+                        DateFormat.yMMMd(
+                                Localizations.localeOf(context).languageCode)
+                            .add_jm()
+                            .format(_lastSyncDate!),
+                      ),
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                ],
               ),
-            ),
+              isThreeLine: _lastSyncDate != null,
+              trailing: TextButton(
+                onPressed: () {
+                  pbService.client.authStore.clear();
+                  _clearAuthForm();
+                  setState(() => _lastSyncDate = null);
+                },
+                child: Text(AppLocalizations.of(context)!.logout),
+              ),
+            )),
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: _isSyncing ? null : _runSync,
