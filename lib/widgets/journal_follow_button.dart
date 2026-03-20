@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../generated_l10n/app_localizations.dart';
-import '../models/crossref_journals_models.dart' as Journals;
-import '../services/database_helper.dart';
-import '../models/journal_entity.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/models/crossref_journals_models.dart' as Journals;
+import 'package:wispar/services/database_helper.dart';
+import 'package:wispar/models/journal_entity.dart';
+import 'package:wispar/services/sync_service.dart';
 
 enum ButtonType { text, outlined }
 
@@ -13,12 +14,12 @@ class FollowButton extends StatelessWidget {
   final ButtonType buttonType;
 
   const FollowButton({
-    Key? key,
+    super.key,
     required this.item,
     required this.isFollowed,
     required this.onFollowStatusChanged,
     this.buttonType = ButtonType.text,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +50,7 @@ class FollowButton extends StatelessWidget {
 
   void toggleFollowStatus(BuildContext context) async {
     final dbHelper = DatabaseHelper();
+    final syncManager = SyncManager();
     int? journalId = await dbHelper.getJournalIdByIssns(item.issn);
     bool currentlyFollowed = false;
     if (journalId != null) {
@@ -69,6 +71,7 @@ class FollowButton extends StatelessWidget {
         ),
       );
     }
+    syncManager.triggerBackgroundSync();
 
     //await dbHelper.clearCachedPublications();
     onFollowStatusChanged(!currentlyFollowed);

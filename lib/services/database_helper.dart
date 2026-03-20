@@ -13,6 +13,7 @@ import 'package:wispar/services/logs_helper.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class DatabaseHelper {
   static const platform = MethodChannel('app.wispar.wispar/database_access');
@@ -77,7 +78,10 @@ class DatabaseHelper {
           title TEXT,
           publisher TEXT,
           dateFollowed TEXT,
-          lastUpdated TEXT
+          lastUpdated TEXT,
+          sync_id TEXT UNIQUE NOT NULL,
+          updated_at TEXT,
+          is_deleted INTEGER DEFAULT 0
         )
       ''');
       // Create the journal_issns table
@@ -85,6 +89,9 @@ class DatabaseHelper {
        CREATE TABLE journal_issns (
           issn TEXT PRIMARY KEY,
           journal_id INTEGER,
+          sync_id TEXT UNIQUE UNIQUE NOT NULL,
+          updated_at TEXT,
+          is_deleted INTEGER DEFAULT 0,
           FOREIGN KEY (journal_id) REFERENCES journals(journal_id)
         )
       ''');
@@ -112,6 +119,9 @@ class DatabaseHelper {
           query_id INTEGER,
           graphAbstractPath,
           journal_id,
+          sync_id TEXT UNIQUE UNIQUE NOT NULL,
+          updated_at TEXT,
+          is_deleted INTEGER DEFAULT 0,
           FOREIGN KEY (journal_id) REFERENCES journals(journal_id)
         )
       ''');
@@ -125,7 +135,10 @@ class DatabaseHelper {
           dateSaved TEXT,
           includeInFeed INTEGER,
           lastFetched TEXT,
-          queryProvider TEXT
+          queryProvider TEXT,
+          sync_id TEXT UNIQUE NOT NULL,
+          updated_at TEXT,
+          is_deleted INTEGER DEFAULT 0
         )
       ''');
 
@@ -137,7 +150,10 @@ class DatabaseHelper {
         includedKeywords TEXT,
         excludedKeywords TEXT,
         journals TEXT,
-        dateCreated TEXT DEFAULT CURRENT_TIMESTAMP
+        dateCreated TEXT DEFAULT CURRENT_TIMESTAMP,
+        sync_id TEXT UNIQUE NOT NULL,
+        updated_at TEXT,
+        is_deleted INTEGER DEFAULT 0
       )
       ''');
 
@@ -145,7 +161,10 @@ class DatabaseHelper {
         CREATE TABLE knownUrls (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           url TEXT,
-          proxySuccess INTEGER
+          proxySuccess INTEGER,
+          sync_id TEXT UNIQUE NOT NULL,
+          updated_at TEXT,
+          is_deleted INTEGER DEFAULT 0
         )
       ''');
     }, onUpgrade: (db, oldVersion, newVersion) async {
@@ -279,6 +298,61 @@ class DatabaseHelper {
         await db.execute('''
           ALTER TABLE feed_filters ADD COLUMN date_before TEXT;
         ''');
+        await db.execute(
+            'ALTER TABLE journals ADD COLUMN sync_id TEXT UNIQUE NOT NULL;');
+        await db.execute('ALTER TABLE journals ADD COLUMN updated_at TEXT;');
+        await db.execute(
+            'ALTER TABLE journals ADD COLUMN is_deleted INTEGER DEFAULT 0;');
+        await db.execute(
+            'ALTER TABLE journal_issns ADD COLUMN sync_id TEXT UNIQUE NOT NULL;');
+        await db
+            .execute('ALTER TABLE journal_issns ADD COLUMN updated_at TEXT;');
+        await db.execute(
+            'ALTER TABLE journal_issns ADD COLUMN is_deleted INTEGER DEFAULT 0;');
+        await db.execute(
+            'ALTER TABLE articles ADD COLUMN sync_id TEXT UNIQUE NOT NULL;');
+        await db.execute('ALTER TABLE articles ADD COLUMN updated_at TEXT;');
+        await db.execute(
+            'ALTER TABLE articles ADD COLUMN is_deleted INTEGER DEFAULT 0;');
+        await db.execute(
+            'ALTER TABLE savedQueries ADD COLUMN sync_id TEXT UNIQUE NOT NULL;');
+        await db
+            .execute('ALTER TABLE savedQueries ADD COLUMN updated_at TEXT;');
+        await db.execute(
+            'ALTER TABLE savedQueries ADD COLUMN is_deleted INTEGER DEFAULT 0;');
+        await db.execute(
+            'ALTER TABLE feed_filters ADD COLUMN sync_id TEXT UNIQUE NOT NULL;');
+        await db
+            .execute('ALTER TABLE feed_filters ADD COLUMN updated_at TEXT;');
+        await db.execute(
+            'ALTER TABLE feed_filters ADD COLUMN is_deleted INTEGER DEFAULT 0;');
+        await db.execute(
+            'ALTER TABLE knownUrls ADD COLUMN sync_id TEXT UNIQUE NOT NULL;');
+        await db.execute('ALTER TABLE knownUrls ADD COLUMN updated_at TEXT;');
+        await db.execute(
+            'ALTER TABLE knownUrls ADD COLUMN is_deleted INTEGER DEFAULT 0;');
+
+        // Initialize sync_ids for existing rows
+        Future<void> initSyncIds(String table, String pk) async {
+          final rows = await db.query(table);
+          for (final row in rows) {
+            await db.update(
+                table,
+                {
+                  'sync_id': Uuid().v7(),
+                  'updated_at': DateTime.now().toIso8601String(),
+                },
+                where: '$pk = ?',
+                whereArgs: [row[pk]]);
+          }
+        }
+
+        await initSyncIds('journals', 'journal_id');
+        await initSyncIds('journal_issns', 'issn');
+        await initSyncIds('articles', 'article_id');
+        await initSyncIds('savedQueries', 'query_id');
+        await initSyncIds('feed_filters', 'id');
+        await initSyncIds('knownUrls', 'id');
       }
     });
   }
@@ -317,6 +391,7 @@ class DatabaseHelper {
             'dateFollowed': DateTime.now().toIso8601String().substring(0, 10),
             'title': journal.title,
             'publisher': journal.publisher,
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
           },
           where: 'journal_id = ?',
           whereArgs: [journalId],
@@ -334,13 +409,26 @@ class DatabaseHelper {
             {
               'issn': issn,
               'journal_id': journalId,
+              'sync_id': const Uuid().v7(),
+              'updated_at': DateTime.now().toUtc().toIso8601String(),
             },
             conflictAlgorithm: ConflictAlgorithm.replace,
           );
         }
       }
     } else {
-      final journalId = await db.insert('journals', journal.toMap());
+      final journalId = await db.insert(
+        'journals',
+        {
+          'title': journal.title,
+          'publisher': journal.publisher,
+          'dateFollowed': journal.dateFollowed ??
+              DateTime.now().toIso8601String().substring(0, 10),
+          'lastUpdated': journal.lastUpdated,
+          'sync_id': const Uuid().v7(),
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        },
+      );
 
       for (final issn in journal.issn) {
         await db.insert(
@@ -348,6 +436,8 @@ class DatabaseHelper {
           {
             'issn': issn,
             'journal_id': journalId,
+            'sync_id': const Uuid().v7(),
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
           },
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
@@ -452,25 +542,34 @@ class DatabaseHelper {
   }
 
   Future<void> removeJournal(List<String> issns) async {
+    int? journalId = await getJournalIdByIssns(issns);
+    if (journalId != null) {
+      await removeJournalById(journalId);
+    }
+  }
+
+  Future<void> removeJournalById(int journalId) async {
     final db = await database;
 
-    int? journalId = await getJournalIdByIssns(issns);
+    await db.update(
+      'articles',
+      {
+        'dateCached': null,
+      },
+      where: 'journal_id = ?',
+      whereArgs: [journalId],
+    );
 
-    if (journalId != null) {
-      await db.update(
-        'articles',
-        {'dateCached': null},
-        where: 'journal_id = ?',
-        whereArgs: [journalId],
-      );
-
-      await db.update(
-        'journals',
-        {'dateFollowed': null, 'lastUpdated': null},
-        where: 'journal_id = ?',
-        whereArgs: [journalId],
-      );
-    }
+    await db.update(
+      'journals',
+      {
+        'dateFollowed': null,
+        'lastUpdated': null,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      },
+      where: 'journal_id = ?',
+      whereArgs: [journalId],
+    );
   }
 
   Future<bool> isJournalFollowed(int journalId) async {
@@ -491,7 +590,9 @@ class DatabaseHelper {
     final db = await database;
     await db.update(
       'journals',
-      {'lastUpdated': DateTime.now().toIso8601String()},
+      {
+        'lastUpdated': DateTime.now().toIso8601String(),
+      },
       where: 'journal_id = ?',
       whereArgs: [journalId],
     );
@@ -553,7 +654,11 @@ class DatabaseHelper {
           'publisher': publicationCard.publisher,
         };
 
-        journalId = await db.insert('journals', journalData);
+        journalId = await db.insert('journals', {
+          ...journalData,
+          'sync_id': const Uuid().v7(),
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        });
 
         // Insert the ISSNs into the journal_issns table
         for (final issn in publicationCard.issn) {
@@ -562,6 +667,8 @@ class DatabaseHelper {
             {
               'issn': issn,
               'journal_id': journalId,
+              'sync_id': const Uuid().v7(),
+              'updated_at': DateTime.now().toUtc().toIso8601String(),
             },
             conflictAlgorithm: ConflictAlgorithm.ignore,
           );
@@ -589,6 +696,8 @@ class DatabaseHelper {
         'dateCached': isCached ? DateTime.now().toIso8601String() : null,
         'isSavedQuery': isSavedQuery ? 1 : 0,
         'query_id': queryId,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+        'sync_id': const Uuid().v7(),
         'journal_id': journalId,
       });
     }
@@ -710,6 +819,8 @@ class DatabaseHelper {
           publicationCard.authors.map((author) => author.toJson()).toList(),
         ),
         'dateCached': DateTime.now().toIso8601String(),
+        'sync_id': const Uuid().v7(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
     }
   }
@@ -1007,6 +1118,8 @@ class DatabaseHelper {
         'dateSaved': dateSaved,
         'includeInFeed': 0,
         'queryProvider': provider,
+        'sync_id': const Uuid().v7(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
       },
     );
   }
@@ -1059,7 +1172,10 @@ class DatabaseHelper {
     final db = await database;
     await db.update(
       'savedQueries',
-      {'includeInFeed': includeInFeed ? 1 : 0},
+      {
+        'includeInFeed': includeInFeed ? 1 : 0,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      },
       where: 'query_id = ?',
       whereArgs: [id],
     );
@@ -1298,6 +1414,8 @@ class DatabaseHelper {
       'date_mode': dateMode,
       'date_after': dateAfter,
       'date_before': dateBefore,
+      'sync_id': const Uuid().v7(),
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
     });
   }
 
@@ -1345,6 +1463,7 @@ class DatabaseHelper {
         'date_mode': dateMode,
         'date_after': dateAfter,
         'date_before': dateBefore,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
       },
       where: 'id = ?',
       whereArgs: [id],
@@ -1363,6 +1482,8 @@ class DatabaseHelper {
       {
         'url': url,
         'proxySuccess': proxySuccess,
+        'sync_id': const Uuid().v7(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -1373,6 +1494,7 @@ class DatabaseHelper {
     final updateData = <String, Object?>{};
     if (url != null) updateData['url'] = url;
     if (proxySuccess != null) updateData['proxySuccess'] = proxySuccess;
+    updateData['updated_at'] = DateTime.now().toUtc().toIso8601String();
 
     return await db.update(
       'knownUrls',
@@ -1399,5 +1521,63 @@ class DatabaseHelper {
       whereArgs: [url],
     );
     return results.isNotEmpty ? results.first : null;
+  }
+
+  Future<String?> getLastSync() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('last_sync');
+  }
+
+  Future<void> setLastSync(String timestamp) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('last_sync', timestamp);
+  }
+
+  Future<void> syncJournalFromCloud(Map<String, dynamic> data) async {
+    final db = await database;
+    final syncId = data['sync_id'];
+
+    final existingJournals = await db.query(
+      'journals',
+      where: 'sync_id = ?',
+      whereArgs: [syncId],
+      limit: 1,
+    );
+
+    if (existingJournals.isEmpty) {
+      await db.insert('journals', data);
+    } else {
+      await db.update(
+        'journals',
+        data,
+        where: 'sync_id = ?',
+        whereArgs: [syncId],
+      );
+    }
+  }
+
+  Future<void> syncJournalIssnFromCloud(Map<String, dynamic> data) async {
+    final db = await database;
+
+    final syncId = data['sync_id'];
+
+    final existingIssns = await db.query(
+      'journal_issns',
+      where: 'sync_id = ?',
+      whereArgs: [syncId],
+      limit: 1,
+    );
+
+    if (existingIssns.isEmpty) {
+      await db.insert('journal_issns', data,
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    } else {
+      await db.update(
+        'journal_issns',
+        data,
+        where: 'sync_id = ?',
+        whereArgs: [syncId],
+      );
+    }
   }
 }

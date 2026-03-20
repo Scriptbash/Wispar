@@ -842,7 +842,7 @@
     "@deleteCloudAccount":{},
     "deleteAccountQmark":"Permenantly delete account?",
     "@deleteAccountQmark":{},
-    "deleteAccountExplanation": "This will permanently delete your account and cloud data. Your local data on this phone will remain.",
+    "deleteAccountExplanation": "This will permanently delete your account and cloud data. Your local data on this device will remain.",
     "@deleteAccountExplanation":{},
     "accountAndDataDeleted":"Account and cloud data deleted",
     "@accountAndDataDeleted":{}
