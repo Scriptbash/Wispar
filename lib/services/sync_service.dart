@@ -48,7 +48,10 @@ class SyncManager {
     await _pushJournals(pb, userId);
     await _pushJournalIssns(pb, userId);
 
-    await dbHelper.setLastSync(DateTime.now().toIso8601String());
+    await _pullArticles(pb, userId);
+    await _pushArticles(pb, userId);
+
+    await dbHelper.setLastSync(DateTime.now().toUtc().toIso8601String());
   }
 
   Future<void> _pullJournals(PocketBase pb, String userId) async {
@@ -58,43 +61,77 @@ class SyncManager {
     final cloudRecords = await pb.collection('journals').getFullList(
           filter: 'user = "$userId"',
         );
+    logger.info("Pulling journals: ${cloudRecords.length} found in cloud.");
+    // I first get the issns to compare locally. If they already exist,
+    // the local sync_id must be updated so the device match with the cloud
+    final cloudIssns = await pb.collection('journal_issns').getFullList(
+          filter: 'user = "$userId"',
+        );
 
     for (final r in cloudRecords) {
-      final syncId = r.get<String>('sync_id');
-      final pbUpdatedAt = DateTime.tryParse(r.get<String>('updated_at')) ??
-          DateTime.fromMillisecondsSinceEpoch(0);
+      final cloudSyncId = r.get<String>('sync_id');
+      final cloudTitle = r.get<String>('title');
+      final pbUpdatedAt = r.get<String>('updated_at');
       final dateFollowedStr = r.get<String?>('date_followed');
 
       final journalData = {
-        'title': r.get<String>('title', ''),
+        'title': cloudTitle,
         'publisher': r.get<String>('publisher', ''),
-        'dateFollowed': (dateFollowedStr == null || dateFollowedStr.isEmpty)
-            ? null
-            : dateFollowedStr,
-        'sync_id': syncId,
+        'dateFollowed':
+            (dateFollowedStr?.isEmpty ?? true) ? null : dateFollowedStr,
+        'sync_id': cloudSyncId,
         'is_deleted': (r.get<bool?>('is_deleted') ?? false) ? 1 : 0,
-        'updated_at': r.get<String>('updated_at', ''),
+        'updated_at': pbUpdatedAt,
       };
 
-      final local = await db.query('journals',
-          where: 'sync_id = ?', whereArgs: [syncId], limit: 1);
+      // Check if sync_id match
+      var local = await db.query('journals',
+          where: 'sync_id = ?', whereArgs: [cloudSyncId], limit: 1);
+
+      // If nothing matches the sync_id, try to match by title/issn
+      if (local.isEmpty) {
+        final titleMatches = await db.query('journals',
+            where: 'LOWER(title) = ?', whereArgs: [cloudTitle.toLowerCase()]);
+
+        for (final potentialMatch in titleMatches) {
+          final localId = potentialMatch['journal_id'] as int;
+
+          final localIssns = await db.query('journal_issns',
+              where: 'journal_id = ?', whereArgs: [localId]);
+          final localIssnSet =
+              localIssns.map((i) => i['issn'] as String).toSet();
+
+          final cloudIssnSet = cloudIssns
+              .where((i) => i.get<String>('journal_id') == r.id)
+              .map((i) => i.get<String>('issn'))
+              .toSet();
+
+          // If an issn match I merge them to avoid duplicates
+          if (localIssnSet.intersection(cloudIssnSet).isNotEmpty) {
+            logger.info(
+                "Merging local journal ${potentialMatch['sync_id']} into cloud ID $cloudSyncId via ISSN match.");
+            await db.update('journals', {'sync_id': cloudSyncId},
+                where: 'journal_id = ?', whereArgs: [localId]);
+
+            local = await db.query('journals',
+                where: 'sync_id = ?', whereArgs: [cloudSyncId], limit: 1);
+            break;
+          }
+        }
+      }
 
       if (local.isEmpty) {
         await dbHelper.syncJournalFromCloud(journalData);
       } else {
-        final localUpdatedAt =
-            DateTime.tryParse((local.first['updated_at'] as String?) ?? '') ??
-                DateTime.fromMillisecondsSinceEpoch(0);
-        if (pbUpdatedAt.isAfter(localUpdatedAt)) {
+        final localUpdatedAt = local.first['updated_at'] as String? ?? '';
+
+        if (_isNewer(pbUpdatedAt, localUpdatedAt)) {
           await dbHelper.syncJournalFromCloud(journalData);
-        }
-      }
 
-      if (journalData['dateFollowed'] == null && local.isNotEmpty) {
-        final localDateFollowed = local.first['dateFollowed'];
-
-        if (localDateFollowed != null) {
-          await dbHelper.removeJournalById(local.first['journal_id'] as int);
+          if (journalData['dateFollowed'] == null &&
+              local.first['dateFollowed'] != null) {
+            await dbHelper.removeJournalById(local.first['journal_id'] as int);
+          }
         }
       }
     }
@@ -160,11 +197,13 @@ class SyncManager {
 
       if (existingCloud == null) {
         // Journal doesn't exist in cloud -> Create it
+        logger.info("Pushing new journal to cloud: ${data['title']}");
         await pb.collection('journals').create(body: data);
       } else {
         final pbDate = existingCloud.data['updated_at'] as String? ?? '';
 
         if (_isNewer(localDate, pbDate)) {
+          logger.info("Pushing update for journal: ${data['title']}");
           await pb.collection('journals').update(existingCloud.id, body: data);
         }
       }
@@ -218,6 +257,193 @@ class SyncManager {
               .collection('journal_issns')
               .update(existingCloud.id, body: data);
         }
+      }
+    }
+  }
+
+  Future<void> _pullArticles(PocketBase pb, String userId) async {
+    final db = await dbHelper.database;
+    final lastSync = await dbHelper.getLastSync();
+
+    String filter = 'user = "$userId"';
+    if (lastSync != null) {
+      final pbDate = lastSync.replaceAll('T', ' ');
+      filter += ' && updated_at > "$pbDate"';
+    }
+
+    final cloudArticles = await pb.collection('articles').getFullList(
+          filter: filter,
+          expand: 'journal_id',
+        );
+
+    logger.info("Delta pull results: ${cloudArticles.length} articles found.");
+
+    for (final r in cloudArticles) {
+      final syncId = r.get<String>('sync_id');
+      final rawDateLiked = r.get<String?>('date_liked');
+      final cloudDateLiked =
+          (rawDateLiked?.isEmpty ?? true) ? null : rawDateLiked;
+      final cloudIsHidden = r.get<bool>('is_hidden', false) ? 1 : 0;
+      final pbUpdatedAt = r.get<String>('updated_at');
+
+      var local = await db.query('articles',
+          where: 'sync_id = ?', whereArgs: [syncId], limit: 1);
+
+      int? localJournalId;
+      final expandedJournal = r.get<RecordModel?>('expand.journal_id');
+      if (expandedJournal != null) {
+        final parentSyncId = expandedJournal.get<String>('sync_id');
+        final journalRes = await db.query('journals',
+            where: 'sync_id = ?', whereArgs: [parentSyncId], limit: 1);
+        if (journalRes.isNotEmpty) {
+          localJournalId = journalRes.first['journal_id'] as int;
+        }
+      }
+
+      if (local.isEmpty) {
+        final String cloudDoi = r.get<String>('doi', '');
+        final doiMatches = await db.query(
+          'articles',
+          where: 'doi = ?',
+          whereArgs: [cloudDoi],
+          limit: 1,
+        );
+
+        if (doiMatches.isNotEmpty) {
+          logger.info(
+              "Merging local article via DOI: $cloudDoi into cloud sync_id: $syncId");
+          await db.update(
+            'articles',
+            {'sync_id': syncId},
+            where: 'doi = ?',
+            whereArgs: [cloudDoi],
+          );
+
+          local = await db.query('articles',
+              where: 'sync_id = ?', whereArgs: [syncId], limit: 1);
+        } else if (cloudDateLiked != null || cloudIsHidden == 1) {
+          await db.insert('articles', {
+            'doi': cloudDoi,
+            'title': r.get<String>('title', ''),
+            'abstract': r.get<String>('abstract', ''),
+            'authors': r.get<String>('authors', ''),
+            'publishedDate': r.get<String>('published_date', ''),
+            'url': r.get<String>('url', ''),
+            'license': r.get<String>('license', ''),
+            'licenseName': r.get<String>('license_name', ''),
+            'isSavedQuery': r.get<bool>('is_saved_query', false) ? 1 : 0,
+            'query_id': r.get<int?>('query_id'),
+            'dateLiked': cloudDateLiked,
+            'isHidden': cloudIsHidden,
+            'journal_id': localJournalId,
+            'sync_id': syncId,
+            'updated_at': pbUpdatedAt,
+          });
+          continue;
+        }
+      }
+
+      if (local.isNotEmpty) {
+        final localUpdatedAt = local.first['updated_at'] as String? ?? '';
+        if (_isNewer(pbUpdatedAt, localUpdatedAt)) {
+          await db.update(
+            'articles',
+            {
+              'dateLiked': cloudDateLiked,
+              'isHidden': cloudIsHidden,
+              'updated_at': pbUpdatedAt,
+              'journal_id': localJournalId,
+            },
+            where: 'sync_id = ?',
+            whereArgs: [syncId],
+          );
+          logger.info("Updated existing article: ${r.get<String>('title')}");
+        }
+      }
+    }
+  }
+
+  Future<void> _pushArticles(PocketBase pb, String userId) async {
+    final db = await dbHelper.database;
+    final lastSync = await dbHelper.getLastSync();
+
+    final rows = await db.query(
+      'articles',
+      where: 'updated_at > ?',
+      whereArgs: [lastSync ?? '1970-01-01T00:00:00Z'],
+    );
+
+    if (rows.isEmpty) return;
+
+    final cloudJournals =
+        await pb.collection('journals').getFullList(filter: 'user = "$userId"');
+    final journalSyncToPbId = {
+      for (var r in cloudJournals) r.get<String>('sync_id'): r.id
+    };
+
+    final cloudArticles =
+        await pb.collection('articles').getFullList(filter: 'user = "$userId"');
+    final cloudMap = {for (var r in cloudArticles) r.get<String>('sync_id'): r};
+
+    for (final a in rows) {
+      try {
+        final syncId = a['sync_id'] as String;
+        final existingCloud = cloudMap[syncId];
+        final localDateLiked = a['dateLiked'] as String?;
+        final localIsHidden = a['isHidden'] == 1;
+
+        final journalRes = await db.query('journals',
+            where: 'journal_id = ?', whereArgs: [a['journal_id']], limit: 1);
+
+        String? pbJournalRecordId;
+        if (journalRes.isNotEmpty) {
+          pbJournalRecordId = journalSyncToPbId[journalRes.first['sync_id']];
+        }
+
+        if (existingCloud == null) {
+          // Only push artcles if it's liked or hidden
+          if (localDateLiked != null || localIsHidden) {
+            if (pbJournalRecordId != null) {
+              final data = {
+                'doi': a['doi'] ?? '',
+                'title': a['title'] ?? '',
+                'abstract': a['abstract'] ?? '',
+                'authors': a['authors'] ?? '',
+                'published_date': a['publishedDate'] ?? '',
+                'url': a['url'] ?? '',
+                'license': a['license'] ?? '',
+                'license_name': a['licenseName'] ?? '',
+                'is_saved_query': a['isSavedQuery'] == 1,
+                'query_id': a['query_id'],
+                'date_liked': localDateLiked,
+                'is_hidden': localIsHidden,
+                'sync_id': syncId,
+                'user': userId,
+                'journal_id': pbJournalRecordId,
+              };
+              await pb.collection('articles').create(body: data);
+            } else {
+              logger.warning(
+                  "Skipping create for $syncId: No cloud journal ID found.");
+            }
+          }
+        } else {
+          final cloudDateLiked = existingCloud.get<String?>('date_liked');
+          final cloudIsHidden = existingCloud.get<bool>('is_hidden', false);
+
+          if (localDateLiked != cloudDateLiked ||
+              localIsHidden != cloudIsHidden) {
+            await pb.collection('articles').update(existingCloud.id, body: {
+              'date_liked': localDateLiked,
+              'is_hidden': localIsHidden,
+              if (pbJournalRecordId != null) 'journal_id': pbJournalRecordId,
+            });
+            logger.info(
+                "Pushed article update: $syncId (Hidden: $localIsHidden, Liked: $localDateLiked)");
+          }
+        }
+      } catch (e) {
+        logger.warning("Failed to push article ${a['sync_id']}: $e");
       }
     }
   }

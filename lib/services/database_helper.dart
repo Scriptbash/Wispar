@@ -340,7 +340,7 @@ class DatabaseHelper {
                 table,
                 {
                   'sync_id': Uuid().v7(),
-                  'updated_at': DateTime.now().toIso8601String(),
+                  'updated_at': DateTime.now().toUtc().toIso8601String(),
                 },
                 where: '$pk = ?',
                 whereArgs: [row[pk]]);
@@ -621,6 +621,7 @@ class DatabaseHelper {
     if (existingArticle.isNotEmpty) {
       // Article already exists, update the timestamp based on parameters
       final Map<String, dynamic> updateData = {};
+      updateData['updated_at'] = DateTime.now().toUtc().toIso8601String();
 
       if (isLiked && existingArticle[0]['dateLiked'] == null) {
         updateData['dateLiked'] =
@@ -749,7 +750,10 @@ class DatabaseHelper {
 
     await db.update(
       'articles',
-      {'dateLiked': null},
+      {
+        'dateLiked': null,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      },
       where: 'doi = ?',
       whereArgs: [doi],
     );
@@ -796,6 +800,7 @@ class DatabaseHelper {
             'authors': jsonEncode(
               publicationCard.authors.map((author) => author.toJson()).toList(),
             ),
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
           },
           where: 'article_id = ?',
           whereArgs: [articleId],
@@ -901,7 +906,10 @@ class DatabaseHelper {
     final db = await database;
     await db.update(
       'articles',
-      {'isHidden': 1},
+      {
+        'isHidden': 1,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      },
       where: 'doi = ?',
       whereArgs: [doi],
     );
@@ -911,7 +919,10 @@ class DatabaseHelper {
     final db = await database;
     await db.update(
       'articles',
-      {'isHidden': 0},
+      {
+        'isHidden': 0,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      },
       where: 'doi = ?',
       whereArgs: [doi],
     );
@@ -1183,7 +1194,10 @@ class DatabaseHelper {
     if (!includeInFeed) {
       await db.update(
         'savedQueries',
-        {'lastFetched': null},
+        {
+          'lastFetched': null,
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        },
         where: 'query_id = ?',
         whereArgs: [id],
       );
