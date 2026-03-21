@@ -8,6 +8,7 @@ import 'package:wispar/screens/journals_details_screen.dart';
 import 'package:wispar/screens/article_website.dart';
 import 'package:wispar/services/database_helper.dart';
 import 'package:wispar/services/zotero_api.dart';
+import 'package:wispar/services/sync_service.dart';
 import 'package:wispar/widgets/publication_card/publication_card_content.dart';
 import 'package:wispar/widgets/publication_card/card_swipe_background.dart';
 import 'package:wispar/widgets/zotero_bottomsheet.dart';
@@ -95,6 +96,8 @@ class PublicationCardState extends State<PublicationCard>
     with SingleTickerProviderStateMixin {
   bool isLiked = false;
   late DatabaseHelper databaseHelper;
+  final syncManager = SyncManager();
+
   late AnimationController _swipeController;
   late Animation<Offset> _slideAnimation;
   double _dragExtent = 0.0;
@@ -150,6 +153,7 @@ class PublicationCardState extends State<PublicationCard>
     } else {
       await databaseHelper.removeFavorite(widget.doi);
     }
+    syncManager.triggerBackgroundSync();
     widget.onFavoriteChanged?.call();
   }
 
@@ -171,6 +175,7 @@ class PublicationCardState extends State<PublicationCard>
         } else {
           await databaseHelper.hideArticle(widget.doi);
         }
+        syncManager.triggerBackgroundSync();
         widget.onHide?.call();
         break;
       case SwipeAction.favorite:
@@ -180,6 +185,7 @@ class PublicationCardState extends State<PublicationCard>
         } else {
           await databaseHelper.removeFavorite(widget.doi);
         }
+        syncManager.triggerBackgroundSync();
         widget.onFavoriteChanged?.call();
         break;
       case SwipeAction.sendToZotero:
