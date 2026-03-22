@@ -8,7 +8,9 @@ class PocketBaseService {
   factory PocketBaseService() => _instance;
 
   bool get isAuthenticated => _client?.authStore.isValid ?? false;
-  String get baseURL => _client?.baseURL ?? 'sync.wispar.app';
+  bool get isVerified =>
+      _client?.authStore.record?.getBoolValue('verified') ?? false;
+  String get baseURL => _client?.baseURL ?? 'https://sync.wispar.app';
 
   PocketBase? _client;
 
@@ -32,7 +34,8 @@ class PocketBaseService {
       clear: () async => await secureStorage.delete(key: 'pb_auth'),
     );
 
-    final savedUrl = prefs.getString('pb_custom_url') ?? 'sync.wispar.app';
+    final savedUrl =
+        prefs.getString('pb_custom_url') ?? 'https://sync.wispar.app';
 
     _client = PocketBase(savedUrl, authStore: store);
     _isInitialized = true;
@@ -46,7 +49,16 @@ class PocketBaseService {
         'passwordConfirm': password,
         'emailVisibility': false,
       });
+      await client.collection('users').requestVerification(email);
       return await client.collection('users').authWithPassword(email, password);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> resendVerification(String email) async {
+    try {
+      await client.collection('users').requestVerification(email);
     } catch (e) {
       rethrow;
     }

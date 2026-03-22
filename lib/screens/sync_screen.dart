@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -31,6 +32,9 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
   DateTime? _lastSyncDate;
   String? _errorMessage;
 
+  int _resendCooldown = 0;
+  Timer? _cooldownTimer;
+
   @override
   void initState() {
     super.initState();
@@ -55,30 +59,87 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
           _emailController.text.trim(),
           _passwordController.text.trim(),
         );
+        // Don't log the user until the user verify their email
+        pbService.client.authStore.clear();
+
+        if (!mounted) return;
+
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(AppLocalizations.of(context)!.checkEmail),
+            content: Text(AppLocalizations.of(context)!.checkEmailDescription),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  setState(() => _isRegisterMode = false);
+                  _passwordController.clear();
+                },
+                child: Text(AppLocalizations.of(context)!.close),
+              ),
+            ],
+          ),
+        );
       } else {
         await pbService.client.collection('users').authWithPassword(
               _emailController.text.trim(),
               _passwordController.text.trim(),
             );
+
+        if (!pbService.isVerified) {
+          pbService.client.authStore.clear();
+          setState(() {
+            _errorMessage = AppLocalizations.of(context)!.emailNotVerifiedError;
+          });
+          return;
+        }
+
+        setState(() {});
+        logger.info('Logged in a cloud account.');
+        await _runSync();
       }
-
-      setState(() {});
-      logger.info('Logged in a cloud account.');
-
-      await _runSync();
     } catch (e, stackTrace) {
       if (!mounted) return;
       setState(() {
         _errorMessage = _getCleanErrorMessage(e);
       });
-      logger.severe(
-        'Failed to authenticate.',
-        e,
-        stackTrace,
+      logger.severe('Failed to authenticate.', e, stackTrace);
+    } finally {
+      if (mounted) setState(() => _isSyncing = false);
+    }
+  }
+
+  Future<void> _handleResendVerification() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) return;
+
+    setState(() => _isSyncing = true);
+    try {
+      await pbService.resendVerification(email);
+      _startResendCooldown();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(AppLocalizations.of(context)!.checkEmailDescription)),
       );
+    } catch (e) {
+      setState(() => _errorMessage = _getCleanErrorMessage(e));
     } finally {
       setState(() => _isSyncing = false);
     }
+  }
+
+  void _startResendCooldown() {
+    setState(() => _resendCooldown = 60);
+    _cooldownTimer?.cancel();
+    _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_resendCooldown == 0) {
+        timer.cancel();
+      } else {
+        setState(() => _resendCooldown--);
+      }
+    });
   }
 
   Future<void> _handleDeleteAccount() async {
@@ -244,6 +305,12 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
   }
 
   @override
+  void dispose() {
+    _cooldownTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.cloudSync)),
@@ -270,8 +337,11 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
                 });
 
                 if (!_isSelfHosted) {
-                  await pbService.updateCustomUrl('http://127.0.0.1:8090');
-                  _urlController.text = 'http://127.0.0.1:8090';
+                  const prodUrl = 'https://sync.wispar.app';
+                  await pbService.updateCustomUrl(prodUrl);
+                  _urlController.text = prodUrl;
+                } else {
+                  _urlController.text = '';
                 }
               },
             ),
@@ -285,9 +355,9 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
             if (_isSelfHosted) ...[
               TextField(
                 controller: _urlController,
-                decoration: const InputDecoration(
-                  labelText: 'Server URL (e.g. http://192.168.1.50:8090)',
-                  hintText: 'http://your-ip:port',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.serverUrl,
+                  hintText: 'http://192.168.1.50:8090',
                 ),
                 onSubmitted: (val) async =>
                     await pbService.updateCustomUrl(val.trim()),
@@ -320,6 +390,24 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
                   style: const TextStyle(
                     color: Colors.red,
                     fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            if (_errorMessage != null &&
+                _errorMessage!.contains("verify") &&
+                !_isRegisterMode)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: TextButton.icon(
+                  onPressed: (_resendCooldown > 0 || _isSyncing)
+                      ? null
+                      : _handleResendVerification,
+                  icon: const Icon(Icons.email),
+                  label: Text(
+                    _resendCooldown > 0
+                        ? AppLocalizations.of(context)!
+                            .waitResendEmail(_resendCooldown)
+                        : AppLocalizations.of(context)!.resendEmail,
                   ),
                 ),
               ),
