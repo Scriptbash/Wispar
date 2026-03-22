@@ -461,11 +461,12 @@ class SyncManager {
     logger.info("Pulling feed filters: ${cloudRecords.length} found in cloud.");
 
     for (final r in cloudRecords) {
-      final syncId = r.get<String>('sync_id');
+      final cloudSyncId = r.get<String>('sync_id');
+      final cloudName = r.get<String>('name');
       final pbUpdatedAt = r.get<String>('updated_at');
 
       final filterData = {
-        'name': r.get<String>('name'),
+        'name': cloudName,
         'includedKeywords': r.get<String?>('included_keywords'),
         'excludedKeywords': r.get<String?>('excluded_keywords'),
         'journals': r.get<String?>('journals'),
@@ -473,28 +474,48 @@ class SyncManager {
         'date_after': r.get<String?>('date_after'),
         'date_before': r.get<String?>('date_before'),
         'dateCreated': r.get<String>('date_created'),
-        'sync_id': syncId,
+        'sync_id': cloudSyncId,
         'is_deleted': r.get<bool>('is_deleted') ? 1 : 0,
         'updated_at': pbUpdatedAt,
       };
 
-      final bool cloudIsDeleted = r.get<bool>('is_deleted');
-
-      if (cloudIsDeleted) {
-        int count = await db.update(
+      if (r.get<bool>('is_deleted')) {
+        await db.update(
           'feed_filters',
           {'is_deleted': 1},
           where: 'sync_id = ? AND is_deleted = 0',
-          whereArgs: [syncId],
+          whereArgs: [cloudSyncId],
         );
-
-        if (count > 0) {
-          logger.info("Marked $syncId as deleted locally.");
-        }
         continue;
       }
-      final local = await db.query('feed_filters',
-          where: 'sync_id = ?', whereArgs: [syncId], limit: 1);
+
+      var local = await db.query('feed_filters',
+          where: 'sync_id = ?', whereArgs: [cloudSyncId], limit: 1);
+
+      if (local.isEmpty) {
+        final nameMatches = await db.query(
+          'feed_filters',
+          where: 'LOWER(name) = ?',
+          whereArgs: [cloudName.toLowerCase()],
+          limit: 1,
+        );
+
+        if (nameMatches.isNotEmpty) {
+          final localId = nameMatches.first['id'];
+          logger.info(
+              "Merging local filter '$cloudName' into cloud sync_id: $cloudSyncId via name match.");
+
+          await db.update(
+            'feed_filters',
+            {'sync_id': cloudSyncId},
+            where: 'id = ?',
+            whereArgs: [localId],
+          );
+
+          local = await db.query('feed_filters',
+              where: 'sync_id = ?', whereArgs: [cloudSyncId], limit: 1);
+        }
+      }
 
       if (local.isEmpty) {
         await db.insert('feed_filters', filterData);
@@ -503,7 +524,7 @@ class SyncManager {
         final localUpdatedAt = local.first['updated_at'] as String? ?? '';
         if (_isNewer(pbUpdatedAt, localUpdatedAt)) {
           await db.update('feed_filters', filterData,
-              where: 'sync_id = ?', whereArgs: [syncId]);
+              where: 'sync_id = ?', whereArgs: [cloudSyncId]);
           logger.info("Updated feed filter: ${filterData['name']}");
         }
       }
