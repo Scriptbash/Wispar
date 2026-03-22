@@ -349,39 +349,96 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
               Text(AppLocalizations.of(context)!.syncDisclaimer)
           ] else ...[
             Card(
-                child: ListTile(
-              leading: Icon(Icons.cloud_done,
-                  color: Theme.of(context).colorScheme.primary),
-              title: Text(
-                  pbService.client.authStore.record?.get<String>("email") ??
-                      "Unknown"),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(AppLocalizations.of(context)!
-                      .syncServer(_urlController.text)),
-                  if (_lastSyncDate != null)
-                    Text(
-                      AppLocalizations.of(context)!.lastSync(
-                        DateFormat.yMMMd(
-                                Localizations.localeOf(context).languageCode)
-                            .add_jm()
-                            .format(_lastSyncDate!),
-                      ),
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 8, 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.cloud_done,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 32,
                     ),
-                ],
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Text(
+                                    pbService.client.authStore.record
+                                            ?.get<String>("email") ??
+                                        "Unknown",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  pbService.client.authStore.clear();
+                                  _clearAuthForm();
+                                  setState(() => _lastSyncDate = null);
+                                },
+                                style: TextButton.styleFrom(
+                                  visualDensity: VisualDensity.compact,
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 8),
+                                ),
+                                child:
+                                    Text(AppLocalizations.of(context)!.logout),
+                              ),
+                            ],
+                          ),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Text(
+                              AppLocalizations.of(context)!
+                                  .syncServer(_urlController.text),
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.color,
+                              ),
+                            ),
+                          ),
+                          if (_lastSyncDate != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(
+                                AppLocalizations.of(context)!.lastSync(
+                                  DateFormat.yMMMd(
+                                          Localizations.localeOf(context)
+                                              .languageCode)
+                                      .add_jm()
+                                      .format(_lastSyncDate!),
+                                ),
+                                style: const TextStyle(
+                                    fontSize: 11, color: Colors.grey),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              isThreeLine: _lastSyncDate != null,
-              trailing: TextButton(
-                onPressed: () {
-                  pbService.client.authStore.clear();
-                  _clearAuthForm();
-                  setState(() => _lastSyncDate = null);
-                },
-                child: Text(AppLocalizations.of(context)!.logout),
-              ),
-            )),
+            ),
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: _isSyncing ? null : _runSync,
