@@ -34,9 +34,13 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _urlController.text = pbService.baseURL;
-    _isSelfHosted = pbService.baseURL !=
-        'http://10.0.2.2:8090'; // Todo replace with sync.wispar.app
+    if (pbService.isAuthenticated) {
+      _urlController.text = pbService.baseURL;
+      _isSelfHosted = pbService.baseURL != 'https://sync.wispar.app';
+    } else {
+      _isSelfHosted = false;
+      _urlController.text = '';
+    }
     _loadLastSync();
   }
 
@@ -266,10 +270,8 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
                 });
 
                 if (!_isSelfHosted) {
-                  await pbService.updateCustomUrl(
-                      'http://10.0.2.2:8090'); // Todo replace with sync.wispar.app
-                  _urlController.text =
-                      'http://10.0.2.2:8090'; // Todo replace with sync.wispar.app
+                  await pbService.updateCustomUrl('http://127.0.0.1:8090');
+                  _urlController.text = 'http://127.0.0.1:8090';
                 }
               },
             ),
@@ -286,7 +288,6 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
                 decoration: const InputDecoration(
                   labelText: 'Server URL (e.g. http://192.168.1.50:8090)',
                   hintText: 'http://your-ip:port',
-                  prefixIcon: Icon(Icons.link),
                 ),
                 onSubmitted: (val) async =>
                     await pbService.updateCustomUrl(val.trim()),

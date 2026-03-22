@@ -7,9 +7,7 @@ class PocketBaseService {
   factory PocketBaseService() => _instance;
 
   bool get isAuthenticated => _client?.authStore.isValid ?? false;
-  String get baseURL =>
-      _client?.baseURL ??
-      'http://10.0.2.2:8090'; // Todo replace with sync.wispar.app
+  String get baseURL => _client?.baseURL ?? 'sync.wispar.app';
 
   PocketBase? _client;
 
@@ -32,8 +30,7 @@ class PocketBaseService {
       clear: () async => prefs.remove('pb_auth'),
     );
 
-    final savedUrl = prefs.getString('pb_custom_url') ??
-        'http://10.0.2.2:8090'; // Todo replace with sync.wispar.app
+    final savedUrl = prefs.getString('pb_custom_url') ?? 'sync.wispar.app';
 
     _client = PocketBase(savedUrl, authStore: store);
     _isInitialized = true;
