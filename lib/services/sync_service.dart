@@ -54,6 +54,9 @@ class SyncManager {
     await _pullFeedFilters(pb, userId);
     await _pushFeedFilters(pb, userId);
 
+    await _pullKnownUrls(pb, userId);
+    await _pushKnownUrls(pb, userId);
+
     await dbHelper.setLastSync(DateTime.now().toUtc().toIso8601String());
   }
 
@@ -568,6 +571,116 @@ class SyncManager {
           logger.info("Pushing update for feed filter: ${data['name']}");
           await pb
               .collection('feed_filters')
+              .update(existingCloud.id, body: data);
+        }
+      }
+    }
+  }
+
+  Future<void> _pullKnownUrls(PocketBase pb, String userId) async {
+    final db = await dbHelper.database;
+
+    final cloudRecords = await pb.collection('known_urls').getFullList(
+          filter: 'user = "$userId"',
+        );
+
+    logger.info("Pulling known URLs: ${cloudRecords.length} found in cloud.");
+
+    for (final r in cloudRecords) {
+      final cloudSyncId = r.get<String>('sync_id');
+      final cloudUrl = r.get<String>('url');
+      final pbUpdatedAt = r.get<String>('updated_at');
+
+      final urlData = {
+        'url': cloudUrl,
+        'proxySuccess': r.get<int>('proxy_success', 0),
+        'sync_id': cloudSyncId,
+        'is_deleted': r.get<bool>('is_deleted') ? 1 : 0,
+        'updated_at': pbUpdatedAt,
+      };
+
+      if (r.get<bool>('is_deleted')) {
+        await db.update(
+          'knownUrls',
+          {'is_deleted': 1},
+          where: 'sync_id = ? AND is_deleted = 0',
+          whereArgs: [cloudSyncId],
+        );
+        continue;
+      }
+
+      // Similar to the others, checks for existing URLs, if there are
+      // their local sync_id is updated with the cloud value to merge them and
+      // avoid duplicates
+      var local = await db.query('knownUrls',
+          where: 'sync_id = ?', whereArgs: [cloudSyncId], limit: 1);
+
+      if (local.isEmpty) {
+        final urlMatches = await db.query(
+          'knownUrls',
+          where: 'url = ?',
+          whereArgs: [cloudUrl],
+          limit: 1,
+        );
+
+        if (urlMatches.isNotEmpty) {
+          final localId = urlMatches.first['id'];
+          logger.info(
+              "Merging local URL for '$cloudUrl' into cloud sync_id: $cloudSyncId");
+
+          await db.update(
+            'knownUrls',
+            {'sync_id': cloudSyncId},
+            where: 'id = ?',
+            whereArgs: [localId],
+          );
+
+          local = await db.query('knownUrls',
+              where: 'sync_id = ?', whereArgs: [cloudSyncId], limit: 1);
+        }
+      }
+
+      if (local.isEmpty) {
+        await db.insert('knownUrls', urlData);
+      } else {
+        final localUpdatedAt = local.first['updated_at'] as String? ?? '';
+        if (_isNewer(pbUpdatedAt, localUpdatedAt)) {
+          await db.update('knownUrls', urlData,
+              where: 'sync_id = ?', whereArgs: [cloudSyncId]);
+        }
+      }
+    }
+  }
+
+  Future<void> _pushKnownUrls(PocketBase pb, String userId) async {
+    final db = await dbHelper.database;
+    final rows = await db.query('knownUrls');
+
+    final cloudRecords = await pb.collection('known_urls').getFullList(
+          filter: 'user = "$userId"',
+        );
+    final cloudMap = {for (var r in cloudRecords) r.get<String>('sync_id'): r};
+
+    for (final row in rows) {
+      final syncId = row['sync_id'] as String;
+      final existingCloud = cloudMap[syncId];
+      final localUpdatedAt = row['updated_at'] as String? ?? '';
+
+      final data = {
+        'url': row['url'],
+        'proxy_success': row['proxySuccess'],
+        'sync_id': syncId,
+        'is_deleted': row['is_deleted'] == 1,
+        'user': userId,
+      };
+
+      if (existingCloud == null) {
+        await pb.collection('known_urls').create(body: data);
+      } else {
+        final pbUpdatedAt = existingCloud.get<String>('updated_at');
+        if (_isNewer(localUpdatedAt, pbUpdatedAt)) {
+          await pb
+              .collection('known_urls')
               .update(existingCloud.id, body: data);
         }
       }

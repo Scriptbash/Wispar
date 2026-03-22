@@ -1506,24 +1506,49 @@ class DatabaseHelper {
 
   Future<int> insertKnownUrl(String url, int proxySuccess) async {
     final db = await database;
+
+    final existing = await db.query(
+      'knownUrls',
+      where: 'url = ?',
+      whereArgs: [url],
+      limit: 1,
+    );
+
+    if (existing.isNotEmpty) {
+      final id = existing.first['id'] as int;
+      return await db.update(
+        'knownUrls',
+        {
+          'proxySuccess': proxySuccess,
+          'is_deleted': 0,
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        },
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    }
+
     return await db.insert(
       'knownUrls',
       {
         'url': url,
         'proxySuccess': proxySuccess,
         'sync_id': const Uuid().v7(),
+        'is_deleted': 0,
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       },
-      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
   Future<int> updateKnownUrl(int id, {String? url, int? proxySuccess}) async {
     final db = await database;
-    final updateData = <String, Object?>{};
+    final updateData = <String, Object?>{
+      'is_deleted': 0,
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
+    };
+
     if (url != null) updateData['url'] = url;
     if (proxySuccess != null) updateData['proxySuccess'] = proxySuccess;
-    updateData['updated_at'] = DateTime.now().toUtc().toIso8601String();
 
     return await db.update(
       'knownUrls',
@@ -1535,8 +1560,12 @@ class DatabaseHelper {
 
   Future<int> deleteKnownUrl(int id) async {
     final db = await database;
-    return await db.delete(
+    return await db.update(
       'knownUrls',
+      {
+        'is_deleted': 1,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      },
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -1546,7 +1575,7 @@ class DatabaseHelper {
     final db = await database;
     final results = await db.query(
       'knownUrls',
-      where: 'url = ?',
+      where: 'url = ? AND is_deleted = 0',
       whereArgs: [url],
     );
     return results.isNotEmpty ? results.first : null;

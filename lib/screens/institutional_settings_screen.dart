@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../generated_l10n/app_localizations.dart';
-import './institutions_screen.dart';
-import '../services/database_helper.dart';
+import 'package:wispar/services/sync_service.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/screens/institutions_screen.dart';
+import 'package:wispar/services/database_helper.dart';
 
 class InstitutionalSettingsScreen extends StatefulWidget {
   const InstitutionalSettingsScreen({super.key});
@@ -15,6 +16,7 @@ class InstitutionalSettingsScreen extends StatefulWidget {
 class _InstitutionalSettingsScreenState
     extends State<InstitutionalSettingsScreen> {
   final dbHelper = DatabaseHelper();
+  final syncManager = SyncManager();
   List<Map<String, dynamic>> knownUrls = [];
 
   @override
@@ -25,7 +27,10 @@ class _InstitutionalSettingsScreenState
 
   Future<void> _loadKnownUrls() async {
     final db = await dbHelper.database;
-    final urls = await db.query('knownUrls');
+    final urls = await db.query(
+      'knownUrls',
+      where: 'is_deleted = 0',
+    );
     setState(() {
       knownUrls = urls;
     });
@@ -126,12 +131,14 @@ class _InstitutionalSettingsScreenState
         proxySuccess: updated['proxySuccess'],
       );
       _loadKnownUrls();
+      syncManager.triggerBackgroundSync();
     }
   }
 
   Future<void> _deleteKnownUrl(int id) async {
     await dbHelper.deleteKnownUrl(id);
     _loadKnownUrls();
+    syncManager.triggerBackgroundSync();
   }
 
   @override
@@ -303,6 +310,7 @@ class _InstitutionalSettingsScreenState
         newEntry['url'].isNotEmpty) {
       await dbHelper.insertKnownUrl(newEntry['url'], newEntry['proxySuccess']);
       _loadKnownUrls();
+      syncManager.triggerBackgroundSync();
     }
   }
 }
