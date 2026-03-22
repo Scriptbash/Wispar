@@ -301,36 +301,30 @@ class DatabaseHelper {
         await db.execute('''
           ALTER TABLE feed_filters ADD COLUMN date_before TEXT;
         ''');
-        await db.execute(
-            'ALTER TABLE journals ADD COLUMN sync_id TEXT UNIQUE NOT NULL;');
+        await db.execute('ALTER TABLE journals ADD COLUMN sync_id TEXT;');
         await db.execute('ALTER TABLE journals ADD COLUMN updated_at TEXT;');
         await db.execute(
             'ALTER TABLE journals ADD COLUMN is_deleted INTEGER DEFAULT 0;');
-        await db.execute(
-            'ALTER TABLE journal_issns ADD COLUMN sync_id TEXT UNIQUE NOT NULL;');
+        await db.execute('ALTER TABLE journal_issns ADD COLUMN sync_id TEXT;');
         await db
             .execute('ALTER TABLE journal_issns ADD COLUMN updated_at TEXT;');
         await db.execute(
             'ALTER TABLE journal_issns ADD COLUMN is_deleted INTEGER DEFAULT 0;');
-        await db.execute(
-            'ALTER TABLE articles ADD COLUMN sync_id TEXT UNIQUE NOT NULL;');
+        await db.execute('ALTER TABLE articles ADD COLUMN sync_id TEXT;');
         await db.execute('ALTER TABLE articles ADD COLUMN updated_at TEXT;');
         await db.execute(
             'ALTER TABLE articles ADD COLUMN is_deleted INTEGER DEFAULT 0;');
-        await db.execute(
-            'ALTER TABLE savedQueries ADD COLUMN sync_id TEXT UNIQUE NOT NULL;');
+        await db.execute('ALTER TABLE savedQueries ADD COLUMN sync_id TEXT;');
         await db
             .execute('ALTER TABLE savedQueries ADD COLUMN updated_at TEXT;');
         await db.execute(
             'ALTER TABLE savedQueries ADD COLUMN is_deleted INTEGER DEFAULT 0;');
-        await db.execute(
-            'ALTER TABLE feed_filters ADD COLUMN sync_id TEXT UNIQUE NOT NULL;');
+        await db.execute('ALTER TABLE feed_filters ADD COLUMN sync_id TEXT;');
         await db
             .execute('ALTER TABLE feed_filters ADD COLUMN updated_at TEXT;');
         await db.execute(
             'ALTER TABLE feed_filters ADD COLUMN is_deleted INTEGER DEFAULT 0;');
-        await db.execute(
-            'ALTER TABLE knownUrls ADD COLUMN sync_id TEXT UNIQUE NOT NULL;');
+        await db.execute('ALTER TABLE knownUrls ADD COLUMN sync_id TEXT;');
         await db.execute('ALTER TABLE knownUrls ADD COLUMN updated_at TEXT;');
         await db.execute(
             'ALTER TABLE knownUrls ADD COLUMN is_deleted INTEGER DEFAULT 0;');
