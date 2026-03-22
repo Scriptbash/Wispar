@@ -51,6 +51,9 @@ class SyncManager {
     await _pullArticles(pb, userId);
     await _pushArticles(pb, userId);
 
+    await _pullFeedFilters(pb, userId);
+    await _pushFeedFilters(pb, userId);
+
     await dbHelper.setLastSync(DateTime.now().toUtc().toIso8601String());
   }
 
@@ -444,6 +447,103 @@ class SyncManager {
         }
       } catch (e) {
         logger.warning("Failed to push article ${a['sync_id']}: $e");
+      }
+    }
+  }
+
+  Future<void> _pullFeedFilters(PocketBase pb, String userId) async {
+    final db = await dbHelper.database;
+
+    final cloudRecords = await pb.collection('feed_filters').getFullList(
+          filter: 'user = "$userId"',
+        );
+
+    logger.info("Pulling feed filters: ${cloudRecords.length} found in cloud.");
+
+    for (final r in cloudRecords) {
+      final syncId = r.get<String>('sync_id');
+      final pbUpdatedAt = r.get<String>('updated_at');
+
+      final filterData = {
+        'name': r.get<String>('name'),
+        'includedKeywords': r.get<String?>('included_keywords'),
+        'excludedKeywords': r.get<String?>('excluded_keywords'),
+        'journals': r.get<String?>('journals'),
+        'date_mode': r.get<String?>('date_mode'),
+        'date_after': r.get<String?>('date_after'),
+        'date_before': r.get<String?>('date_before'),
+        'dateCreated': r.get<String>('date_created'),
+        'sync_id': syncId,
+        'is_deleted': r.get<bool>('is_deleted') ? 1 : 0,
+        'updated_at': pbUpdatedAt,
+      };
+
+      final bool cloudIsDeleted = r.get<bool>('is_deleted');
+
+      if (cloudIsDeleted) {
+        int count = await db.update('feed_filters', {'is_deleted': 1},
+            where: 'sync_id = ?', whereArgs: [syncId]);
+
+        if (count > 0) logger.info("Marked $syncId as deleted locally.");
+        continue;
+      }
+
+      final local = await db.query('feed_filters',
+          where: 'sync_id = ?', whereArgs: [syncId], limit: 1);
+
+      if (local.isEmpty) {
+        await db.insert('feed_filters', filterData);
+        logger.info("Inserted new feed filter: ${filterData['name']}");
+      } else {
+        final localUpdatedAt = local.first['updated_at'] as String? ?? '';
+        if (_isNewer(pbUpdatedAt, localUpdatedAt)) {
+          await db.update('feed_filters', filterData,
+              where: 'sync_id = ?', whereArgs: [syncId]);
+          logger.info("Updated feed filter: ${filterData['name']}");
+        }
+      }
+    }
+  }
+
+  Future<void> _pushFeedFilters(PocketBase pb, String userId) async {
+    final db = await dbHelper.database;
+    final rows = await db.query('feed_filters');
+
+    final cloudRecords = await pb.collection('feed_filters').getFullList(
+          filter: 'user = "$userId"',
+        );
+    final cloudMap = {for (var r in cloudRecords) r.get<String>('sync_id'): r};
+
+    for (final f in rows) {
+      final syncId = f['sync_id'] as String;
+      final existingCloud = cloudMap[syncId];
+      final localUpdatedAt = f['updated_at'] as String? ?? '';
+
+      final data = {
+        'name': f['name'],
+        'included_keywords': f['includedKeywords'],
+        'excluded_keywords': f['excludedKeywords'],
+        'journals': f['journals'],
+        'date_mode': f['date_mode'],
+        'date_after': f['date_after'],
+        'date_before': f['date_before'],
+        'date_created': f['dateCreated'],
+        'sync_id': syncId,
+        'is_deleted': f['is_deleted'] == 1,
+        'user': userId,
+      };
+
+      if (existingCloud == null) {
+        logger.info("Pushing new feed filter to cloud: ${data['name']}");
+        await pb.collection('feed_filters').create(body: data);
+      } else {
+        final pbUpdatedAt = existingCloud.get<String>('updated_at');
+        if (_isNewer(localUpdatedAt, pbUpdatedAt)) {
+          logger.info("Pushing update for feed filter: ${data['name']}");
+          await pb
+              .collection('feed_filters')
+              .update(existingCloud.id, body: data);
+        }
       }
     }
   }

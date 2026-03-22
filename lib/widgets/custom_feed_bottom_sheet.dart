@@ -67,12 +67,14 @@ class CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
 
     _dateMode = widget.initialDateMode ?? 'none';
 
-    if (widget.initialDateAfter != null) {
-      _publishedDateAfter = DateTime.parse(widget.initialDateAfter!);
+    if (widget.initialDateAfter != null &&
+        widget.initialDateAfter!.isNotEmpty) {
+      _publishedDateAfter = DateTime.tryParse(widget.initialDateAfter!);
     }
 
-    if (widget.initialDateBefore != null) {
-      _publishedDateBefore = DateTime.parse(widget.initialDateBefore!);
+    if (widget.initialDateBefore != null &&
+        widget.initialDateBefore!.isNotEmpty) {
+      _publishedDateBefore = DateTime.tryParse(widget.initialDateBefore!);
     }
 
     _nameController = TextEditingController(text: widget.initialName ?? '');
