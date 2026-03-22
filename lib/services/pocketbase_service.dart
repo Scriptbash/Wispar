@@ -1,5 +1,6 @@
 import 'package:pocketbase/pocketbase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class PocketBaseService {
   PocketBaseService._internal();
@@ -22,12 +23,13 @@ class PocketBaseService {
 
   Future<void> init() async {
     if (_isInitialized) return;
-
+    final secureStorage = const FlutterSecureStorage();
     final prefs = await SharedPreferences.getInstance();
     final store = AsyncAuthStore(
-      save: (String data) async => prefs.setString('pb_auth', data),
-      initial: prefs.getString('pb_auth'),
-      clear: () async => prefs.remove('pb_auth'),
+      save: (String data) async =>
+          await secureStorage.write(key: 'pb_auth', value: data),
+      initial: await secureStorage.read(key: 'pb_auth'),
+      clear: () async => await secureStorage.delete(key: 'pb_auth'),
     );
 
     final savedUrl = prefs.getString('pb_custom_url') ?? 'sync.wispar.app';
