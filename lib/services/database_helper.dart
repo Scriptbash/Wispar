@@ -150,6 +150,9 @@ class DatabaseHelper {
         includedKeywords TEXT,
         excludedKeywords TEXT,
         journals TEXT,
+        date_mode TEXT,
+        date_after TEXT,
+        date_before TEXT,
         dateCreated TEXT DEFAULT CURRENT_TIMESTAMP,
         sync_id TEXT UNIQUE NOT NULL,
         updated_at TEXT,
@@ -1435,7 +1438,11 @@ class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> getFeedFilters() async {
     final db = await database;
-    return await db.query('feed_filters', orderBy: 'dateCreated DESC');
+    return await db.query(
+      'feed_filters',
+      orderBy: 'dateCreated DESC',
+      where: 'is_deleted = 0',
+    );
   }
 
   Future<List<FeedFilter>> getParsedFeedFilters() async {
@@ -1486,7 +1493,15 @@ class DatabaseHelper {
 
   Future<void> deleteFeedFilter(int id) async {
     final db = await database;
-    await db.delete('feed_filters', where: 'id = ?', whereArgs: [id]);
+    await db.update(
+      'feed_filters',
+      {
+        'is_deleted': 1,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   Future<int> insertKnownUrl(String url, int proxySuccess) async {
