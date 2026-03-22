@@ -481,13 +481,18 @@ class SyncManager {
       final bool cloudIsDeleted = r.get<bool>('is_deleted');
 
       if (cloudIsDeleted) {
-        int count = await db.update('feed_filters', {'is_deleted': 1},
-            where: 'sync_id = ?', whereArgs: [syncId]);
+        int count = await db.update(
+          'feed_filters',
+          {'is_deleted': 1},
+          where: 'sync_id = ? AND is_deleted = 0',
+          whereArgs: [syncId],
+        );
 
-        if (count > 0) logger.info("Marked $syncId as deleted locally.");
+        if (count > 0) {
+          logger.info("Marked $syncId as deleted locally.");
+        }
         continue;
       }
-
       final local = await db.query('feed_filters',
           where: 'sync_id = ?', whereArgs: [syncId], limit: 1);
 

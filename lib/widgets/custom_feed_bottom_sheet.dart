@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:wispar/services/database_helper.dart';
+import 'package:wispar/services/sync_service.dart';
 
 class CustomizeFeedBottomSheet extends StatefulWidget {
   final List<String> followedJournals;
@@ -412,6 +413,7 @@ class CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                     child: FloatingActionButton.extended(
                       onPressed: () async {
                         final db = DatabaseHelper();
+                        final syncManager = SyncManager();
                         final feedName = _nameController.text.trim();
                         final include = _includeChips.join(' ');
                         final exclude = _excludeChips.join(' ');
@@ -454,6 +456,7 @@ class CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                             dateAfter: _publishedDateAfter?.toIso8601String(),
                             dateBefore: _publishedDateBefore?.toIso8601String(),
                           );
+                          syncManager.triggerBackgroundSync();
                         } else {
                           await db.insertFeedFilter(
                             name: feedName,
@@ -464,6 +467,7 @@ class CustomizeFeedBottomSheetState extends State<CustomizeFeedBottomSheet> {
                             dateAfter: _publishedDateAfter?.toIso8601String(),
                             dateBefore: _publishedDateBefore?.toIso8601String(),
                           );
+                          syncManager.triggerBackgroundSync();
                         }
 
                         widget.onApply(
