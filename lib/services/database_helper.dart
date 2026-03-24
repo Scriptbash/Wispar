@@ -74,7 +74,6 @@ class DatabaseHelper {
       await db.execute('''
         CREATE TABLE journals (
           journal_id INTEGER PRIMARY KEY AUTOINCREMENT,
-          issn TEXT,
           title TEXT,
           publisher TEXT,
           dateFollowed TEXT,
@@ -350,6 +349,80 @@ class DatabaseHelper {
         await initSyncIds('savedQueries', 'query_id');
         await initSyncIds('feed_filters', 'id');
         await initSyncIds('knownUrls', 'id');
+
+        try {
+          await db.execute("ALTER TABLE journals DROP COLUMN issn");
+        } catch (e) {
+          logger.info('Unable to drop the issn column in the journals table');
+        }
+        await db.delete('journals', where: 'title IS NULL OR TRIM(title) = ""');
+        int deletedInvalidIssns = await db.delete('journal_issns',
+            where: 'issn IS NULL OR TRIM(issn) = ""');
+
+        logger.info(
+            "Deleted $deletedInvalidIssns invalid ISSN records with empty keys.");
+
+        // Merge duplicated journals
+        final List<Map<String, dynamic>> allJournals =
+            await db.query('journals');
+        final Set<int> processedIds = {};
+
+        for (var j in allJournals) {
+          int currentId = j['journal_id'] as int;
+          if (processedIds.contains(currentId)) continue;
+
+          String currentTitle =
+              (j['title'] ?? "").toString().toLowerCase().trim();
+          String currentPub =
+              (j['publisher'] ?? "").toString().toLowerCase().trim();
+          if (currentTitle.isEmpty) continue;
+
+          final List<Map<String, dynamic>> siblings = await db.query(
+            'journals',
+            where: 'LOWER(TRIM(title)) = ? AND journal_id != ?',
+            whereArgs: [currentTitle, currentId],
+          );
+
+          for (var sibling in siblings) {
+            int sibId = sibling['journal_id'] as int;
+            if (processedIds.contains(sibId)) continue;
+
+            String sibPub =
+                (sibling['publisher'] ?? "").toString().toLowerCase().trim();
+
+            bool isMatch = false;
+            if (currentPub.isEmpty || sibPub.isEmpty) {
+              isMatch = true;
+            } else if (currentPub.contains(sibPub) ||
+                sibPub.contains(currentPub)) {
+              isMatch = true;
+            }
+
+            if (isMatch) {
+              bool currentIsBetter = currentPub.length >= sibPub.length ||
+                  j['dateFollowed'] != null;
+
+              int keepId = currentIsBetter ? currentId : sibId;
+              int deleteId = currentIsBetter ? sibId : currentId;
+
+              await db.update('journal_issns', {'journal_id': keepId},
+                  where: 'journal_id = ?', whereArgs: [deleteId]);
+              await db.update('articles', {'journal_id': keepId},
+                  where: 'journal_id = ?', whereArgs: [deleteId]);
+
+              // Delete duplicate
+              await db.delete('journals',
+                  where: 'journal_id = ?', whereArgs: [deleteId]);
+              processedIds.add(deleteId);
+
+              logger.info(
+                  "Fuzzy Merged '$currentTitle': ID $deleteId into $keepId");
+
+              if (keepId == sibId) break;
+            }
+          }
+          processedIds.add(currentId);
+        }
       }
     });
   }
@@ -366,80 +439,114 @@ class DatabaseHelper {
   Future<void> insertJournal(Journal journal) async {
     final db = await database;
 
-    final existingIssn = await db.query(
-      'journal_issns',
-      where: 'issn IN (${List.filled(journal.issn.length, '?').join(',')})',
-      whereArgs: journal.issn,
+    int? journalId = await getOrCreateJournalId(
+      issns: journal.issn,
+      title: journal.title,
+      publisher: journal.publisher,
     );
 
-    if (existingIssn.isNotEmpty) {
-      final int journalId = existingIssn.first['journal_id'] as int;
-
-      final journalMap = await db.query(
+    if (journalId != null) {
+      await db.update(
         'journals',
+        {
+          'dateFollowed': journal.dateFollowed ??
+              DateTime.now().toIso8601String().substring(0, 10),
+          'title': journal.title,
+          'publisher': journal.publisher,
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        },
         where: 'journal_id = ?',
         whereArgs: [journalId],
       );
+    }
+  }
 
-      if (journalMap.isNotEmpty && journalMap.first['dateFollowed'] == null) {
-        await db.update(
-          'journals',
-          {
-            'dateFollowed': DateTime.now().toIso8601String().substring(0, 10),
-            'title': journal.title,
-            'publisher': journal.publisher,
-            'updated_at': DateTime.now().toUtc().toIso8601String(),
-          },
-          where: 'journal_id = ?',
-          whereArgs: [journalId],
-        );
+  Future<int?> getOrCreateJournalId({
+    required List<String> issns,
+    required String? title,
+    String? publisher,
+  }) async {
+    if ((title == null || title.trim().isEmpty) && issns.isEmpty) {
+      return null; // The journal has no ISSN and no title, skip it
+    }
 
-        await db.delete(
-          'journal_issns',
-          where: 'journal_id = ?',
-          whereArgs: [journalId],
-        );
+    final db = await database;
 
-        for (final issn in journal.issn) {
+    // Try to match by issns
+    if (issns.isNotEmpty) {
+      final existingIssn = await db.query(
+        'journal_issns',
+        where: 'issn IN (${List.filled(issns.length, '?').join(',')})',
+        whereArgs: issns,
+      );
+      if (existingIssn.isNotEmpty) {
+        return existingIssn.first['journal_id'] as int;
+      }
+    }
+
+    // Try to match by title and publisher
+    if (title != null && title.trim().isNotEmpty) {
+      final List<Map<String, dynamic>> titleMatches = await db.query(
+        'journals',
+        where: 'LOWER(TRIM(title)) = ?',
+        whereArgs: [title.toLowerCase().trim()],
+      );
+
+      for (var match in titleMatches) {
+        String dbPub =
+            (match['publisher'] ?? "").toString().toLowerCase().trim();
+        String newPub = (publisher ?? "").toLowerCase().trim();
+
+        if (dbPub.isEmpty ||
+            newPub.isEmpty ||
+            dbPub.contains(newPub) ||
+            newPub.contains(dbPub)) {
+          int journalId = match['journal_id'];
+
+          //  Update the issns if new ones are available form the duplicate
+          for (final issn in issns) {
+            await db.insert(
+                'journal_issns',
+                {
+                  'issn': issn,
+                  'journal_id': journalId,
+                  'sync_id': const Uuid().v7(),
+                  'updated_at': DateTime.now().toUtc().toIso8601String(),
+                },
+                conflictAlgorithm: ConflictAlgorithm.ignore);
+          }
+          return journalId;
+        }
+      }
+    }
+    // The journal doesn't exist so insert it if it has a title
+    if (title != null && title.trim().isNotEmpty) {
+      final journalId = await db.insert('journals', {
+        'title': title,
+        'publisher': publisher,
+        'sync_id': const Uuid().v7(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      });
+
+      for (final issn in issns) {
+        // Insert the journal's issns if they are not missing
+        if (issn.trim().isNotEmpty) {
           await db.insert(
             'journal_issns',
             {
-              'issn': issn,
+              'issn': issn.trim(),
               'journal_id': journalId,
               'sync_id': const Uuid().v7(),
               'updated_at': DateTime.now().toUtc().toIso8601String(),
             },
-            conflictAlgorithm: ConflictAlgorithm.replace,
+            conflictAlgorithm: ConflictAlgorithm.ignore,
           );
         }
       }
-    } else {
-      final journalId = await db.insert(
-        'journals',
-        {
-          'title': journal.title,
-          'publisher': journal.publisher,
-          'dateFollowed': journal.dateFollowed ??
-              DateTime.now().toIso8601String().substring(0, 10),
-          'lastUpdated': journal.lastUpdated,
-          'sync_id': const Uuid().v7(),
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        },
-      );
-
-      for (final issn in journal.issn) {
-        await db.insert(
-          'journal_issns',
-          {
-            'issn': issn,
-            'journal_id': journalId,
-            'sync_id': const Uuid().v7(),
-            'updated_at': DateTime.now().toUtc().toIso8601String(),
-          },
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-      }
+      return journalId;
     }
+
+    return null;
   }
 
   Future<List<Journal>> getFollowedJournals() async {
@@ -644,44 +751,20 @@ class DatabaseHelper {
         );
       }
     } else {
-      int? journalId = await getJournalIdByIssns(publicationCard.issn);
-      if (journalId == null) {
-        // Journal not found, insert it
-        final Map<String, dynamic> journalData = {
-          'title': publicationCard.journalTitle,
-          'publisher': publicationCard.publisher,
-        };
+      int? journalId = await getOrCreateJournalId(
+        issns: publicationCard.issn,
+        title: publicationCard.journalTitle,
+        publisher: publicationCard.publisher,
+      );
 
-        journalId = await db.insert('journals', {
-          ...journalData,
-          'sync_id': const Uuid().v7(),
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        });
-
-        // Insert the ISSNs into the journal_issns table
-        for (final issn in publicationCard.issn) {
-          await db.insert(
-            'journal_issns',
-            {
-              'issn': issn,
-              'journal_id': journalId,
-              'sync_id': const Uuid().v7(),
-              'updated_at': DateTime.now().toUtc().toIso8601String(),
-            },
-            conflictAlgorithm: ConflictAlgorithm.ignore,
-          );
-        }
-      }
-
-      // Insert the article
+      // Insert the article, but store a journal_id null if it had no journal
       await db.insert('articles', {
         'doi': publicationCard.doi,
         'title': publicationCard.title,
         'abstract': publicationCard.abstract,
         'publishedDate': publicationCard.publishedDate?.toIso8601String(),
-        'authors': jsonEncode(publicationCard.authors
-            .map((author) => author.toJson())
-            .toList()), // Serialize authors to JSON
+        'authors': jsonEncode(
+            publicationCard.authors.map((author) => author.toJson()).toList()),
         'url': publicationCard.url,
         'license': publicationCard.license,
         'licenseName': publicationCard.licenseName,
@@ -702,33 +785,41 @@ class DatabaseHelper {
   }
 
   Future<List<PublicationCard>> getFavoriteArticles() async {
-    final Database db = await DatabaseHelper().database;
+    final Database db = await database;
 
     final List<Map<String, dynamic>> maps = await db.rawQuery('''
     SELECT articles.*, journals.title AS journalTitle, 
-       GROUP_CONCAT(journal_issns.issn) AS issns
-        FROM articles
-        LEFT JOIN journals ON articles.journal_id = journals.journal_id
-        LEFT JOIN journal_issns ON journals.journal_id = journal_issns.journal_id
-        WHERE articles.dateLiked IS NOT NULL
-        GROUP BY articles.article_id
+    GROUP_CONCAT(journal_issns.issn) AS issns
+    FROM articles
+    LEFT JOIN journals ON articles.journal_id = journals.journal_id
+    LEFT JOIN journal_issns ON journals.journal_id = journal_issns.journal_id
+    WHERE articles.dateLiked IS NOT NULL
+    GROUP BY articles.article_id
   ''');
 
     return List.generate(maps.length, (i) {
-      List<String> issns = (maps[i]['issns'] as String?)?.split(',') ?? [];
+      String? rawIssns = maps[i]['issns'] as String?;
+      List<String> issns = rawIssns != null ? rawIssns.split(',') : [];
+
+      DateTime? pubDate;
+      if (maps[i]['publishedDate'] != null) {
+        pubDate = DateTime.tryParse(maps[i]['publishedDate']);
+      }
 
       return PublicationCard(
         doi: maps[i]['doi'],
         title: maps[i]['title'],
         issn: issns,
         abstract: maps[i]['abstract'],
-        publishedDate: DateTime.parse(maps[i]['publishedDate']),
-        authors: List<PublicationAuthor>.from(
-          (jsonDecode(maps[i]['authors']) as List<dynamic>)
-              .map((authorJson) => PublicationAuthor.fromJson(authorJson)),
-        ),
+        publishedDate: pubDate,
+        authors: maps[i]['authors'] != null
+            ? List<PublicationAuthor>.from(
+                (jsonDecode(maps[i]['authors']) as List<dynamic>).map(
+                    (authorJson) => PublicationAuthor.fromJson(authorJson)),
+              )
+            : [],
         dateLiked: maps[i]['dateLiked'],
-        journalTitle: maps[i]['journalTitle'],
+        journalTitle: maps[i]['journalTitle'] ?? '',
         url: maps[i]['url'],
         license: maps[i]['license'],
         licenseName: maps[i]['licenseName'],
@@ -767,50 +858,37 @@ class DatabaseHelper {
 
   Future<void> insertCachedPublication(PublicationCard publicationCard) async {
     final db = await database;
+
+    int? journalId = await getOrCreateJournalId(
+      issns: publicationCard.issn,
+      title: publicationCard.journalTitle,
+      publisher: publicationCard.publisher,
+    );
+
     final List<Map<String, dynamic>> publicationMaps = await db.query(
       'articles',
-      columns: ['article_id', 'dateCached'],
       where: 'doi = ?',
       whereArgs: [publicationCard.doi],
     );
 
     if (publicationMaps.isNotEmpty) {
-      // Publication found, retrieve its ID
-      final int articleId = publicationMaps.first['article_id'];
-
-      // If the publication wasn't cached before, update the dateCached
-      if (publicationMaps.first['dateCached'] == null) {
-        final int? journalId = await getJournalIdByIssns(publicationCard.issn);
-
-        if (journalId == null) {
-          throw Exception('No matching journal found for the given ISSNs.');
-        }
-
-        await db.update(
-          'articles',
-          {
-            'dateCached': DateTime.now().toIso8601String(),
-            'title': publicationCard.title,
-            'abstract': publicationCard.abstract,
-            'journal_id': journalId,
-            'publishedDate': publicationCard.publishedDate?.toIso8601String(),
-            'authors': jsonEncode(
-              publicationCard.authors.map((author) => author.toJson()).toList(),
-            ),
-            'updated_at': DateTime.now().toUtc().toIso8601String(),
-          },
-          where: 'article_id = ?',
-          whereArgs: [articleId],
-        );
-      }
+      await db.update(
+        'articles',
+        {
+          'dateCached': DateTime.now().toIso8601String(),
+          'title': publicationCard.title,
+          'abstract': publicationCard.abstract,
+          'journal_id': journalId,
+          'publishedDate': publicationCard.publishedDate?.toIso8601String(),
+          'authors': jsonEncode(
+            publicationCard.authors.map((author) => author.toJson()).toList(),
+          ),
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        },
+        where: 'doi = ?',
+        whereArgs: [publicationCard.doi],
+      );
     } else {
-      // Publication not found, insert it
-      final int? journalId = await getJournalIdByIssns(publicationCard.issn);
-
-      if (journalId == null) {
-        throw Exception('No matching journal found for the given ISSNs.');
-      }
-
       await db.insert('articles', {
         'doi': publicationCard.doi,
         'title': publicationCard.title,
