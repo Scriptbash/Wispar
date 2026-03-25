@@ -28,14 +28,14 @@
   </a>
   <br>
   <a href="https://github.com/Scriptbash/Wispar/releases/latest">
-    <img src="https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white" height="35">
+    <img src="https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white" width="140">
   </a>
   <a href="https://github.com/Scriptbash/Wispar/releases/latest">
-    <img src="https://img.shields.io/badge/macOS-000000?style=flat&logo=apple&logoColor=white" height="35">
+    <img src="https://img.shields.io/badge/macOS-000000?style=flat&logo=apple&logoColor=white" width="120">
   </a>
   <!--
   <a href="https://github.com/Scriptbash/Wispar/releases/latest">
-    <img src="https://img.shields.io/badge/Flathub-000000?logo=flathub&logoColor=fff" height="35">
+    <img src="https://img.shields.io/badge/Flathub-000000?logo=flathub&logoColor=fff" width="125">
   </a>-->
 </p>
 
