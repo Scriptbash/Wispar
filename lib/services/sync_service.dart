@@ -19,7 +19,7 @@ class SyncManager {
     if (local == null) return false;
     if (pb == null) return true;
 
-    return local.difference(pb).inSeconds > 1;
+    return local.difference(pb).inSeconds > 2;
   }
 
   void triggerBackgroundSync() {
@@ -27,50 +27,56 @@ class SyncManager {
       logger.info("Syncing in the background");
       if (_debounce?.isActive ?? false) _debounce!.cancel();
       _debounce = Timer(const Duration(seconds: 1), () {
-        sync().catchError((e, stackTrace) =>
+        sync(isFullSync: false).catchError((e, stackTrace) =>
             logger.severe("Background sync failed.", e, stackTrace));
       });
     }
   }
 
-  Future<void> sync() async {
+  Future<void> sync({bool isFullSync = true}) async {
     final pb = pbService.client;
     final userId = pb.authStore.record!.id;
+    final lastSyncTime = isFullSync ? null : await dbHelper.getLastSync();
 
-    await _pullJournals(
-      pb,
-      userId,
-    );
-    await _pullJournalIssns(
-      pb,
-      userId,
-    );
-    await _pushJournals(pb, userId);
-    await _pushJournalIssns(pb, userId);
+    await _pullJournals(pb, userId, lastSyncTime);
+    await _pullJournalIssns(pb, userId, lastSyncTime);
+    await _pushJournals(pb, userId, lastSyncTime);
+    await _pushJournalIssns(pb, userId, lastSyncTime);
 
-    await _pullSavedQueries(pb, userId);
-    await _pushSavedQueries(pb, userId);
+    await _pullSavedQueries(pb, userId, lastSyncTime);
+    await _pushSavedQueries(pb, userId, lastSyncTime);
 
-    await _pullArticles(pb, userId);
-    await _pushArticles(pb, userId);
+    await _pullArticles(pb, userId, lastSyncTime);
+    await _pushArticles(pb, userId, lastSyncTime);
 
-    await _pullFeedFilters(pb, userId);
-    await _pushFeedFilters(pb, userId);
+    await _pullFeedFilters(pb, userId, lastSyncTime);
+    await _pushFeedFilters(pb, userId, lastSyncTime);
 
-    await _pullKnownUrls(pb, userId);
-    await _pushKnownUrls(pb, userId);
+    await _pullKnownUrls(pb, userId, lastSyncTime);
+    await _pushKnownUrls(pb, userId, lastSyncTime);
 
     await dbHelper.setLastSync(DateTime.now().toUtc().toIso8601String());
   }
 
-  Future<void> _pullJournals(PocketBase pb, String userId) async {
+  Future<void> _pullJournals(
+      PocketBase pb, String userId, String? lastSync) async {
     final db = await dbHelper.database;
 
     // Get all the user's journals
+    String filter = 'user = "$userId"';
+    if (lastSync != null) {
+      final formattedDate = lastSync.replaceAll('T', ' ').substring(0, 19);
+      filter += ' && updated_at > "$formattedDate"';
+    }
+
     final cloudRecords = await pb.collection('journals').getFullList(
-          filter: 'user = "$userId"',
+          filter: filter,
         );
-    logger.info("Pulling journals: ${cloudRecords.length} found in cloud.");
+
+    if (cloudRecords.isEmpty) return;
+
+    logger.info("Delta pull: Found ${cloudRecords.length} updated journals.");
+
     // I first get the issns to compare locally. If they already exist,
     // the local sync_id must be updated so the device match with the cloud
     final cloudIssns = await pb.collection('journal_issns').getFullList(
@@ -146,14 +152,23 @@ class SyncManager {
     }
   }
 
-  Future<void> _pullJournalIssns(PocketBase pb, String userId) async {
+  Future<void> _pullJournalIssns(
+      PocketBase pb, String userId, String? lastSync) async {
     final db = await dbHelper.database;
+
+    String filter = 'user = "$userId"';
+    if (lastSync != null) {
+      final formattedDate = lastSync.replaceAll('T', ' ').substring(0, 19);
+      filter += ' && updated_at > "$formattedDate"';
+    }
 
     // Get the journal issn and the journal_id from the cloud
     final cloudIssns = await pb.collection('journal_issns').getFullList(
-          filter: 'user = "$userId"',
+          filter: filter,
           expand: 'journal_id',
         );
+
+    if (cloudIssns.isEmpty) return;
 
     for (final r in cloudIssns) {
       final syncId = r.get<String>('sync_id');
@@ -178,11 +193,18 @@ class SyncManager {
     }
   }
 
-  Future<void> _pushJournals(PocketBase pb, String userId) async {
+  Future<void> _pushJournals(
+      PocketBase pb, String userId, String? lastSync) async {
     final db = await dbHelper.database;
-    final rows = await db.query('journals');
 
-    // Get all cloud journal data
+    final rows = await db.query(
+      'journals',
+      where: lastSync != null ? 'updated_at > ?' : null,
+      whereArgs: lastSync != null ? [lastSync] : null,
+    );
+
+    if (rows.isEmpty) return;
+
     final cloudRecords =
         await pb.collection('journals').getFullList(filter: 'user = "$userId"');
     final cloudMap = {for (var r in cloudRecords) r.get<String>('sync_id'): r};
@@ -225,9 +247,18 @@ class SyncManager {
     }
   }
 
-  Future<void> _pushJournalIssns(PocketBase pb, String userId) async {
+  Future<void> _pushJournalIssns(
+      PocketBase pb, String userId, String? lastSync) async {
     final db = await dbHelper.database;
-    final rows = await db.query('journal_issns');
+
+    final rows = await db.query(
+      'journal_issns',
+      where: lastSync != null ? 'updated_at > ?' : null,
+      whereArgs: lastSync != null ? [lastSync] : null,
+    );
+
+    if (rows.isEmpty) return;
+
     // Get all the issns data from cloud
     final cloudIssns = await pb
         .collection('journal_issns')
@@ -276,13 +307,13 @@ class SyncManager {
     }
   }
 
-  Future<void> _pullArticles(PocketBase pb, String userId) async {
+  Future<void> _pullArticles(
+      PocketBase pb, String userId, String? lastSync) async {
     final db = await dbHelper.database;
-    final lastSync = await dbHelper.getLastSync();
 
     String filter = 'user = "$userId"';
     if (lastSync != null) {
-      final pbDate = lastSync.replaceAll('T', ' ');
+      final pbDate = lastSync.replaceAll('T', ' ').substring(0, 19);
       filter += ' && updated_at > "$pbDate"';
     }
 
@@ -359,7 +390,7 @@ class SyncManager {
 
         if (localSyncId != syncId) {
           await db.update('articles', {'sync_id': syncId},
-              where: 'doi = ?', whereArgs: [cloudDoi]);
+              where: 'doi = ? AND doi != ""', whereArgs: [cloudDoi]);
         }
 
         if (_isNewer(pbUpdatedAt, localUpdatedAt)) {
@@ -381,9 +412,9 @@ class SyncManager {
     }
   }
 
-  Future<void> _pushArticles(PocketBase pb, String userId) async {
+  Future<void> _pushArticles(
+      PocketBase pb, String userId, String? lastSync) async {
     final db = await dbHelper.database;
-    final lastSync = await dbHelper.getLastSync();
 
     final rows = await db.query(
       'articles',
@@ -418,10 +449,6 @@ class SyncManager {
         final localIsHidden = a['isHidden'] == 1;
         final isSavedQuery = a['isSavedQuery'] == 1;
 
-        if (localDateLiked == null && !localIsHidden) {
-          continue;
-        }
-
         String? pbJournalRecordId;
         if (a['journal_id'] != null) {
           final journalRes = await db.query('journals',
@@ -441,6 +468,10 @@ class SyncManager {
         }
 
         if (existingCloud == null) {
+          if (localDateLiked == null && !localIsHidden) {
+            continue;
+          }
+
           final data = {
             'doi': a['doi'] ?? '',
             'title': a['title'] ?? '',
@@ -461,15 +492,20 @@ class SyncManager {
           await pb.collection('articles').create(body: data);
           logger.info("Created new article in cloud: ${a['title']}");
         } else {
-          await pb.collection('articles').update(existingCloud.id, body: {
-            'date_liked': localDateLiked,
-            'is_hidden': localIsHidden,
-            if (pbJournalRecordId != null) 'journal_id': pbJournalRecordId,
-            if (pbQueryRecordId != null) 'query_id': pbQueryRecordId,
-            'is_saved_query': isSavedQuery,
-          });
-          logger.info(
-              "Pushed article update: $syncId (Hidden: $localIsHidden, Liked: $localDateLiked)");
+          final pbUpdatedAt = existingCloud.data['updated_at'] as String? ?? '';
+          final localUpdatedAt = a['updated_at'] as String? ?? '';
+
+          if (_isNewer(localUpdatedAt, pbUpdatedAt)) {
+            await pb.collection('articles').update(existingCloud.id, body: {
+              'date_liked': localDateLiked,
+              'is_hidden': localIsHidden,
+              if (pbJournalRecordId != null) 'journal_id': pbJournalRecordId,
+              if (pbQueryRecordId != null) 'query_id': pbQueryRecordId,
+              'is_saved_query': isSavedQuery,
+            });
+            logger.info(
+                "Pushed article update: $syncId (Hidden: $localIsHidden, Liked: $localDateLiked)");
+          }
         }
       } catch (e) {
         logger.warning("Failed to push article ${a['sync_id']}: $e");
@@ -477,14 +513,24 @@ class SyncManager {
     }
   }
 
-  Future<void> _pullFeedFilters(PocketBase pb, String userId) async {
+  Future<void> _pullFeedFilters(
+      PocketBase pb, String userId, String? lastSync) async {
     final db = await dbHelper.database;
 
+    String filter = 'user = "$userId"';
+    if (lastSync != null) {
+      final pbDate = lastSync.replaceAll('T', ' ').substring(0, 19);
+      filter += ' && updated_at > "$pbDate"';
+    }
+
     final cloudRecords = await pb.collection('feed_filters').getFullList(
-          filter: 'user = "$userId"',
+          filter: filter,
         );
 
-    logger.info("Pulling feed filters: ${cloudRecords.length} found in cloud.");
+    if (cloudRecords.isEmpty) return;
+
+    logger
+        .info("Delta pull: Found ${cloudRecords.length} updated feed filters.");
 
     for (final r in cloudRecords) {
       final cloudSyncId = r.get<String>('sync_id');
@@ -545,9 +591,17 @@ class SyncManager {
     }
   }
 
-  Future<void> _pushFeedFilters(PocketBase pb, String userId) async {
+  Future<void> _pushFeedFilters(
+      PocketBase pb, String userId, String? lastSync) async {
     final db = await dbHelper.database;
-    final rows = await db.query('feed_filters');
+
+    final rows = await db.query(
+      'feed_filters',
+      where: lastSync != null ? 'updated_at > ?' : null,
+      whereArgs: lastSync != null ? [lastSync] : null,
+    );
+
+    if (rows.isEmpty) return;
 
     final cloudRecords = await pb.collection('feed_filters').getFullList(
           filter: 'user = "$userId"',
@@ -588,14 +642,23 @@ class SyncManager {
     }
   }
 
-  Future<void> _pullKnownUrls(PocketBase pb, String userId) async {
+  Future<void> _pullKnownUrls(
+      PocketBase pb, String userId, String? lastSync) async {
     final db = await dbHelper.database;
 
+    String filter = 'user = "$userId"';
+    if (lastSync != null) {
+      final pbDate = lastSync.replaceAll('T', ' ').substring(0, 19);
+      filter += ' && updated_at > "$pbDate"';
+    }
+
     final cloudRecords = await pb.collection('known_urls').getFullList(
-          filter: 'user = "$userId"',
+          filter: filter,
         );
 
-    logger.info("Pulling known URLs: ${cloudRecords.length} found in cloud.");
+    if (cloudRecords.isEmpty) return;
+
+    logger.info("Delta pull: Found ${cloudRecords.length} updated known URLs.");
 
     for (final r in cloudRecords) {
       final cloudSyncId = r.get<String>('sync_id');
@@ -613,7 +676,7 @@ class SyncManager {
       if (r.get<bool>('is_deleted')) {
         await db.update(
           'knownUrls',
-          {'is_deleted': 1},
+          {'is_deleted': 1, 'updated_at': pbUpdatedAt},
           where: 'sync_id = ? AND is_deleted = 0',
           whereArgs: [cloudSyncId],
         );
@@ -653,6 +716,7 @@ class SyncManager {
 
       if (local.isEmpty) {
         await db.insert('knownUrls', urlData);
+        logger.info("Inserted new known URL: ${urlData['url']}");
       } else {
         final localUpdatedAt = local.first['updated_at'] as String? ?? '';
         if (_isNewer(pbUpdatedAt, localUpdatedAt)) {
@@ -663,9 +727,17 @@ class SyncManager {
     }
   }
 
-  Future<void> _pushKnownUrls(PocketBase pb, String userId) async {
+  Future<void> _pushKnownUrls(
+      PocketBase pb, String userId, String? lastSync) async {
     final db = await dbHelper.database;
-    final rows = await db.query('knownUrls');
+
+    final rows = await db.query(
+      'knownUrls',
+      where: lastSync != null ? 'updated_at > ?' : null,
+      whereArgs: lastSync != null ? [lastSync] : null,
+    );
+
+    if (rows.isEmpty) return;
 
     final cloudRecords = await pb.collection('known_urls').getFullList(
           filter: 'user = "$userId"',
@@ -686,10 +758,12 @@ class SyncManager {
       };
 
       if (existingCloud == null) {
+        logger.info("Pushing new known URL: ${data['url']}");
         await pb.collection('known_urls').create(body: data);
       } else {
         final pbUpdatedAt = existingCloud.get<String>('updated_at');
         if (_isNewer(localUpdatedAt, pbUpdatedAt)) {
+          logger.info("Pushing update for known URL: ${data['url']}");
           await pb
               .collection('known_urls')
               .update(existingCloud.id, body: data);
@@ -698,11 +772,24 @@ class SyncManager {
     }
   }
 
-  Future<void> _pullSavedQueries(PocketBase pb, String userId) async {
+  Future<void> _pullSavedQueries(
+      PocketBase pb, String userId, String? lastSync) async {
     final db = await dbHelper.database;
+
+    String filter = 'user = "$userId"';
+    if (lastSync != null) {
+      final pbDate = lastSync.replaceAll('T', ' ').substring(0, 19);
+      filter += ' && updated_at > "$pbDate"';
+    }
+
     final cloudRecords = await pb.collection('saved_queries').getFullList(
-          filter: 'user = "$userId"',
+          filter: filter,
         );
+
+    if (cloudRecords.isEmpty) return;
+
+    logger.info(
+        "Delta pull: Found ${cloudRecords.length} updated saved queries.");
 
     for (final r in cloudRecords) {
       final cloudSyncId = r.get<String>('sync_id');
@@ -731,8 +818,11 @@ class SyncManager {
         );
 
         if (match.isNotEmpty) {
+          logger.info(
+              "Merging local query '${queryData['queryName']}' into cloud sync_id: $cloudSyncId");
           await db.update('savedQueries', {'sync_id': cloudSyncId},
               where: 'query_id = ?', whereArgs: [match.first['query_id']]);
+
           local = await db.query('savedQueries',
               where: 'sync_id = ?', whereArgs: [cloudSyncId], limit: 1);
         }
@@ -741,20 +831,31 @@ class SyncManager {
       if (local.isEmpty) {
         if (queryData['is_deleted'] == 0) {
           await db.insert('savedQueries', queryData);
+          logger.info("Inserted new saved query: ${queryData['queryName']}");
         }
       } else {
         final localUpdatedAt = local.first['updated_at'] as String? ?? '';
+
         if (_isNewer(pbUpdatedAt, localUpdatedAt)) {
           await db.update('savedQueries', queryData,
               where: 'sync_id = ?', whereArgs: [cloudSyncId]);
+          logger.info("Updated saved query: ${queryData['queryName']}");
         }
       }
     }
   }
 
-  Future<void> _pushSavedQueries(PocketBase pb, String userId) async {
+  Future<void> _pushSavedQueries(
+      PocketBase pb, String userId, String? lastSync) async {
     final db = await dbHelper.database;
-    final rows = await db.query('savedQueries');
+
+    final rows = await db.query(
+      'savedQueries',
+      where: lastSync != null ? 'updated_at > ?' : null,
+      whereArgs: lastSync != null ? [lastSync] : null,
+    );
+
+    if (rows.isEmpty) return;
 
     final cloudRecords = await pb.collection('saved_queries').getFullList(
           filter: 'user = "$userId"',
@@ -783,6 +884,7 @@ class SyncManager {
       } else {
         final pbUpdatedAt = existingCloud.get<String>('updated_at');
         if (_isNewer(localUpdatedAt, pbUpdatedAt)) {
+          logger.info("Pushing update for saved query: ${data['query_name']}");
           await pb
               .collection('saved_queries')
               .update(existingCloud.id, body: data);

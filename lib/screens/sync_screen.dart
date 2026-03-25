@@ -240,7 +240,7 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
   Future<void> _runSync() async {
     setState(() => _isSyncing = true);
     try {
-      await syncManager.sync();
+      await syncManager.sync(isFullSync: true);
       await _loadLastSync();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
