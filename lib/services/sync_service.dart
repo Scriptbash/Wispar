@@ -1,4 +1,5 @@
 import 'package:pocketbase/pocketbase.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wispar/services/pocketbase_service.dart';
 import 'package:wispar/services/database_helper.dart';
 import 'package:wispar/services/logs_helper.dart';
@@ -22,7 +23,15 @@ class SyncManager {
     return local.difference(pb).inSeconds > 2;
   }
 
-  void triggerBackgroundSync() {
+  Future<bool> isBackgroundSyncEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('background_sync_enabled') ?? true;
+  }
+
+  void triggerBackgroundSync() async {
+    if (!await isBackgroundSyncEnabled()) {
+      return;
+    }
     if (pbService.isAuthenticated) {
       logger.info("Syncing in the background");
       if (_debounce?.isActive ?? false) _debounce!.cancel();

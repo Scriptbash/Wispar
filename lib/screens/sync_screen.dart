@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:pocketbase/pocketbase.dart';
@@ -304,6 +305,17 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
     return AppLocalizations.of(context)!.cantConnectServer;
   }
 
+  Future<bool> _isBackgroundSyncEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('background_sync_enabled') ?? true;
+  }
+
+  Future<void> _toggleBackgroundSync(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('background_sync_enabled', value);
+    setState(() {});
+  }
+
   @override
   void dispose() {
     _cooldownTimer?.cancel();
@@ -362,7 +374,6 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
                 onSubmitted: (val) async =>
                     await pbService.updateCustomUrl(val.trim()),
               ),
-              const SizedBox(height: 16),
             ],
             TextField(
               controller: _emailController,
@@ -476,27 +487,13 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
                                   ),
                                 ),
                               ),
-                              TextButton(
-                                onPressed: () {
-                                  pbService.client.authStore.clear();
-                                  _clearAuthForm();
-                                  setState(() => _lastSyncDate = null);
-                                },
-                                style: TextButton.styleFrom(
-                                  visualDensity: VisualDensity.compact,
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                ),
-                                child:
-                                    Text(AppLocalizations.of(context)!.logout),
-                              ),
                             ],
                           ),
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Text(
                               AppLocalizations.of(context)!
-                                  .syncServer(_urlController.text),
+                                  .syncServer(pbService.baseURL),
                               style: TextStyle(
                                 fontSize: 13,
                                 color: Theme.of(context)
@@ -541,7 +538,33 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
                   ? AppLocalizations.of(context)!.syncing
                   : AppLocalizations.of(context)!.syncNow),
             ),
+            FutureBuilder<bool>(
+              future: _isBackgroundSyncEnabled(),
+              builder: (context, snapshot) {
+                final bool isEnabled = snapshot.data ?? true;
+                return SwitchListTile(
+                  title: Text(AppLocalizations.of(context)!.backgroundSync),
+                  subtitle: Text(
+                      AppLocalizations.of(context)!.backgroundSyncDescription),
+                  value: isEnabled,
+                  onChanged: _isSyncing ? null : _toggleBackgroundSync,
+                  contentPadding: EdgeInsets.zero,
+                );
+              },
+            ),
             const SizedBox(height: 48),
+            OutlinedButton(
+              onPressed: () {
+                pbService.client.authStore.clear();
+                _clearAuthForm();
+                setState(() => _lastSyncDate = null);
+              },
+              style: TextButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+              ),
+              child: Text(AppLocalizations.of(context)!.logout),
+            ),
             const Divider(),
             TextButton.icon(
               onPressed: _isSyncing ? null : _handleDeleteAccount,
