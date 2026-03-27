@@ -63,6 +63,16 @@ class _SyncAuthFormState extends State<SyncAuthForm> {
       return;
     }
 
+    final bool emailValid = RegExp(
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(email);
+
+    if (!emailValid) {
+      setState(() =>
+          _errorMessage = AppLocalizations.of(context)!.pleaseEnterValidEmail);
+      return;
+    }
+
     if (password.isEmpty) {
       setState(() =>
           _errorMessage = AppLocalizations.of(context)!.pleaseEnterPassword);
@@ -263,6 +273,7 @@ class _SyncAuthFormState extends State<SyncAuthForm> {
           ),
         TextField(
           controller: _emailController,
+          keyboardType: TextInputType.emailAddress,
           decoration:
               InputDecoration(labelText: AppLocalizations.of(context)!.email),
         ),
