@@ -12,7 +12,7 @@
 	<true/>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)app.wispar.wispar</string>
+		<string>MAX4AK5MU7.app.wispar.wispar</string>
 	</array>
 </dict>
 </plist>
