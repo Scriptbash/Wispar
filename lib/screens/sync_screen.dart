@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
-import 'package:pocketbase/pocketbase.dart';
 import 'package:wispar/services/pocketbase_service.dart';
 import 'package:wispar/services/sync_service.dart';
 import 'package:wispar/services/database_helper.dart';
 import 'package:wispar/services/logs_helper.dart';
+import 'package:wispar/widgets/sync_auth_form.dart';
 
 class SyncSettingsScreen extends StatefulWidget {
   const SyncSettingsScreen({super.key});
@@ -17,130 +17,17 @@ class SyncSettingsScreen extends StatefulWidget {
 }
 
 class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
-  final _emailController = TextEditingController(text: '');
-  final _passwordController = TextEditingController(text: '');
-  bool _isSyncing = false;
-  bool _isRegisterMode = false;
-
-  final _urlController = TextEditingController();
-  bool _isSelfHosted = false;
-
   final pbService = PocketBaseService();
   final syncManager = SyncManager();
   final DatabaseHelper dbHelper = DatabaseHelper();
   final logger = LogsService().logger;
-
+  bool _isSyncing = false;
   DateTime? _lastSyncDate;
-  String? _errorMessage;
-
-  int _resendCooldown = 0;
-  Timer? _cooldownTimer;
 
   @override
   void initState() {
     super.initState();
-    if (pbService.isAuthenticated) {
-      _urlController.text = pbService.baseURL;
-      _isSelfHosted = pbService.baseURL != 'https://sync.wispar.app';
-    } else {
-      _isSelfHosted = false;
-      _urlController.text = '';
-    }
     _loadLastSync();
-  }
-
-  Future<void> _handleLogin() async {
-    setState(() {
-      _isSyncing = true;
-      _errorMessage = null;
-    });
-    try {
-      if (_isRegisterMode) {
-        await pbService.register(
-          _emailController.text.trim(),
-          _passwordController.text.trim(),
-        );
-        // Don't log the user until the user verify their email
-        pbService.client.authStore.clear();
-
-        if (!mounted) return;
-
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(AppLocalizations.of(context)!.checkEmail),
-            content: Text(AppLocalizations.of(context)!.checkEmailDescription),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  setState(() => _isRegisterMode = false);
-                  _passwordController.clear();
-                },
-                child: Text(AppLocalizations.of(context)!.close),
-              ),
-            ],
-          ),
-        );
-      } else {
-        await pbService.client.collection('users').authWithPassword(
-              _emailController.text.trim(),
-              _passwordController.text.trim(),
-            );
-
-        if (!pbService.isVerified) {
-          pbService.client.authStore.clear();
-          setState(() {
-            _errorMessage = AppLocalizations.of(context)!.emailNotVerifiedError;
-          });
-          return;
-        }
-
-        setState(() {});
-        logger.info('Logged in a cloud account.');
-        await _runSync();
-      }
-    } catch (e, stackTrace) {
-      if (!mounted) return;
-      setState(() {
-        _errorMessage = _getCleanErrorMessage(e);
-      });
-      logger.severe('Failed to authenticate.', e, stackTrace);
-    } finally {
-      if (mounted) setState(() => _isSyncing = false);
-    }
-  }
-
-  Future<void> _handleResendVerification() async {
-    final email = _emailController.text.trim();
-    if (email.isEmpty) return;
-
-    setState(() => _isSyncing = true);
-    try {
-      await pbService.resendVerification(email);
-      _startResendCooldown();
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(AppLocalizations.of(context)!.checkEmailDescription)),
-      );
-    } catch (e) {
-      setState(() => _errorMessage = _getCleanErrorMessage(e));
-    } finally {
-      setState(() => _isSyncing = false);
-    }
-  }
-
-  void _startResendCooldown() {
-    setState(() => _resendCooldown = 60);
-    _cooldownTimer?.cancel();
-    _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_resendCooldown == 0) {
-        timer.cancel();
-      } else {
-        setState(() => _resendCooldown--);
-      }
-    });
   }
 
   Future<void> _handleDeleteAccount() async {
@@ -166,8 +53,10 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
       setState(() => _isSyncing = true);
       try {
         await pbService.deleteAccount();
-        _clearAuthForm();
-        setState(() {});
+        setState(() {
+          _isSyncing = false;
+          _lastSyncDate = null;
+        });
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -189,42 +78,6 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
         setState(() => _isSyncing = false);
       }
     }
-  }
-
-  Future<void> _handleForgotPassword() async {
-    final email = _emailController.text.trim();
-    if (email.isEmpty) {
-      setState(
-          () => _errorMessage = AppLocalizations.of(context)!.pleaseEnterEmail);
-      return;
-    }
-
-    setState(() {
-      _isSyncing = true;
-      _errorMessage = null;
-    });
-
-    try {
-      await pbService.requestPasswordReset(email);
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(AppLocalizations.of(context)!.passwordResetSent)),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _errorMessage = _getCleanErrorMessage(e));
-    } finally {
-      if (mounted) setState(() => _isSyncing = false);
-    }
-  }
-
-  void _clearAuthForm() {
-    _emailController.clear();
-    _passwordController.clear();
-    _isRegisterMode = false;
-    _isSyncing = false;
   }
 
   Future<void> _loadLastSync() async {
@@ -262,49 +115,6 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
     }
   }
 
-  String _getCleanErrorMessage(dynamic e) {
-    if (e is! ClientException) return e.toString();
-
-    final data = e.response['data'] as Map<String, dynamic>? ?? {};
-
-    if (e.statusCode == 400) {
-      if (data.containsKey('identity') || data.containsKey('email')) {
-        final emailErr = data['identity'] ?? data['email'];
-        final code = emailErr['code'];
-
-        if (code == 'validation_required') {
-          return AppLocalizations.of(context)!.pleaseEnterEmail;
-        }
-        if (code == 'validation_not_unique') {
-          return AppLocalizations.of(context)!.accountAlreadyExists;
-        }
-        if (code == 'validation_is_email') {
-          return AppLocalizations.of(context)!.pleaseEnterValidEmail;
-        }
-      }
-
-      if (data.containsKey('password')) {
-        final passErr = data['password'];
-        final code = passErr['code'];
-
-        if (code == 'validation_required') {
-          return AppLocalizations.of(context)!.pleaseEnterPassword;
-        }
-        if (code == 'validation_min_text_constraint') {
-          return AppLocalizations.of(context)!.passwordTooShort;
-        }
-      }
-
-      return AppLocalizations.of(context)!.checkdetailAndTryAgain;
-    }
-
-    if (e.statusCode == 401 || e.statusCode == 404) {
-      return AppLocalizations.of(context)!.invalidEmailOrPassword;
-    }
-
-    return AppLocalizations.of(context)!.cantConnectServer;
-  }
-
   Future<bool> _isBackgroundSyncEnabled() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool('background_sync_enabled') ?? true;
@@ -318,7 +128,6 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
 
   @override
   void dispose() {
-    _cooldownTimer?.cancel();
     super.dispose();
   }
 
@@ -329,124 +138,21 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          Text(
+            AppLocalizations.of(context)!.loginToSyncDevices,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          SizedBox(
+            height: 16,
+          ),
           if (!pbService.isAuthenticated) ...[
-            SegmentedButton<bool>(
-              segments: [
-                ButtonSegment(
-                    value: false,
-                    label: Text('Wispar Sync'),
-                    icon: Icon(Icons.cloud)),
-                ButtonSegment(
-                    value: true,
-                    label: Text(AppLocalizations.of(context)!.selfHosted),
-                    icon: Icon(Icons.dns)),
-              ],
-              selected: {_isSelfHosted},
-              onSelectionChanged: (value) async {
-                setState(() {
-                  _errorMessage = null;
-                  _isSelfHosted = value.first;
-                });
-
-                if (!_isSelfHosted) {
-                  const prodUrl = 'https://sync.wispar.app';
-                  await pbService.updateCustomUrl(prodUrl);
-                  _urlController.text = prodUrl;
-                } else {
-                  _urlController.text = '';
-                }
+            SyncAuthForm(
+              onLoginSuccess: () {
+                setState(() {});
+                _runSync();
               },
             ),
-            const SizedBox(height: 16),
-            Text(
-              AppLocalizations.of(context)!.loginToSyncDevices,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            if (_isSelfHosted) ...[
-              TextField(
-                controller: _urlController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.serverUrl,
-                  hintText: 'http://192.168.1.50:8090',
-                ),
-                onSubmitted: (val) async =>
-                    await pbService.updateCustomUrl(val.trim()),
-              ),
-            ],
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.email),
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.password),
-              obscureText: true,
-            ),
-            if (!_isRegisterMode && !_isSelfHosted)
-              TextButton(
-                onPressed: _isSyncing ? null : _handleForgotPassword,
-                child: Text(AppLocalizations.of(context)!.forgotPassword),
-              ),
-            const SizedBox(height: 16),
-            if (_errorMessage != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: Text(
-                  _errorMessage!,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            if (_errorMessage != null &&
-                _errorMessage!.contains("verify") &&
-                !_isRegisterMode)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: TextButton.icon(
-                  onPressed: (_resendCooldown > 0 || _isSyncing)
-                      ? null
-                      : _handleResendVerification,
-                  icon: const Icon(Icons.email),
-                  label: Text(
-                    _resendCooldown > 0
-                        ? AppLocalizations.of(context)!
-                            .waitResendEmail(_resendCooldown)
-                        : AppLocalizations.of(context)!.resendEmail,
-                  ),
-                ),
-              ),
-            FilledButton(
-              onPressed: _isSyncing
-                  ? null
-                  : () async {
-                      if (_isSelfHosted) {
-                        await pbService
-                            .updateCustomUrl(_urlController.text.trim());
-                      }
-                      _handleLogin();
-                    },
-              child: Text(_isRegisterMode
-                  ? AppLocalizations.of(context)!.signUp
-                  : AppLocalizations.of(context)!.login),
-            ),
-            if (!_isSelfHosted)
-              TextButton(
-                onPressed: () =>
-                    setState(() => _isRegisterMode = !_isRegisterMode),
-                child: Text(_isRegisterMode
-                    ? AppLocalizations.of(context)!.haveAnAccount
-                    : AppLocalizations.of(context)!.needAnAccount),
-              ),
-            SizedBox(height: 16),
-            if (!_isSelfHosted)
-              Text(AppLocalizations.of(context)!.syncDisclaimer)
           ] else ...[
             Card(
               elevation: 3,
@@ -556,8 +262,10 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
             OutlinedButton(
               onPressed: () {
                 pbService.client.authStore.clear();
-                _clearAuthForm();
-                setState(() => _lastSyncDate = null);
+                setState(() {
+                  _lastSyncDate = null;
+                  _isSyncing = false;
+                });
               },
               style: TextButton.styleFrom(
                 visualDensity: VisualDensity.compact,

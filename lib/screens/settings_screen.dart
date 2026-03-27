@@ -100,7 +100,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 builder: (context) => const PublicationCardSettingsScreen())),
       ),
       _buildTile(
-        icon: Icons.sync,
+        icon: Icons.cloud_sync_outlined,
         label: AppLocalizations.of(context)!.cloudSync,
         onTap: () => Navigator.push(
             context,
