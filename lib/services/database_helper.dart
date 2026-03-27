@@ -336,7 +336,9 @@ class DatabaseHelper {
                 table,
                 {
                   'sync_id': Uuid().v7(),
-                  'updated_at': DateTime.now().toUtc().toIso8601String(),
+                  'updated_at': DateTime.fromMillisecondsSinceEpoch(0)
+                      .toUtc()
+                      .toIso8601String(),
                 },
                 where: '$pk = ?',
                 whereArgs: [row[pk]]);
