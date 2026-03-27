@@ -69,7 +69,7 @@ jobs:
         with:
           channel: 'stable'
       - run: flutter pub get
-      - run: flutter build macos --debug
+      - run: flutter build macos --debug --no-codesign
       - uses: actions/upload-artifact@v7
         with:
           name: macos-debug-app
