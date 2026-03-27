@@ -429,5 +429,21 @@
     "previousMatch": "Occurrence précédente",
     "issnFilter": "Filtre ISSN",
     "openAccessOnly": "Libre accès seulement",
-    "loginToSyncDevices": "Connectez-vous pour synchroniser vos appareils"
+    "loginToSyncDevices": "Connectez-vous pour synchroniser vos appareils",
+    "syncLongDescription": "Wispar propose un service de synchronisation optionnel pour maintenir vos données cohérentes sur tous vos appareils. Vous pouvez utiliser Wispar Sync (voir la Politique de confidentialité) ou l’auto-héberger pour un contrôle total des données (voir la Documentation). Vous pouvez également ignorer la synchronisation et continuer.",
+    "documentation": "Documentation",
+    "cloudSync": "Synchronisation nuagique",
+    "selfHosted": "Auto-Hébergé",
+    "syncNow": "Synchroniser maintenant",
+    "syncing": "Synchronisation…",
+    "lastSync": "Dernière synchronisation : {time}",
+    "backgroundSync": "Synchronisation en arrière-plan",
+    "backgroundSyncDescription": "Si activé, la synchronisation s’effectuera automatiquement pendant l’utilisation de l’application.",
+    "authFailed": "Erreur d'authentification : {error}",
+    "accountAlreadyExists": "Ce compte existe déjà.",
+    "pleaseEnterEmail": "Veuillez entrer votre courriel.",
+    "pleaseEnterValidEmail": "Veuillez fournir une adresse courriel valide.",
+    "pleaseEnterPassword": "Veuillez entrer votre mot de passe.",
+    "passwordTooShort": "Le mot de passe doit être d'au moins 8 caractères.",
+    "checkdetailAndTryAgain": "Veuillez vérifier vos informations et essayer à nouveau."
 }
