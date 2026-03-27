@@ -428,5 +428,6 @@
     "nextMatch": "Prochaine occurrence",
     "previousMatch": "Occurrence précédente",
     "issnFilter": "Filtre ISSN",
-    "openAccessOnly": "Libre accès seulement"
+    "openAccessOnly": "Libre accès seulement",
+    "loginToSyncDevices": "Connectez-vous pour synchroniser vos appareils"
 }
