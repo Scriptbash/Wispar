@@ -7,6 +7,7 @@ import 'package:wispar/services/database_helper.dart';
 import 'package:wispar/services/feed_service.dart';
 import 'package:wispar/services/abstract_helper.dart';
 import 'package:wispar/models/feed_filter_entity.dart';
+import 'package:wispar/services/sync_service.dart';
 import 'package:wispar/widgets/publication_card/publication_card.dart';
 import 'package:wispar/screens/publication_card_settings_screen.dart';
 import 'package:wispar/widgets/sort_dialog.dart';
@@ -46,6 +47,7 @@ class HomeScreenState extends State<HomeScreen> {
   List<PublicationCard> _activeFeed = [];
 
   final FeedService _feedService = FeedService();
+  final syncManager = SyncManager();
 
   List<Map<String, dynamic>> savedQueries = [];
   bool _feedLoaded = false; // Needed to avoid conflicts wih onAbstractChanged
@@ -916,6 +918,7 @@ class HomeScreenState extends State<HomeScreen> {
                                           .primary),
                                   onPressed: () async {
                                     await db.deleteFeedFilter(filter.id);
+                                    syncManager.triggerBackgroundSync();
                                     Navigator.pop(context);
 
                                     // Reset to Home feed after deletion

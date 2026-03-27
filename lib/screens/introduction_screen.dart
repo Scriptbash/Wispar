@@ -1,21 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../generated_l10n/app_localizations.dart';
-import './institutions_screen.dart';
-import './zotero_settings_screen.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/screens/institutions_screen.dart';
+import 'package:wispar/screens/zotero_settings_screen.dart';
+import 'package:wispar/services/sync_service.dart';
+import 'package:wispar/widgets/sync_auth_form.dart';
+import 'package:wispar/services/pocketbase_service.dart';
+import 'package:wispar/services/logs_helper.dart';
 
 class IntroScreen extends StatefulWidget {
   final VoidCallback onDone;
 
-  const IntroScreen({Key? key, required this.onDone}) : super(key: key);
+  const IntroScreen({super.key, required this.onDone});
 
   @override
-  _IntroScreenState createState() => _IntroScreenState();
+  IntroScreenState createState() => IntroScreenState();
 }
 
-class _IntroScreenState extends State<IntroScreen> {
+class IntroScreenState extends State<IntroScreen> {
   String institutionName = 'No institution';
+  final pbService = PocketBaseService();
+  final syncManager = SyncManager();
+  final logger = LogsService().logger;
 
   @override
   void initState() {
@@ -87,6 +94,55 @@ class _IntroScreenState extends State<IntroScreen> {
             imagePadding: EdgeInsets.zero,
             bodyFlex: 1,
           ),
+        ),
+        PageViewModel(
+          titleWidget: const SizedBox.shrink(),
+          bodyWidget: Column(
+            children: [
+              const SizedBox(height: 8),
+              Icon(
+                  pbService.isAuthenticated
+                      ? Icons.cloud_done
+                      : Icons.cloud_sync,
+                  size: 100,
+                  color: Colors.deepPurpleAccent),
+              const SizedBox(height: 20),
+              Text(
+                "Wispar Sync",
+                style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurpleAccent),
+              ),
+              const SizedBox(height: 12),
+              if (!pbService.isAuthenticated) ...[
+                Text(
+                  AppLocalizations.of(context)!.syncLongDescription,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 20),
+                SyncAuthForm(
+                  onLoginSuccess: () async {
+                    setState(() => ());
+                    try {
+                      syncManager.sync(isFullSync: true);
+                    } catch (e, stackTrace) {
+                      logger.severe("The initial sync failed.", e, stackTrace);
+                    }
+                  },
+                ),
+              ] else ...[
+                const SizedBox(height: 20),
+                Text(
+                  AppLocalizations.of(context)!.userIsLoggedIn,
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ],
+          ),
+          decoration: const PageDecoration(bodyFlex: 2),
         ),
         PageViewModel(
           titleWidget: const SizedBox.shrink(),

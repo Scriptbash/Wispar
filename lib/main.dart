@@ -14,11 +14,13 @@ import 'package:wispar/screens/downloads_screen.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:wispar/services/background_service.dart';
 import 'package:wispar/services/logs_helper.dart';
+import 'package:wispar/services/pocketbase_service.dart';
 import 'package:background_fetch/background_fetch.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:wispar/services/sync_service.dart';
 import 'package:wispar/webview_env.dart';
 import 'dart:io' show Platform;
 
@@ -45,6 +47,7 @@ void main() async {
     databaseFactory = databaseFactoryFfi;
   }
   LogsService();
+  await PocketBaseService().init();
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     await windowManager.ensureInitialized();
     WindowOptions windowOptions = const WindowOptions(
@@ -78,19 +81,24 @@ void main() async {
 class Wispar extends StatefulWidget {
   static const title = 'Wispar';
 
-  const Wispar({Key? key}) : super(key: key);
+  const Wispar({super.key});
 
   @override
-  _WisparState createState() => _WisparState();
+  WisparState createState() => WisparState();
 }
 
-class _WisparState extends State<Wispar> {
+class WisparState extends State<Wispar> {
   bool _hasSeenIntro = false;
+  final pbService = PocketBaseService();
+  final syncManager = SyncManager();
 
   @override
   void initState() {
     super.initState();
     _checkIntroPreference();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      syncManager.triggerBackgroundSync();
+    });
   }
 
   // Load the intro preference
@@ -173,14 +181,13 @@ class _WisparState extends State<Wispar> {
 class HomeScreenNavigator extends StatefulWidget {
   final bool skipToSearch;
 
-  const HomeScreenNavigator({Key? key, this.skipToSearch = false})
-      : super(key: key);
+  const HomeScreenNavigator({super.key, this.skipToSearch = false});
 
   @override
-  _HomeScreenNavigatorState createState() => _HomeScreenNavigatorState();
+  HomeScreenNavigatorState createState() => HomeScreenNavigatorState();
 }
 
-class _HomeScreenNavigatorState extends State<HomeScreenNavigator> {
+class HomeScreenNavigatorState extends State<HomeScreenNavigator> {
   var _currentIndex = 0;
 
   @override

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../generated_l10n/app_localizations.dart';
-import '../models/journal_entity.dart';
-import '../widgets/sort_dialog.dart';
-import '../services/database_helper.dart';
-import '../widgets/journal_card.dart';
+import 'package:wispar/services/sync_service.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/models/journal_entity.dart';
+import 'package:wispar/widgets/sort_dialog.dart';
+import 'package:wispar/services/database_helper.dart';
+import 'package:wispar/widgets/journal_card.dart';
 
 class JournalsTabContent extends StatefulWidget {
   final int initialSortBy;
@@ -12,18 +13,18 @@ class JournalsTabContent extends StatefulWidget {
   final Function(int) onSortOrderChanged;
 
   const JournalsTabContent({
-    Key? key,
+    super.key,
     required this.initialSortBy,
     required this.initialSortOrder,
     required this.onSortByChanged,
     required this.onSortOrderChanged,
-  }) : super(key: key);
+  });
 
   @override
-  _JournalsTabContentState createState() => _JournalsTabContentState();
+  JournalsTabContentState createState() => JournalsTabContentState();
 }
 
-class _JournalsTabContentState extends State<JournalsTabContent> {
+class JournalsTabContentState extends State<JournalsTabContent> {
   late DatabaseHelper dbHelper;
   bool _isEditing = false;
 
@@ -153,7 +154,9 @@ class _JournalsTabContentState extends State<JournalsTabContent> {
   }
 
   Future<void> _unfollowJournal(BuildContext context, Journal journal) async {
+    final syncManager = SyncManager();
     await dbHelper.removeJournal(journal.issn);
     setState(() {});
+    syncManager.triggerBackgroundSync();
   }
 }
