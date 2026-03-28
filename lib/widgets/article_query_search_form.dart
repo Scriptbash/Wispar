@@ -696,15 +696,16 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                     border: OutlineInputBorder(),
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
               ],
             ),
-            SizedBox(height: 16),
-            Text(
-              AppLocalizations.of(context)!.saveQuery,
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Switch(
+            const SizedBox(height: 16),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                AppLocalizations.of(context)!.saveQuery,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
               value: saveQuery,
               onChanged: (bool value) {
                 setState(() {
@@ -712,7 +713,6 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                 });
               },
             ),
-            SizedBox(height: 8),
             if (saveQuery)
               TextFormField(
                 controller: queryNameController,
@@ -721,7 +721,7 @@ class QuerySearchFormState extends State<QuerySearchForm> {
                   border: OutlineInputBorder(),
                 ),
               ),
-            SizedBox(height: 70),
+            const SizedBox(height: 70),
           ],
         ),
       ),
