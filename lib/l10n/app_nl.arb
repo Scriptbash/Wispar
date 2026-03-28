@@ -1,328 +1,219 @@
 {
-  "welcomeWispar": "Welkom bij Wispar!",
-  "@welcomeWispar": {},
-  "setupInstitutionalAccess": "Institutie Toegang Opzetten",
-  "@setupInstitutionalAccess": {},
-  "setupSelectInstitution": "Selecteer mijn institutie",
-  "@setupSelectInstitution": {},
-  "setupSelectedInstitution": "Je hebt geselecteerd:",
-  "@setupSelectedInstitution": {},
-  "setupLinkZotero": "Koppel Zotero",
-  "@setupLinkZotero": {},
-  "setupZoteroLong": "Zend publicaties direct naar je Zotero bibliotheek. Ze zullen toegevoegd worden aan een speciale Wispar verzameling.",
-  "@setupZoteroLong": {},
-  "setupLinkMyZotero": "Koppel mijn Zotero profiel",
-  "@setupLinkMyZotero": {},
-  "setupOtherSettings": "Andere Instellingen",
-  "@setupOtherSettings": {},
-  "setupOtherSettingsLong": "Additionele instellingen zijn beschikbaar in de app's instellingen menu. Ze is toegankelijk van de Thuis scherm door de ellips menu te tappen aan de rechterbovenhoek.",
-  "@setupOtherSettingsLong": {},
-  "setupAlmostSet": "Je bent helemaal klaar!... Bijna!",
-  "@setupAlmostSet": {},
-  "skip": "Overslaan",
-  "@skip": {},
-  "getStarted": "Aan de Slag",
-  "@getStarted": {},
-  "home": "Thuis",
-  "@home": {
-    "description": "The home menu button and the app bar title when in the home screen."
-  },
-  "favorites": "Favorieten",
-  "@favorites": {
-    "description": "The favorites menu button and the app bar title when in the favorites screen."
-  },
-  "download": "Installeer",
-  "@download": {
-    "description": "The verb to download, without the 'to'."
-  },
-  "delete": "Verwijder",
-  "@delete": {},
-  "downloadSuccessful": "Het artikel werd succesvol geinstalleerd!",
-  "@downloadSuccessful": {},
-  "downloadDeleted": "Het artikel werd verwijderd!",
-  "@downloadDeleted": {},
-  "noDownloads": "Je hebt geen enkele downloads.",
-  "@noDownloads": {},
-  "settings": "Instellingen",
-  "@settings": {
-    "description": "The settings option menu button and the app bar title when in the settings screen."
-  },
-  "journalLibraryEmpty": "Je bent geen enkele journalen aan het volgen. Gebruik de zoek menu om journalen te vinden en te volgen.",
-  "@journalLibraryEmpty": {
-    "description": "Message shown when the user is not following any journals."
-  },
-  "library": "Bibliotheek",
-  "@library": {
-    "description": "The library menu button and the app bar title when in the library screen."
-  },
-  "queries": "Zoektermen",
-  "@queries": {
-    "description": "Title of the saved search queries tab."
-  },
-  "search": "Zoek",
-  "@search": {
-    "description": "Text shown inside the search screen app bar and for the seach button."
-  },
-  "searchPlaceholder": "Zoek…",
-  "@searchPlaceholder": {
-    "description": "Place holder text in the search input widget."
-  },
-  "emptyDOIError": "Gelieve een DOI ingeven",
-  "@emptyDOIError": {},
-  "searchByQuery": "Zoek via zoektermen",
-  "@searchByQuery": {},
-  "searchByDOI": "Zoek via DOI",
-  "@searchByDOI": {},
-  "searchByTitle": "Zoek via titel",
-  "@searchByTitle": {},
-  "searchByISSN": "Zoek via ISSN",
-  "@searchByISSN": {},
-  "queryHasNoNameError": "Je moet een zoekterm naam ingeven om het op te slaan.",
-  "@queryHasNoNameError": {},
-  "emptySearchQuery": "Gelieve een zoekterm in te geven",
-  "@emptySearchQuery": {},
-  "moreOptions": "Meer opties",
-  "@moreOptions": {},
-  "saveQuery": "Bewaar deze zoekterm",
-  "@saveQuery": {},
-  "queryName": "Zoekterm naam",
-  "@queryName": {},
-  "dateSaved": "Datum bewaard",
-  "@dateSaved": {},
-  "articles": "Artikels",
-  "@articles": {
-    "description": "As in scientific articles."
-  },
-  "category": "Categorie",
-  "@category": {},
-  "publisher": "Uitgever",
-  "@publisher": {},
-  "publishedin": "Uitgegeven in",
-  "@publishedin": {},
-  "latestpublications": "Laatste uitgevingen",
-  "@latestpublications": {},
-  "authors": "Auteurs",
-  "@authors": {},
-  "publishedon": "Uitgegeven Op {date}",
-  "@publishedon": {},
-  "abstract": "Samenvatting",
-  "@abstract": {},
-  "copydoi": "Kopieer DOI",
-  "@copydoi": {},
-  "doicopied": "DOI gekopieerd naar klembord",
-  "@doicopied": {
-    "description": "Snackbar shown when the Copy DOI button is pressed."
-  },
-  "issnCopied": "ISSN gekopieerd naar klembord",
-  "@issnCopied": {},
-  "apiQueryCopied": "API aanvraag gekopieerd naar klembord",
-  "@apiQueryCopied": {},
-  "articleViewer": "Artikel bekijker",
-  "@articleViewer": {},
-  "openExternalBrowser": "Open in externale browser",
-  "@openExternalBrowser": {},
-  "journals": "Journalen",
-  "@journals": {
-    "description": "The journals menu button and the app bar title when in the journals screen."
-  },
-  "appDescription": "Jouw open-source app om bij te blijven met de wetenschappelijke literatuur. We zullen jouw snel op gang zetten!",
-  "@appDescription": {},
-  "setupInstitutionalAccessLong": "Selecteer de EZproxy van je institutie om toegang te krijgen aan hun journaal abonnementen. Dit zal de nood aan een VPN of op locatie toegang elimineren.",
-  "@setupInstitutionalAccessLong": {},
-  "downloads": "Installaties",
-  "@downloads": {
-    "description": "The downloads menu button and the app bar title when in the downloads screen."
-  },
-  "setupAlmostSetLong": "Vervolgens, we zullen jouw naar de zoekscherm brengen, waar je jouw favoriete journalen kan volgen. Vergeet niet om de categorie menu te veranderen van 'Artikels' naar 'Journalen'.",
-  "@setupAlmostSetLong": {},
-  "follow": "Volg",
-  "@follow": {
-    "description": "The button text shown on journal cards when it is not followed."
-  },
-  "unfollow": "Ontvolg",
-  "@unfollow": {
-    "description": "The button text shown on journal cards when it is followed."
-  },
-  "journalSearchError": "Een fout vond plaats tijdens het zoeken naar journalen.",
-  "@journalSearchError": {},
-  "subjects": "Onderwerpen",
-  "@subjects": {},
-  "viewarticle": "Zie artikel",
-  "@viewarticle": {},
-  "apiFetchIntervalHint": "Selecteer hoe vaak artikels op te halen",
-  "@apiFetchIntervalHint": {},
-  "homeFeedEmpty": "Geen publicaties beschikbaar. Publicatie kaarten zullen toegevoegd worden eens je tenminste één journaal volgt.",
-  "@homeFeedEmpty": {
-    "description": "The message shown when the feed in the home screen is empty."
-  },
-  "about": "Over",
-  "@about": {},
-  "failLoadMorePublication": "Meer publicaties gefaald te laden.",
-  "@failLoadMorePublication": {},
-  "dark": "Donker",
-  "@dark": {},
-  "systemtheme": "Systeem thema",
-  "@systemtheme": {},
-  "unpaywallarticle": "Dit artikel werd voorzien door Unpaywall",
-  "@unpaywallarticle": {
-    "description": "Snackbar shown when an article was fetched from Unpaywall."
-  },
-  "addedtoyourfav": "Toegevoegd aan je favorieten op {date}",
-  "@addedtoyourfav": {},
-  "zoteroPermissions3": "Eens de API sleutel gecreëerd is, kopieer de waarde en plak het in de tekst veld onderaan.",
-  "@zoteroPermissions3": {},
-  "databaseSettings": "Database instellingen",
-  "@databaseSettings": {},
-  "errorOpenExternalBrowser": "Openen van de link in een andere browser mislukt",
-  "@errorOpenExternalBrowser": {},
-  "favorite": "Favoriet",
-  "@favorite": {},
-  "favoriteadded": "Toegevoegd aan favorieten",
-  "@favoriteadded": {
-    "description": "Snackbar shown when an article is added to the user's favorites."
-  },
-  "favoriteremoved": "Verwijderd van favorieten",
-  "@favoriteremoved": {
-    "description": "Snackbar shown when an article is removed from the user's favorites."
-  },
-  "abstractunavailable": "Samenvatting onbeschikbaar. De uitgever voorziet geen samenvattingen aan Crossref. Volle tekst zou nog steeds beschikbaar moeten zijn.",
-  "@abstractunavailable": {
-    "description": "Text shown in the place of the abstract when it is unavailable."
-  },
-  "searchresults": "Zoekresultaten",
-  "@searchresults": {},
-  "noresultsfound": "Geen resultaten gevonden.",
-  "@noresultsfound": {},
-  "noSavedQueries": "Geen opgeslagen zoektermen.",
-  "@noSavedQueries": {},
-  "noFavorites": "Je hebt geen artikels in favorieten. Gebruik de hart ikoon op publicatie kaarten die je leuk vindt om ze toe te voegen aan je favorieten!",
-  "@noFavorites": {
-    "description": "The message shown when the user has no articles in their favorites."
-  },
-  "display": "Weergave",
-  "@display": {},
-  "displaySettings": "Weergave instellingen",
-  "@displaySettings": {},
-  "appearance": "Uiterlijk",
-  "@appearance": {},
-  "theme": "Thema",
-  "@theme": {},
-  "light": "Licht",
-  "@light": {},
-  "publicationCard": "Publicatie kaart",
-  "@publicationCard": {},
-  "showAllAbstracts": "Toon alle samenvattingen",
-  "@showAllAbstracts": {},
-  "hideMissingAbstracts": "Verberg missende samenvattingen",
-  "@hideMissingAbstracts": {},
-  "hideAllAbstracts": "Verberg alle samenvattingen",
-  "@hideAllAbstracts": {},
-  "forwardedproxy": "Doorgestuurd doorheen jouw institutie proxy",
-  "@forwardedproxy": {
-    "description": "Snackbar shown when a request is intercepted and sent through the user's institution EZproxy."
-  },
-  "selectinstitution": "Kies je institutie",
-  "@selectinstitution": {},
-  "sortby": "Sorteer via",
-  "@sortby": {},
-  "sortorder": "Sorteer volgorde",
-  "@sortorder": {},
-  "followingsince": "Volgend sinds {date}",
-  "@followingsince": {},
-  "journaltitle": "Journaal titel",
-  "@journaltitle": {},
-  "followingdate": "Volgend datum",
-  "@followingdate": {},
-  "ascending": "Oplopend",
-  "@ascending": {},
-  "descending": "Aflopend",
-  "@descending": {},
-  "articletitle": "Artikel titel",
-  "@articletitle": {},
-  "firstauthfamname": "Eerst auteur familie naam",
-  "@firstauthfamname": {},
-  "datepublished": "Datum gepubliceerd",
-  "@datepublished": {},
-  "dateaddedtofavorites": "Datum toegevoegd aan favorieten",
-  "@dateaddedtofavorites": {},
-  "noinstitution": "Geen institutie",
-  "@noinstitution": {},
-  "buildingfeed": "Jouw feed aan het samenstellen. Gelieve te wachten…",
-  "@buildingfeed": {},
-  "fetchingArticleFromJournal": "Artikels aan het ophalen van {journalName}.",
-  "@fetchingArticleFromJournal": {},
-  "noPublicationFound": "Geen uitgevingen gevonden.",
-  "@noPublicationFound": {},
-  "sharedMessage": "Gedeeld via de Wispar app",
-  "@sharedMessage": {
-    "description": "Default sharing text."
-  },
-  "shareArticle": "Deel artikel",
-  "@shareArticle": {},
-  "sendToZotero": "Zenden naar Zotero",
-  "@sendToZotero": {},
-  "zoteroSettings": "Zotero instellingen",
-  "@zoteroSettings": {},
-  "zoteroPermissions1": "Wispar heeft beide lees and schrijf toegang nodig tot jou Zotero account om van zijn integratie te genieten.",
-  "@zoteroPermissions1": {},
-  "zoteroPermissions2": "Wanneer je een nieuwe Zotero API sleutel creëert, moet je beide \"Bibliotheek toegang toelaten\" en \"Schrijf toegang toelaten\" selecteren.",
-  "@zoteroPermissions2": {},
-  "zoteroCreateKey": "Creëer een nieuwe API sleutel",
-  "@zoteroCreateKey": {},
-  "zoteroEnterKey": "Voeg een API sleutel in",
-  "@zoteroEnterKey": {
-    "description": "Hint text shown in the text field where users can enter their Zotero API key."
-  },
-  "zoteroValidKey": "API sleutel opgeslaan!",
-  "@zoteroValidKey": {
-    "description": "Snackbar shown when a valid Zotero API key has been saved."
-  },
-  "zoteroInvalidKey": "Het API sleutel is invalied!",
-  "@zoteroInvalidKey": {
-    "description": "Snackbar shown when an attempt to save an invalid Zotero API key is made."
-  },
-  "save": "Opslaan",
-  "@save": {},
-  "savedOn": "Opgeslagen op: {date}",
-  "@savedOn": {},
-  "sourceCode": "Bron Code",
-  "@sourceCode": {},
-  "reportIssue": "Meld een probleem",
-  "@reportIssue": {},
-  "enabled": "Ingeschakeld",
-  "@enabled": {},
-  "disabled": "Uitgeschakeld",
-  "@disabled": {},
-  "database": "Database",
-  "@database": {},
-  "cleanupInterval": "Opruim interval (dagen)",
-  "@cleanupInterval": {},
-  "cleanupIntervalHint": "Voeg een aantal van dagen in (1 tot 365 )",
-  "@cleanupIntervalHint": {},
-  "apiFetchInterval": "API ophaal interval",
-  "@apiFetchInterval": {},
-  "cleanupIntervalInvalidNumber": "Gelieve een valiede aantal dagen in te voeren.",
-  "@cleanupIntervalInvalidNumber": {},
-  "cleanupIntervalNumberNotBetween": "Gelieve een waarde tussen 1 en 365 in te voeren.",
-  "@cleanupIntervalNumberNotBetween": {},
-  "saveSettings": "Instellingen opslaan",
-  "@saveSettings": {},
-  "settingsSaved": "Instellingen succesvol opgeslaan!",
-  "@settingsSaved": {},
-  "privacyPolicy": "Privacybeleid",
-  "@privacyPolicy": {},
-  "donate": "Doneer",
-  "@donate": {},
-  "donateMessage": "Help ontwikkeling van Wispar ondersteunen",
-  "@donateMessage": {
-    "description": "Text shown in the subtitle of the Donate button in the settings."
-  },
-  "otherLicense": "Andere licentie",
-  "@otherLicense": {},
-  "unknownLicense": "Onbekende licentie",
-  "@unknownLicense": {},
-  "hours": "uren",
-  "@hours": {},
-  "madeBy": "Gemaakt door {app_author}",
-  "@madeBy": {}
+    "welcomeWispar": "Welkom bij Wispar!",
+    "setupInstitutionalAccess": "Institutie Toegang Opzetten",
+    "setupSelectInstitution": "Selecteer mijn institutie",
+    "setupSelectedInstitution": "Je hebt geselecteerd:",
+    "setupLinkZotero": "Koppel Zotero",
+    "setupZoteroLong": "Zend publicaties direct naar je Zotero bibliotheek. Ze zullen toegevoegd worden aan een speciale Wispar verzameling.",
+    "setupLinkMyZotero": "Koppel mijn Zotero profiel",
+    "setupOtherSettings": "Andere Instellingen",
+    "setupOtherSettingsLong": "Additionele instellingen zijn beschikbaar in de app's instellingen menu. Ze is toegankelijk van de Thuis scherm door de ellips menu te tappen aan de rechterbovenhoek.",
+    "setupAlmostSet": "Je bent helemaal klaar!... Bijna!",
+    "skip": "Overslaan",
+    "getStarted": "Aan de Slag",
+    "home": "Thuis",
+    "@home": {
+        "description": "The home menu button and the app bar title when in the home screen."
+    },
+    "favorites": "Favorieten",
+    "@favorites": {
+        "description": "The favorites menu button and the app bar title when in the favorites screen."
+    },
+    "download": "Installeer",
+    "@download": {
+        "description": "The verb to download, without the 'to'."
+    },
+    "delete": "Verwijder",
+    "downloadSuccessful": "Het artikel werd succesvol geinstalleerd!",
+    "downloadDeleted": "Het artikel werd verwijderd!",
+    "noDownloads": "Je hebt geen enkele downloads.",
+    "settings": "Instellingen",
+    "@settings": {
+        "description": "The settings option menu button and the app bar title when in the settings screen."
+    },
+    "journalLibraryEmpty": "Je bent geen enkele journalen aan het volgen. Gebruik de zoek menu om journalen te vinden en te volgen.",
+    "@journalLibraryEmpty": {
+        "description": "Message shown when the user is not following any journals."
+    },
+    "library": "Bibliotheek",
+    "@library": {
+        "description": "The library menu button and the app bar title when in the library screen."
+    },
+    "queries": "Zoektermen",
+    "@queries": {
+        "description": "Title of the saved search queries tab."
+    },
+    "search": "Zoek",
+    "@search": {
+        "description": "Text shown inside the search screen app bar and for the seach button."
+    },
+    "searchPlaceholder": "Zoek…",
+    "@searchPlaceholder": {
+        "description": "Place holder text in the search input widget."
+    },
+    "emptyDOIError": "Gelieve een DOI ingeven",
+    "searchByQuery": "Zoek via zoektermen",
+    "searchByDOI": "Zoek via DOI",
+    "searchByTitle": "Zoek via titel",
+    "searchByISSN": "Zoek via ISSN",
+    "queryHasNoNameError": "Je moet een zoekterm naam ingeven om het op te slaan.",
+    "emptySearchQuery": "Gelieve een zoekterm in te geven",
+    "moreOptions": "Meer opties",
+    "saveQuery": "Bewaar deze zoekterm",
+    "queryName": "Zoekterm naam",
+    "dateSaved": "Datum bewaard",
+    "articles": "Artikels",
+    "@articles": {
+        "description": "As in scientific articles."
+    },
+    "category": "Categorie",
+    "publisher": "Uitgever",
+    "publishedin": "Uitgegeven in",
+    "latestpublications": "Laatste uitgevingen",
+    "authors": "Auteurs",
+    "publishedon": "Uitgegeven Op {date}",
+    "abstract": "Samenvatting",
+    "copydoi": "Kopieer DOI",
+    "doicopied": "DOI gekopieerd naar klembord",
+    "@doicopied": {
+        "description": "Snackbar shown when the Copy DOI button is pressed."
+    },
+    "issnCopied": "ISSN gekopieerd naar klembord",
+    "apiQueryCopied": "API aanvraag gekopieerd naar klembord",
+    "articleViewer": "Artikel bekijker",
+    "openExternalBrowser": "Open in externale browser",
+    "journals": "Journalen",
+    "@journals": {
+        "description": "The journals menu button and the app bar title when in the journals screen."
+    },
+    "appDescription": "Jouw open-source app om bij te blijven met de wetenschappelijke literatuur. We zullen jouw snel op gang zetten!",
+    "setupInstitutionalAccessLong": "Selecteer de EZproxy van je institutie om toegang te krijgen aan hun journaal abonnementen. Dit zal de nood aan een VPN of op locatie toegang elimineren.",
+    "downloads": "Installaties",
+    "@downloads": {
+        "description": "The downloads menu button and the app bar title when in the downloads screen."
+    },
+    "setupAlmostSetLong": "Vervolgens, we zullen jouw naar de zoekscherm brengen, waar je jouw favoriete journalen kan volgen. Vergeet niet om de categorie menu te veranderen van 'Artikels' naar 'Journalen'.",
+    "follow": "Volg",
+    "@follow": {
+        "description": "The button text shown on journal cards when it is not followed."
+    },
+    "unfollow": "Ontvolg",
+    "@unfollow": {
+        "description": "The button text shown on journal cards when it is followed."
+    },
+    "journalSearchError": "Een fout vond plaats tijdens het zoeken naar journalen.",
+    "subjects": "Onderwerpen",
+    "viewarticle": "Zie artikel",
+    "apiFetchIntervalHint": "Selecteer hoe vaak artikels op te halen",
+    "homeFeedEmpty": "Geen publicaties beschikbaar. Publicatie kaarten zullen toegevoegd worden eens je tenminste één journaal volgt.",
+    "@homeFeedEmpty": {
+        "description": "The message shown when the feed in the home screen is empty."
+    },
+    "about": "Over",
+    "failLoadMorePublication": "Meer publicaties gefaald te laden.",
+    "dark": "Donker",
+    "systemtheme": "Systeem thema",
+    "unpaywallarticle": "Dit artikel werd voorzien door Unpaywall",
+    "@unpaywallarticle": {
+        "description": "Snackbar shown when an article was fetched from Unpaywall."
+    },
+    "addedtoyourfav": "Toegevoegd aan je favorieten op {date}",
+    "zoteroPermissions3": "Eens de API sleutel gecreëerd is, kopieer de waarde en plak het in de tekst veld onderaan.",
+    "databaseSettings": "Database instellingen",
+    "errorOpenExternalBrowser": "Openen van de link in een andere browser mislukt",
+    "favorite": "Favoriet",
+    "favoriteadded": "Toegevoegd aan favorieten",
+    "@favoriteadded": {
+        "description": "Snackbar shown when an article is added to the user's favorites."
+    },
+    "favoriteremoved": "Verwijderd van favorieten",
+    "@favoriteremoved": {
+        "description": "Snackbar shown when an article is removed from the user's favorites."
+    },
+    "abstractunavailable": "Samenvatting onbeschikbaar. De uitgever voorziet geen samenvattingen aan Crossref. Volle tekst zou nog steeds beschikbaar moeten zijn.",
+    "@abstractunavailable": {
+        "description": "Text shown in the place of the abstract when it is unavailable."
+    },
+    "searchresults": "Zoekresultaten",
+    "noresultsfound": "Geen resultaten gevonden.",
+    "noSavedQueries": "Geen opgeslagen zoektermen.",
+    "noFavorites": "Je hebt geen artikels in favorieten. Gebruik de hart ikoon op publicatie kaarten die je leuk vindt om ze toe te voegen aan je favorieten!",
+    "@noFavorites": {
+        "description": "The message shown when the user has no articles in their favorites."
+    },
+    "display": "Weergave",
+    "displaySettings": "Weergave instellingen",
+    "appearance": "Uiterlijk",
+    "theme": "Thema",
+    "light": "Licht",
+    "publicationCard": "Publicatie kaart",
+    "showAllAbstracts": "Toon alle samenvattingen",
+    "hideMissingAbstracts": "Verberg missende samenvattingen",
+    "hideAllAbstracts": "Verberg alle samenvattingen",
+    "forwardedproxy": "Doorgestuurd doorheen jouw institutie proxy",
+    "@forwardedproxy": {
+        "description": "Snackbar shown when a request is intercepted and sent through the user's institution EZproxy."
+    },
+    "selectinstitution": "Kies je institutie",
+    "sortby": "Sorteer via",
+    "sortorder": "Sorteer volgorde",
+    "followingsince": "Volgend sinds {date}",
+    "journaltitle": "Journaal titel",
+    "followingdate": "Volgend datum",
+    "ascending": "Oplopend",
+    "descending": "Aflopend",
+    "articletitle": "Artikel titel",
+    "firstauthfamname": "Eerst auteur familie naam",
+    "datepublished": "Datum gepubliceerd",
+    "dateaddedtofavorites": "Datum toegevoegd aan favorieten",
+    "noinstitution": "Geen institutie",
+    "buildingfeed": "Jouw feed aan het samenstellen. Gelieve te wachten…",
+    "fetchingArticleFromJournal": "Artikels aan het ophalen van {journalName}.",
+    "noPublicationFound": "Geen uitgevingen gevonden.",
+    "sharedMessage": "Gedeeld via de Wispar app",
+    "@sharedMessage": {
+        "description": "Default sharing text."
+    },
+    "shareArticle": "Deel artikel",
+    "sendToZotero": "Zenden naar Zotero",
+    "zoteroSettings": "Zotero instellingen",
+    "zoteroPermissions1": "Wispar heeft beide lees and schrijf toegang nodig tot jou Zotero account om van zijn integratie te genieten.",
+    "zoteroPermissions2": "Wanneer je een nieuwe Zotero API sleutel creëert, moet je beide \"Bibliotheek toegang toelaten\" en \"Schrijf toegang toelaten\" selecteren.",
+    "zoteroCreateKey": "Creëer een nieuwe API sleutel",
+    "zoteroEnterKey": "Voeg een API sleutel in",
+    "@zoteroEnterKey": {
+        "description": "Hint text shown in the text field where users can enter their Zotero API key."
+    },
+    "zoteroValidKey": "API sleutel opgeslaan!",
+    "@zoteroValidKey": {
+        "description": "Snackbar shown when a valid Zotero API key has been saved."
+    },
+    "zoteroInvalidKey": "Het API sleutel is invalied!",
+    "@zoteroInvalidKey": {
+        "description": "Snackbar shown when an attempt to save an invalid Zotero API key is made."
+    },
+    "save": "Opslaan",
+    "savedOn": "Opgeslagen op: {date}",
+    "sourceCode": "Bron Code",
+    "reportIssue": "Meld een probleem",
+    "enabled": "Ingeschakeld",
+    "disabled": "Uitgeschakeld",
+    "database": "Database",
+    "cleanupInterval": "Opruim interval (dagen)",
+    "cleanupIntervalHint": "Voeg een aantal van dagen in (1 tot 365 )",
+    "apiFetchInterval": "API ophaal interval",
+    "cleanupIntervalInvalidNumber": "Gelieve een valiede aantal dagen in te voeren.",
+    "cleanupIntervalNumberNotBetween": "Gelieve een waarde tussen 1 en 365 in te voeren.",
+    "saveSettings": "Instellingen opslaan",
+    "settingsSaved": "Instellingen succesvol opgeslaan!",
+    "privacyPolicy": "Privacybeleid",
+    "donate": "Doneer",
+    "donateMessage": "Help ontwikkeling van Wispar ondersteunen",
+    "@donateMessage": {
+        "description": "Text shown in the subtitle of the Donate button in the settings."
+    },
+    "otherLicense": "Andere licentie",
+    "unknownLicense": "Onbekende licentie",
+    "hours": "uren",
+    "madeBy": "Gemaakt door {app_author}"
 }
