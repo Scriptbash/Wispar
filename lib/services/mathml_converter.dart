@@ -52,13 +52,14 @@ class MathmlToLatexConverter {
     '⁻': '^-',
     '⁰': r'^0',
     '⊂': r'\subset ',
-    '{': r'\{',
-    '}': r'\}',
+    '÷': '--',
   };
 
   String convert(String raw) {
     try {
       final cleaned = raw
+          .replaceAllMapped(RegExp(r'\$\$(.*?)\$\$', dotAll: true),
+              (m) => '\$${m.group(1)}\$')
           .replaceAll('\u00A0', ' ')
           .replaceAll('&nbsp;', ' ')
           .replaceAll('&InvisibleTimes;', '')
@@ -70,14 +71,22 @@ class MathmlToLatexConverter {
           .replaceAll('\u2218', r'\circ ');
 
       final wrapped =
-          '<root xmlns:mml="http://www.w3.org/1998/Math/MathML">$cleaned</root>';
+          '<root xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1.2">$cleaned</root>';
       final document = XmlDocument.parse(wrapped);
+
       String result = _convertChildren(document.rootElement.children).trim();
 
       return result
-          .replaceAll('\$ \$', '')
+          .replaceAllMapped(
+              RegExp(r'([a-zA-Z0-9]+)\s*\$(\{\})?(_{.*?}|\^{.*?})\$'),
+              (match) => '\$' + match.group(1)! + match.group(3)! + '\$')
+          .replaceAllMapped(RegExp(r'\$(\{\})?(_{.*?}|\^{.*?})\$'),
+              (match) => '\${}' + match.group(2)! + '\$')
           .replaceAll('\$\$', '')
-          .replaceAll(RegExp(r' +'), ' ');
+          .replaceAll(RegExp(r'\$\s+\$'), ' ')
+          .replaceAll(RegExp(r'\$+\$'), '\$')
+          .replaceAll(RegExp(r' +'), ' ')
+          .trim();
     } catch (e, stackTrace) {
       logger.warning('Unable to convert MathML to Latex.', e, stackTrace);
       return raw;
@@ -88,30 +97,58 @@ class MathmlToLatexConverter {
     final buffer = StringBuffer();
     for (var node in nodes) {
       if (node is XmlText) {
-        buffer.write(_applyMapping(node.value.replaceAll(RegExp(r'\s+'), ' ')));
+        String text = node.value.replaceAll(RegExp(r'\s+'), ' ');
+
+        String processed = text.splitMapJoin(
+          RegExp(r'\$.+?\$'),
+          onMatch: (m) => m.group(0)!,
+          onNonMatch: (n) {
+            String mapped = _applyMapping(n);
+
+            return mapped.splitMapJoin(
+              RegExp(r'\\[a-zA-Z]+(?:\s*\{[^{}]*\})*'),
+              onMatch: (m) => '\$${m.group(0)!.trim()}\$',
+              onNonMatch: (n2) => n2,
+            );
+          },
+        );
+        buffer.write(processed);
       } else if (node is XmlElement) {
-        if (node.name.local == 'math') {
-          String mathContent = _convertNode(node).trim();
-          if (mathContent.startsWith('_') || mathContent.startsWith('^')) {
-            String current = buffer.toString();
-            final match =
-                RegExp(r'([a-zA-Z0-9\(\)\[\]]+) ?$').firstMatch(current);
-            if (match != null) {
-              String base = match.group(1)!;
-              String precedingText =
-                  current.substring(0, current.length - match.group(0)!.length);
-              buffer.clear();
-              buffer.write(precedingText);
-              buffer.write('\$$base$mathContent\$');
-            } else {
-              buffer.write('\$$mathContent\$');
-            }
-          } else {
-            if (buffer.isNotEmpty && !buffer.toString().endsWith(' ')) {
-              buffer.write(' ');
-            }
-            buffer.write('\$$mathContent\$');
+        final localName = node.name.local;
+
+        if (localName == 'alternatives') {
+          final texNode = node.children.whereType<XmlElement>().firstWhere(
+                (e) => e.name.local == 'tex-math',
+                orElse: () => XmlElement(XmlName('empty')),
+              );
+          if (texNode.name.local != 'empty') {
+            String tex = texNode.innerText
+                .replaceAll('\$\$', '')
+                .replaceAll('\$', '')
+                .trim();
+            buffer.write('\$$tex\$');
+            continue;
           }
+        }
+
+        if (localName == 'math') {
+          String mathContent = _convertNode(node).trim();
+          if (mathContent.isEmpty) continue;
+          buffer.write('\$$mathContent\$');
+        } else if (localName == 'italic') {
+          String content =
+              _convertChildren(node.children).trim().replaceAll('\$', '');
+          if (content.isNotEmpty) buffer.write('\$$content\$');
+        } else if (localName == 'sup') {
+          String content =
+              _convertChildren(node.children).trim().replaceAll('\$', '');
+          if (content.isNotEmpty) buffer.write('\$^{$content\}\$');
+        } else if (localName == 'sub') {
+          String content =
+              _convertChildren(node.children).trim().replaceAll('\$', '');
+          if (content.isNotEmpty) buffer.write('\$_{$content\}\$');
+        } else if (localName == 'sc') {
+          buffer.write(_convertChildren(node.children).trim().toUpperCase());
         } else {
           buffer.write(_convertChildren(node.children));
         }
@@ -154,41 +191,46 @@ class MathmlToLatexConverter {
           if (elements.isEmpty) return '';
           final base = _convertNode(elements[0]);
           final sub = elements.length > 1 ? _convertNode(elements[1]) : '';
-          if (tag == 'munder' && (sub.contains(r'\bar') || sub.contains('‾'))) {
-            return r'\underline{' + base + '}';
-          }
-          return '${base}_{$sub}';
+          return '${base.isEmpty ? '{}' : base}_{$sub}';
 
         case 'msup':
-        case 'mover':
           if (elements.isEmpty) return '';
           final base = _convertNode(elements[0]);
           final sup = elements.length > 1 ? _convertNode(elements[1]) : '';
-          if (tag == 'mover' && (sup.contains(r'\bar') || sup.contains('‾'))) {
-            return r'\overline{' + base + '}';
+          return '${base.isEmpty ? '{}' : base}^{$sup}';
+
+        case 'mover':
+          if (elements.isEmpty) return '';
+          final base = _convertNode(elements[0]);
+          final over =
+              elements.length > 1 ? _convertNode(elements[1]).trim() : '';
+
+          if (over == r'\bar') return r'\bar{' + base + '}';
+          if (over == r'\to') {
+            return r'\vec{' + base + '}';
           }
-          return '${base}^{$sup}';
+          if (over == '^' || over == r'\hat') return r'\hat{' + base + '}';
+          if (over == '~' || over == r'\tilde') return r'\tilde{' + base + '}';
+
+          return r'\overline{' + base + '}';
 
         case 'msubsup':
         case 'munderover':
           if (elements.isEmpty) return '';
-          return '${_convertNode(elements[0])}_{${elements.length > 1 ? _convertNode(elements[1]) : ""}}^{${elements.length > 2 ? _convertNode(elements[2]) : ""}}';
+          final base = _convertNode(elements[0]);
+          final sub = elements.length > 1 ? _convertNode(elements[1]) : '';
+          final sup = elements.length > 2 ? _convertNode(elements[2]) : '';
+          return '${base.isEmpty ? '{}' : base}_{$sub}^{$sup}';
+
+        case 'mfrac':
+          return '\\frac{${elements.isNotEmpty ? _convertNode(elements[0]) : ""}}{${elements.length > 1 ? _convertNode(elements[1]) : ""}}';
+
+        case 'mfenced':
+          return '(${processChildren()})';
 
         case 'msqrt':
           return '\\sqrt{${processChildren()}}';
-        case 'mroot':
-          if (elements.length < 2) return '\\sqrt{${processChildren()}}';
-          return '\\sqrt[${_convertNode(elements[1])}]{${_convertNode(elements[0])}}';
-        case 'mtable':
-          return '\\begin{matrix}${processChildren()}\\end{matrix}';
-        case 'mtr':
-          return processChildren() + r' \\ ';
-        case 'mtd':
-          return processChildren() + ' & ';
-        case 'mfrac':
-          return '\\frac{${elements.isNotEmpty ? _convertNode(elements[0]) : ""}}{${elements.length > 1 ? _convertNode(elements[1]) : ""}}';
-        case 'mfenced':
-          return '${node.getAttribute('open') ?? '('}${processChildren()}${node.getAttribute('close') ?? ')'}';
+
         default:
           return processChildren();
       }
