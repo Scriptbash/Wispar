@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wispar/services/zotero_api.dart';
 import 'package:wispar/models/zotero_models.dart';
 import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/services/logs_helper.dart';
 
 Future<ZoteroCollection?> selectZoteroCollection(
   BuildContext context, {
@@ -218,6 +219,7 @@ class _ZoteroCollectionSheetState extends State<_ZoteroCollectionSheet> {
 
   Future<void> _showCreateDialog() async {
     final controller = TextEditingController();
+    final logger = LogsService().logger;
 
     final name = await showDialog<String>(
       context: context,
@@ -253,17 +255,20 @@ class _ZoteroCollectionSheetState extends State<_ZoteroCollectionSheet> {
     );
 
     await _loadCollections();
+    if (collections.isNotEmpty) {
+      final created = collections.firstWhere(
+        (c) => c.name == name,
+        orElse: () => collections.last,
+      );
 
-    final created = collections.firstWhere(
-      (c) => c.name == name,
-      orElse: () => collections.last,
-    );
+      if (!mounted) return;
 
-    if (!mounted) return;
-
-    setState(() {
-      selectedCollection = created;
-    });
+      setState(() {
+        selectedCollection = created;
+      });
+    } else {
+      logger.warning("Could not select new collection: List is empty.");
+    }
   }
 
   @override
