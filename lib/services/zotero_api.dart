@@ -193,7 +193,7 @@ class ZoteroService {
     }
   }
 
-  static Future<void> createZoteroItem(String apiKey, String userId,
+  static Future<bool> createZoteroItem(String apiKey, String userId,
       ZoteroCollection targetCollection, Map<String, dynamic> itemData) async {
     final logger = LogsService().logger;
     String url;
@@ -216,12 +216,14 @@ class ZoteroService {
       body: body,
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return true;
     } else {
       logger.severe(
           "Failed to create Zotero item.",
           "Status code:${response.statusCode}",
           StackTrace.fromString("Response body: ${response.body}"));
+      return false;
     }
   }
 
@@ -286,14 +288,19 @@ class ZoteroService {
           {'creatorType': 'reviewedAuthor'}
         ]*/
         };
-        await ZoteroService.createZoteroItem(
+        bool success = await ZoteroService.createZoteroItem(
             apiKey, userId, targetCollection, articleData);
-
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(AppLocalizations.of(context)!.zoteroArticleSent),
-          duration: const Duration(seconds: 1),
-        ));
-        logger.info("Successfully sent the article to Zotero");
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(AppLocalizations.of(context)!.zoteroArticleSent),
+            duration: const Duration(seconds: 1),
+          ));
+          logger.info("Successfully sent the article to Zotero");
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(AppLocalizations.of(context)!.zoteroError),
+          ));
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
@@ -306,8 +313,8 @@ class ZoteroService {
       logger.severe("Failed to send item to Zotero", e, stackTrace);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Failed to send to Zotero"),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.zoteroError),
         ),
       );
     }
