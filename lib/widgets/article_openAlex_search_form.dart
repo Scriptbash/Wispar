@@ -475,6 +475,7 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
             ),
             SizedBox(height: 16),
             SwitchListTile(
+              contentPadding: EdgeInsets.zero,
               title: Text(
                 AppLocalizations.of(context)!.openAccessOnly,
                 style: TextStyle(fontWeight: FontWeight.w500),
@@ -622,9 +623,10 @@ class OpenAlexSearchFormState extends State<OpenAlexSearchForm> {
             ),*/
             SizedBox(height: 20),
             SwitchListTile(
+              contentPadding: EdgeInsets.zero,
               title: Text(
                 AppLocalizations.of(context)!.saveQuery,
-                style: TextStyle(fontWeight: FontWeight.w600),
+                style: TextStyle(fontWeight: FontWeight.w500),
               ),
               value: saveQuery,
               onChanged: (bool value) {

@@ -338,26 +338,35 @@ class _SyncAuthFormState extends State<SyncAuthForm> {
         SizedBox(height: 8),
         const Divider(),
         SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            FilledButton.tonalIcon(
+        SizedBox(
+          width: double.infinity,
+          child: Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            runSpacing: 12,
+            children: [
+              FilledButton.tonalIcon(
                 onPressed: () {
                   launchUrl(
                     Uri.parse(
                         'https://github.com/Scriptbash/Wispar/blob/main/PRIVACY.md'),
                   );
                 },
-                label: Text(AppLocalizations.of(context)!.privacyPolicy)),
-            FilledButton.tonalIcon(
+                icon: const Icon(Icons.privacy_tip_outlined),
+                label: Text(AppLocalizations.of(context)!.privacyPolicy),
+              ),
+              FilledButton.tonalIcon(
                 onPressed: () {
                   launchUrl(
                     Uri.parse(
                         'https://wispar.app/docs/initial-setup/cloud-sync'),
                   );
                 },
-                label: Text(AppLocalizations.of(context)!.documentation))
-          ],
+                icon: const Icon(Icons.description_outlined),
+                label: Text(AppLocalizations.of(context)!.documentation),
+              ),
+            ],
+          ),
         ),
       ],
     );
