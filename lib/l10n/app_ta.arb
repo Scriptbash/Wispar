@@ -1,485 +1,328 @@
 {
-  "home": "வீடு",
-  "@home": {
-    "description": "The home menu button and the app bar title when in the home screen."
-  },
-  "favorites": "பிடித்தவை",
-  "@favorites": {
-    "description": "The favorites menu button and the app bar title when in the favorites screen."
-  },
-  "downloads": "பதிவிறக்கங்கள்",
-  "@downloads": {
-    "description": "The downloads menu button and the app bar title when in the downloads screen."
-  },
-  "settings": "அமைப்புகள்",
-  "@settings": {
-    "description": "The settings option menu button and the app bar title when in the settings screen."
-  },
-  "journalnotfollowing1": "நீங்கள் எந்த பத்திரிகைகளையும் பின்பற்றவில்லை. பயன்படுத்தவும்",
-  "@journalnotfollowing1": {
-    "description": "The message shown when the user is not following any journals. The text had to be split since it contains an icon. The full text is: You are not following any journals. Use the <magnifying glass icon> icon to find and follow journals."
-  },
-  "journalnotfollowing2": "பத்திரிகைகளைக் கண்டுபிடித்து பின்பற்ற படவுரு.",
-  "@journalnotfollowing2": {
-    "description": "The message shown when the user is not following any journals. The text had to be split since it contains an icon. The full text is: You are not following any journals. Use the <magnifying glass icon> icon to find and follow journals."
-  },
-  "follow": "பின்தொடர்",
-  "@follow": {
-    "description": "The button text shown on journal cards when it is not followed."
-  },
-  "unfollow": "பின்தொடரவும்",
-  "@unfollow": {
-    "description": "The button text shown on journal cards when it is followed."
-  },
-  "journals": "பத்திரிகைகள்",
-  "@journals": {
-    "description": "The journals menu button and the app bar title when in the journals screen."
-  },
-  "search": "தேடு",
-  "@search": {
-    "description": "Placeholder text shown inside the search bar."
-  },
-  "publishedin": "வெளியிடப்பட்டது",
-  "@publishedin": {},
-  "subjects": "பாடங்கள்",
-  "@subjects": {},
-  "latestpublications": "அண்மைக் கால வெளியீடுகள்",
-  "@latestpublications": {},
-  "authors": "ஆசிரியர்கள்",
-  "@authors": {},
-  "publishedon": "{date} இல் வெளியிடப்பட்டது",
-  "@publishedon": {},
-  "abstract": "சுருக்கம்",
-  "@abstract": {},
-  "copydoi": "Doi ஐ நகலெடுக்கவும்",
-  "@copydoi": {},
-  "doicopied": "DOI கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது",
-  "@doicopied": {
-    "description": "Snackbar shown when the Copy DOI button is pressed."
-  },
-  "viewarticle": "கட்டுரையைக் காண்க",
-  "@viewarticle": {},
-  "favorite": "பிடித்த",
-  "@favorite": {},
-  "favoriteadded": "பிடித்தவைகளில் சேர்க்கப்பட்டது",
-  "@favoriteadded": {
-    "description": "Snackbar shown when an article is added to the user's favorites."
-  },
-  "favoriteremoved": "பிடித்தவைகளிலிருந்து அகற்றப்பட்டது",
-  "@favoriteremoved": {
-    "description": "Snackbar shown when an article is removed from the user's favorites."
-  },
-  "abstractunavailable": "சுருக்கம் கிடைக்கவில்லை. வெளியீட்டாளர் கிராச்ரெஃப் சுருக்கங்களை வழங்கவில்லை. முழு உரை இன்னும் கிடைக்க வேண்டும்.",
-  "@abstractunavailable": {
-    "description": "Text shown in the place of the abstract when it is unavailable."
-  },
-  "searchresults": "தேடல் முடிவுகள்",
-  "@searchresults": {},
-  "nofavorites1": "உங்களுக்கு பிடித்தவைகளில் கட்டுரைகள் எதுவும் இல்லை. பயன்படுத்தவும் ",
-  "@nofavorites1": {
-    "description": "The message shown when the user has no articles in their favorites. The text had to be split since it contains an icon. The full text is: You have no articles in your favorites. Use the <heart icon> icon to add a publication you like in your favorites!"
-  },
-  "nofavorites2": "உங்களுக்கு பிடித்தவைகளில் நீங்கள் விரும்பும் வெளியீட்டைச் சேர்க்க ஐகான்!",
-  "@nofavorites2": {
-    "description": "The message shown when the user has no articles in their favorites. The text had to be split since it contains an icon. The full text is: You have no articles in your favorites. Use the <heart icon> icon to add a publication you like in your favorites!"
-  },
-  "appearance": "தோற்றம்",
-  "@appearance": {},
-  "light": "ஒளி",
-  "@light": {},
-  "dark": "இருண்ட",
-  "@dark": {},
-  "systemtheme": "கணினி கருப்பொருள்",
-  "@systemtheme": {},
-  "unpaywallarticle": "கட்டுரை unpaywall மூலம் வழங்கப்பட்டது",
-  "@unpaywallarticle": {
-    "description": "Snackbar shown when an article was fetched from Unpaywall."
-  },
-  "forwardedproxy": "உங்கள் நிறுவன பதிலாள் மூலம் அனுப்பப்பட்டது",
-  "@forwardedproxy": {
-    "description": "Snackbar shown when a request is intercepted and sent through the user's institution EZproxy."
-  },
-  "selectinstitution": "உங்கள் நிறுவனத்தைத் தேர்ந்தெடுக்கவும்",
-  "@selectinstitution": {},
-  "sortby": "வரிசைப்படுத்தவும்",
-  "@sortby": {},
-  "sortorder": "வரிசைப்படுத்தும் முறை",
-  "@sortorder": {},
-  "followingsince": "{date} முதல் பின்வருமாறு",
-  "@followingsince": {},
-  "journaltitle": "செய்தித் தாள் தலைப்பு",
-  "@journaltitle": {},
-  "followingdate": "அடுத்த தேதி",
-  "@followingdate": {},
-  "ascending": "ஏறுதல்",
-  "@ascending": {},
-  "descending": "இறங்கு",
-  "@descending": {},
-  "articletitle": "கட்டுரை தலைப்பு",
-  "@articletitle": {},
-  "firstauthfamname": "முதல் ஆசிரியர் குடும்ப பெயர்",
-  "@firstauthfamname": {},
-  "datepublished": "தேதி வெளியிடப்பட்டது",
-  "@datepublished": {},
-  "dateaddedtofavorites": "பிடித்தவைகளில் தேதி சேர்க்கப்பட்டது",
-  "@dateaddedtofavorites": {},
-  "addedtoyourfav": "{date} இல் உங்களுக்கு பிடித்தவைகளில் சேர்க்கப்பட்டது",
-  "@addedtoyourfav": {},
-  "noinstitution": "நிறுவனம் இல்லை",
-  "@noinstitution": {},
-  "buildingfeed": "உங்கள் ஊட்டத்தை உருவாக்குதல். தயவுசெய்து காத்திருங்கள்…",
-  "@buildingfeed": {},
-  "nopublication1": "வெளியீடுகள் எதுவும் கிடைக்கவில்லை. நீங்கள் செல்வதன் மூலம் பத்திரிகைகளைப் பின்பற்றுகிறீர்கள் என்பதை உறுதிப்படுத்திக் கொள்ளுங்கள்",
-  "@nopublication1": {
-    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
-  },
-  "nopublication2": "பட்டியல் மற்றும் பயன்படுத்தவும்",
-  "@nopublication2": {
-    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
-  },
-  "nopublication3": "பத்திரிகைகளைக் கண்டுபிடிக்க படவுரு.",
-  "@nopublication3": {
-    "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
-  },
-  "sharedMessage": "VISPAR பயன்பாடு வழியாக பகிரப்பட்டது",
-  "@sharedMessage": {
-    "description": "Default sharing text."
-  },
-  "shareArticle": "கட்டுரை பகிர்ந்து கொள்ளுங்கள்",
-  "@shareArticle": {},
-  "sendToZotero": "சோட்டெரோவுக்கு அனுப்புங்கள்",
-  "@sendToZotero": {},
-  "zoteroSettings": "சோட்டெரோ அமைப்புகள்",
-  "@zoteroSettings": {},
-  "zoteroPermissions1": "உங்கள் சோட்டெரோ கணக்கை அதன் ஒருங்கிணைப்பை அனுபவிக்க VISPAR க்கு அணுகல் மற்றும் எழுத வேண்டும்.",
-  "@zoteroPermissions1": {},
-  "zoteroPermissions2": "புதிய சோட்டெரோ பநிஇ விசையை உருவாக்கும்போது, நீங்கள் \"நூலக அணுகலை அனுமதிக்கவும்\" மற்றும் \"எழுத அணுகலை அனுமதிக்கவும்\" இரண்டையும் தேர்ந்தெடுக்க வேண்டும்.",
-  "@zoteroPermissions2": {},
-  "zoteroPermissions3": "பநிஇ விசை உருவாக்கப்பட்டதும், மதிப்பை நகலெடுத்து கீழே உள்ள உரை புலத்திற்குள் ஒட்டவும்.",
-  "@zoteroPermissions3": {},
-  "zoteroCreateKey": "புதிய பநிஇ விசையை உருவாக்கவும்",
-  "@zoteroCreateKey": {},
-  "zoteroEnterKey": "பநிஇ விசையை உள்ளிடவும்",
-  "@zoteroEnterKey": {
-    "description": "Hint text shown in the text field where users can enter their Zotero API key."
-  },
-  "zoteroValidKey": "பநிஇ விசை சேமிக்கப்பட்டது!",
-  "@zoteroValidKey": {
-    "description": "Snackbar shown when a valid Zotero API key has been saved."
-  },
-  "zoteroInvalidKey": "பநிஇ விசை தவறானது!",
-  "@zoteroInvalidKey": {
-    "description": "Snackbar shown when an attempt to save an invalid Zotero API key is made."
-  },
-  "save": "சேமி",
-  "@save": {},
-  "sourceCode": "மூலக் குறியீடு",
-  "@sourceCode": {},
-  "reportIssue": "ஒரு சிக்கலைப் புகாரளிக்கவும்",
-  "@reportIssue": {},
-  "enabled": "இயக்கப்பட்டது",
-  "@enabled": {},
-  "disabled": "முடக்கப்பட்டது",
-  "@disabled": {},
-  "database": "தரவுத்தளம்",
-  "@database": {},
-  "privacyPolicy": "தனியுரிமைக் கொள்கை",
-  "@privacyPolicy": {},
-  "donate": "நன்கொடை",
-  "@donate": {},
-  "donateMessage": "விச்பரின் வளர்ச்சியை ஆதரிக்க உதவுகிறது",
-  "@donateMessage": {
-    "description": "Text shown in the subtitle of the Donate button in the settings."
-  },
-  "otherLicense": "பிற உரிமம்",
-  "@otherLicense": {},
-  "unknownLicense": "தெரியாத உரிமம்",
-  "@unknownLicense": {},
-  "publisher": "வெளியீட்டாளர்",
-  "@publisher": {},
-  "scrapeAbstracts": "காணாமல் போன சுருக்கங்களைத் துடைக்கவும்",
-  "@scrapeAbstracts": {},
-  "databaseNotFound": "தரவுத்தள கோப்பு கிடைக்கவில்லை.",
-  "@databaseNotFound": {},
-  "selectDBExportLocation": "தரவுத்தளத்தை ஏற்றுமதி செய்ய வேண்டிய இடத்தைத் தேர்ந்தெடுக்கவும்.",
-  "@selectDBExportLocation": {},
-  "exportDatabase": "ஏற்றுமதி தரவுத்தளம்",
-  "@exportDatabase": {},
-  "download": "பதிவிறக்கம்",
-  "@download": {
-    "description": "The verb to download, without the 'to'."
-  },
-  "delete": "நீக்கு",
-  "@delete": {},
-  "downloadSuccessful": "கட்டுரை வெற்றிகரமாக பதிவிறக்கம் செய்யப்பட்டது!",
-  "@downloadSuccessful": {},
-  "downloadDeleted": "கட்டுரை நீக்கப்பட்டது!",
-  "@downloadDeleted": {},
-  "noDownloads": "உங்களிடம் எந்த பதிவிறக்கங்களும் இல்லை.",
-  "@noDownloads": {},
-  "journalLibraryEmpty": "நீங்கள் எந்த பத்திரிகைகளையும் பின்பற்றவில்லை. பத்திரிகைகளைக் கண்டுபிடித்து பின்பற்ற தேடல் மெனுவைப் பயன்படுத்தவும்.",
-  "@journalLibraryEmpty": {
-    "description": "Message shown when the user is not following any journals."
-  },
-  "emptyDOIError": "தயவுசெய்து ஒரு DOI ஐ உள்ளிடவும்",
-  "@emptyDOIError": {},
-  "searchByDOI": "Doi மூலம் தேடுங்கள்",
-  "@searchByDOI": {},
-  "searchByQuery": "வினவல் மூலம் தேடுங்கள்",
-  "@searchByQuery": {},
-  "searchByTitle": "தலைப்பு மூலம் தேடுங்கள்",
-  "@searchByTitle": {},
-  "searchByISSN": "ISSN ஆல் தேடுங்கள்",
-  "@searchByISSN": {},
-  "queryName": "வினவல் பெயர்",
-  "@queryName": {},
-  "dateSaved": "தேதி சேமிக்கப்பட்டது",
-  "@dateSaved": {},
-  "articles": "கட்டுரைகள்",
-  "@articles": {
-    "description": "As in scientific articles."
-  },
-  "category": "வகை",
-  "@category": {},
-  "issnCopied": "ஐ.எச்.எச்.என் இடைநிலைப்பலகைக்கு நகலெடுக்கப்பட்டது",
-  "@issnCopied": {},
-  "apiQueryCopied": "இடைநிலைப்பலகைக்கு நகலெடுக்கப்பட்ட பநிஇ கோரிக்கை",
-  "@apiQueryCopied": {},
-  "articleViewer": "கட்டுரை பார்வையாளர்",
-  "@articleViewer": {},
-  "noresultsfound": "முடிவுகள் எதுவும் கிடைக்கவில்லை.",
-  "@noresultsfound": {},
-  "noSavedQueries": "சேமித்த வினவல்கள் இல்லை.",
-  "@noSavedQueries": {},
-  "failLoadMorePublication": "அதிக வெளியீடுகளை ஏற்றுவதில் தோல்வி.",
-  "@failLoadMorePublication": {},
-  "savedOn": "{date} இல் சேமிக்கப்பட்டது",
-  "@savedOn": {
-    "placeholders": {
-      "date": {
-        "type": "DateTime",
-        "format": "yMMMMd"
-      }
-    }
-  },
-  "apiFetchInterval": "பநிஇ இடைவெளி",
-  "@apiFetchInterval": {},
-  "setupAlmostSet": "நீங்கள் அனைவரும் அமைக்கப்பட்டிருக்கிறீர்கள்!… கிட்டத்தட்ட!",
-  "@setupAlmostSet": {},
-  "welcomeWispar": "VISPAR க்கு வருக!",
-  "@welcomeWispar": {},
-  "skip": "தவிர்",
-  "@skip": {},
-  "getStarted": "தொடங்கவும்",
-  "@getStarted": {},
-  "library": "நூலகம்",
-  "@library": {
-    "description": "The library menu button and the app bar title when in the library screen."
-  },
-  "setupOtherSettingsLong": "பயன்பாட்டின் அமைப்புகள் பட்டியலில் கூடுதல் அமைப்புகள் கிடைக்கின்றன. மேல் வலது மூலையில் நீள்வட்ட மெனுவைத் தட்டுவதன் மூலம் முகப்புத் திரையில் இருந்து அதை அணுகவும்.",
-  "@setupOtherSettingsLong": {},
-  "setupAlmostSetLong": "அடுத்து, நாங்கள் உங்களை தேடல் திரைக்கு அழைத்துச் செல்வோம், அங்கு உங்களுக்கு பிடித்த பத்திரிகைகளைப் பின்பற்றலாம். வகை மெனுவை 'கட்டுரைகள்' என்பதிலிருந்து 'பத்திரிகைகளுக்கு' மாற்ற மறக்காதீர்கள்.",
-  "@setupAlmostSetLong": {},
-  "queries": "வினவல்கள்",
-  "@queries": {
-    "description": "Title of the saved search queries tab."
-  },
-  "searchPlaceholder": "தேடுங்கள்…",
-  "@searchPlaceholder": {
-    "description": "Place holder text in the search input widget."
-  },
-  "filterFavorites": "பிடித்தவைகளை வடிகட்டவும்",
-  "@filterFavorites": {},
-  "queryHasNoNameError": "சேமிக்க வினவல் பெயரை உள்ளிட வேண்டும்.",
-  "@queryHasNoNameError": {},
-  "emptySearchQuery": "தேடல் வினவலை உள்ளிடவும்",
-  "@emptySearchQuery": {},
-  "journalSearchError": "பத்திரிகைகளைத் தேட முயற்சிக்கும்போது பிழை ஏற்பட்டது.",
-  "@journalSearchError": {},
-  "moreOptions": "மேலும் விருப்பங்கள்",
-  "@moreOptions": {},
-  "saveQuery": "இந்த வினவலைச் சேமிக்கவும்",
-  "@saveQuery": {},
-  "apiFetchIntervalHint": "கட்டுரைகளை எவ்வளவு அடிக்கடி பெற வேண்டும் என்பதைத் தேர்ந்தெடுக்கவும்",
-  "@apiFetchIntervalHint": {},
-  "noFavorites": "உங்களுக்கு பிடித்தவைகளில் கட்டுரைகள் எதுவும் இல்லை. உங்களுக்கு பிடித்தவைகளில் சேர்க்க விரும்பும் வெளியீட்டு அட்டைகளில் ஆர்ட் ஐகானைப் பயன்படுத்தவும்!",
-  "@noFavorites": {
-    "description": "The message shown when the user has no articles in their favorites."
-  },
-  "storagePermissionDenied": "இசைவு மறுக்கப்பட்டது.",
-  "@storagePermissionDenied": {},
-  "databaseExported": "தரவுத்தளம் வெற்றிகரமாக ஏற்றுமதி செய்யப்பட்டது!",
-  "@databaseExported": {},
-  "databaseExportFailed": "தரவுத்தளத்தை ஏற்றுமதி செய்வதில் தோல்வி.",
-  "@databaseExportFailed": {},
-  "importDatabase": "தரவுத்தளத்தை இறக்குமதி செய்யுங்கள்",
-  "@importDatabase": {},
-  "databaseImportFailed": "தரவுத்தளத்தை இறக்குமதி செய்வதில் தோல்வி.",
-  "@databaseImportFailed": {},
-  "databaseImported": "தரவுத்தளம் வெற்றிகரமாக இறக்குமதி செய்யப்பட்டது!",
-  "@databaseImported": {},
-  "settingsSaved": "அமைப்புகள் வெற்றிகரமாக சேமிக்கப்பட்டன!",
-  "@settingsSaved": {},
-  "appDescription": "விஞ்ஞான இலக்கியங்களுடன் புதுப்பித்த நிலையில் இருக்க உங்கள் திறந்த மூல பயன்பாடு. நீங்கள் விரைவாக அமைப்போம்!",
-  "@appDescription": {},
-  "setupInstitutionalAccess": "நிறுவன அணுகல் அமைவு",
-  "@setupInstitutionalAccess": {},
-  "setupInstitutionalAccessLong": "அவர்களின் செய்தித் தாள் சந்தாக்களுக்கான அணுகலைப் பெற உங்கள் நிறுவனத்தின் EZProxy ஐத் தேர்ந்தெடுக்கவும். இது ஒரு VPN அல்லது வளாகத்தில் அணுகலின் தேவையை நீக்கும்.",
-  "@setupInstitutionalAccessLong": {},
-  "setupSelectInstitution": "எனது நிறுவனத்தைத் தேர்ந்தெடுக்கவும்",
-  "@setupSelectInstitution": {},
-  "setupSelectedInstitution": "நீங்கள் தேர்ந்தெடுத்துள்ளீர்கள்:",
-  "@setupSelectedInstitution": {},
-  "setupLinkZotero": "இணைப்பு எனவே",
-  "@setupLinkZotero": {},
-  "setupZoteroLong": "உங்கள் சோட்டெரோ நூலகத்திற்கு நேரடியாக வெளியீடுகளை அனுப்பவும். அவை ஒரு சிறப்பு VISPAR சேகரிப்பில் சேர்க்கப்படும்.",
-  "@setupZoteroLong": {},
-  "setupLinkMyZotero": "எனது சோட்டெரோ கணக்கை இணைக்கவும்",
-  "@setupLinkMyZotero": {},
-  "setupOtherSettings": "பிற அமைப்புகள்",
-  "@setupOtherSettings": {},
-  "homeFeedEmpty": "வெளியீடுகள் எதுவும் கிடைக்கவில்லை. நீங்கள் குறைந்தது ஒரு பத்திரிகையைப் பின்தொடர்ந்தவுடன் வெளியீட்டு அட்டைகள் சேர்க்கப்படும்.",
-  "@homeFeedEmpty": {
-    "description": "The message shown when the feed in the home screen is empty."
-  },
-  "databaseSettings": "தரவுத்தள அமைப்புகள்",
-  "@databaseSettings": {},
-  "filter": "வெளியீட்டு அட்டைகளை வடிகட்டவும்",
-  "@filter": {},
-  "filterResultsEmpty": "உங்கள் வடிப்பானுடன் எந்த வெளியீடும் பொருந்தவில்லை",
-  "@filterResultsEmpty": {},
-  "filterDownloads": "பதிவிறக்கங்களை வடிகட்டவும்",
-  "@filterDownloads": {},
-  "cleanupIntervalHint": "நாட்களின் எண்ணிக்கையை உள்ளிடவும் (1 முதல் 365 வரை)",
-  "@cleanupIntervalHint": {},
-  "cleanupIntervalInvalidNumber": "சரியான எண்ணிக்கையிலான நாட்களை உள்ளிடவும்.",
-  "@cleanupIntervalInvalidNumber": {},
-  "about": "பற்றி",
-  "@about": {},
-  "madeBy": "{app_author} ஆல் தயாரிக்கப்பட்டது",
-  "@madeBy": {},
-  "hours": "மணி",
-  "@hours": {},
-  "includeInFeed": "தீவனத்தில் சேர்க்கவும்",
-  "@includeInFeed": {},
-  "openExternalBrowser": "வெளிப்புற உலாவியில் திறக்கவும்",
-  "@openExternalBrowser": {},
-  "errorOpenExternalBrowser": "வேறு உலாவியில் இணைப்பைத் திறக்க முடியவில்லை",
-  "@errorOpenExternalBrowser": {},
-  "openExternalPdfApp": "வெளிப்புற PDF ரீடரில் திறக்கவும்",
-  "@openExternalPdfApp": {},
-  "errorOpenExternalPdfApp": "PDF கோப்பை வேறு பயன்பாட்டில் திறக்க முடியவில்லை",
-  "@errorOpenExternalPdfApp": {},
-  "display": "காட்சி",
-  "@display": {},
-  "hideAllAbstracts": "அனைத்து சுருக்கங்களையும் மறைக்கவும்",
-  "@hideAllAbstracts": {},
-  "cleanupIntervalNumberNotBetween": "1 முதல் 365 க்கு இடையில் ஒரு மதிப்பை உள்ளிடவும்.",
-  "@cleanupIntervalNumberNotBetween": {},
-  "saveSettings": "அமைப்புகளை சேமிக்கவும்",
-  "@saveSettings": {},
-  "displaySettings": "அமைப்புகளைக் காண்பி",
-  "@displaySettings": {},
-  "theme": "கருப்பொருள்",
-  "@theme": {},
-  "publicationCard": "வெளியீட்டு அட்டை",
-  "@publicationCard": {},
-  "showAllAbstracts": "அனைத்து சுருக்கங்களையும் காட்டு",
-  "@showAllAbstracts": {},
-  "hideMissingAbstracts": "காணாமல் போன சுருக்கங்களை மறைக்கவும்",
-  "@hideMissingAbstracts": {},
-  "fetchingArticleFromJournal": "{journalName}ல் இருந்து கட்டுரைகளைப் பெறுதல்.",
-  "@fetchingArticleFromJournal": {},
-  "noPublicationFound": "வெளியீடுகள் எதுவும் கிடைக்கவில்லை.",
-  "@noPublicationFound": {},
-  "cleanupInterval": "தூய்மைப்படுத்த இடைவெளி (நாட்கள்)",
-  "@cleanupInterval": {},
-  "notificationSettingsMessage": "அறிவிப்புகள் நிரந்தரமாக முடக்கப்பட்டுள்ளன. அவற்றை இயக்க, பயன்பாட்டின் அறிவிப்பு அமைப்புகளுக்குச் செல்லவும்.",
-  "@notificationSettingsMessage": {},
-  "notificationTitleJournal": "பத்திரிகைகள் புதுப்பிக்கப்பட்டன",
-  "@notificationTitleJournal": {},
-  "notificationTitleQuery": "வினவல்கள் புதுப்பிக்கப்பட்டன",
-  "@notificationTitleQuery": {},
-  "fgNotificationContent": "உங்கள் பத்திரிகையைப் புதுப்பிக்க பின்னணியில் விச்பர் இயங்குகிறது",
-  "@fgNotificationContent": {},
-  "fgNotificationTitle": "பின்னணி புதுப்பிப்புகள் பணி",
-  "@fgNotificationTitle": {},
-  "enterKeyword": "ஒரு முக்கிய சொல்லை உள்ளிடவும்",
-  "@enterKeyword": {},
-  "lastUpdatedHours": "{hours, plural, one{கடைசி புதுப்பிக்கப்பட்டது 1 மணிநேரத்துக்கு முன்பு} other{கடைசி புதுப்பிக்கப்பட்டது {hours} மணிநேரங்களுக்கு முன்பு}}",
-  "@lastUpdatedHours": {
-    "placeholders": {
-      "hours": {
-        "type": "int"
-      }
-    }
-  },
-  "lastUpdatedDays": "{days, plural, one{கடைசி புதுப்பிக்கப்பட்டது 1 நாள் முன்பு} other{கடைசி புதுப்பிக்கப்பட்டது {days} நாட்கள் முன்பு}}",
-  "@lastUpdatedDays": {
-    "placeholders": {
-      "days": {
-        "type": "int"
-      }
-    }
-  },
-  "noHiddenArticles": "மறைக்கப்பட்ட வெளியீடுகள் இல்லை",
-  "@noHiddenArticles": {},
-  "unhideArticle": "இந்த வெளியீட்டை மறைவிலகு",
-  "@unhideArticle": {},
-  "hideArticle": "இந்த வெளியீட்டை மறை",
-  "@hideArticle": {},
-  "viewHiddenArticles": "மறைக்கப்பட்ட வெளியீடுகளைக் காண்க",
-  "@viewHiddenArticles": {},
-  "lastUpdatedMinutes": "{minutes, plural, one{1 நிமையம் முன் புதுப்பிக்கப்பட்டது} other{ {minutes} நிமையங்களுக்கு முன்பு}}",
-  "@lastUpdatedMinutes": {
-    "placeholders": {
-      "minutes": {
-        "type": "int"
-      }
-    }
-  },
-  "concurrentFetches": "ஒரே நேரத்தில் பநிஇ கோரிக்கைகள்: {number}",
-  "@concurrentFetches": {},
-  "language": "மொழி",
-  "@language": {},
-  "notifications": "அறிவிப்புகள்",
-  "@notifications": {},
-  "notifPermsGranted": "இசைவு வழங்கப்பட்டது",
-  "@notifPermsGranted": {},
-  "notifPermsNotGranted": "இசைவு வழங்கப்படவில்லை",
-  "@notifPermsNotGranted": {},
-  "openAppSettings": "திறந்த அமைப்புகள்",
-  "@openAppSettings": {},
-  "notificationContent": "புதிய கட்டுரைகள் கிடைக்கின்றன!",
-  "@notificationContent": {},
-  "displayName": "காட்சி பெயர்",
-  "@displayName": {},
-  "citedByCount": "எண்ணுங்கள் ஆல் மேற்கோள் காட்டப்பட்டது",
-  "@citedByCount": {},
-  "worksCount": "படைப்புகள் எண்ணிக்கை",
-  "@worksCount": {},
-  "publicationDate": "வெளியீட்டு தேதி",
-  "@publicationDate": {},
-  "queryPreview": "வினவல் முன்னோட்டம்:",
-  "@queryPreview": {},
-  "system": "மண்டலம்",
-  "@system": {},
-  "pendingUpdate": "புதுப்பிப்பு நிலுவையில் உள்ளது",
-  "@pendingUpdate": {},
-  "hiddenArticles": "மறைக்கப்பட்ட வெளியீடுகள்",
-  "@hiddenArticles": {},
-  "searchOpenAlex": "ஓபனலெக்ச் (பரிந்துரைக்கப்படுகிறது)",
-  "@searchOpenAlex": {},
-  "source": "ஆதாரம்: {search_provider}",
-  "@source": {},
-  "everything": "எல்லாம்",
-  "@everything": {},
-  "titleAndAbstract": "தலைப்பு மற்றும் சுருக்கம்",
-  "@titleAndAbstract": {},
-  "title": "தலைப்பு",
-  "@title": {},
-  "addKeyword": "முக்கிய சொல்லைச் சேர்க்கவும்",
-  "@addKeyword": {},
-  "searchIn": "இதில் தேடு",
-  "@searchIn": {}
+    "home": "வீடு",
+    "@home": {
+        "description": "The home menu button and the app bar title when in the home screen."
+    },
+    "favorites": "பிடித்தவை",
+    "@favorites": {
+        "description": "The favorites menu button and the app bar title when in the favorites screen."
+    },
+    "downloads": "பதிவிறக்கங்கள்",
+    "@downloads": {
+        "description": "The downloads menu button and the app bar title when in the downloads screen."
+    },
+    "settings": "அமைப்புகள்",
+    "@settings": {
+        "description": "The settings option menu button and the app bar title when in the settings screen."
+    },
+    "journalnotfollowing1": "நீங்கள் எந்த பத்திரிகைகளையும் பின்பற்றவில்லை. பயன்படுத்தவும்",
+    "@journalnotfollowing1": {
+        "description": "The message shown when the user is not following any journals. The text had to be split since it contains an icon. The full text is: You are not following any journals. Use the <magnifying glass icon> icon to find and follow journals."
+    },
+    "journalnotfollowing2": "பத்திரிகைகளைக் கண்டுபிடித்து பின்பற்ற படவுரு.",
+    "@journalnotfollowing2": {
+        "description": "The message shown when the user is not following any journals. The text had to be split since it contains an icon. The full text is: You are not following any journals. Use the <magnifying glass icon> icon to find and follow journals."
+    },
+    "follow": "பின்தொடர்",
+    "@follow": {
+        "description": "The button text shown on journal cards when it is not followed."
+    },
+    "unfollow": "பின்தொடரவும்",
+    "@unfollow": {
+        "description": "The button text shown on journal cards when it is followed."
+    },
+    "journals": "பத்திரிகைகள்",
+    "@journals": {
+        "description": "The journals menu button and the app bar title when in the journals screen."
+    },
+    "search": "தேடு",
+    "@search": {
+        "description": "Placeholder text shown inside the search bar."
+    },
+    "publishedin": "வெளியிடப்பட்டது",
+    "subjects": "பாடங்கள்",
+    "latestpublications": "அண்மைக் கால வெளியீடுகள்",
+    "authors": "ஆசிரியர்கள்",
+    "publishedon": "{date} இல் வெளியிடப்பட்டது",
+    "abstract": "சுருக்கம்",
+    "copydoi": "Doi ஐ நகலெடுக்கவும்",
+    "doicopied": "DOI கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது",
+    "@doicopied": {
+        "description": "Snackbar shown when the Copy DOI button is pressed."
+    },
+    "viewarticle": "கட்டுரையைக் காண்க",
+    "favorite": "பிடித்த",
+    "favoriteadded": "பிடித்தவைகளில் சேர்க்கப்பட்டது",
+    "@favoriteadded": {
+        "description": "Snackbar shown when an article is added to the user's favorites."
+    },
+    "favoriteremoved": "பிடித்தவைகளிலிருந்து அகற்றப்பட்டது",
+    "@favoriteremoved": {
+        "description": "Snackbar shown when an article is removed from the user's favorites."
+    },
+    "abstractunavailable": "சுருக்கம் கிடைக்கவில்லை. வெளியீட்டாளர் கிராச்ரெஃப் சுருக்கங்களை வழங்கவில்லை. முழு உரை இன்னும் கிடைக்க வேண்டும்.",
+    "@abstractunavailable": {
+        "description": "Text shown in the place of the abstract when it is unavailable."
+    },
+    "searchresults": "தேடல் முடிவுகள்",
+    "nofavorites1": "உங்களுக்கு பிடித்தவைகளில் கட்டுரைகள் எதுவும் இல்லை. பயன்படுத்தவும் ",
+    "@nofavorites1": {
+        "description": "The message shown when the user has no articles in their favorites. The text had to be split since it contains an icon. The full text is: You have no articles in your favorites. Use the <heart icon> icon to add a publication you like in your favorites!"
+    },
+    "nofavorites2": "உங்களுக்கு பிடித்தவைகளில் நீங்கள் விரும்பும் வெளியீட்டைச் சேர்க்க ஐகான்!",
+    "@nofavorites2": {
+        "description": "The message shown when the user has no articles in their favorites. The text had to be split since it contains an icon. The full text is: You have no articles in your favorites. Use the <heart icon> icon to add a publication you like in your favorites!"
+    },
+    "appearance": "தோற்றம்",
+    "light": "ஒளி",
+    "dark": "இருண்ட",
+    "systemtheme": "கணினி கருப்பொருள்",
+    "unpaywallarticle": "கட்டுரை unpaywall மூலம் வழங்கப்பட்டது",
+    "@unpaywallarticle": {
+        "description": "Snackbar shown when an article was fetched from Unpaywall."
+    },
+    "forwardedproxy": "உங்கள் நிறுவன பதிலாள் மூலம் அனுப்பப்பட்டது",
+    "@forwardedproxy": {
+        "description": "Snackbar shown when a request is intercepted and sent through the user's institution EZproxy."
+    },
+    "selectinstitution": "உங்கள் நிறுவனத்தைத் தேர்ந்தெடுக்கவும்",
+    "sortby": "வரிசைப்படுத்தவும்",
+    "sortorder": "வரிசைப்படுத்தும் முறை",
+    "followingsince": "{date} முதல் பின்வருமாறு",
+    "journaltitle": "செய்தித் தாள் தலைப்பு",
+    "followingdate": "அடுத்த தேதி",
+    "ascending": "ஏறுதல்",
+    "descending": "இறங்கு",
+    "articletitle": "கட்டுரை தலைப்பு",
+    "firstauthfamname": "முதல் ஆசிரியர் குடும்ப பெயர்",
+    "datepublished": "தேதி வெளியிடப்பட்டது",
+    "dateaddedtofavorites": "பிடித்தவைகளில் தேதி சேர்க்கப்பட்டது",
+    "addedtoyourfav": "{date} இல் உங்களுக்கு பிடித்தவைகளில் சேர்க்கப்பட்டது",
+    "noinstitution": "நிறுவனம் இல்லை",
+    "buildingfeed": "உங்கள் ஊட்டத்தை உருவாக்குதல். தயவுசெய்து காத்திருங்கள்…",
+    "nopublication1": "வெளியீடுகள் எதுவும் கிடைக்கவில்லை. நீங்கள் செல்வதன் மூலம் பத்திரிகைகளைப் பின்பற்றுகிறீர்கள் என்பதை உறுதிப்படுத்திக் கொள்ளுங்கள்",
+    "@nopublication1": {
+        "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
+    },
+    "nopublication2": "பட்டியல் மற்றும் பயன்படுத்தவும்",
+    "@nopublication2": {
+        "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
+    },
+    "nopublication3": "பத்திரிகைகளைக் கண்டுபிடிக்க படவுரு.",
+    "@nopublication3": {
+        "description": "The message shown when the feed in the home screen is empty. The text had to be split since it contains icons. The full text is: No publications available. Make sure you are following journals by going in the <journal icon> menu and use the <magnifying glass> icon to find journals."
+    },
+    "sharedMessage": "VISPAR பயன்பாடு வழியாக பகிரப்பட்டது",
+    "@sharedMessage": {
+        "description": "Default sharing text."
+    },
+    "shareArticle": "கட்டுரை பகிர்ந்து கொள்ளுங்கள்",
+    "sendToZotero": "சோட்டெரோவுக்கு அனுப்புங்கள்",
+    "zoteroSettings": "சோட்டெரோ அமைப்புகள்",
+    "zoteroPermissions1": "உங்கள் சோட்டெரோ கணக்கை அதன் ஒருங்கிணைப்பை அனுபவிக்க VISPAR க்கு அணுகல் மற்றும் எழுத வேண்டும்.",
+    "zoteroPermissions2": "புதிய சோட்டெரோ பநிஇ விசையை உருவாக்கும்போது, நீங்கள் \"நூலக அணுகலை அனுமதிக்கவும்\" மற்றும் \"எழுத அணுகலை அனுமதிக்கவும்\" இரண்டையும் தேர்ந்தெடுக்க வேண்டும்.",
+    "zoteroPermissions3": "பநிஇ விசை உருவாக்கப்பட்டதும், மதிப்பை நகலெடுத்து கீழே உள்ள உரை புலத்திற்குள் ஒட்டவும்.",
+    "zoteroCreateKey": "புதிய பநிஇ விசையை உருவாக்கவும்",
+    "zoteroEnterKey": "பநிஇ விசையை உள்ளிடவும்",
+    "@zoteroEnterKey": {
+        "description": "Hint text shown in the text field where users can enter their Zotero API key."
+    },
+    "zoteroValidKey": "பநிஇ விசை சேமிக்கப்பட்டது!",
+    "@zoteroValidKey": {
+        "description": "Snackbar shown when a valid Zotero API key has been saved."
+    },
+    "zoteroInvalidKey": "பநிஇ விசை தவறானது!",
+    "@zoteroInvalidKey": {
+        "description": "Snackbar shown when an attempt to save an invalid Zotero API key is made."
+    },
+    "save": "சேமி",
+    "sourceCode": "மூலக் குறியீடு",
+    "reportIssue": "ஒரு சிக்கலைப் புகாரளிக்கவும்",
+    "enabled": "இயக்கப்பட்டது",
+    "disabled": "முடக்கப்பட்டது",
+    "database": "தரவுத்தளம்",
+    "privacyPolicy": "தனியுரிமைக் கொள்கை",
+    "donate": "நன்கொடை",
+    "donateMessage": "விச்பரின் வளர்ச்சியை ஆதரிக்க உதவுகிறது",
+    "@donateMessage": {
+        "description": "Text shown in the subtitle of the Donate button in the settings."
+    },
+    "otherLicense": "பிற உரிமம்",
+    "unknownLicense": "தெரியாத உரிமம்",
+    "publisher": "வெளியீட்டாளர்",
+    "scrapeAbstracts": "காணாமல் போன சுருக்கங்களைத் துடைக்கவும்",
+    "databaseNotFound": "தரவுத்தள கோப்பு கிடைக்கவில்லை.",
+    "selectDBExportLocation": "தரவுத்தளத்தை ஏற்றுமதி செய்ய வேண்டிய இடத்தைத் தேர்ந்தெடுக்கவும்.",
+    "exportDatabase": "ஏற்றுமதி தரவுத்தளம்",
+    "download": "பதிவிறக்கம்",
+    "@download": {
+        "description": "The verb to download, without the 'to'."
+    },
+    "delete": "நீக்கு",
+    "downloadSuccessful": "கட்டுரை வெற்றிகரமாக பதிவிறக்கம் செய்யப்பட்டது!",
+    "downloadDeleted": "கட்டுரை நீக்கப்பட்டது!",
+    "noDownloads": "உங்களிடம் எந்த பதிவிறக்கங்களும் இல்லை.",
+    "journalLibraryEmpty": "நீங்கள் எந்த பத்திரிகைகளையும் பின்பற்றவில்லை. பத்திரிகைகளைக் கண்டுபிடித்து பின்பற்ற தேடல் மெனுவைப் பயன்படுத்தவும்.",
+    "@journalLibraryEmpty": {
+        "description": "Message shown when the user is not following any journals."
+    },
+    "emptyDOIError": "தயவுசெய்து ஒரு DOI ஐ உள்ளிடவும்",
+    "searchByDOI": "Doi மூலம் தேடுங்கள்",
+    "searchByQuery": "வினவல் மூலம் தேடுங்கள்",
+    "searchByTitle": "தலைப்பு மூலம் தேடுங்கள்",
+    "searchByISSN": "ISSN ஆல் தேடுங்கள்",
+    "queryName": "வினவல் பெயர்",
+    "dateSaved": "தேதி சேமிக்கப்பட்டது",
+    "articles": "கட்டுரைகள்",
+    "@articles": {
+        "description": "As in scientific articles."
+    },
+    "category": "வகை",
+    "issnCopied": "ஐ.எச்.எச்.என் இடைநிலைப்பலகைக்கு நகலெடுக்கப்பட்டது",
+    "apiQueryCopied": "இடைநிலைப்பலகைக்கு நகலெடுக்கப்பட்ட பநிஇ கோரிக்கை",
+    "articleViewer": "கட்டுரை பார்வையாளர்",
+    "noresultsfound": "முடிவுகள் எதுவும் கிடைக்கவில்லை.",
+    "noSavedQueries": "சேமித்த வினவல்கள் இல்லை.",
+    "failLoadMorePublication": "அதிக வெளியீடுகளை ஏற்றுவதில் தோல்வி.",
+    "savedOn": "{date} இல் சேமிக்கப்பட்டது",
+    "@savedOn": {
+        "placeholders": {
+            "date": {
+                "type": "DateTime",
+                "format": "yMMMMd"
+            }
+        }
+    },
+    "apiFetchInterval": "பநிஇ இடைவெளி",
+    "setupAlmostSet": "நீங்கள் அனைவரும் அமைக்கப்பட்டிருக்கிறீர்கள்!… கிட்டத்தட்ட!",
+    "welcomeWispar": "VISPAR க்கு வருக!",
+    "skip": "தவிர்",
+    "getStarted": "தொடங்கவும்",
+    "library": "நூலகம்",
+    "@library": {
+        "description": "The library menu button and the app bar title when in the library screen."
+    },
+    "setupOtherSettingsLong": "பயன்பாட்டின் அமைப்புகள் பட்டியலில் கூடுதல் அமைப்புகள் கிடைக்கின்றன. மேல் வலது மூலையில் நீள்வட்ட மெனுவைத் தட்டுவதன் மூலம் முகப்புத் திரையில் இருந்து அதை அணுகவும்.",
+    "setupAlmostSetLong": "அடுத்து, நாங்கள் உங்களை தேடல் திரைக்கு அழைத்துச் செல்வோம், அங்கு உங்களுக்கு பிடித்த பத்திரிகைகளைப் பின்பற்றலாம். வகை மெனுவை 'கட்டுரைகள்' என்பதிலிருந்து 'பத்திரிகைகளுக்கு' மாற்ற மறக்காதீர்கள்.",
+    "queries": "வினவல்கள்",
+    "@queries": {
+        "description": "Title of the saved search queries tab."
+    },
+    "searchPlaceholder": "தேடுங்கள்…",
+    "@searchPlaceholder": {
+        "description": "Place holder text in the search input widget."
+    },
+    "filterFavorites": "பிடித்தவைகளை வடிகட்டவும்",
+    "queryHasNoNameError": "சேமிக்க வினவல் பெயரை உள்ளிட வேண்டும்.",
+    "emptySearchQuery": "தேடல் வினவலை உள்ளிடவும்",
+    "journalSearchError": "பத்திரிகைகளைத் தேட முயற்சிக்கும்போது பிழை ஏற்பட்டது.",
+    "moreOptions": "மேலும் விருப்பங்கள்",
+    "saveQuery": "இந்த வினவலைச் சேமிக்கவும்",
+    "apiFetchIntervalHint": "கட்டுரைகளை எவ்வளவு அடிக்கடி பெற வேண்டும் என்பதைத் தேர்ந்தெடுக்கவும்",
+    "noFavorites": "உங்களுக்கு பிடித்தவைகளில் கட்டுரைகள் எதுவும் இல்லை. உங்களுக்கு பிடித்தவைகளில் சேர்க்க விரும்பும் வெளியீட்டு அட்டைகளில் ஆர்ட் ஐகானைப் பயன்படுத்தவும்!",
+    "@noFavorites": {
+        "description": "The message shown when the user has no articles in their favorites."
+    },
+    "storagePermissionDenied": "இசைவு மறுக்கப்பட்டது.",
+    "databaseExported": "தரவுத்தளம் வெற்றிகரமாக ஏற்றுமதி செய்யப்பட்டது!",
+    "databaseExportFailed": "தரவுத்தளத்தை ஏற்றுமதி செய்வதில் தோல்வி.",
+    "importDatabase": "தரவுத்தளத்தை இறக்குமதி செய்யுங்கள்",
+    "databaseImportFailed": "தரவுத்தளத்தை இறக்குமதி செய்வதில் தோல்வி.",
+    "databaseImported": "தரவுத்தளம் வெற்றிகரமாக இறக்குமதி செய்யப்பட்டது!",
+    "settingsSaved": "அமைப்புகள் வெற்றிகரமாக சேமிக்கப்பட்டன!",
+    "appDescription": "விஞ்ஞான இலக்கியங்களுடன் புதுப்பித்த நிலையில் இருக்க உங்கள் திறந்த மூல பயன்பாடு. நீங்கள் விரைவாக அமைப்போம்!",
+    "setupInstitutionalAccess": "நிறுவன அணுகல் அமைவு",
+    "setupInstitutionalAccessLong": "அவர்களின் செய்தித் தாள் சந்தாக்களுக்கான அணுகலைப் பெற உங்கள் நிறுவனத்தின் EZProxy ஐத் தேர்ந்தெடுக்கவும். இது ஒரு VPN அல்லது வளாகத்தில் அணுகலின் தேவையை நீக்கும்.",
+    "setupSelectInstitution": "எனது நிறுவனத்தைத் தேர்ந்தெடுக்கவும்",
+    "setupSelectedInstitution": "நீங்கள் தேர்ந்தெடுத்துள்ளீர்கள்:",
+    "setupLinkZotero": "இணைப்பு எனவே",
+    "setupZoteroLong": "உங்கள் சோட்டெரோ நூலகத்திற்கு நேரடியாக வெளியீடுகளை அனுப்பவும். அவை ஒரு சிறப்பு VISPAR சேகரிப்பில் சேர்க்கப்படும்.",
+    "setupLinkMyZotero": "எனது சோட்டெரோ கணக்கை இணைக்கவும்",
+    "setupOtherSettings": "பிற அமைப்புகள்",
+    "homeFeedEmpty": "வெளியீடுகள் எதுவும் கிடைக்கவில்லை. நீங்கள் குறைந்தது ஒரு பத்திரிகையைப் பின்தொடர்ந்தவுடன் வெளியீட்டு அட்டைகள் சேர்க்கப்படும்.",
+    "@homeFeedEmpty": {
+        "description": "The message shown when the feed in the home screen is empty."
+    },
+    "databaseSettings": "தரவுத்தள அமைப்புகள்",
+    "filter": "வெளியீட்டு அட்டைகளை வடிகட்டவும்",
+    "filterResultsEmpty": "உங்கள் வடிப்பானுடன் எந்த வெளியீடும் பொருந்தவில்லை",
+    "filterDownloads": "பதிவிறக்கங்களை வடிகட்டவும்",
+    "cleanupIntervalHint": "நாட்களின் எண்ணிக்கையை உள்ளிடவும் (1 முதல் 365 வரை)",
+    "cleanupIntervalInvalidNumber": "சரியான எண்ணிக்கையிலான நாட்களை உள்ளிடவும்.",
+    "about": "பற்றி",
+    "madeBy": "{app_author} ஆல் தயாரிக்கப்பட்டது",
+    "hours": "மணி",
+    "includeInFeed": "தீவனத்தில் சேர்க்கவும்",
+    "openExternalBrowser": "வெளிப்புற உலாவியில் திறக்கவும்",
+    "errorOpenExternalBrowser": "வேறு உலாவியில் இணைப்பைத் திறக்க முடியவில்லை",
+    "openExternalPdfApp": "வெளிப்புற PDF ரீடரில் திறக்கவும்",
+    "errorOpenExternalPdfApp": "PDF கோப்பை வேறு பயன்பாட்டில் திறக்க முடியவில்லை",
+    "display": "காட்சி",
+    "hideAllAbstracts": "அனைத்து சுருக்கங்களையும் மறைக்கவும்",
+    "cleanupIntervalNumberNotBetween": "1 முதல் 365 க்கு இடையில் ஒரு மதிப்பை உள்ளிடவும்.",
+    "saveSettings": "அமைப்புகளை சேமிக்கவும்",
+    "displaySettings": "அமைப்புகளைக் காண்பி",
+    "theme": "கருப்பொருள்",
+    "publicationCard": "வெளியீட்டு அட்டை",
+    "showAllAbstracts": "அனைத்து சுருக்கங்களையும் காட்டு",
+    "hideMissingAbstracts": "காணாமல் போன சுருக்கங்களை மறைக்கவும்",
+    "fetchingArticleFromJournal": "{journalName}ல் இருந்து கட்டுரைகளைப் பெறுதல்.",
+    "noPublicationFound": "வெளியீடுகள் எதுவும் கிடைக்கவில்லை.",
+    "cleanupInterval": "தூய்மைப்படுத்த இடைவெளி (நாட்கள்)",
+    "notificationSettingsMessage": "அறிவிப்புகள் நிரந்தரமாக முடக்கப்பட்டுள்ளன. அவற்றை இயக்க, பயன்பாட்டின் அறிவிப்பு அமைப்புகளுக்குச் செல்லவும்.",
+    "notificationTitleJournal": "பத்திரிகைகள் புதுப்பிக்கப்பட்டன",
+    "notificationTitleQuery": "வினவல்கள் புதுப்பிக்கப்பட்டன",
+    "fgNotificationContent": "உங்கள் பத்திரிகையைப் புதுப்பிக்க பின்னணியில் விச்பர் இயங்குகிறது",
+    "fgNotificationTitle": "பின்னணி புதுப்பிப்புகள் பணி",
+    "enterKeyword": "ஒரு முக்கிய சொல்லை உள்ளிடவும்",
+    "lastUpdatedHours": "{hours, plural, one{கடைசி புதுப்பிக்கப்பட்டது 1 மணிநேரத்துக்கு முன்பு} other{கடைசி புதுப்பிக்கப்பட்டது {hours} மணிநேரங்களுக்கு முன்பு}}",
+    "@lastUpdatedHours": {
+        "placeholders": {
+            "hours": {
+                "type": "int"
+            }
+        }
+    },
+    "lastUpdatedDays": "{days, plural, one{கடைசி புதுப்பிக்கப்பட்டது 1 நாள் முன்பு} other{கடைசி புதுப்பிக்கப்பட்டது {days} நாட்கள் முன்பு}}",
+    "@lastUpdatedDays": {
+        "placeholders": {
+            "days": {
+                "type": "int"
+            }
+        }
+    },
+    "noHiddenArticles": "மறைக்கப்பட்ட வெளியீடுகள் இல்லை",
+    "unhideArticle": "இந்த வெளியீட்டை மறைவிலகு",
+    "hideArticle": "இந்த வெளியீட்டை மறை",
+    "viewHiddenArticles": "மறைக்கப்பட்ட வெளியீடுகளைக் காண்க",
+    "lastUpdatedMinutes": "{minutes, plural, one{1 நிமையம் முன் புதுப்பிக்கப்பட்டது} other{ {minutes} நிமையங்களுக்கு முன்பு}}",
+    "@lastUpdatedMinutes": {
+        "placeholders": {
+            "minutes": {
+                "type": "int"
+            }
+        }
+    },
+    "concurrentFetches": "ஒரே நேரத்தில் பநிஇ கோரிக்கைகள்: {number}",
+    "language": "மொழி",
+    "notifications": "அறிவிப்புகள்",
+    "notifPermsGranted": "இசைவு வழங்கப்பட்டது",
+    "notifPermsNotGranted": "இசைவு வழங்கப்படவில்லை",
+    "openAppSettings": "திறந்த அமைப்புகள்",
+    "notificationContent": "புதிய கட்டுரைகள் கிடைக்கின்றன!",
+    "displayName": "காட்சி பெயர்",
+    "citedByCount": "எண்ணுங்கள் ஆல் மேற்கோள் காட்டப்பட்டது",
+    "worksCount": "படைப்புகள் எண்ணிக்கை",
+    "publicationDate": "வெளியீட்டு தேதி",
+    "queryPreview": "வினவல் முன்னோட்டம்:",
+    "system": "மண்டலம்",
+    "pendingUpdate": "புதுப்பிப்பு நிலுவையில் உள்ளது",
+    "hiddenArticles": "மறைக்கப்பட்ட வெளியீடுகள்",
+    "searchOpenAlex": "ஓபனலெக்ச் (பரிந்துரைக்கப்படுகிறது)",
+    "source": "ஆதாரம்: {search_provider}",
+    "everything": "எல்லாம்",
+    "titleAndAbstract": "தலைப்பு மற்றும் சுருக்கம்",
+    "title": "தலைப்பு",
+    "addKeyword": "முக்கிய சொல்லைச் சேர்க்கவும்",
+    "searchIn": "இதில் தேடு"
 }
