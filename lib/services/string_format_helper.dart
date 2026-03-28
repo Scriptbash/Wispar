@@ -15,7 +15,6 @@ String getAuthorsNames(List<PublicationAuthor> authors) {
 String cleanAbstract(String rawAbstract) {
   final converter = MathmlToLatexConverter();
   rawAbstract = converter.convert(rawAbstract);
-  rawAbstract = html.parse(rawAbstract).body!.text;
   rawAbstract = rawAbstract.replaceAll(
     RegExp(r'<jats:title>.*?</jats:title>', dotAll: true),
     '',
@@ -42,12 +41,13 @@ String cleanAbstract(String rawAbstract) {
     '',
   );
 
+  rawAbstract = html.parse(rawAbstract).body!.text;
   // Remove remaining XML/HTML tags
   rawAbstract = rawAbstract.replaceAll(RegExp(r'<[^>]+>'), '');
 
   // Remove leading "Abstract"
   rawAbstract = rawAbstract.replaceAll(
-    RegExp(r'^\s*abstract[:.\s]*', caseSensitive: false),
+    RegExp(r'^\s*(A\s*BSTRACT|Abstract)[:.\s]*', caseSensitive: false),
     '',
   );
 
