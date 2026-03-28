@@ -1,14 +1,59 @@
 import 'package:xml/xml.dart';
-import './logs_helper.dart';
+import 'package:wispar/services/logs_helper.dart';
 
-// Converts MathML to latex equations so that they can be rendered with Latext
 class MathmlToLatexConverter {
   final logger = LogsService().logger;
+
+  final _specialChars = {
+    'α': r'\alpha',
+    'β': r'\beta',
+    'γ': r'\gamma',
+    'δ': r'\delta',
+    'Δ': r'\Delta',
+    'λ': r'\lambda',
+    'μ': r'\mu',
+    'π': r'\pi',
+    'σ': r'\sigma',
+    'Ω': r'\Omega',
+    'τ': r'\tau',
+    'ν': r'\nu',
+    'θ': r'\theta',
+    'φ': r'\phi',
+    'ψ': r'\psi',
+    'η': r'\eta',
+    '±': r'\pm',
+    '→': r'\to',
+    '∞': r'\infty',
+    '≈': r'\approx',
+    '≠': r'\neq',
+    '×': r'\times',
+    '·': r'\cdot',
+    '°': r'^\circ',
+    '−': '-',
+    '—': '-',
+    '‾': r'\bar',
+    '∘': r'\circ',
+    '⁺': r'^+',
+    '⁻': '^-',
+    '⁰': r'^0',
+  };
+
   String convert(String raw) {
     try {
-      final wrapped = '<root>$raw</root>';
+      final cleaned = raw
+          .replaceAll('mml:', '')
+          .replaceAll('&InvisibleTimes;', '')
+          .replaceAll('&it;', '')
+          .replaceAll('&sdot;', '·')
+          .replaceAll('\u2062', '')
+          .replaceAll('\u2212', '-')
+          .replaceAll('\u203e', r'\bar')
+          .replaceAll('\u2218', r'\circ');
+
+      final wrapped = '<root>$cleaned</root>';
       final document = XmlDocument.parse(wrapped);
-      return _convertChildren(document.rootElement.children);
+
+      return _convertChildren(document.rootElement.children).trim();
     } catch (e, stackTrace) {
       logger.warning('Unable to convert MathML to Latex.', e, stackTrace);
       return raw;
@@ -17,155 +62,143 @@ class MathmlToLatexConverter {
 
   String _convertChildren(List<XmlNode> nodes) {
     final buffer = StringBuffer();
-    final formulaBuffer = StringBuffer();
-    bool insideFormula = false;
 
     for (int i = 0; i < nodes.length; i++) {
       final node = nodes[i];
 
       if (node is XmlText) {
-        final text = node.value;
-        final trimmed = text.trimRight();
+        buffer.write(_applyMapping(node.value));
+      } else if (node is XmlElement) {
+        final tag = node.name.local;
+        if (tag == 'math') {
+          String mathContent = _convertNode(node).trim();
 
-        final isChemicalSymbol =
-            RegExp(r'^[A-Z][a-z]?$').hasMatch(trimmed.trim());
+          if (mathContent.startsWith('_') || mathContent.startsWith('^')) {
+            String current = buffer.toString().trimRight();
+            final match =
+                RegExp(r'([a-zA-Z0-9\(\)\[\]]+)$').firstMatch(current);
 
-        if (isChemicalSymbol) {
-          // Start formula buffering if not already
-          if (!insideFormula) {
-            insideFormula = true;
-            formulaBuffer.clear();
-          }
-          formulaBuffer.write(trimmed.trim());
-        } else {
-          // Flush formula if any
-          if (insideFormula && formulaBuffer.isNotEmpty) {
-            final formula = '\$${formulaBuffer.toString()}\$';
+            buffer.clear();
+            if (match != null) {
+              String base = match.group(0)!;
+              String precedingText =
+                  current.substring(0, current.length - base.length);
+
+              if (precedingText.trimRight().endsWith(r'$')) {
+                precedingText = precedingText.trimRight();
+                precedingText =
+                    precedingText.substring(0, precedingText.length - 1);
+                buffer.write(precedingText);
+                buffer.write('$base$mathContent\$');
+              } else {
+                buffer.write(precedingText);
+                buffer.write('\$$base$mathContent\$');
+              }
+            } else {
+              buffer.write(current);
+              buffer.write('\$$mathContent\$');
+            }
+          } else {
             if (buffer.isNotEmpty && !buffer.toString().endsWith(' ')) {
               buffer.write(' ');
             }
-            buffer.write(formula);
-            if (!formula.endsWith('.')) {
-              buffer.write(' ');
-            }
-            formulaBuffer.clear();
-            insideFormula = false;
+            buffer.write('\$$mathContent\$');
           }
-          buffer.write(trimmed); // regular text
+        } else {
+          buffer.write(_convertNode(node));
         }
-      } else if (node is XmlElement && node.name.local == 'math') {
-        final mathContent = _convertChildren(node.children);
-        if (!insideFormula) {
-          insideFormula = true;
-          formulaBuffer.clear();
-        }
-        formulaBuffer.write(mathContent);
-
-        // Look ahead: is next another <math> or chemical formula?
-        final next = i + 1 < nodes.length ? nodes[i + 1] : null;
-        final isNextMath = next is XmlElement && next.name.local == 'math';
-        final isNextChemText = next is XmlText &&
-            RegExp(r'^[A-Z][a-z]?$').hasMatch(next.value.trim());
-
-        if (!isNextMath && !isNextChemText) {
-          final formula = '\$${formulaBuffer.toString()}\$';
-          if (buffer.isNotEmpty && !buffer.toString().endsWith(' ')) {
-            buffer.write(' ');
-          }
-          buffer.write(formula);
-          if (!formula.endsWith('.') &&
-              (next == null || !_startsWithSpace(next))) {
-            buffer.write(' ');
-          }
-          formulaBuffer.clear();
-          insideFormula = false;
-        }
-      } else {
-        if (insideFormula && formulaBuffer.isNotEmpty) {
-          final formula = '\$${formulaBuffer.toString()}\$';
-          if (buffer.isNotEmpty && !buffer.toString().endsWith(' ')) {
-            buffer.write(' ');
-          }
-          buffer.write(formula);
-          if (!formula.endsWith('.')) {
-            buffer.write(' ');
-          }
-          formulaBuffer.clear();
-          insideFormula = false;
-        }
-        buffer.write(_convertNode(node));
       }
     }
-
-    // Final flush
-    if (insideFormula && formulaBuffer.isNotEmpty) {
-      final formula = '\$${formulaBuffer.toString()}\$';
-      if (buffer.isNotEmpty && !buffer.toString().endsWith(' ')) {
-        buffer.write(' ');
-      }
-      buffer.write(formula);
-      if (!formula.endsWith('.')) {
-        buffer.write(' ');
-      }
-    }
-
-    return buffer.toString();
-  }
-
-  bool _startsWithSpace(XmlNode node) {
-    if (node is XmlText) {
-      return node.value.startsWith(RegExp(r'\s'));
-    }
-    return false;
+    return buffer.toString().replaceAll(RegExp(r'\s+'), ' ').trim();
   }
 
   String _convertNode(XmlNode node) {
-    if (node is XmlText) {
-      return node.value;
-    }
+    if (node is XmlText) return _applyMapping(node.value);
 
     if (node is XmlElement) {
       final tag = node.name.local;
-
-      // Detect full <math> tag
-      if (tag == 'math') {
-        final latex = _convertChildren(node.children);
-        return '\$$latex\$'; // wrap with dollar signs for Latext
-      }
-
-      // Handle MathML elements inside <math>
       switch (tag) {
         case 'mi':
         case 'mn':
         case 'mo':
-          return node.innerText;
-        case 'msup':
-          final base =
-              node.children.length > 0 ? _convertNode(node.children[0]) : '';
-          final sup =
-              node.children.length > 1 ? _convertNode(node.children[1]) : '';
-          return '$base^{$sup}';
-        case 'msub':
-          final base =
-              node.children.length > 0 ? _convertNode(node.children[0]) : '';
+        case 'mtext':
+          return _applyMapping(node.innerText.trim());
 
-          final sub =
-              node.children.length > 1 ? _convertNode(node.children[1]) : '';
-          return '${base}_{$sub}';
-        case 'mfrac':
-          final numerator =
-              node.children.length > 0 ? _convertNode(node.children[0]) : '';
-          final denominator =
-              node.children.length > 1 ? _convertNode(node.children[1]) : '';
-          return '\\frac{$numerator}{$denominator}';
-        case 'msqrt':
-          return '\\sqrt{${_convertChildren(node.children)}}';
+        case 'math':
         case 'mrow':
-          return _convertChildren(node.children);
+        case 'mstyle':
+          return node.children.map(_convertNode).join('');
+
+        case 'msub':
+          final children = node.children.whereType<XmlElement>().toList();
+          if (children.isEmpty) return '';
+          final base = _convertNode(children[0]).trim();
+          final sub =
+              children.length > 1 ? _convertNode(children[1]).trim() : '';
+          return base.isEmpty ? '_{$sub}' : '{$base}_{$sub}';
+
+        case 'msup':
+          final children = node.children.whereType<XmlElement>().toList();
+          if (children.isEmpty) return '';
+          final base = _convertNode(children[0]).trim();
+          final sup =
+              children.length > 1 ? _convertNode(children[1]).trim() : '';
+          return base.isEmpty ? '^{$sup}' : '{$base}^{$sup}';
+
+        case 'msubsup':
+          final children = node.children.whereType<XmlElement>().toList();
+          if (children.isEmpty) return '';
+          final base = _convertNode(children[0]).trim();
+          final sub =
+              children.length > 1 ? _convertNode(children[1]).trim() : '';
+          final sup =
+              children.length > 2 ? _convertNode(children[2]).trim() : '';
+          return '{$base}_{$sub}^{$sup}';
+
+        case 'mover':
+          final children = node.children.whereType<XmlElement>().toList();
+          if (children.isEmpty) return '';
+          final base = _convertNode(children[0]).trim();
+          final over =
+              children.length > 1 ? _convertNode(children[1]).trim() : '';
+          if (over == r'\bar' || over == '‾') return '\\bar{$base}';
+          if (over == r'\vec' || over == '→') return '\\vec{$base}';
+          return '\\overset{$over}{$base}';
+
+        case 'munder':
+          final children = node.children.whereType<XmlElement>().toList();
+          if (children.isEmpty) return '';
+          final base = _convertNode(children[0]).trim();
+          final under =
+              children.length > 1 ? _convertNode(children[1]).trim() : '';
+          return '\\underset{$under}{$base}';
+
+        case 'mfrac':
+          final children = node.children.whereType<XmlElement>().toList();
+          final num =
+              children.isNotEmpty ? _convertNode(children[0]).trim() : '';
+          final den =
+              children.length > 1 ? _convertNode(children[1]).trim() : '';
+          return '\\frac{$num}{$den}';
+
+        case 'mfenced':
+          final open = node.getAttribute('open') ?? '(';
+          final close = node.getAttribute('close') ?? ')';
+          final content = node.children.map(_convertNode).join(', ');
+          return '$open$content$close';
+
         default:
-          return _convertChildren(node.children);
+          return node.children.map(_convertNode).join('');
       }
     }
     return '';
+  }
+
+  String _applyMapping(String text) {
+    String result = text;
+    _specialChars.forEach((unicode, latex) {
+      result = result.replaceAll(unicode, latex);
+    });
+    return result;
   }
 }
