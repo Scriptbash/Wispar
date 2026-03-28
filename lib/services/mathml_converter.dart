@@ -52,7 +52,6 @@ class MathmlToLatexConverter {
     '⁻': '^-',
     '⁰': r'^0',
     '⊂': r'\subset ',
-    '÷': '--',
   };
 
   String convert(String raw) {
@@ -77,6 +76,10 @@ class MathmlToLatexConverter {
       String result = _convertChildren(document.rootElement.children).trim();
 
       return result
+          .replaceAll(RegExp(r'\$\.\$'), '.')
+          .replaceAll(RegExp(r'\$,\$'), ',')
+          .replaceAllMapped(RegExp(r'(\d)\s*([.,])\s*(\d)'),
+              (match) => match.group(1)! + match.group(2)! + match.group(3)!)
           .replaceAllMapped(
               RegExp(r'([a-zA-Z0-9]+)\s*\$(\{\})?(_{.*?}|\^{.*?})\$'),
               (match) => '\$' + match.group(1)! + match.group(3)! + '\$')
