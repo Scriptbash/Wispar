@@ -181,7 +181,7 @@
     "setupLinkZotero": "Connexion à Zotero",
     "setupInstitutionalAccessLong": "Sélectionnez l'EZproxy de votre institution pour accéder à ses abonnements aux revues. Cela éliminera le besoin d'utiliser un VPN ou un accès sur site.",
     "appDescription": "Votre application open-source pour rester à jour avec la littérature scientifique. Commençons rapidement !",
-    "setupZoteroLong": "Envoyez des publications directement vers votre bibliothèque Zotero. Elles seront ajoutées à une collection spéciale Wispar.",
+    "setupZoteroLong": "Envoyez des publications directement vers votre bibliothèque Zotero. Elles seront ajoutées à une collection de votre choix.",
     "publicationCard": "Carte de publication",
     "hideMissingAbstracts": "Cacher les résumés manquants",
     "setupOtherSettingsLong": "Des paramètres supplémentaires sont disponibles dans le menu des paramètres de l'application. Accédez-y depuis l'écran d'accueil en appuyant sur le menu à trois points dans le coin supérieur droit.",
@@ -473,5 +473,6 @@
     "deleteCloudAccount": "Supprimer le compte infonuagique",
     "deleteAccountQmark": "Supprimer définitivement le compte ?",
     "deleteAccountExplanation": "Cela supprimera définitivement votre compte et vos données infonuagiques. Vos données locales sur cet appareil resteront intactes.",
-    "accountAndDataDeleted": "Compte et données infonuagiques supprimés"
+    "accountAndDataDeleted": "Compte et données infonuagiques supprimés",
+    "zoteroError": "Impossible d'envoyer l'article vers Zotero. Veuillez consulter les journaux de l'appli pour plus d'information."
 }
