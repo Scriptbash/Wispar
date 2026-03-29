@@ -951,10 +951,9 @@ class DatabaseHelper {
         journals.title AS journalTitle,
         GROUP_CONCAT(journal_issns.issn) AS issns
       FROM articles
-      JOIN journals ON articles.journal_id = journals.journal_id
+      LEFT JOIN journals ON articles.journal_id = journals.journal_id
       LEFT JOIN journal_issns ON articles.journal_id = journal_issns.journal_id
-      WHERE articles.dateCached IS NOT NULL 
-      AND articles.isHidden = 1
+      WHERE articles.isHidden = 1
       GROUP BY articles.doi
       ''');
 
