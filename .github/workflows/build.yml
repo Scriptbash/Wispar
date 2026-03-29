@@ -51,6 +51,11 @@ jobs:
         channel: 'stable'
         architecture: x64
     - run: flutter pub get
+    - name: Disable macOS code signing
+      run: |
+        echo "CODE_SIGNING_ALLOWED=NO" >> macos/Runner/Configs/Debug.xcconfig
+        echo "CODE_SIGNING_REQUIRED=NO" >> macos/Runner/Configs/Debug.xcconfig
+        echo "CODE_SIGN_IDENTITY=" >> macos/Runner/Configs/Debug.xcconfig
     - run: flutter build ios --debug --no-codesign
     - uses: actions/upload-artifact@v7
       with:
