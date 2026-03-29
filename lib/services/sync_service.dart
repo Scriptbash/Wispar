@@ -1,5 +1,6 @@
 import 'package:pocketbase/pocketbase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:wispar/services/pocketbase_service.dart';
 import 'package:wispar/services/database_helper.dart';
 import 'package:wispar/services/logs_helper.dart';
@@ -21,6 +22,18 @@ class SyncManager {
     if (pb == null) return true;
 
     return local.difference(pb).inSeconds > 2;
+  }
+
+  Future<void> _alignLocalTimestamp(
+      Database db, String table, String syncId, RecordModel pbRecord) async {
+    final newCloudTimestamp =
+        pbRecord.get<String?>('updated_at') ?? pbRecord.get<String>('updated');
+    await db.update(
+      table,
+      {'updated_at': newCloudTimestamp},
+      where: 'sync_id = ?',
+      whereArgs: [syncId],
+    );
   }
 
   Future<bool> isBackgroundSyncEnabled() async {
@@ -226,7 +239,7 @@ class SyncManager {
             "Skipping push for journal ID ${j['journal_id']} due to empty title.");
         continue;
       }
-      final syncId = j['sync_id'];
+      final syncId = j['sync_id'] as String;
       final existingCloud = cloudMap[syncId];
       final localDate = j['updated_at'] as String? ?? '';
       final data = {
@@ -244,13 +257,17 @@ class SyncManager {
       if (existingCloud == null) {
         // Journal doesn't exist in cloud -> Create it
         logger.info("Pushing new journal to cloud: ${data['title']}");
-        await pb.collection('journals').create(body: data);
+        final pbRecord = await pb.collection('journals').create(body: data);
+        await _alignLocalTimestamp(db, 'journals', syncId, pbRecord);
       } else {
         final pbDate = existingCloud.data['updated_at'] as String? ?? '';
 
         if (_isNewer(localDate, pbDate)) {
           logger.info("Pushing update for journal: ${data['title']}");
-          await pb.collection('journals').update(existingCloud.id, body: data);
+          final pbRecord = await pb
+              .collection('journals')
+              .update(existingCloud.id, body: data);
+          await _alignLocalTimestamp(db, 'journals', syncId, pbRecord);
         }
       }
     }
@@ -292,25 +309,29 @@ class SyncManager {
       final pbJournalRecordId = journalSyncToPbId[journalSyncId];
       if (pbJournalRecordId == null) continue;
 
+      final syncId = issn['sync_id'] as String;
       final data = {
         'issn': issn['issn'] ?? '',
         'journal_id': pbJournalRecordId,
-        'sync_id': issn['sync_id'],
+        'sync_id': syncId,
         'is_deleted': issn['is_deleted'] == 1,
         'user': userId,
       };
       // Create the issn in cloud
       final existingCloud = cloudIssnMap[issn['sync_id']];
       if (existingCloud == null) {
-        await pb.collection('journal_issns').create(body: data);
+        final pbRecord =
+            await pb.collection('journal_issns').create(body: data);
+        await _alignLocalTimestamp(db, 'journal_issns', syncId, pbRecord);
       } else {
         final pbDate = existingCloud.data['updated_at'] as String? ?? '';
         final localDate = issn['updated_at'] as String? ?? '';
 
         if (_isNewer(localDate, pbDate)) {
-          await pb
+          final pbRecord = await pb
               .collection('journal_issns')
               .update(existingCloud.id, body: data);
+          await _alignLocalTimestamp(db, 'journal_issns', syncId, pbRecord);
         }
       }
     }
@@ -341,7 +362,7 @@ class SyncManager {
       final rawDateLiked = r.get<String?>('date_liked');
       final cloudDateLiked =
           (rawDateLiked?.isEmpty ?? true) ? null : rawDateLiked;
-      final cloudIsHidden = r.get<bool>('is_hidden', false) ? 1 : 0;
+      final cloudIsHidden = r.getBoolValue('is_hidden') ? 1 : 0;
 
       List<Map<String, Object?>> localMatches = await db.query(
         'articles',
@@ -379,7 +400,7 @@ class SyncManager {
         'url': r.get<String>('url', ''),
         'license': r.get<String>('license', ''),
         'licenseName': r.get<String>('license_name', ''),
-        'isSavedQuery': r.get<bool>('is_saved_query', false) ? 1 : 0,
+        'isSavedQuery': r.getBoolValue('is_saved_query') ? 1 : 0,
         'query_id': localQueryId,
         'dateLiked': cloudDateLiked,
         'isHidden': cloudIsHidden,
@@ -408,6 +429,7 @@ class SyncManager {
             {
               'dateLiked': cloudDateLiked,
               'isHidden': cloudIsHidden,
+              'isSavedQuery': r.getBoolValue('is_saved_query') ? 1 : 0,
               'updated_at': pbUpdatedAt,
               'journal_id': localJournalId,
               'query_id': localQueryId,
@@ -498,20 +520,23 @@ class SyncManager {
             'journal_id': pbJournalRecordId,
             'query_id': pbQueryRecordId,
           };
-          await pb.collection('articles').create(body: data);
+          final pbRecord = await pb.collection('articles').create(body: data);
+          await _alignLocalTimestamp(db, 'articles', syncId, pbRecord);
           logger.info("Created new article in cloud: ${a['title']}");
         } else {
           final pbUpdatedAt = existingCloud.data['updated_at'] as String? ?? '';
           final localUpdatedAt = a['updated_at'] as String? ?? '';
 
           if (_isNewer(localUpdatedAt, pbUpdatedAt)) {
-            await pb.collection('articles').update(existingCloud.id, body: {
+            final pbRecord =
+                await pb.collection('articles').update(existingCloud.id, body: {
               'date_liked': localDateLiked,
               'is_hidden': localIsHidden,
               if (pbJournalRecordId != null) 'journal_id': pbJournalRecordId,
               if (pbQueryRecordId != null) 'query_id': pbQueryRecordId,
               'is_saved_query': isSavedQuery,
             });
+            await _alignLocalTimestamp(db, 'articles', syncId, pbRecord);
             logger.info(
                 "Pushed article update: $syncId (Hidden: $localIsHidden, Liked: $localDateLiked)");
           }
@@ -638,14 +663,16 @@ class SyncManager {
 
       if (existingCloud == null) {
         logger.info("Pushing new feed filter to cloud: ${data['name']}");
-        await pb.collection('feed_filters').create(body: data);
+        final pbRecord = await pb.collection('feed_filters').create(body: data);
+        await _alignLocalTimestamp(db, 'feed_filters', syncId, pbRecord);
       } else {
         final pbUpdatedAt = existingCloud.get<String>('updated_at');
         if (_isNewer(localUpdatedAt, pbUpdatedAt)) {
           logger.info("Pushing update for feed filter: ${data['name']}");
-          await pb
+          final pbRecord = await pb
               .collection('feed_filters')
               .update(existingCloud.id, body: data);
+          await _alignLocalTimestamp(db, 'feed_filters', syncId, pbRecord);
         }
       }
     }
@@ -768,14 +795,16 @@ class SyncManager {
 
       if (existingCloud == null) {
         logger.info("Pushing new known URL: ${data['url']}");
-        await pb.collection('known_urls').create(body: data);
+        final pbRecord = await pb.collection('known_urls').create(body: data);
+        await _alignLocalTimestamp(db, 'knownUrls', syncId, pbRecord);
       } else {
         final pbUpdatedAt = existingCloud.get<String>('updated_at');
         if (_isNewer(localUpdatedAt, pbUpdatedAt)) {
           logger.info("Pushing update for known URL: ${data['url']}");
-          await pb
+          final pbRecord = await pb
               .collection('known_urls')
               .update(existingCloud.id, body: data);
+          await _alignLocalTimestamp(db, 'knownUrls', syncId, pbRecord);
         }
       }
     }
@@ -889,14 +918,17 @@ class SyncManager {
 
       if (existingCloud == null) {
         logger.info("Pushing new saved query: ${data['query_name']}");
-        await pb.collection('saved_queries').create(body: data);
+        final pbRecord =
+            await pb.collection('saved_queries').create(body: data);
+        await _alignLocalTimestamp(db, 'savedQueries', syncId, pbRecord);
       } else {
         final pbUpdatedAt = existingCloud.get<String>('updated_at');
         if (_isNewer(localUpdatedAt, pbUpdatedAt)) {
           logger.info("Pushing update for saved query: ${data['query_name']}");
-          await pb
+          final pbRecord = await pb
               .collection('saved_queries')
               .update(existingCloud.id, body: data);
+          await _alignLocalTimestamp(db, 'savedQueries', syncId, pbRecord);
         }
       }
     }
