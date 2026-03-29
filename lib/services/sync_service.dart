@@ -21,7 +21,7 @@ class SyncManager {
     if (local == null) return false;
     if (pb == null) return true;
 
-    return local.difference(pb).inSeconds > 2;
+    return local.isAfter(pb);
   }
 
   Future<void> _alignLocalTimestamp(
