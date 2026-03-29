@@ -45,7 +45,7 @@
     "otherLicense": "其他许可证",
     "setupLinkMyZotero": "链接我的 Zotero 账户",
     "setupOtherSettings": "其他设置",
-    "setupZoteroLong": "将出版物直接发送到您的 Zotero 图书馆。它们将被添加到一个专门的 Wispar 收藏中。",
+    "setupZoteroLong": "将出版物直接发送到 Zotero 图书馆。它们将被添加到你选择的集合中。",
     "setupAlmostSet": "您已准备就绪！… 差不多了！",
     "getStarted": "开始使用",
     "home": "首页",
@@ -543,5 +543,6 @@
     "deleteCloudAccount": "删除云账户",
     "deleteAccountQmark": "永久删除账户？",
     "deleteAccountExplanation": "这会永久删除账户和云账户。此设备上的本地数据将保留。",
-    "accountAndDataDeleted": "已删除账户和云数据"
+    "accountAndDataDeleted": "已删除账户和云数据",
+    "zoteroError": "无法发送文章到 Zotero。请检查日志查看更多信息。"
 }
