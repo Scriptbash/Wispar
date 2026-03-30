@@ -449,8 +449,8 @@ class SyncManager {
 
     final rows = await db.query(
       'articles',
-      where: 'updated_at > ?',
-      whereArgs: [lastSync ?? '1970-01-01T00:00:00Z'],
+      where: lastSync != null ? 'updated_at > ?' : null,
+      whereArgs: lastSync != null ? [lastSync] : null,
     );
 
     if (rows.isEmpty) return;
