@@ -143,10 +143,29 @@ class SyncManager {
               .map((i) => i.get<String>('issn'))
               .toSet();
 
+          bool isMatch = false;
           // If an issn match I merge them to avoid duplicates
           if (localIssnSet.intersection(cloudIssnSet).isNotEmpty) {
+            isMatch = true;
+          } else if (localIssnSet.isEmpty || cloudIssnSet.isEmpty) {
+            String localPub = (potentialMatch['publisher'] ?? '')
+                .toString()
+                .toLowerCase()
+                .trim();
+            String cloudPub =
+                r.get<String>('publisher', '').toLowerCase().trim();
+
+            if (localPub.isEmpty ||
+                cloudPub.isEmpty ||
+                localPub.contains(cloudPub) ||
+                cloudPub.contains(localPub)) {
+              isMatch = true;
+            }
+          }
+
+          if (isMatch) {
             logger.info(
-                "Merging local journal ${potentialMatch['sync_id']} into cloud ID $cloudSyncId via ISSN match.");
+                "Merging local journal ${potentialMatch['sync_id']} into cloud ID $cloudSyncId.");
             await db.update('journals', {'sync_id': cloudSyncId},
                 where: 'journal_id = ?', whereArgs: [localId]);
 
