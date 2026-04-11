@@ -350,7 +350,7 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
               await platform.invokeMethod('resolveCustomPath', bookmark);
         }
       } else {
-        outputDirectory = await FilePicker.platform.getDirectoryPath(
+        outputDirectory = await FilePicker.getDirectoryPath(
           dialogTitle: AppLocalizations.of(context)!.selectDBExportLocation,
         );
       }
@@ -423,7 +423,7 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
   Future<void> _importDatabase() async {
     try {
       final dbHelper = DatabaseHelper();
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['zip'],
       );
@@ -614,8 +614,8 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                                         'resolveCustomPath', pickedBookmark);
                                   }
                                 } else {
-                                  directoryPath = await FilePicker.platform
-                                      .getDirectoryPath(
+                                  directoryPath =
+                                      await FilePicker.getDirectoryPath(
                                     dialogTitle: AppLocalizations.of(context)!
                                         .selectCustomDBLocation,
                                   );
