@@ -168,18 +168,6 @@
                 "type": "bool"
             },
             {
-                "hidden": false,
-                "id": "number4019482521",
-                "max": null,
-                "min": null,
-                "name": "query_id",
-                "onlyInt": false,
-                "presentable": false,
-                "required": false,
-                "system": false,
-                "type": "number"
-            },
-            {
                 "autogeneratePattern": "",
                 "hidden": false,
                 "id": "text4199597090",
@@ -229,6 +217,19 @@
                 "type": "relation"
             },
             {
+                "cascadeDelete": false,
+                "collectionId": "pbc_2414388848",
+                "hidden": false,
+                "id": "relation4019482521",
+                "maxSelect": 1,
+                "minSelect": 0,
+                "name": "query_id",
+                "presentable": false,
+                "required": false,
+                "system": false,
+                "type": "relation"
+            },
+            {
                 "hidden": false,
                 "id": "autodate2990389176",
                 "name": "created",
@@ -249,7 +250,9 @@
                 "type": "autodate"
             }
         ],
-        "indexes": [],
+        "indexes": [
+            "CREATE UNIQUE INDEX `idx_0w5ODLoyvp` ON `articles` (\n  `sync_id`,\n  `user`\n)"
+        ],
         "system": false
     },
     {
