@@ -27,8 +27,9 @@ class LogsService {
         print(
             '${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}');
         if (record.error != null) print('Error: ${record.error}');
-        if (record.stackTrace != null)
+        if (record.stackTrace != null) {
           print('Stacktrace: ${record.stackTrace}');
+        }
       }
     });
   }
@@ -48,15 +49,16 @@ class LogsService {
         buffer.writeln(
             '${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}');
         if (record.error != null) buffer.writeln('Error: ${record.error}');
-        if (record.stackTrace != null)
+        if (record.stackTrace != null) {
           buffer.writeln('Stacktrace: ${record.stackTrace}');
+        }
         buffer.writeln();
       }
 
       final Uint8List logBytes =
           Uint8List.fromList(buffer.toString().codeUnits);
 
-      final String? outputPath = await FilePicker.platform.saveFile(
+      final String? outputPath = await FilePicker.saveFile(
         dialogTitle: AppLocalizations.of(context)!.selectLogsLocation,
         fileName: 'wispar_logs.txt',
         bytes: logBytes,
@@ -88,8 +90,9 @@ class LogsService {
         buffer.writeln(
             '${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}');
         if (record.error != null) buffer.writeln('Error: ${record.error}');
-        if (record.stackTrace != null)
+        if (record.stackTrace != null) {
           buffer.writeln('Stacktrace: ${record.stackTrace}');
+        }
         buffer.writeln();
       }
 
