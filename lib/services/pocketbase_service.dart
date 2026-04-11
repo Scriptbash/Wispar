@@ -39,6 +39,20 @@ class PocketBaseService {
 
     _client = PocketBase(savedUrl, authStore: store);
     _isInitialized = true;
+
+    await refreshAuth();
+  }
+
+  Future<void> refreshAuth() async {
+    if (client.authStore.isValid) {
+      try {
+        await client.collection('users').authRefresh();
+      } catch (e) {
+        if (e is ClientException && e.statusCode != 0) {
+          client.authStore.clear();
+        }
+      }
+    }
   }
 
   Future<RecordAuth> register(String email, String password) async {
