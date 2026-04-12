@@ -1,0 +1,544 @@
+{
+    "welcomeWispar": "Wispar에 오신 것을 환영합니다!",
+    "appDescription": "과학 문헌의 최신 동향을 파악할 수 있는 오픈소스 앱입니다. 지금 바로 시작해 보세요!",
+    "institutionalAccess": "기관용 액세스",
+    "setupInstitutionalAccess": "기관 접속 설정",
+    "setupInstitutionalAccessLong": "소속 기관의 EZproxy를 선택하여 해당 기관의 학술지 구독 콘텐츠에 접속하세요. 이렇게 하면 VPN이나 온프레미스 접속이 필요하지 않습니다.",
+    "setupSelectInstitution": "소속 기관 선택",
+    "setupSelectedInstitution": "선택하신 항목:",
+    "setupLinkZotero": "Zotero 링크",
+    "setupZoteroLong": "논문을 Zotero 라이브러리로 바로 전송하세요. 선택한 컬렉션에 추가됩니다.",
+    "setupLinkMyZotero": "Zotero 계정 연결",
+    "setupOtherSettings": "기타 설정",
+    "setupOtherSettingsLong": "앱의 설정 메뉴에서 추가 설정을 확인할 수 있습니다. 홈 화면에서 오른쪽 상단의 점 세 개 메뉴를 탭하여 설정 메뉴로 이동하세요.",
+    "setupAlmostSet": "이제 다 됐습니다!… 거의 다 됐네요!",
+    "setupAlmostSetLong": "다음으로, 즐겨찾는 저널을 구독할 수 있는 검색 화면으로 이동하겠습니다. 카테고리 메뉴를 '논문'에서 '저널'로 변경하는 것을 잊지 마세요.",
+    "skip": "건너뛰기",
+    "getStarted": "시작하기",
+    "notifications": "알림",
+    "notifPermsGranted": "권한 승인됨",
+    "notifPermsNotGranted": "권한이 부여되지 않았습니다",
+    "openAppSettings": "설정 열기",
+    "notificationSettingsMessage": "알림 기능은 기본적으로 비활성화되어 있습니다. 알림을 활성화하려면 앱의 알림 설정으로 이동하세요.",
+    "notificationContent": "새로운 기사가 추가되었습니다!",
+    "notificationTitleJournal": "저널 목록이 업데이트되었습니다",
+    "notificationTitleQuery": "쿼리가 업데이트되었습니다",
+    "numberPublications": "{count, plural, =0{게재된 논문 없음} =1{게재된 논문 1편} other{게재된 논문 {count}편}}",
+    "@numberPublications": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "showPublicationCount": "게재 논문 수 표시",
+    "selectFeed": "피드 선택",
+    "createCustomFeed": "나만의 피드 만들기",
+    "done": "완료",
+    "edit": "편집",
+    "clearAll": "모두 지우기",
+    "selectAll": "모두 선택",
+    "select": "선택",
+    "customizeFeed": "피드 맞춤 설정",
+    "feedName": "피드 이름",
+    "followedJournals": "구독 중인 저널",
+    "moreJournals": "더 많은 저널",
+    "includeKeywords": "키워드 포함",
+    "excludeKeywords": "키워드 제외",
+    "typePressSpace": "단어를 입력하고 스페이스 바를 누르세요…",
+    "errorFeedNameEmpty": "피드 이름을 입력해 주세요",
+    "errorFeedNameAlreadyExists": "이 이름의 피드가 이미 존재합니다",
+    "errorSelectOneJournal": "저널을 하나 이상 선택하세요",
+    "home": "홈",
+    "@home": {
+        "description": "The home menu button and the app bar title when in the home screen."
+    },
+    "favorites": "즐겨찾기",
+    "@favorites": {
+        "description": "The favorites menu button and the app bar title when in the favorites screen."
+    },
+    "download": "다운로드",
+    "@download": {
+        "description": "The verb to download, without the 'to'."
+    },
+    "delete": "삭제",
+    "downloads": "다운로드",
+    "@downloads": {
+        "description": "The downloads menu button and the app bar title when in the downloads screen."
+    },
+    "downloadSuccessful": "논문이 성공적으로 다운로드되었습니다!",
+    "downloadDeleted": "해당 글이 삭제되었습니다!",
+    "noDownloads": "다운로드한 항목이 없습니다.",
+    "settings": "설정",
+    "@settings": {
+        "description": "The settings option menu button and the app bar title when in the settings screen."
+    },
+    "journalLibraryEmpty": "현재 구독 중인 저널이 없습니다. 검색 메뉴를 사용하여 저널을 찾고 구독하세요.",
+    "@journalLibraryEmpty": {
+        "description": "Message shown when the user is not following any journals."
+    },
+    "follow": "팔로우하기",
+    "@follow": {
+        "description": "The button text shown on journal cards when it is not followed."
+    },
+    "unfollow": "구독 취소",
+    "@unfollow": {
+        "description": "The button text shown on journal cards when it is followed."
+    },
+    "library": "도서관",
+    "@library": {
+        "description": "The library menu button and the app bar title when in the library screen."
+    },
+    "journals": "학술지",
+    "@journals": {
+        "description": "The journals menu button and the app bar title when in the journals screen."
+    },
+    "queries": "검색어",
+    "@queries": {
+        "description": "Title of the saved search queries tab."
+    },
+    "search": "검색",
+    "@search": {
+        "description": "Text shown inside the search screen app bar and for the seach button."
+    },
+    "searchPlaceholder": "검색…",
+    "@searchPlaceholder": {
+        "description": "Place holder text in the search input widget."
+    },
+    "filter": "출판물 카드 필터링",
+    "filterResultsEmpty": "필터 조건에 맞는 출판물이 없습니다",
+    "filterDownloads": "다운로드 필터",
+    "filterFavorites": "즐겨찾기 필터",
+    "emptyDOIError": "DOI를 입력해 주세요",
+    "searchByQuery": "검색어 입력",
+    "searchOpenAlex": "OpenAlex (추천)",
+    "source": "출처: {search_provider}",
+    "everything": "모든 것",
+    "titleAndAbstract": "제목 및 초록",
+    "title": "제목",
+    "searchIn": "검색",
+    "addKeyword": "키워드 추가",
+    "enterKeyword": "키워드 입력",
+    "displayName": "표시 이름",
+    "citedByCount": "인용 횟수",
+    "worksCount": "작품 수",
+    "publicationDate": "발행일",
+    "publishedAfter": "발행일:",
+    "publishedBefore": "이전에 게시됨",
+    "publishedBetween": "발행 기간:",
+    "noFilter": "필터 없음",
+    "issnFilter": "ISSN 필터",
+    "openAccessOnly": "오픈 액세스 전용",
+    "selectStartDate": "시작 날짜 선택",
+    "selectEndDate": "종료일 선택",
+    "queryPreview": "쿼리 미리보기:",
+    "searchByDOI": "DOI로 검색",
+    "searchByTopic": "주제별 검색",
+    "searchByTitle": "제목으로 검색",
+    "searchByISSN": "ISSN으로 검색",
+    "queryHasNoNameError": "검색어를 저장하려면 검색어 이름을 입력해야 합니다.",
+    "emptySearchQuery": "검색어를 입력해 주세요",
+    "journalSearchError": "저널을 검색하는 과정에서 오류가 발생했습니다.",
+    "selectTopicFirst": "먼저 주제를 선택하세요!",
+    "moreOptions": "더 많은 옵션",
+    "saveQuery": "이 검색어 저장",
+    "queryName": "쿼리 이름",
+    "includeInFeed": "피드에 포함",
+    "dateSaved": "저장 날짜",
+    "articles": "기사",
+    "@articles": {
+        "description": "As in scientific articles."
+    },
+    "category": "카테고리",
+    "publisher": "출판사",
+    "publisherWithValue": "발행처: {name}",
+    "publishedin": "게재지",
+    "subjects": "주제",
+    "latestpublications": "최신 간행물",
+    "authors": "저자",
+    "publishedon": "{date}에 게시됨",
+    "@publishedon": {
+        "placeholders": {
+            "date": {
+                "type": "DateTime",
+                "format": "yMMMMd"
+            }
+        }
+    },
+    "abstract": "초록",
+    "graphicalAbstract": "그래픽 요약",
+    "copy": "복사",
+    "copydoi": "DOI 복사",
+    "copyAbstract": "초록 복사",
+    "copyTitle": "제목 복사",
+    "copyUrl": "URL 복사",
+    "copiedToClipboard": "클립보드에 복사되었습니다!",
+    "doicopied": "DOI가 클립보드에 복사되었습니다",
+    "@doicopied": {
+        "description": "Snackbar shown when the Copy DOI button is pressed."
+    },
+    "issnCopied": "ISSN이 클립보드에 복사되었습니다",
+    "apiQueryCopied": "API 요청이 클립보드에 복사되었습니다",
+    "viewarticle": "기사 보기",
+    "articleViewer": "논문 뷰어",
+    "openExternalBrowser": "외부 브라우저에서 열기",
+    "errorOpenExternalBrowser": "다른 브라우저에서 링크를 열 수 없습니다",
+    "openExternalApp": "외부 앱에서 열기",
+    "errorOpenExternalPdfApp": "다른 앱에서 PDF 파일을 열 수 없습니다",
+    "favorite": "즐겨찾기",
+    "favoriteadded": "즐겨찾기에 추가됨",
+    "@favoriteadded": {
+        "description": "Snackbar shown when an article is added to the user's favorites."
+    },
+    "favoriteremoved": "즐겨찾기에서 삭제됨",
+    "@favoriteremoved": {
+        "description": "Snackbar shown when an article is removed from the user's favorites."
+    },
+    "abstractunavailable": "초록을 확인할 수 없습니다. 출판사가 Crossref에 초록을 제공하지 않습니다. 전문은 여전히 이용 가능할 것입니다.",
+    "@abstractunavailable": {
+        "description": "Text shown in the place of the abstract when it is unavailable."
+    },
+    "searchresults": "검색 결과",
+    "noresultsfound": "결과가 없습니다.",
+    "noSavedQueries": "저장된 검색 조건 없음.",
+    "noFavorites": "즐겨찾기에 저장된 논문이 없습니다. 마음에 드는 논문 카드의 하트 아이콘을 눌러 즐겨찾기에 추가하세요!",
+    "@noFavorites": {
+        "description": "The message shown when the user has no articles in their favorites."
+    },
+    "apiSettings": "API 설정",
+    "openAlexApiKey": "OpenAlex API 키",
+    "openAlexApiKeyDesc": "OpenAlex의 API에 접근하려면 무료 API 키가 필요합니다. 키가 없어도 요청이 처리될 수는 있지만, 요청 제한을 피하고 안정성을 보장하기 위해 키를 사용하는 것을 강력히 권장합니다.",
+    "openAlexNoApiKey": "OpenAlex API 키가 설정되어 있지 않습니다. 서비스 중단을 방지하려면 설정에서 API 키를 추가해 주십시오.",
+    "display": "표시",
+    "displaySettings": "디스플레이 설정",
+    "appearance": "외관",
+    "theme": "테마",
+    "light": "밝은 테마",
+    "dark": "어두운 테마",
+    "systemtheme": "시스템 테마",
+    "system": "시스템",
+    "pdfTheme": "PDF 뷰어 테마",
+    "pdfReadingOrientation": "PDF 읽기 방향",
+    "vertical": "Vertical",
+    "horizontal": "가로",
+    "publicationCard": "게재 정보 카드",
+    "publicationCardSettings": "게재 정보 카드 설정",
+    "gestures": "제스처",
+    "infoDisplayOnCards": "출판물 카드에 표시되는 정보",
+    "none": "없음",
+    "addToFavorites": "즐겨찾기에 추가",
+    "hidePublication": "게시물 숨기기",
+    "swipeLeftAction": "왼쪽으로 스와이프 동작",
+    "swipeRightAction": "오른쪽으로 스와이프",
+    "showAllAbstracts": "모든 초록 보기",
+    "hideMissingAbstracts": "누락된 초록 숨기기",
+    "hideAllAbstracts": "모든 초록 숨기기",
+    "licenseInfo": "라이선스 정보",
+    "optionsMenu": "옵션 메뉴",
+    "favoriteButton": "즐겨찾기 버튼",
+    "unpaywallarticle": "이 기사는 Unpaywall을 통해 제공되었습니다",
+    "@unpaywallarticle": {
+        "description": "Snackbar shown when an article was fetched from Unpaywall."
+    },
+    "unpaywallArticleAvailable": "Unpaywall을 통해 기사 이용 가능",
+    "unpaywallChoicePrompt": "이 기사는 Unpaywall을 통해 이용하실 수 있습니다. 어떻게 진행하시겠습니까?",
+    "useUnpaywall": "Unpaywall을 통해 열기",
+    "goToWebsite": "웹사이트로 이동",
+    "forwardedproxy": "소속 기관의 프록시를 통해 전달됨",
+    "@forwardedproxy": {
+        "description": "Snackbar shown when a request is intercepted and sent through the user's institution EZproxy."
+    },
+    "proxySuccess": "프록시 연결에 성공했습니다",
+    "proxyFailure": "프록시 연결에 실패했습니다",
+    "proxyLogin": "이곳은 로그인 페이지입니다",
+    "editKnownUrl": "알려진 URL 편집",
+    "addKnownUrl": "알려진 URL 추가",
+    "redirectsSuccessfully": "리디렉션 성공",
+    "failsToRedirect": "리디렉션 실패",
+    "loginPage": "로그인 페이지",
+    "manageUrlsAndRedirect": "URL 및 리디렉션 상태 관리",
+    "selectinstitution": "소속 기관 선택",
+    "sort": "정렬",
+    "sortby": "정렬 기준",
+    "sortorder": "정렬 순서",
+    "followingsince": "{date}에서 팔로우 중",
+    "@followingsince": {
+        "placeholders": {
+            "date": {
+                "type": "DateTime",
+                "format": "yMMMMd"
+            }
+        }
+    },
+    "lastUpdatedMinutes": "{minutes, plural, one{마지막 업데이트: 1분 전} other{마지막 업데이트: {minutes}분 전}}",
+    "@lastUpdatedMinutes": {
+        "placeholders": {
+            "minutes": {
+                "type": "int"
+            }
+        }
+    },
+    "lastUpdatedHours": "{hours, plural, one{마지막 업데이트 1시간 전} other{마지막 업데이트 {hours}시간 전}}",
+    "@lastUpdatedHours": {
+        "placeholders": {
+            "hours": {
+                "type": "int"
+            }
+        }
+    },
+    "lastUpdatedDays": "{days, plural, one{마지막 업데이트: 1일 전} other{마지막 업데이트: {days}일 전}}",
+    "@lastUpdatedDays": {
+        "placeholders": {
+            "days": {
+                "type": "int"
+            }
+        }
+    },
+    "pendingUpdate": "업데이트 예정",
+    "journaltitle": "저널명",
+    "followingdate": "다음 날짜",
+    "ascending": "오름차순",
+    "descending": "내림차순",
+    "articletitle": "기사 제목",
+    "firstauthfamname": "제1저자 성",
+    "datepublished": "게시일",
+    "dateaddedtofavorites": "즐겨찾기에 추가된 날짜",
+    "addedtoyourfav": "{date}에서 즐겨찾기에 추가됨",
+    "@addedtoyourfav": {
+        "placeholders": {
+            "date": {
+                "type": "DateTime",
+                "format": "yMMMMd"
+            }
+        }
+    },
+    "noinstitution": "소속 기관 없음",
+    "buildingfeed": "피드를 불러오는 중입니다. 잠시만 기다려 주세요…",
+    "fetchingArticleFromJournal": "{journalName}에서 논문 가져오기.",
+    "noPublicationFound": "검색된 출판물이 없습니다.",
+    "failLoadMorePublication": "더 많은 간행물을 불러오지 못했습니다.",
+    "homeFeedEmpty": "현재 게시된 콘텐츠가 없습니다. 저널을 하나 이상 구독하면 게시물 카드가 추가됩니다.",
+    "@homeFeedEmpty": {
+        "description": "The message shown when the feed in the home screen is empty."
+    },
+    "sharedMessage": "Wispar 앱을 통해 공유됨",
+    "@sharedMessage": {
+        "description": "Default sharing text."
+    },
+    "shareArticle": "기사 공유",
+    "hiddenArticles": "숨겨진 출판물",
+    "noHiddenArticles": "숨겨진 논문 없음",
+    "hideArticle": "이 간행물 숨기기",
+    "viewHiddenArticles": "숨겨진 간행물 보기",
+    "unhideArticle": "이 간행물 숨김 해제",
+    "sendToZotero": "Zotero로 보내기",
+    "zoteroError": "Zotero로 기사를 전송할 수 없습니다. 자세한 내용은 로그를 확인해 주세요.",
+    "zoteroSettings": "Zotero 설정",
+    "zoteroPermissions1": "Wispar의 연동 기능을 이용하려면 Zotero 계정에 대한 읽기 및 쓰기 권한이 필요합니다.",
+    "zoteroPermissions2": "새로운 Zotero API 키를 생성할 때는 \"라이브러리 액세스 허용\"과 \"쓰기 액세스 허용\"을 모두 선택해야 합니다.",
+    "zoteroPermissions3": "API 키가 생성되면 해당 값을 복사하여 아래 텍스트 입력란에 붙여넣으세요.",
+    "zoteroCreateKey": "새 API 키 생성",
+    "zoteroEnterKey": "API 키 입력",
+    "@zoteroEnterKey": {
+        "description": "Hint text shown in the text field where users can enter their Zotero API key."
+    },
+    "zoteroValidKey": "API 키가 저장되었습니다!",
+    "@zoteroValidKey": {
+        "description": "Snackbar shown when a valid Zotero API key has been saved."
+    },
+    "zoteroInvalidKey": "API 키가 유효하지 않습니다!",
+    "@zoteroInvalidKey": {
+        "description": "Snackbar shown when an attempt to save an invalid Zotero API key is made."
+    },
+    "zoteroApiKeyEmpty": "Zotero API 키가 아직 설정되지 않았습니다. 앱 설정에서 API 키를 구성해 주세요.",
+    "zoteroArticleSent": "이 기사가 Zotero로 전송되었습니다.",
+    "zoteroSpecificCollection": "항상 특정 컬렉션으로 보내기",
+    "zoteroSelectCollection": "컬렉션 선택",
+    "noZoteroCollectionSelected": "선택된 컬렉션이 없습니다",
+    "zoteroSpecificCollection2": "항상 이 컬렉션으로 보내기",
+    "zoteroNewCollection": "새로운 컬렉션",
+    "zoteroCollectionName": "컬렉션 이름",
+    "create": "만들기",
+    "send": "보내기",
+    "save": "저장",
+    "savedOn": "{date}에 저장됨",
+    "@savedOn": {
+        "placeholders": {
+            "date": {
+                "type": "DateTime",
+                "format": "yMMMMd"
+            }
+        }
+    },
+    "zoomOut": "축소",
+    "zoomIn": "확대",
+    "goToFirstPage": "첫 페이지로 이동",
+    "goToLastPage": "마지막 페이지로 이동",
+    "nextMatch": "다음 결과",
+    "previousMatch": "이전 결과",
+    "sourceCode": "소스 코드",
+    "reportIssue": "문제 신고",
+    "enabled": "사용 가능",
+    "disabled": "사용 불가",
+    "database": "데이터베이스",
+    "databaseSettings": "데이터베이스 설정",
+    "concurrentFetches": "동시 API 요청: {number}",
+    "scrapeAbstracts": "누락된 초록 수집",
+    "cachedArticleRetentionDays": "캐시된 기사 보존 기간 (일)",
+    "cachedArticleRetentionDaysDesc": "캐시된 기사를 보관할 일수를 설정하세요. 지정된 기간이 지난 기사는 PDF 및 그래픽 초록과 함께 데이터베이스에서 삭제됩니다. 즐겨찾기, 다운로드한 PDF, 숨겨진 기사는 삭제되지 않습니다. 값을 0으로 설정하면 정리 기능이 비활성화되지만, 고아 파일은 여전히 삭제됩니다.",
+    "cleanupIntervalHint": "일수 입력 (1~365일)",
+    "apiFetchInterval": "API 가져오기 간격",
+    "apiFetchIntervalHint": "기사 가져오기 빈도 선택",
+    "cleanupIntervalInvalidNumber": "유효한 일수를 입력해 주세요.",
+    "cleanupIntervalNumberNotBetween": "1에서 365 사이의 숫자를 입력해 주세요.",
+    "databaseNotFound": "데이터베이스 파일을 찾을 수 없습니다.",
+    "storagePermissionDenied": "권한이 거부되었습니다.",
+    "databaseExported": "데이터베이스 내보내기가 성공적으로 완료되었습니다!",
+    "databaseExportFailed": "데이터베이스 내보내기에 실패했습니다.",
+    "selectDBExportLocation": "데이터베이스를 내보낼 위치를 선택하십시오.",
+    "exportDatabase": "데이터베이스 내보내기",
+    "exportingDatabase": "데이터베이스 내보내기 중입니다. 잠시만 기다려 주십시오.",
+    "importDatabase": "데이터베이스 가져오기",
+    "importingDatabase": "데이터베이스 불러오는 중입니다. 잠시만 기다려 주세요.",
+    "databaseImportFailed": "데이터베이스 가져오기에 실패했습니다.",
+    "databaseImported": "데이터베이스 가져오기가 성공적으로 완료되었습니다!",
+    "customDatabaseLocation": "사용자 지정 데이터베이스 위치",
+    "selectCustomDBLocation": "데이터베이스 파일을 저장할 위치를 선택하십시오",
+    "currentDBLocation": "현재 위치: {path}",
+    "movingDatabase": "데이터베이스 파일을 이동 중입니다. 잠시만 기다려 주십시오.",
+    "databaseMoved": "데이터베이스 파일이 성공적으로 이동되었습니다!",
+    "databaseMoveFailed": "데이터베이스 파일을 이동할 수 없음: {error}",
+    "databaseConflictTitle": "기존 Wispar 데이터가 발견되었습니다.",
+    "databaseConflictMessage": "선택한 폴더에서 Wispar 데이터가 발견되었습니다. 기존 파일을 그대로 사용할까요, 아니면 현재 데이터베이스로 덮어쓸까요?",
+    "useExistingFiles": "기존 파일 사용",
+    "overwriteFiles": "현재 데이터베이스로 덮어쓰기",
+    "overrideUserAgent": "사용자 에이전트 재정의",
+    "customUserAgent": "사용자 지정 사용자 에이전트",
+    "language": "언어",
+    "saveSettings": "설정 저장",
+    "settingsSaved": "설정이 성공적으로 저장되었습니다!",
+    "privacyPolicy": "개인정보 처리방침",
+    "about": "소개",
+    "madeBy": "{app_author} 제작",
+    "donate": "기부하기",
+    "donateMessage": "Wispar 개발을 후원해 주세요",
+    "@donateMessage": {
+        "description": "Text shown in the subtitle of the Donate button in the settings."
+    },
+    "otherLicense": "기타 라이선스",
+    "unknownLicense": "라이선스 미상",
+    "hours": "시간",
+    "failedLoadMoreResults": "더 많은 결과를 불러오지 못했습니다. 로그를 확인하고 GitHub에 문제를 보고해 주시기 바랍니다.",
+    "errorOccured": "오류가 발생했습니다. 로그를 확인하시고 GitHub에 문제를 보고해 주시기 바랍니다.",
+    "logs": "로그",
+    "viewLogs": "로그 보기",
+    "deleteLogs": "로그 삭제",
+    "logsDeleted": "로그가 삭제되었습니다!",
+    "logsUnavailable": "로그가 제공되지 않습니다.",
+    "logCopied": "로그가 클립보드에 복사되었습니다!",
+    "saveLogs": "로그 저장",
+    "selectLogsLocation": "로그를 저장할 위치를 선택하십시오.",
+    "logsExportedSuccessfully": "로그를 성공적으로 저장했습니다!",
+    "logsExportedError": "로그를 저장할 수 없습니다.",
+    "shareLogs": "로그 공유",
+    "translate": "번역",
+    "noAiApiKeySetError": "AI API 키가 설정되어 있지 않습니다. 설정으로 이동하여 키를 구성해 주세요.",
+    "translationFailed": "번역 실패",
+    "showTranslation": "번역 보기",
+    "showOriginal": "원문 보기",
+    "swapLanguages": "언어 변경",
+    "cancel": "취소",
+    "aiSettings": "AI 설정",
+    "hideAiFeatures": "모든 AI 기능 숨기기",
+    "aiProvider": "AI 제공업체",
+    "pleaseSelectProvider": "제공업체를 선택해 주세요",
+    "apiKeyLabel": "{providerName} API 키",
+    "pleaseEnterAiAPIKey": "{providerName}용 API 키를 입력해 주세요",
+    "overrideBaseUrl": "기본 URL 재정의",
+    "customBaseUrl": "사용자 지정 기본 URL",
+    "pleaseEnterBaseUrl": "기본 URL을 입력해 주세요",
+    "invalidUrl": "잘못된 URL",
+    "modelNameLabel": "{provider} 모델 이름 입력",
+    "pleaseEnterModelName": "{provider} 모델명을 입력해 주세요.",
+    "aiTemperature": "온도",
+    "aiCustomPrompts": "사용자 지정 번역 프롬프트",
+    "aiCustomPromptsDescription": "$src와 $dst는 원문 언어와 대상 언어를, $text는 번역할 텍스트를 나타냅니다. 예시: 다음 텍스트를 $src에서 $dst로 번역하세요: $text",
+    "prompt": "프롬프트",
+    "missingPlaceholders": "누락된 자리 표시자: {placeholders}",
+    "pdfNotReadyForChat": "PDF가 채팅 준비가 되지 않았습니다. 잠시 기다리시거나 다시 시도해 주세요.",
+    "chatWithPdf": "PDF와 대화하기",
+    "typeYourMessage": "메시지를 입력하세요…",
+    "askAboutPdf": "안녕하세요! 이 PDF에 대해 이야기할 준비가 되었습니다. 어떤 내용을 알고 싶으신가요, 아니면 요약해 드릴까요? PDF와 대화하는 데는 토큰이 많이 소모된다는 점을 유의해 주세요!",
+    "pdfNotFound": "PDF 파일을 찾을 수 없습니다.",
+    "apiTokenMissing": "설정에서 {aiModel}의 API 키가 누락되었습니다. 설정해 주십시오.",
+    "@apiTokenMissing": {
+        "placeholders": {
+            "aiModel": {
+                "type": "String"
+            }
+        }
+    },
+    "noResponseFromAI": "AI로부터 응답을 받지 못했습니다.",
+    "errorConnectingToAI": "AI({statusCode})에 연결하는 중 오류가 발생했습니다. 인터넷 연결 또는 API 설정을 확인해 주십시오.",
+    "@errorConnectingToAI": {
+        "placeholders": {
+            "statusCode": {
+                "type": "int"
+            }
+        }
+    },
+    "networkError": "네트워크 오류 또는 AI 서비스와의 통신 문제.",
+    "pdfDownloadOptionsTitle": "PDF 다운로드 옵션",
+    "openInExternalPdfViewer": "외부 PDF 뷰어에서 열기",
+    "openInExternalPdfViewerSubtitle": "기기의 기본 브라우저나 PDF 앱에서 PDF를 열어보세요.",
+    "downloadingFile": "파일 다운로드 중…",
+    "downloadFailedInAppViewer": "앱 내에서 파일을 열 수 없습니다. 웹사이트의 PDF 다운로드 버튼을 이용하거나 외부 PDF 뷰어 옵션을 선택해 보십시오.",
+    "errorOpeningFile": "파일을 열 수 없습니다.",
+    "downloadStarting": "다운로드 중입니다.",
+    "downloadFoundPdf": "검색된 PDF 다운로드",
+    "downloadToApp": "앱에서 다운로드",
+    "downloadToAppSubtitle": "Wispar 내에서 PDF를 직접 다운로드하고 열람하여 더 원활한 통합을 경험해 보세요.",
+    "loginToSyncDevices": "기기 간 동기화를 위해 로그인하세요",
+    "syncLongDescription": "Wispar는 여러 기기에서 데이터를 일관되게 유지할 수 있도록 선택적 동기화 서비스를 제공합니다. Wispar Sync(개인정보 처리방침 참조)를 사용하거나, 데이터를 완전히 제어하기 위해 자체 호스팅을 설정할 수 있습니다(문서 참조). 동기화 과정을 건너뛰고 계속 진행할 수도 있습니다.",
+    "documentation": "문서",
+    "cloudSync": "클라우드 동기화",
+    "selfHosted": "자체 호스팅",
+    "syncNow": "지금 동기화하기",
+    "syncing": "동기화 중...",
+    "lastSync": "마지막 동기화: {time}",
+    "backgroundSync": "백그라운드 동기화",
+    "backgroundSyncDescription": "이 기능이 활성화되어 있으면 앱 사용 중에 자동으로 동기화가 이루어집니다.",
+    "authFailed": "인증 실패: {error}",
+    "accountAlreadyExists": "이 계정은 이미 존재합니다.",
+    "pleaseEnterEmail": "이메일을 입력해 주세요.",
+    "pleaseEnterValidEmail": "유효한 이메일 주소를 입력해 주세요.",
+    "pleaseEnterPassword": "비밀번호를 입력해 주세요.",
+    "passwordTooShort": "비밀번호는 8자 이상이어야 합니다.",
+    "checkdetailAndTryAgain": "정보를 확인한 후 다시 시도해 주세요.",
+    "invalidEmailOrPassword": "이메일 또는 비밀번호가 잘못되었습니다.",
+    "cantConnectServer": "서버에 연결할 수 없습니다.",
+    "forgotPassword": "비밀번호를 잊으셨나요?",
+    "passwordResetSent": "비밀번호 재설정 이메일이 발송되었습니다! 수신함 및 스팸 폴더를 확인해 주세요.",
+    "deleteAccountFailed": "계정 삭제 실패: {error}",
+    "syncFailed": "동기화 실패: {e}",
+    "syncSuccess": "동기화가 성공적으로 완료되었습니다!",
+    "login": "로그인",
+    "userIsLoggedIn": "로그인이 완료되었습니다! 귀하의 데이터는 계속 동기화됩니다.",
+    "logout": "로그아웃",
+    "user": "사용자: {name}",
+    "syncServer": "싱크 서버: {address}",
+    "serverUrl": "서버 URL",
+    "checkEmail": "이메일을 확인해 주세요.",
+    "checkEmailDescription": "확인 링크가 발송되었습니다. 로그인하기 전에 계정을 확인해 주세요.",
+    "emailNotVerifiedError": "동기화하기 전에 이메일 주소를 확인해 주세요.",
+    "waitResendEmail": "이메일을 다시 보내려면 {cooldown}초 동안 기다려 주세요.",
+    "resendEmail": "인증 이메일 다시 보내기",
+    "close": "닫기",
+    "email": "이메일",
+    "password": "비밀번호",
+    "signUp": "가입하기",
+    "haveAnAccount": "계정이 있으신가요? 로그인",
+    "needAnAccount": "계정이 필요하신가요? 가입하기",
+    "deleteCloudAccount": "클라우드 계정 삭제",
+    "deleteAccountQmark": "계정을 영구적으로 삭제하시겠습니까?",
+    "deleteAccountExplanation": "이 작업을 수행하면 계정과 클라우드 데이터가 영구적으로 삭제됩니다. 이 기기에 저장된 로컬 데이터는 그대로 유지됩니다.",
+    "accountAndDataDeleted": "계정 및 클라우드 데이터 삭제됨"
+}
