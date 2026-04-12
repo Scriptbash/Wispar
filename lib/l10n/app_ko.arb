@@ -23,7 +23,7 @@
     "notificationContent": "새로운 기사가 추가되었습니다!",
     "notificationTitleJournal": "저널 목록이 업데이트되었습니다",
     "notificationTitleQuery": "쿼리가 업데이트되었습니다",
-    "numberPublications": "{count, 복수형, =0{게재된 논문 없음} =1{게재된 논문 1편} 기타{게재된 논문 {count}편}}",
+    "numberPublications": "{count, plural, =0{게재된 논문 없음} =1{게재된 논문 1편} other{게재된 논문 {count}편}}",
     "@numberPublications": {
         "placeholders": {
             "count": {}
@@ -104,7 +104,7 @@
         "description": "Place holder text in the search input widget."
     },
     "filter": "출판물 카드 필터링",
-    "filterResultsEmpty": "필터 조건에 맞는 출판물이 없습니다.",
+    "filterResultsEmpty": "필터 조건에 맞는 출판물이 없습니다",
     "filterDownloads": "다운로드 필터",
     "filterFavorites": "즐겨찾기 필터",
     "emptyDOIError": "DOI를 입력해 주세요",
@@ -171,12 +171,12 @@
     "copyTitle": "제목 복사",
     "copyUrl": "URL 복사",
     "copiedToClipboard": "클립보드에 복사되었습니다!",
-    "doicopied": "DOI가 클립보드에 복사되었습니다.",
+    "doicopied": "DOI가 클립보드에 복사되었습니다",
     "@doicopied": {
         "description": "Snackbar shown when the Copy DOI button is pressed."
     },
     "issnCopied": "ISSN이 클립보드에 복사되었습니다",
-    "apiQueryCopied": "API 요청이 클립보드에 복사되었습니다.",
+    "apiQueryCopied": "API 요청이 클립보드에 복사되었습니다",
     "viewarticle": "기사 보기",
     "articleViewer": "논문 뷰어",
     "openExternalBrowser": "외부 브라우저에서 열기",
@@ -211,8 +211,8 @@
     "displaySettings": "디스플레이 설정",
     "appearance": "외관",
     "theme": "테마",
-    "light": "Light",
-    "dark": "Dark",
+    "light": "밝은 테마",
+    "dark": "어두운 테마",
     "systemtheme": "시스템 테마",
     "system": "시스템",
     "pdfTheme": "PDF 뷰어 테마",
@@ -234,7 +234,7 @@
     "licenseInfo": "라이선스 정보",
     "optionsMenu": "옵션 메뉴",
     "favoriteButton": "즐겨찾기 버튼",
-    "unpaywallarticle": "이 기사는 Unpaywall을 통해 제공되었습니다.",
+    "unpaywallarticle": "이 기사는 Unpaywall을 통해 제공되었습니다",
     "@unpaywallarticle": {
         "description": "Snackbar shown when an article was fetched from Unpaywall."
     },
@@ -268,7 +268,7 @@
             }
         }
     },
-    "lastUpdatedMinutes": "{분, 복수, 하나{마지막 업데이트: 1분 전} 기타{마지막 업데이트: {minutes}분 전}}",
+    "lastUpdatedMinutes": "{minutes, plural, one{마지막 업데이트: 1분 전} other{마지막 업데이트: {minutes}분 전}}",
     "@lastUpdatedMinutes": {
         "placeholders": {
             "minutes": {
@@ -276,7 +276,7 @@
             }
         }
     },
-    "lastUpdatedHours": "{시간, 복수형, 하나{마지막 업데이트: 1시간 전} 기타{마지막 업데이트: {hours}시간 전}}",
+    "lastUpdatedHours": "{hours, plural, one{마지막 업데이트 1시간 전} other{마지막 업데이트 {hours}시간 전}}",
     "@lastUpdatedHours": {
         "placeholders": {
             "hours": {
@@ -284,7 +284,7 @@
             }
         }
     },
-    "lastUpdatedDays": "{days, 복수형, one{마지막 업데이트: 1일 전} other{마지막 업데이트: {days}일 전}}",
+    "lastUpdatedDays": "{days, plural, one{마지막 업데이트: 1일 전} other{마지막 업데이트: {days}일 전}}",
     "@lastUpdatedDays": {
         "placeholders": {
             "days": {
@@ -451,7 +451,7 @@
     "aiProvider": "AI 제공업체",
     "pleaseSelectProvider": "제공업체를 선택해 주세요",
     "apiKeyLabel": "{providerName} API 키",
-    "pleaseEnterAiAPIKey": "{providerName}용 API 키를 입력해 주세요.",
+    "pleaseEnterAiAPIKey": "{providerName}용 API 키를 입력해 주세요",
     "overrideBaseUrl": "기본 URL 재정의",
     "customBaseUrl": "사용자 지정 기본 URL",
     "pleaseEnterBaseUrl": "기본 URL을 입력해 주세요",
@@ -529,7 +529,7 @@
     "checkEmail": "이메일을 확인해 주세요.",
     "checkEmailDescription": "확인 링크가 발송되었습니다. 로그인하기 전에 계정을 확인해 주세요.",
     "emailNotVerifiedError": "동기화하기 전에 이메일 주소를 확인해 주세요.",
-    "waitResendEmail": "이메일을 다시 보내려면 잠시 기다려 주십시오.",
+    "waitResendEmail": "이메일을 다시 보내려면 {cooldown}초 동안 기다려 주세요.",
     "resendEmail": "인증 이메일 다시 보내기",
     "close": "닫기",
     "email": "이메일",
