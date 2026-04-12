@@ -49,28 +49,42 @@ function HomepageHeader() {
 function AppStoreSection() {
   return (
     <section id="download" className={styles.appStores}>
-      <div className="container text--center">
-        <Heading as="h1">Get Wispar Now</Heading>
-        <div className={styles.storeButtons}>
+      <div className="container text--center" style={{ padding: '40px 0' }}>
+        <Heading as="h1" style={{ marginBottom: '30px' }}>Get Wispar Now</Heading>
+        <div className={styles.storeButtons} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '15px' }}>          
           <a href="https://play.google.com/store/apps/details?id=app.wispar.wispar">
             <img
-              src="/img/badges/play_store.png"
+              src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
               alt="Get it on Google Play"
-              style={{ height: '60px', marginRight: '10px', marginBottom: '14px' }}
-            />
-          </a>
-          <a href="https://f-droid.org/packages/app.wispar.wispar">
-            <img
-              src="/img/badges/f_droid.png"
-              alt="Download on F-Droid"
-              style={{ height: '90px', marginRight: '10px' }}
+              style={{ height: '50px' }}
             />
           </a>
           <a href="https://apps.apple.com/us/app/wispar/id6741366984">
             <img
-              src="/img/badges/app_store.svg"
+              src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
               alt="Download on the App Store"
-              style={{ width: '200px', marginRight: '10px', marginBottom: '14px', marginTop: '14px' }}
+              style={{ height: '50px' }}
+            />
+          </a>
+          <a href="https://f-droid.org/packages/app.wispar.wispar">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/9/96/%22Get_it_on_F-droid%22_Badge.png"
+              alt="Download on F-Droid"
+              style={{ height: '50px' }}
+            />
+          </a>
+          <a href="https://github.com/Scriptbash/Wispar/releases/latest">
+            <img 
+              src="https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white" 
+              alt="Download for Windows"
+              style={{ height: '50px', borderRadius: '8px' }}
+            />
+          </a>
+          <a href="https://github.com/Scriptbash/Wispar/releases/latest">
+            <img 
+              src="https://img.shields.io/badge/macOS-000000?style=flat&logo=apple&logoColor=white" 
+              alt="Download for macOS"
+              style={{ height: '50px', borderRadius: '8px' }}
             />
           </a>
         </div>

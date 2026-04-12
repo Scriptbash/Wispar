@@ -1,15 +1,19 @@
 ---
-sidebar_position: 6
+sidebar_position: 7
 ---
 
 # FAQ
 
 ## Do I need an account to use Wispar?
 
-No. Wispar does not require any kind of account. In fact, there is no account creation at all. Your data stays entirely in a local database on your device. An institutional account is only needed if you configure an institution in the EZproxy settings.
+No. Wispar is designed to be fully functional without an account. By default, all data (followed journals, favorites, settings, etc.) is stored locally on the device.
+
+Account creation is only required if the optional **Device Synchronization** feature is used. Users can choose between a hosted service (**Wispar Sync**) or a **Self-hosted** backend. In both cases, the account is only used to facilitate data mirroring across multiple devices.
+
+An institutional account is separate and only needed if an institution is configured in the EZproxy settings to access paywalled content.
 
 ## My institution is not available in the list of proxies. How can it be added?
 
-If your institution uses EZproxy, OpenAthens, or a similar proxy, it can be included by either submitting a pull request or opening an issue in the following GitHub repository: [ezproxy-db](https://github.com/tom5760/ezproxy-db)
+If an institution uses EZproxy, OpenAthens, or a similar proxy service and is missing from the list, it can be added by submitting a pull request or opening an issue in the following repository: [ezproxy-db](https://github.com/tom5760/ezproxy-db)
 
-Once the proxy is added to the repository, it will automatically become available in Wispar, since the proxy list is not cached.
+Once the proxy is added to that database, it becomes available in Wispar immediately, as the proxy list is fetched dynamically and not cached.
