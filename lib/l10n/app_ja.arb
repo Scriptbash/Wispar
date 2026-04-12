@@ -112,7 +112,7 @@
     "copyTitle": "論文名をコピー",
     "downloadToApp": "アプリ内でダウンロードする",
     "downloadStarting": "ダウンロード開始。",
-    "errorOpeningFile": "",
+    "errorOpeningFile": "ファイルを開くことができませんでした。",
     "aiSettings": "AIの設定",
     "graphicalAbstract": "グラフィカルアブストラクト",
     "translate": "訳して",
@@ -174,7 +174,7 @@
     "vertical": "Vertical",
     "addToFavorites": "お気に入りに追加",
     "sortby": "並べ替え",
-    "lastUpdatedMinutes": "{minutes, plural, one{最終更新：1分前} other{最終更新：{minutes}分前}}",
+    "lastUpdatedMinutes": "{minutes, plural, one{最終更新 1分前} other{最終更新 {minutes}分前}}",
     "@lastUpdatedMinutes": {
         "placeholders": {
             "minutes": {
@@ -207,7 +207,7 @@
     "password": "パスワード",
     "signUp": "登録する",
     "deleteAccountQmark": "アカウントを完全に削除しますか？",
-    "numberPublications": "{count, plural, =0{論文なし} =1{論文1件} other{{count}件}}",
+    "numberPublications": "{count, plural, =0{論文なし} =1{論文1件} other{論文{count}件}}",
     "@numberPublications": {
         "placeholders": {
             "count": {}
@@ -524,5 +524,21 @@
     "publisherWithValue": "発行元：{name}",
     "issnCopied": "ISSNがクリップボードにコピーされました",
     "apiQueryCopied": "APIリクエストがクリップボードにコピーされました",
-    "openExternalBrowser": "外部ブラウザで開く"
+    "openExternalBrowser": "外部ブラウザで開く",
+    "lastUpdatedDays": "{days, plural, one{最終更新 1日前} other{最終更新 {days}日前}}",
+    "@lastUpdatedDays": {
+        "placeholders": {
+            "days": {
+                "type": "int"
+            }
+        }
+    },
+    "lastUpdatedHours": "{hours, plural, one{最終更新 1時間前} other{最終更新 {hours}時間前}}",
+    "@lastUpdatedHours": {
+        "placeholders": {
+            "hours": {
+                "type": "int"
+            }
+        }
+    }
 }
