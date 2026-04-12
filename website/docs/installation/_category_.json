@@ -3,6 +3,6 @@
   "position": 2,
   "link": {
     "type": "generated-index",
-    "description": "Wispar can currently be installed on both Android and iOS devices."
+    "description": "Wispar can currently be installed on Android, iOS, Windows and MacOS devices. A Linux build is also available in the GitHub releases, but isn't packaged yet."
   }
 }
