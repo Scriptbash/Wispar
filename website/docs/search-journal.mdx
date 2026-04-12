@@ -1,0 +1,50 @@
+---
+sidebar_position: 4
+---
+
+# Searching for Journals
+
+Wispar makes it easy to discover new journals or find your favorites. To begin, navigate to the **Search** screen and ensure the **Journals** toggle is selected at the top.
+
+You can find journals using three different methods:
+
+## 1. Search by Topics
+This is the default mode and the best way to discover journals in your field. Wispar uses a hierarchical classification system to help you narrow down your interests.
+
+- **How it works:** Tap a broad **Field** (e.g., Physical Sciences) to reveal its **Subfields**. Continue tapping to drill down through up to four levels of specificity.
+- **Flexible Search:** You don't have to reach the bottom level! You can launch a search at any level as long as at least the first Field is selected.
+- **Goal:** This is perfect for exploring a new research area or seeing what journals are available in a broad discipline.
+
+:::info[Search Methodology]
+Wispar identifies journals by analyzing articles tagged with your selected topic via the **OpenAlex API**. These articles are grouped by their source (ISSN) to find relevant journals. Because this relies on article-level classification, you may occasionally see a journal that seems slightly outside your specified topic.
+:::
+
+## 2. Search by Title
+If you already know the name of the journal you are looking for, use this mode.
+
+- **How it works:** Simply enter keywords or the full name of a journal. 
+- **Results:** Wispar will return all journals that include those words in their title. 
+
+## 3. Search by ISSN
+For the most precise results, you can search using a journal's **International Standard Serial Number (ISSN)**.
+
+- **How it works:** Enter the 8-digit code (e.g., `2041-1723`).
+- **Results:** This will return the specific journal associated with that unique identifier. 
+
+---
+
+:::tip[Following Journals via Article Search]
+If a journal is available in **OpenAlex** but not found via the standard Journal search (Crossref), it can still be followed through the **Articles** search:
+
+1. Switch the search toggle to **Articles** and select **OpenAlex** as the provider.
+2. Open the filters and enter the ISSN (or a comma-delimited list of ISSNs).
+3. Set **Sort by** to "Publication date" and **Sort order** to "Descending".
+4. Save the query and launch the search.
+5. In the **Library** screen, go to the **Queries** tab, find the query card and enable the **Include in feed** toggle.
+
+The saved query will now act as a custom feed for those specific journals. **Note that OpenAlex publication data may update slower than Crossref**.
+:::
+
+:::tip[Following Journals]
+Once a journal is found, tap the **Follow** button. This adds the journal to the feed, ensuring the latest abstracts in that area of study are not missed.
+:::
