@@ -138,15 +138,15 @@ class _SyncSettingsScreenState extends State<SyncSettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text(
-            AppLocalizations.of(context)!.loginToSyncDevices,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          ),
-          SizedBox(
-            height: 16,
-          ),
           if (!pbService.isAuthenticated) ...[
+            Text(
+              AppLocalizations.of(context)!.loginToSyncDevices,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 16,
+            ),
             SyncAuthForm(
               onLoginSuccess: () {
                 setState(() {});
