@@ -171,7 +171,7 @@
     "emptySearchQuery": "検索語句を入力してください",
     "moreOptions": "その他のオプション",
     "publishedin": "掲載誌：",
-    "vertical": "Vertical",
+    "vertical": "縦向き",
     "addToFavorites": "お気に入りに追加",
     "sortby": "並べ替え",
     "lastUpdatedMinutes": "{minutes, plural, one{最終更新 1分前} other{最終更新 {minutes}分前}}",
