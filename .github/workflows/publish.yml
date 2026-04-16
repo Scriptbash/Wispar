@@ -31,6 +31,16 @@ jobs:
           echo "CMakeLists.txt not found in expected location"
           exit 1
         fi
+    - name: Patch dartjni
+      run: |
+        JNI_CMAKE=$(find $HOME/.pub-cache/hosted/pub.dev -path "*/jni-*/src/CMakeLists.txt" | head -n 1)
+        if [ -n "$JNI_CMAKE" ] && [ -f "$JNI_CMAKE" ]; then
+          sed -i '2i add_link_options("LINKER:--build-id=none")' "$JNI_CMAKE"
+          echo "Patched CMakeLists.txt in $JNI_CMAKE"
+        else
+          echo "Error: jni CMakeLists.txt not found in expected location."
+          exit 1
+        fi
     - name: Decode Keystore
       run: |
        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
