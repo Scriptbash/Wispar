@@ -1108,13 +1108,13 @@ class DatabaseHelper {
       List<String> issns = (maps[i]['issns'] as String?)?.split(',') ?? [];
 
       return DownloadedCard(
-        pdfPath: maps[i]['pdfPath'],
+        pdfPath: maps[i]['pdfPath'] ?? '',
         publicationCard: PublicationCard(
-          doi: maps[i]['doi'],
-          title: maps[i]['title'],
+          doi: maps[i]['doi'] ?? '',
+          title: maps[i]['title'] ?? '',
           issn: issns,
-          abstract: maps[i]['abstract'],
-          journalTitle: maps[i]['journalTitle'],
+          abstract: maps[i]['abstract'] ?? '',
+          journalTitle: maps[i]['journalTitle'] ?? '',
           publishedDate: DateTime.parse(maps[i]['publishedDate']),
           authors: [],
           url: '',
