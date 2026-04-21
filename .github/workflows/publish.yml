@@ -70,7 +70,7 @@ jobs:
     - name: Setup ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '4.0.2'
+        ruby-version: '4.0.3'
         bundler-cache: true
         working-directory: 'android'
     - name: Deploy to Play Store
