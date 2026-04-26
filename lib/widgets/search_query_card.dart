@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:wispar/services/string_format_helper.dart';
 import 'package:wispar/screens/article_search_results_screen.dart';
 import 'package:wispar/services/database_helper.dart';
+import 'package:wispar/services/sync_service.dart';
 
 class SearchQueryCard extends StatefulWidget {
   final int queryId;
@@ -32,6 +33,7 @@ class SearchQueryCard extends StatefulWidget {
 class SearchQueryCardState extends State<SearchQueryCard> {
   bool _includeInFeed = false;
   late DatabaseHelper databaseHelper;
+  final syncManager = SyncManager();
 
   @override
   void initState() {
@@ -249,6 +251,7 @@ class SearchQueryCardState extends State<SearchQueryCard> {
 
                       await databaseHelper.updateIncludeInFeed(
                           widget.queryId, _includeInFeed);
+                      syncManager.triggerBackgroundSync();
                     },
                   )
                 ],
