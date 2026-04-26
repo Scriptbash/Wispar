@@ -266,33 +266,70 @@ class HomeScreenState extends State<HomeScreen> {
   void _sortFeed() {
     setState(() {
       _filteredFeed.sort((a, b) {
+        int result = 0;
+
         switch (sortBy) {
           case 0: // Sort by published date
-            return a.publishedDate!.compareTo(b.publishedDate!);
+            if (a.publishedDate == null && b.publishedDate == null) {
+              result = 0;
+            } else if (a.publishedDate == null) {
+              result = 1;
+            } else if (b.publishedDate == null) {
+              result = -1;
+            } else {
+              result = a.publishedDate!.compareTo(b.publishedDate!);
+            }
+            break;
 
           case 1: // Sort by title
-            if (a.title.isEmpty && b.title.isEmpty) return 0;
-            if (a.title.isEmpty) return 1;
-            if (b.title.isEmpty) return -1;
-            return a.title.compareTo(b.title);
+            if (a.title.isEmpty && b.title.isEmpty) {
+              result = 0;
+            } else if (a.title.isEmpty) {
+              result = 1;
+            } else if (b.title.isEmpty) {
+              result = -1;
+            } else {
+              result = a.title.toLowerCase().compareTo(b.title.toLowerCase());
+            }
+            break;
 
           case 2: // Sort by journal title
-            if (a.journalTitle.isEmpty && b.journalTitle.isEmpty) return 0;
-            if (a.journalTitle.isEmpty) return 1;
-            if (b.journalTitle.isEmpty) return -1;
-            return a.journalTitle.compareTo(b.journalTitle);
+            if (a.journalTitle.isEmpty && b.journalTitle.isEmpty) {
+              result = 0;
+            } else if (a.journalTitle.isEmpty) {
+              result = 1;
+            } else if (b.journalTitle.isEmpty) {
+              result = -1;
+            } else {
+              result = a.journalTitle
+                  .toLowerCase()
+                  .compareTo(b.journalTitle.toLowerCase());
+            }
+            break;
 
           case 3: // Sort by first author's family name
             String aFamily = (a.authors.isNotEmpty ? a.authors[0].family : '');
             String bFamily = (b.authors.isNotEmpty ? b.authors[0].family : '');
-            if (aFamily.isEmpty && bFamily.isEmpty) return 0;
-            if (aFamily.isEmpty) return 1;
-            if (bFamily.isEmpty) return -1;
-            return aFamily.compareTo(bFamily);
+            if (aFamily.isEmpty && bFamily.isEmpty) {
+              result = 0;
+            } else if (aFamily.isEmpty) {
+              result = 1;
+            } else if (bFamily.isEmpty) {
+              result = -1;
+            } else {
+              result = aFamily.toLowerCase().compareTo(bFamily.toLowerCase());
+            }
+            break;
 
           default:
-            return 0;
+            result = 0;
         }
+
+        if (result == 0) {
+          result = a.doi.compareTo(b.doi);
+        }
+
+        return result;
       });
 
       if (sortOrder == 1) {
