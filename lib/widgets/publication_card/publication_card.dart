@@ -149,7 +149,8 @@ class PublicationCardState extends State<PublicationCard>
   void _handleFavoriteToggle() async {
     setState(() => isLiked = !isLiked);
     if (isLiked) {
-      await databaseHelper.insertArticle(widget, isLiked: true);
+      await databaseHelper.insertArticle(widget,
+          isLiked: true, updateSyncTimestamp: true);
     } else {
       await databaseHelper.removeFavorite(widget.doi);
     }
@@ -181,7 +182,8 @@ class PublicationCardState extends State<PublicationCard>
       case SwipeAction.favorite:
         setState(() => isLiked = !isLiked);
         if (isLiked) {
-          await databaseHelper.insertArticle(widget, isLiked: true);
+          await databaseHelper.insertArticle(widget,
+              isLiked: true, updateSyncTimestamp: true);
         } else {
           await databaseHelper.removeFavorite(widget.doi);
         }

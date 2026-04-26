@@ -837,21 +837,21 @@ class ArticleScreenState extends State<ArticleScreen> {
 
                               if (isLiked) {
                                 await databaseHelper.insertArticle(
-                                  PublicationCard(
-                                    title: widget.title,
-                                    abstract: widget.abstract,
-                                    journalTitle: widget.journalTitle,
-                                    issn: widget.issn,
-                                    publishedDate: widget.publishedDate,
-                                    doi: widget.doi,
-                                    authors: widget.authors,
-                                    url: widget.url,
-                                    license: widget.license,
-                                    licenseName: widget.licenseName,
-                                    publisher: widget.publisher,
-                                  ),
-                                  isLiked: true,
-                                );
+                                    PublicationCard(
+                                      title: widget.title,
+                                      abstract: widget.abstract,
+                                      journalTitle: widget.journalTitle,
+                                      issn: widget.issn,
+                                      publishedDate: widget.publishedDate,
+                                      doi: widget.doi,
+                                      authors: widget.authors,
+                                      url: widget.url,
+                                      license: widget.license,
+                                      licenseName: widget.licenseName,
+                                      publisher: widget.publisher,
+                                    ),
+                                    isLiked: true,
+                                    updateSyncTimestamp: true);
                               } else {
                                 await databaseHelper.removeFavorite(widget.doi);
                               }

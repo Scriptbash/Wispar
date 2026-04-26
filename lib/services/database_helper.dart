@@ -713,6 +713,7 @@ class DatabaseHelper {
     bool isSavedQuery = false,
     int? queryId,
     String pdfPath = '',
+    bool updateSyncTimestamp = false,
   }) async {
     final db = await database;
 
@@ -727,7 +728,9 @@ class DatabaseHelper {
     if (existingArticle.isNotEmpty) {
       // Article already exists, update the timestamp based on parameters
       final Map<String, dynamic> updateData = {};
-      updateData['updated_at'] = DateTime.now().toUtc().toIso8601String();
+      if (updateSyncTimestamp) {
+        updateData['updated_at'] = DateTime.now().toUtc().toIso8601String();
+      }
 
       if (isLiked && existingArticle[0]['dateLiked'] == null) {
         updateData['dateLiked'] =
@@ -779,7 +782,9 @@ class DatabaseHelper {
         'dateCached': isCached ? DateTime.now().toIso8601String() : null,
         'isSavedQuery': isSavedQuery ? 1 : 0,
         'query_id': queryId,
-        'updated_at': DateTime.now().toUtc().toIso8601String(),
+        'updated_at': updateSyncTimestamp
+            ? DateTime.now().toUtc().toIso8601String()
+            : DateTime.fromMillisecondsSinceEpoch(0).toUtc().toIso8601String(),
         'sync_id': const Uuid().v7(),
         'journal_id': journalId,
       });
