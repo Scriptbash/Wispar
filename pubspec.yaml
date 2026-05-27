@@ -69,7 +69,7 @@ dependencies:
   window_manager: ^0.5.1
   infinite_scroll_pagination: ^5.1.1
   uuid: ^4.5.3
-  pocketbase: ^0.23.2
+  pocketbase: ^0.24.0
   flutter_secure_storage: ^10.0.0
 
 dev_dependencies:
