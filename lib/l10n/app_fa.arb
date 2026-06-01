@@ -1,14 +1,180 @@
 {
-  "welcomeWispar": "به ویسپار خوش آمدید!",
-  "@welcomeWispar": {},
-  "appDescription": "با این برنامهٔ متن‌باز، از آخرین مقالات علمی باخبر باشید. سریع راه‌اندازیش می‌کنیم!",
-  "@appDescription": {},
-  "setupInstitutionalAccess": "راه اندازی دسترسی از طریق مؤسسه‌ یا دانشگاه شما (اختیاری)",
-  "@setupInstitutionalAccess": {},
-  "setupSelectInstitution": "دانشگاه یا موسسه مورد نظر خود را انتخاب کنید",
-  "@setupSelectInstitution": {},
-  "setupSelectedInstitution": "انتخاب شما:",
-  "@setupSelectedInstitution": {},
-  "setupLinkZotero": "اتصال به Zotero",
-  "@setupLinkZotero": {}
+    "welcomeWispar": "به ویسپار خوش آمدید!",
+    "appDescription": "با این برنامهٔ متن‌باز، از آخرین مقالات علمی باخبر باشید. سریع راه‌اندازیش می‌کنیم!",
+    "setupInstitutionalAccess": "راه اندازی دسترسی از طریق مؤسسه‌ یا دانشگاه شما (اختیاری)",
+    "setupSelectInstitution": "دانشگاه یا موسسه مورد نظر خود را انتخاب کنید",
+    "setupSelectedInstitution": "انتخاب شما:",
+    "setupLinkZotero": "اتصال به Zotero",
+    "institutionalAccess": "دسترسی سازمانی",
+    "setupInstitutionalAccessLong": "برای دسترسی به اشتراک‌های مجله‌های مؤسسهٔ خود، EZproxy آن را انتخاب کنید. این کار نیاز به وی‌پی‌ان یا دسترسی از داخل شبکهٔ مؤسسه را از بین می‌برد.",
+    "setupZoteroLong": "مقاله‌ها را مستقیماً به کتابخانهٔ Zotero خود بفرستید. آن‌ها به مجموعه‌ی دلخواه شما اضافه خواهند شد.",
+    "setupLinkMyZotero": "حساب Zotero خود را متصل کنید",
+    "setupOtherSettings": "سایر تنظیمات",
+    "setupOtherSettingsLong": "تنظیمات بیشتر در منوی تنظیمات برنامه در دسترس است. برای دسترسی به آن، از صفحهٔ اصلی، روی منوی سه‌نقطه در گوشهٔ بالا سمت راست ضربه بزنید.",
+    "setupAlmostSet": "همه چیز آماده است!... تقریباً!",
+    "setupAlmostSetLong": "در مرحله بعد، شما را به صفحه جستجو می‌بریم، جایی که می‌توانید مجله‌های مورد علاقه خود را دنبال کنید. فراموش نکنید که منوی دسته‌بندی را از «مقاله‌ها» به «مجله‌ها» تغییر دهید.",
+    "skip": "رد کردن",
+    "getStarted": "شروع کنید",
+    "notifications": "اعلان‌ها",
+    "notifPermsGranted": "دسترسی داده شد",
+    "notifPermsNotGranted": "دسترسی داده نشد",
+    "openAppSettings": "باز کردن تنظیمات",
+    "notificationSettingsMessage": "اعلان‌ها به طور دائمی غیرفعال شده‌اند. برای فعال کردن آنها، به تنظیمات اعلان برنامه بروید.",
+    "notificationContent": "مقاله‌های جدیدی در دسترس هستند!",
+    "notificationTitleJournal": "مجلات به‌روزرسانی شدند",
+    "notificationTitleQuery": "پرس‌وجوها به‌روزرسانی شدند",
+    "showPublicationCount": "نمایش تعداد انتشارها",
+    "selectFeed": "یک فید را انتخاب کنید",
+    "createCustomFeed": "ایجاد فید سفارشی",
+    "done": "انجام شد",
+    "edit": "ویرایش",
+    "clearAll": "پاک کردن همه",
+    "selectAll": "انتخاب همه",
+    "select": "انتخاب",
+    "customizeFeed": "فید سفارشی",
+    "feedName": "نام فید",
+    "followedJournals": "مجلات دنبال‌شده",
+    "moreJournals": "مجلات بیشتر",
+    "includeKeywords": "شامل کلیدواژه‌ها",
+    "excludeKeywords": "کلیدواژه‌های مستثنی",
+    "typePressSpace": "بنویسید و سپس space را بزنید…",
+    "errorFeedNameEmpty": "نامی برای فید وارد کنید",
+    "errorFeedNameAlreadyExists": "فیدی با همین نام موجود است",
+    "errorSelectOneJournal": "حداقل یک مجله انتخاب کنید",
+    "home": "خانه",
+    "@home": {
+        "description": "The home menu button and the app bar title when in the home screen."
+    },
+    "favorites": "علاقه‌مندی‌ها",
+    "@favorites": {
+        "description": "The favorites menu button and the app bar title when in the favorites screen."
+    },
+    "download": "بارگیری",
+    "@download": {
+        "description": "The verb to download, without the 'to'."
+    },
+    "delete": "پاک کردن",
+    "downloads": "بارگیری‌ها",
+    "@downloads": {
+        "description": "The downloads menu button and the app bar title when in the downloads screen."
+    },
+    "downloadSuccessful": "مقاله با موفقیت بارگیری شد!",
+    "downloadDeleted": "مقاله حذف شد!",
+    "noDownloads": "هیچ بارگیری‌ای ندارید.",
+    "settings": "تنظیمات",
+    "@settings": {
+        "description": "The settings option menu button and the app bar title when in the settings screen."
+    },
+    "journalLibraryEmpty": "هیچ مجله‌ای را دنبال نمی‌کنید. از منوی جستجو برای یافتن و دنبال کردن مجله‌ها استفاده کنید.",
+    "@journalLibraryEmpty": {
+        "description": "Message shown when the user is not following any journals."
+    },
+    "follow": "دنبال کردن",
+    "@follow": {
+        "description": "The button text shown on journal cards when it is not followed."
+    },
+    "unfollow": "دنبال نکردن",
+    "@unfollow": {
+        "description": "The button text shown on journal cards when it is followed."
+    },
+    "library": "کتابخانه",
+    "@library": {
+        "description": "The library menu button and the app bar title when in the library screen."
+    },
+    "journals": "مجلات",
+    "@journals": {
+        "description": "The journals menu button and the app bar title when in the journals screen."
+    },
+    "queries": "پرس‌وجوها",
+    "@queries": {
+        "description": "Title of the saved search queries tab."
+    },
+    "search": "جستجو",
+    "@search": {
+        "description": "Text shown inside the search screen app bar and for the seach button."
+    },
+    "searchPlaceholder": "جستجو…",
+    "@searchPlaceholder": {
+        "description": "Place holder text in the search input widget."
+    },
+    "filter": "فیلتر کردن کارت‌های انتشارها",
+    "filterResultsEmpty": "هیچ انتشاری با فیلتر شما منطبق نیست",
+    "filterDownloads": "فیلتر کردن بارگیری‌ها",
+    "filterFavorites": "فیلتر کردن علاقه‌مندی‌ها",
+    "emptyDOIError": "لطفا DOI را وارد کنید",
+    "searchByQuery": "جستجو بر اساس پرس‌وجو",
+    "searchOpenAlex": "OpenAlex (توصیه می‌شود)",
+    "source": "منبع: {search_provider}",
+    "everything": "همه‌چیز",
+    "titleAndAbstract": "عنوان و چکیده",
+    "title": "عنوان",
+    "searchIn": "جستجو در",
+    "addKeyword": "اضافه‌کردن کلیدواژه",
+    "enterKeyword": "یک کلیدواژه وارد کنید",
+    "displayName": "نمایش نام",
+    "citedByCount": "تعداد ارجاعات",
+    "worksCount": "تعداد کارها",
+    "publicationDate": "تاریخ انتشار",
+    "publishedAfter": "منتشر شده بعد از",
+    "publishedBefore": "منتشر شده قبل از",
+    "publishedBetween": "منتشر شده بین",
+    "noFilter": "بدون فیلتر",
+    "issnFilter": "فیلتر ISSN",
+    "openAccessOnly": "فقط دسترسی آزاد",
+    "selectStartDate": "تاریخ شروع را انتخاب کنید",
+    "selectEndDate": "تاریخ پایان را انتخاب کنید",
+    "queryPreview": "پیش‌نمایش پرس‌وجو:",
+    "searchByDOI": "جستجو بر اساس DOI",
+    "searchByTopic": "جستجو بر اساس موضوع",
+    "searchByTitle": "جستجو بر اساس عنوان",
+    "searchByISSN": "جستجو بر اساس ISSN",
+    "queryHasNoNameError": "برای ذخیرهٔ پرس‌وجو، باید نامی برای آن وارد کنید.",
+    "emptySearchQuery": "لطفاً یک پرس‌وجوی جستجو وارد کنید",
+    "journalSearchError": "هنگام جستجوی مجله‌ها، خطایی رخ داد.",
+    "selectTopicFirst": "ابتدا یک موضوع را انتخاب کنید!",
+    "moreOptions": "گزینه‌های بیشتر",
+    "saveQuery": "ذخیره‌ کردن این پرس‌وجو",
+    "queryName": "نام پرس‌وجو",
+    "includeInFeed": "قرار دادن در فید",
+    "dateSaved": "تاریخ ذخیره شدن",
+    "articles": "مقاله‌ها",
+    "@articles": {
+        "description": "As in scientific articles."
+    },
+    "category": "دسته‌بندی",
+    "publisher": "ناشر",
+    "publisherWithValue": "ناشر: {name}",
+    "publishedin": "منتشرشده در",
+    "subjects": "موضوعات",
+    "latestpublications": "آخرین انتشارات",
+    "authors": "نویسندگان",
+    "publishedon": "منتشر شده در {date}",
+    "@publishedon": {
+        "placeholders": {
+            "date": {
+                "type": "DateTime",
+                "format": "yMMMMd"
+            }
+        }
+    },
+    "abstract": "چکیده",
+    "graphicalAbstract": "چکیده‌ی تصویری",
+    "copy": "رونوشت",
+    "copydoi": "رونوشت DOI",
+    "copyAbstract": "رونوشت چکیده",
+    "copyTitle": "رونوشت عنوان",
+    "copyUrl": "رونوشت URL",
+    "copiedToClipboard": "در کلیپ‌بورد رونوشت شد!",
+    "doicopied": "DOI در کلیپ‌بورد رونوشت شد",
+    "@doicopied": {
+        "description": "Snackbar shown when the Copy DOI button is pressed."
+    },
+    "issnCopied": "ISSN در کلیپ‌بورد رونوشت شد",
+    "apiQueryCopied": "درخواست API در کلیپ‌بورد رونوشت شد",
+    "viewarticle": "مشاهده‌ی مقاله",
+    "articleViewer": "نمایشگر مقاله",
+    "openExternalBrowser": "باز کردن در مرورگر خارجی",
+    "errorOpenExternalBrowser": "قادر به باز کردن لینک در مرورگر دیگر نیست",
+    "openExternalApp": "باز کردن در برنامه‌ی خارجی",
+    "errorOpenExternalPdfApp": "قادر به باز کردن فایل PDF در برنامهٔ دیگر نیست"
 }
