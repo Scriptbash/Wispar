@@ -1,6 +1,5 @@
 plugins {
     id "com.android.application"
-    id "org.jetbrains.kotlin.android"
     id "dev.flutter.flutter-gradle-plugin"
 }
 
@@ -24,7 +23,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace "app.wispar.wispar"
     compileSdkVersion 36
-    ndkVersion "27.0.12077973"
+    ndkVersion "29.0.14206865"
 
     compileOptions {
         coreLibraryDesugaringEnabled true
