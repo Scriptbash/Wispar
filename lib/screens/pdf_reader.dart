@@ -6,7 +6,7 @@ import 'package:wispar/widgets/pdf_control_overlay.dart';
 import 'package:wispar/widgets/publication_card/publication_card.dart';
 import 'package:wispar/services/database_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:open_filex/open_filex.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -144,7 +144,7 @@ class PdfReaderState extends State<PdfReader> {
               tooltip: AppLocalizations.of(context)!.openInExternalPdfViewer,
               onPressed: () async {
                 try {
-                  OpenFilex.open(resolvedPdfPath);
+                  OpenFile.open(resolvedPdfPath);
                 } catch (e, stackTrace) {
                   logger.severe(
                       'Unable to open the PDF file in an external app.',
