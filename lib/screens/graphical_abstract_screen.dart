@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:open_filex/open_filex.dart';
-import '../generated_l10n/app_localizations.dart';
-import '../services/logs_helper.dart';
+import 'package:open_file/open_file.dart';
+import 'package:wispar/generated_l10n/app_localizations.dart';
+import 'package:wispar/services/logs_helper.dart';
 
 class ImageScreen extends StatelessWidget {
   final File imageFile;
@@ -28,7 +28,7 @@ class ImageScreen extends StatelessWidget {
             tooltip: AppLocalizations.of(context)!.openExternalApp,
             onPressed: () async {
               try {
-                OpenFilex.open(imagePath);
+                OpenFile.open(imagePath);
               } catch (e, stackTrace) {
                 logger.severe(
                     'Unable to open the graphical abstract image in an external app.',

@@ -50,7 +50,6 @@ dependencies:
   package_info_plus: ^10.1.0
   share_plus: ^13.1.0
   introduction_screen: ^4.0.0
-  open_filex: ^4.7.0
   google_nav_bar: ^5.0.7
   file_picker: ^12.0.0-beta.2
   flutter_local_notifications: 22.0.0
@@ -71,6 +70,7 @@ dependencies:
   uuid: ^4.5.3
   pocketbase: ^0.24.0
   flutter_secure_storage: ^10.0.0
+  open_file: ^3.5.11
 
 dev_dependencies:
   flutter_test:
