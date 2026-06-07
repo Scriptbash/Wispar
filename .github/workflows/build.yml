@@ -20,7 +20,6 @@ jobs:
       with:
         channel: 'stable'
     - run: flutter pub get
-    - run: dart run pdfrx:remove_wasm_modules
     - name: Patch dartjni
       run: |
         JNI_CMAKE=$(find $HOME/.pub-cache/hosted/pub.dev -path "*/jni-*/src/CMakeLists.txt" | head -n 1)
