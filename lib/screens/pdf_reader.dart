@@ -236,7 +236,8 @@ class PdfReaderState extends State<PdfReader> {
                                   );
                                 }
                               : null,
-                          maxScale: 8,
+                          sizeDelegateProvider:
+                              PdfViewerSizeDelegateProviderLegacy(maxScale: 8),
                           loadingBannerBuilder:
                               (context, bytesDownloaded, totalBytes) {
                             return Center(
