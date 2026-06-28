@@ -1,1 +1,380 @@
-{}
+{
+    "welcomeWispar": "Вітаємо у Wispar!",
+    "appDescription": "Застосунгок з відкритим кодом, який допоможе вам слідкувати за сучасною науковою літературою. Давайте все швиденько налаштуємо!",
+    "institutionalAccess": "Доступ від інституту",
+    "setupInstitutionalAccess": "Налаштувати доступ від інституту",
+    "setupInstitutionalAccessLong": "Оберіть EZproxy вашого інституту, щоб отримати доступ до підписаних журналів. Після цього вам не знадобиться VPN чи локальний доступ.",
+    "setupSelectInstitution": "Обеати мій заклад",
+    "setupSelectedInstitution": "Ви обрали:",
+    "setupLinkZotero": "Прив'язати Zotero",
+    "setupZoteroLong": "Надсилати публікації напряму у ваш Zotero. Вони будуть додані до колекції за вашим вибором.",
+    "setupLinkMyZotero": "Прив'язати мій акаунт Zotero",
+    "setupOtherSettings": "Інші налаштування",
+    "setupOtherSettingsLong": "Додаткові налаштування доступні в меню налаштувань застосунка. Вони доступні на домашньому екрані, еліптичне меню в правому верхньому кутку.",
+    "setupAlmostSet": "Все налаштовано!... Майже!",
+    "setupAlmostSetLong": "Зараз ми перейдемо до екрану пошуку, де ви зможете підписатись на улюблені журнали. Не забудьте перемкнути категорію меню зі'Статті' на 'Журнали'.",
+    "skip": "Пропустити",
+    "getStarted": "Почати",
+    "notifications": "Сповіщення",
+    "notifPermsGranted": "Дозвіл надано",
+    "notifPermsNotGranted": "Дозвіл не надано",
+    "openAppSettings": "Відкрити налаштування",
+    "notificationSettingsMessage": "Сповіщення повнісю вимкнено. Щоб включити, зайдіть в меню сповіщень застосунку.",
+    "notificationContent": "Доступні нові статті!",
+    "notificationTitleJournal": "Журнали оновлено",
+    "notificationTitleQuery": "Запити оновлено",
+    "downloadDeleted": "Статтю видалено!",
+    "noDownloads": "У вас жодних завантажень.",
+    "settings": "Налаштукання",
+    "@settings": {
+        "description": "The settings option menu button and the app bar title when in the settings screen."
+    },
+    "journalLibraryEmpty": "Ви не підписані на жодний журнал. Скористайтесь меню пошуку для підписки.",
+    "@journalLibraryEmpty": {
+        "description": "Message shown when the user is not following any journals."
+    },
+    "follow": "Підписатись",
+    "@follow": {
+        "description": "The button text shown on journal cards when it is not followed."
+    },
+    "unfollow": "Відписатись",
+    "@unfollow": {
+        "description": "The button text shown on journal cards when it is followed."
+    },
+    "library": "Бібліотека",
+    "@library": {
+        "description": "The library menu button and the app bar title when in the library screen."
+    },
+    "journals": "Журнали",
+    "@journals": {
+        "description": "The journals menu button and the app bar title when in the journals screen."
+    },
+    "queries": "Запити",
+    "@queries": {
+        "description": "Title of the saved search queries tab."
+    },
+    "search": "Пошук",
+    "@search": {
+        "description": "Text shown inside the search screen app bar and for the seach button."
+    },
+    "searchPlaceholder": "Пошук…",
+    "@searchPlaceholder": {
+        "description": "Place holder text in the search input widget."
+    },
+    "filter": "Відфільтрувати карти публікацій",
+    "filterResultsEmpty": "Жодних публікацій відповідних фільтрам",
+    "filterDownloads": "Відфільтрувати завантаження",
+    "filterFavorites": "Відфільтрувати улюблене",
+    "emptyDOIError": "Будь ласка, введіть DOI",
+    "searchByQuery": "Пошук за запитом",
+    "searchOpenAlex": "OpenAlex (рекомндовано)",
+    "source": "Джерело: {search_provider}",
+    "everything": "Все",
+    "titleAndAbstract": "Назва та реферат",
+    "title": "Назва",
+    "searchIn": "Шукати в",
+    "addKeyword": "Додати ключові слова",
+    "enterKeyword": "Ввести ключові слова",
+    "displayName": "Показати назву",
+    "publicationDate": "Дата публікації",
+    "publishedAfter": "Опубліковано після",
+    "publishedBefore": "Опубліковано до",
+    "publishedBetween": "Опубліковано між",
+    "noFilter": "Без фільтрів",
+    "issnFilter": "ISSN фільтр",
+    "openAccessOnly": "Лише з відкритим доступом",
+    "searchByDOI": "Шукати за DOI",
+    "searchByTopic": "Шукати за темами",
+    "searchByTitle": "Шукати за назвою",
+    "searchByISSN": "Шукати за ISSN",
+    "emptySearchQuery": "Будь ласка, введіть пошуковий запит",
+    "journalSearchError": "Підчас пошуку журналів, виникла помилка.",
+    "selectTopicFirst": "Спочатку оберіть тему!",
+    "articles": "Статті",
+    "@articles": {
+        "description": "As in scientific articles."
+    },
+    "category": "Категорія",
+    "publisher": "Видавництво",
+    "publisherWithValue": "Видавництво: {name}",
+    "publishedin": "Видано в",
+    "latestpublications": "Останні публікації",
+    "authors": "Автори",
+    "publishedon": "Видано {date}",
+    "@publishedon": {
+        "placeholders": {
+            "date": {
+                "type": "DateTime",
+                "format": "yMMMMd"
+            }
+        }
+    },
+    "abstract": "Реферат",
+    "download": "Завантажити",
+    "@download": {
+        "description": "The verb to download, without the 'to'."
+    },
+    "delete": "Видалити",
+    "downloads": "Завантаження",
+    "@downloads": {
+        "description": "The downloads menu button and the app bar title when in the downloads screen."
+    },
+    "downloadSuccessful": "Статтю завантажено!",
+    "selectEndDate": "Обрати кінечну дату",
+    "copy": "Копіювати",
+    "copydoi": "Копіювати DOI",
+    "copyAbstract": "Копіювати реферат",
+    "copyTitle": "Копіювати назву",
+    "copyUrl": "Копіювати URL",
+    "copiedToClipboard": "Копійовано в буфер!",
+    "doicopied": "DOI копійовано в буфер",
+    "@doicopied": {
+        "description": "Snackbar shown when the Copy DOI button is pressed."
+    },
+    "issnCopied": "ISSN копійовано в буфер",
+    "apiQueryCopied": "API запит копійовано в буфер",
+    "viewarticle": "Переглянути статтю",
+    "articleViewer": "Переглядач статтей",
+    "openExternalBrowser": "Відкрити іншому браузері",
+    "errorOpenExternalBrowser": "Не вдається відкрити посилання в зовнішньому браузері",
+    "openExternalApp": "Відкрити в іншій програмі",
+    "errorOpenExternalPdfApp": "Не вдається відкрити PDF файл в іншій програмі",
+    "favorite": "Улюблене",
+    "favoriteadded": "додано в улюблене",
+    "@favoriteadded": {
+        "description": "Snackbar shown when an article is added to the user's favorites."
+    },
+    "favoriteremoved": "видалено з улюбленого",
+    "@favoriteremoved": {
+        "description": "Snackbar shown when an article is removed from the user's favorites."
+    },
+    "abstractunavailable": "Реферат недоступний. Видавець не надав реферат в Crossref. Повний текст, все ж, має бути доступним.",
+    "@abstractunavailable": {
+        "description": "Text shown in the place of the abstract when it is unavailable."
+    },
+    "searchresults": "Результати пошуку",
+    "noFavorites": "В клюблених жодної статті. Натисніть іконку серця на карті публікації, яку ви бажаєте додати в улюблені!",
+    "@noFavorites": {
+        "description": "The message shown when the user has no articles in their favorites."
+    },
+    "apiSettings": "API налаштування",
+    "openAlexApiKey": "OpenAlex API Ключ",
+    "openAlexNoApiKey": "API ключ OpenAlex не надано. Будь ласка, додайте через налаштування, задля уникнення розривів.",
+    "appearance": "Вигляд",
+    "theme": "Тема",
+    "light": "Світла",
+    "dark": "Темна",
+    "systemtheme": "Системна тема",
+    "system": "Система",
+    "pdfTheme": "Тема перегляду PDF",
+    "pdfReadingOrientation": "Орієнтація PDF",
+    "vertical": "Вертикальна",
+    "horizontal": "Горизонтальна",
+    "publicationCard": "Карта публікації",
+    "publicationCardSettings": "Налаштування карти публікації",
+    "gestures": "Жести",
+    "infoDisplayOnCards": "Інформація на карті публікації",
+    "addToFavorites": "Додати в улюблене",
+    "hidePublication": "Приховати публікацію",
+    "swipeLeftAction": "Дія на лівий свайп",
+    "swipeRightAction": "Дія на правий свайп",
+    "showAllAbstracts": "Показати всі реферати",
+    "hideMissingAbstracts": "Приховати відсутні реферати",
+    "hideAllAbstracts": "Приховати всі реферати",
+    "licenseInfo": "Інформація про ліцензію",
+    "optionsMenu": "Меню налаштувань",
+    "unpaywallarticle": "Статтю отримано через Unpaywall",
+    "@unpaywallarticle": {
+        "description": "Snackbar shown when an article was fetched from Unpaywall."
+    },
+    "unpaywallArticleAvailable": "Статтю доступна через Unpaywall",
+    "unpaywallChoicePrompt": "Стаття доступна через Unpaywall. Що бажаєте зробити?",
+    "useUnpaywall": "Відкрити черезUnpaywall",
+    "goToWebsite": "На сайт",
+    "forwardedproxy": "Перенаправлено через проксі вашого закладу",
+    "@forwardedproxy": {
+        "description": "Snackbar shown when a request is intercepted and sent through the user's institution EZproxy."
+    },
+    "selectinstitution": "Оберіть ваш заклад",
+    "sort": "Сортувати",
+    "sortby": "Сортувати за",
+    "sortorder": "Порядок сортування",
+    "followingsince": "Підписка з {date}",
+    "@followingsince": {
+        "placeholders": {
+            "date": {
+                "type": "DateTime",
+                "format": "yMMMMd"
+            }
+        }
+    },
+    "lastUpdatedMinutes": "{minutes, plural, one{Останне оновлення 1 хвилину тому} other{Останне оновлення {minutes} хвилин тому}}",
+    "@lastUpdatedMinutes": {
+        "placeholders": {
+            "minutes": {
+                "type": "int"
+            }
+        }
+    },
+    "lastUpdatedHours": "{hours, plural, one{Останне оновлення 1 годину тому} other{Останне оновлення {hours} годин тому}}",
+    "@lastUpdatedHours": {
+        "placeholders": {
+            "hours": {
+                "type": "int"
+            }
+        }
+    },
+    "lastUpdatedDays": "{days, plural, one{Останне оновлення 1 день тому} other{Останне оновлення {days} днів тому}}",
+    "@lastUpdatedDays": {
+        "placeholders": {
+            "days": {
+                "type": "int"
+            }
+        }
+    },
+    "pendingUpdate": "Очікування оновлення",
+    "journaltitle": "Назва журналу",
+    "articletitle": "Назва статті",
+    "firstauthfamname": "Приізвище першого автора",
+    "datepublished": "Дата публікації",
+    "addedtoyourfav": "Додано до улюблених {date}",
+    "@addedtoyourfav": {
+        "placeholders": {
+            "date": {
+                "type": "DateTime",
+                "format": "yMMMMd"
+            }
+        }
+    },
+    "buildingfeed": "Ваша стрічка збирається. Будь ласка, зачекайте…",
+    "fetchingArticleFromJournal": "Підтягуються статті з {journalName}.",
+    "noPublicationFound": "Публікацій не знайдено.",
+    "failLoadMorePublication": "Не вдалось завантажити більше публікацій.",
+    "homeFeedEmpty": "Немає доступних публікацій. Карти публікацій з'являться, як тільки ви підпишетесь хоч на один журнал.",
+    "@homeFeedEmpty": {
+        "description": "The message shown when the feed in the home screen is empty."
+    },
+    "sharedMessage": "Поділитись через Wispar",
+    "@sharedMessage": {
+        "description": "Default sharing text."
+    },
+    "shareArticle": "Поділитись статтею",
+    "hiddenArticles": "Приховані публікації",
+    "noHiddenArticles": "Жодних прихованих публікацій",
+    "hideArticle": "Приховати публікацію",
+    "viewHiddenArticles": "Переглянути приховані публікації",
+    "unhideArticle": "Показати цю публікацію",
+    "sendToZotero": "Надіслати в Zotero",
+    "zoteroError": "Не вдалось надіслати статтю в Zotero. Будь ласка, перегляньте звіт для детальної інформації.",
+    "zoteroSettings": "Налаштування Zotero",
+    "zoteroPermissions1": "Wispar потрібен доступ на перегляд та запис вашого профіля Zotero для інтеграції.",
+    "zoteroPermissions2": "При створенні нового API ключа Zotero вам треба \"Надати доступ до бібліотеки\" та \"Надати доступ на запис\".",
+    "zoteroPermissions3": "Коли API ключ створно, скопіюйте його значення до текстового поля нижче.",
+    "zoteroCreateKey": "Створити новий API ключ",
+    "zoteroEnterKey": "Введіть новий API ключ",
+    "@zoteroEnterKey": {
+        "description": "Hint text shown in the text field where users can enter their Zotero API key."
+    },
+    "zoteroValidKey": "API ключ збережено!",
+    "@zoteroValidKey": {
+        "description": "Snackbar shown when a valid Zotero API key has been saved."
+    },
+    "zoteroInvalidKey": "API ключ недійсний!",
+    "@zoteroInvalidKey": {
+        "description": "Snackbar shown when an attempt to save an invalid Zotero API key is made."
+    },
+    "zoteroApiKeyEmpty": "API ключ Zotero ще не налаштовано. Будь ласка, налаштуйте API в налаштуваннях застосунка.",
+    "zoteroArticleSent": "Статтю надіслано в Zotero.",
+    "zoteroSpecificCollection": "Завжди відправляти в конкретну колекцію",
+    "zoteroSelectCollection": "Обрати колекцію",
+    "noZoteroCollectionSelected": "Колекцій не вибрано",
+    "zoteroSpecificCollection2": "Завжди відправляти в цю колекцію",
+    "zoteroNewCollection": "Нова колекція",
+    "zoteroCollectionName": "Назва колекції",
+    "create": "Створити",
+    "send": "Надіслати",
+    "save": "Зберегти",
+    "savedOn": "Збережено {date}",
+    "@savedOn": {
+        "placeholders": {
+            "date": {
+                "type": "DateTime",
+                "format": "yMMMMd"
+            }
+        }
+    },
+    "zoomOut": "Зменшити",
+    "zoomIn": "Збільшити",
+    "goToFirstPage": "До першої сторінки",
+    "goToLastPage": "До останньої сторінки",
+    "reportIssue": "Розповісти про проблему",
+    "cleanupIntervalHint": "Введіть кількість днів (1-365)",
+    "cleanupIntervalInvalidNumber": "Будь ласка, введіть дійсну кількість днів.",
+    "cleanupIntervalNumberNotBetween": "Будь ласка, введіть число від 1 до 365.",
+    "storagePermissionDenied": "Дозвіл не надано.",
+    "databaseExported": "Базу данних експортовано!",
+    "databaseExportFailed": "Не вдалось експортувати базу даних.",
+    "selectDBExportLocation": "Оберіть, куди експортувати базу даних.",
+    "exportDatabase": "Експортувати базу даних",
+    "exportingDatabase": "Експорт бази даних, зачекайте.",
+    "importDatabase": "Імпортувати базу даних",
+    "importingDatabase": "Імпортування бази даних, зачекайте.",
+    "databaseImportFailed": "Не вдалось імпортувати базу даних.",
+    "databaseImported": "Базу даних імпортовано!",
+    "customDatabaseLocation": "Власне розташування бази даних",
+    "selectCustomDBLocation": "Оберіть місце розташування файлів бази даних",
+    "currentDBLocation": "Поточне місце: {path}",
+    "movingDatabase": "Переміщення файлів бази даних. Зачекайте.",
+    "databaseMoved": "Файли бази даних переміщено!",
+    "databaseMoveFailed": "Не можливо перемістити файли бази даних: {error}",
+    "databaseConflictTitle": "Знайдені існуючі дані Wispar.",
+    "numberPublications": "{count, plural, =0{Жодних публікацій} =1{1 публікація} other{{count} публікацій}}",
+    "@numberPublications": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "done": "Зроблено",
+    "edit": "Редагувати",
+    "clearAll": "Очистити все",
+    "selectAll": "Обрати все",
+    "select": "Обрати",
+    "errorSelectOneJournal": "Оберіть хоча б один журнал",
+    "home": "Додому",
+    "@home": {
+        "description": "The home menu button and the app bar title when in the home screen."
+    },
+    "favorites": "Улюблені",
+    "@favorites": {
+        "description": "The favorites menu button and the app bar title when in the favorites screen."
+    },
+    "database": "База даних",
+    "databaseSettings": "Налаштування бази даних",
+    "databaseNotFound": "Файл бази даних не знайдено.",
+    "databaseConflictMessage": "У вибраній теці знайдено дані Wispar. Бажаєте використовувати існуючі файли, чи перезаписати поточною базою даних?",
+    "useExistingFiles": "Використовувати існуючі файли",
+    "overwriteFiles": "Перезаписати поточною базою даних",
+    "privacyPolicy": "Політика конфіденційності",
+    "about": "Про програму",
+    "madeBy": "Розроблено {app_author}",
+    "donate": "Підтримати",
+    "donateMessage": "Підтримайте розробку Wispar",
+    "@donateMessage": {
+        "description": "Text shown in the subtitle of the Donate button in the settings."
+    },
+    "viewLogs": "Переглянути звіти",
+    "deleteLogs": "Видалити звіти",
+    "logsDeleted": "Звіти видалено!",
+    "logsUnavailable": "Звіти відсутні.",
+    "logCopied": "Звіт скопійовано в буфер!",
+    "saveLogs": "Зберегти звіт",
+    "selectLogsLocation": "Оберіть місце збереження звітів.",
+    "logsExportedSuccessfully": "Звіти збережено!",
+    "logsExportedError": "Не вдається зберегти звіти.",
+    "shareLogs": "Поділитись звітами",
+    "translate": "Перекласти",
+    "noAiApiKeySetError": "AI API ключ не надано. Будь ласка, зайдіть в налаштування.",
+    "translationFailed": "Перекласти не вдалось",
+    "showTranslation": "Показати переклад",
+    "showOriginal": "Показати оригінал"
+}
