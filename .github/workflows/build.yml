@@ -87,7 +87,7 @@ jobs:
         with:
           channel: 'stable'
       - name: Setup nuget
-        uses: NuGet/setup-nuget@v2
+        uses: NuGet/setup-nuget@v4
       - run: flutter pub get
       - run: flutter build windows --debug
       - uses: actions/upload-artifact@v7
