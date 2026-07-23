@@ -152,7 +152,7 @@
     "shareLogs": "ログを共有する",
     "publishedAfter": "掲載日（以降）",
     "publishedBefore": "掲載日（以前）",
-    "publishedBetween": "公開期間：",
+    "publishedBetween": "掲載日範囲",
     "noFilter": "フィルターなし",
     "selectStartDate": "開始日を選択してください",
     "selectEndDate": "終了日を選択してください",
