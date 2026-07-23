@@ -28,6 +28,7 @@ class DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
     'fa': 'فارسی',
     'tr': 'Türkçe',
     'ru': 'Русский',
+    'uk': 'Українська',
     'ja': '日本語',
     'id': 'Bahasa Indonesia',
     'pt': 'Português',
@@ -52,6 +53,7 @@ class DisplaySettingsScreenState extends State<DisplaySettingsScreen> {
     const Locale('de'),
     const Locale('ko'),
     const Locale('zh'),
+    const Locale('uk'),
   ];
 
   @override
