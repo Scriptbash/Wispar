@@ -138,6 +138,7 @@ class WisparState extends State<Wispar> {
         Locale('pt'), // Portuguese
         Locale('de'), // German
         Locale('ko'), // Korean
+        Locale('uk'), // Ukrainian
         Locale.fromSubtags(
           languageCode: 'zh',
           scriptCode: 'Hans',
