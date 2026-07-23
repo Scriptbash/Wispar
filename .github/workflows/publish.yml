@@ -137,7 +137,7 @@ jobs:
         with:
           channel: 'stable'
       - name: Setup nuget
-        uses: NuGet/setup-nuget@v2
+        uses: NuGet/setup-nuget@v4
       - name: Flutter pub get
         run: flutter pub get
       - name: Build Windows release
