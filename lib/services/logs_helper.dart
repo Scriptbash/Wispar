@@ -58,11 +58,12 @@ class LogsService {
       final Uint8List logBytes =
           Uint8List.fromList(buffer.toString().codeUnits);
 
-      final String? outputPath = await FilePicker.saveFile(
+      final String? outputPath = (await FilePicker.saveFile(
         dialogTitle: AppLocalizations.of(context)!.selectLogsLocation,
         fileName: 'wispar_logs.txt',
         bytes: logBytes,
-      );
+      ))
+          ?.path;
 
       if (outputPath == null) {
         return;
