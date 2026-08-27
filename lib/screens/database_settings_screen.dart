@@ -454,14 +454,14 @@ class DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
   Future<void> _importDatabase() async {
     try {
       final dbHelper = DatabaseHelper();
-      FilePickerResult? result = await FilePicker.pickFiles(
+      final List<PlatformFile> result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['zip'],
       );
-      if (result == null || !mounted) return;
+      if (result.isEmpty || !mounted) return;
       await _showLoadingDialog(AppLocalizations.of(context)!.importingDatabase);
       await dbHelper.closeDatabase();
-      File selectedFile = File(result.files.single.path!);
+      File selectedFile = File(result.single.path!);
 
       final dbPath = await dbHelper.getDbPath();
       final dbDirectoryPath = p.dirname(dbPath);
